@@ -14,12 +14,12 @@ plugins:
 locale:              zh-CN
 title:               谭九鼎的博客
 name:                谭九鼎
-#description:         存放我的学习笔记。 # 默认会自动使用仓库的tagline
+#description:         # 默认会自动使用仓库的tagline
 #url:                 blog.imba-tjd.tech
 repository:          imba-tjd/imba-tjd.github.io
-logo:                /assets/favicon.png
-breadcrumbs: true
-github_username: imba-tjd
+logo:                https://avatars.githubusercontent.com/imba-tjd?s=40&v=4
+#breadcrumbs: true
+#github_username: imba-tjd
 
 search: true
 search_full_content: true
@@ -53,6 +53,7 @@ footer_scripts:
 
 include:
   - _pages
+  # - _posts
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
@@ -78,8 +79,6 @@ exclude:
   - Rakefile
   - README
   - tmp
-  - /docs # ignore Minimal Mistakes /docs
-  - /test # ignore Minimal Mistakes /test
 keep_files:
   - .git
   - .svn
@@ -148,11 +147,12 @@ defaults:
       type: posts
     values:
       layout: single
-      author_profile: true
+      # author_profile: true
       read_time: true
       comments: # true
       share: true
       related: true
+      toc: true
 
 
 # Defaults
