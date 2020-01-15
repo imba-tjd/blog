@@ -10,30 +10,30 @@ System.Net.Http
 
 ### HttpClient
 
--   构造函数可以直接用无参的，也可以接受HttpClientHandler
--   BaseAddress：获取或设置基地址， 使用URN时会拼接上
--   DefaultRequestHeaders：返回一个HttpRequestHeaders对象，具体见下面
--   Timeout：接受TimeSpan，默认100秒，DNS查询15秒，需要无限可用System.Threading.Timeout.InfiniteTimeSpan
--   GetByteArrayAsync、GetStreamAsync、GetStringAsync：只接受Uri对象或字符串，编码不清楚
--   PostAsync、PutAsync、PatchAsync、SendAsync、DeleteAsync、 GetAsync ：发送对应的请求，都支持取消；其中前三者需要HttpContent，Send就是自定义其它所有请求，需要HttpRequestMessage；返回都是`Task<HttpResponseMessage>`
--   `System.Net.ServicePointManager.DefaultConnectionLimit`限制最大并发数，默认是两个
+* 构造函数可以直接用无参的，也可以接受HttpClientHandler
+* BaseAddress：获取或设置基地址， 使用URN时会拼接上
+* DefaultRequestHeaders：返回一个HttpRequestHeaders对象，具体见下面
+* Timeout：接受TimeSpan，默认100秒，DNS查询15秒，需要无限可用System.Threading.Timeout.InfiniteTimeSpan
+* GetByteArrayAsync、GetStreamAsync、GetStringAsync：只接受Uri对象或字符串，编码不清楚
+* PostAsync、PutAsync、PatchAsync、SendAsync、DeleteAsync、 GetAsync ：发送对应的请求，都支持取消；其中前三者需要HttpContent，Send就是自定义其它所有请求，需要HttpRequestMessage；返回都是`Task<HttpResponseMessage>`
+* `System.Net.ServicePointManager.DefaultConnectionLimit`限制最大并发数，默认是两个
 
 ### HttpClientHandler
 
--   用于更改client的默认行为，传给它的构造函数
--   设置缓存行为、自动压缩、认证、代理、重定向（是否允许、最大次数）、SSL协议等
--   UseCookies默认为true，用CookieContainer可以获取/设置cookies
--   UseProxy默认为true，Proxy默认为null，会使用系统的代理设置；new Proxy可手动设置代理
--   AllowAutoRedirect默认为true（从https自动重定向http好像会抛异常）
--   AutomaticDecompression枚举默认为None不使用压缩，可以用GZip和Flags特性
--   可以使用链式处理：自定义一个继承DelegatingHandler的类，然后把下一个handler传给InnerHandler属性，最后一个通常是无参的HttpClientHandler。发送请求时是从前往后处理，接收时从后往前
--   core2.1后会自动使用更高级的SocketsHttpHandler，使用了Span
+* 用于更改client的默认行为，传给它的构造函数
+* 设置缓存行为、自动压缩、认证、代理、重定向（是否允许、最大次数）、SSL协议等
+* UseCookies默认为true，用CookieContainer可以获取/设置cookies
+* UseProxy默认为true，Proxy默认为null，会使用系统的代理设置；new Proxy可手动设置代理
+* AllowAutoRedirect默认为true（从https自动重定向http好像会抛异常）
+* AutomaticDecompression枚举默认为None不使用压缩，可以用GZip和Flags特性
+* 可以使用链式处理：自定义一个继承DelegatingHandler的类，然后把下一个handler传给InnerHandler属性，最后一个通常是无参的HttpClientHandler。发送请求时是从前往后处理，接收时从后往前
+* core2.1后会自动使用更高级的SocketsHttpHandler，使用了Span
 
 ### HttpContent
 
--   虽然回应信息也具有Content属性，但此处只记录作为Post的参数发送出去的信息
--   本身的构造函数是protected的，实际主要用ByteArrayContent的子类StringContent，或用StreamContent
--   具有Headers属性，可以除开client的头单独设置；提交表单等需要设置ContentType
+* 虽然回应信息也具有Content属性，但此处只记录作为Post的参数发送出去的信息
+* 本身的构造函数是protected的，实际主要用ByteArrayContent的子类StringContent，或用StreamContent
+* 具有Headers属性，可以除开client的头单独设置；提交表单等需要设置ContentType
 
 ### FormUrlEncodedContent
 
@@ -47,19 +47,19 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 
 ### HttpResponseMessage
 
--   StatusCode、IsSuccessStatusCode、EnsureSuccessStatusCode()
--   Content.ReadAsStringAsync()
--   RequestMessage获取导致此响应消息的请求消息，如果发生过跳转就会与最初的不同；可以获取Method和RequestUri等
--   Headers获取Date、Server（哪种http软件）、Content-Length、Expires、Cache-Control、Connection: Keep-Alive、Content-Type
--   Version
+* StatusCode、IsSuccessStatusCode、EnsureSuccessStatusCode()
+* Content.ReadAsStringAsync()
+* RequestMessage获取导致此响应消息的请求消息，如果发生过跳转就会与最初的不同；可以获取Method和RequestUri等
+* Headers获取Date、Server（哪种http软件）、Content-Length、Expires、Cache-Control、Connection: Keep-Alive、Content-Type
+* Version
 
 ### HttpRequestHeaders
 
--   本身位于System.Net.Http.Headers命名空间中，但是一般用`HttpClient.DefaultRequestHeaders`获取，回复用`response.Headers`；是引用类型，修改它就好，不需要也不能再赋值回来；或者每次请求也可以单独使用它
--   用于设置HTTP请求头
--   修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`
--   ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" }
--   TryGetValues可以获取它的值
+* 本身位于System.Net.Http.Headers命名空间中，但是一般用`HttpClient.DefaultRequestHeaders`获取，回复用`response.Headers`；是引用类型，修改它就好，不需要也不能再赋值回来；或者每次请求也可以单独使用它
+* 用于设置HTTP请求头
+* 修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`
+* ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" }
+* TryGetValues可以获取它的值
 
 给网址进行编码
 --------------
@@ -67,21 +67,21 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 > https://stackoverflow.com/questions/4396598/whats-the-difference-between-escapeuristring-and-escapedatastring
 > https://www.cnblogs.com/dudu/archive/2011/02/25/asp\_net\_UrlEncode.html
 
--   System.Net.WebUtility与System.Web.HttpUtility类似，但后者在.Net Core上是在Web命名空间里唯一的一个类了
--   Uri.EscapeUriString**适合把url中的中文编码掉**；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错； 只支持utf8，没有UnEscapeUriString方法
--   HttpUtility.UrlPathEncode：不要使用此方法，已弃用
--   WebUtility.UrlEncode：与Uri.EscapeDataString相比会编码波浪号；HttpUtility.UrlEncode可以指定编码方式
--   曾经空格会被编码成加号，后来弃用了；但表单的提交不符合最新标准，仍用加号，许多实现也支持把加号解码成空格
--   **最完美的方法**是先分别把键值对用Uri.EscapeDataString编码再手动合并起来，之后用Uri.UnescapeDataString解码；保留以下符号：`!'()*-._~0-9a-zA-Z`，会把`://`编码掉
--   WebUtility.HtmlEncode：此方法用于把Html特殊字符转换成Html实体，比如大于小于符号，与url编码无关
+* System.Net.WebUtility与System.Web.HttpUtility类似，但后者在.Net Core上是在Web命名空间里唯一的一个类了
+* Uri.EscapeUriString**适合把url中的中文编码掉**；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错； 只支持utf8，没有UnEscapeUriString方法
+* HttpUtility.UrlPathEncode：不要使用此方法，已弃用
+* WebUtility.UrlEncode：与Uri.EscapeDataString相比会编码波浪号；HttpUtility.UrlEncode可以指定编码方式
+* 曾经空格会被编码成加号，后来弃用了；但表单的提交不符合最新标准，仍用加号，许多实现也支持把加号解码成空格
+* **最完美的方法**是先分别把键值对用Uri.EscapeDataString编码再手动合并起来，之后用Uri.UnescapeDataString解码；保留以下符号：`!'()*-._~0-9a-zA-Z`，会把`://`编码掉
+* WebUtility.HtmlEncode：此方法用于把Html特殊字符转换成Html实体，比如大于小于符号，与url编码无关
 
 安全性
 ------
 
--   https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/security-in-network-programming
--   ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;：fx4.8/core3.0才支持1.3，win7必须设置这个否则只会使用1.0
--   HTTP/2: `AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);`、https://github.com/dotnet/samples/pull/992/files、https://docs.microsoft.com/zh-cn/dotnet/core/whats-new/dotnet-core-3-0\#http2-support
--   `ServicePointManager.Expect100Continue = true;`
+* https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/security-in-network-programming
+* ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;：fx4.8/core3.0才支持1.3，win7必须设置这个否则只会使用1.0
+* HTTP/2: `AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);`、https://github.com/dotnet/samples/pull/992/files、https://docs.microsoft.com/zh-cn/dotnet/core/whats-new/dotnet-core-3-0\#http2-support
+* `ServicePointManager.Expect100Continue = true;`
 
 Cookie
 ------
@@ -104,7 +104,7 @@ cookieContainer.Add(new Uri("..."), "a=a,b=b"/response.Cookies); // 省略第一
 例子
 ----
 
--   https://github.com/wangqiang3311/HttpRequestDemo
+* https://github.com/wangqiang3311/HttpRequestDemo
 
 发送HEAD
 --------
@@ -164,11 +164,11 @@ using (var receiveStream = response.GetResponseStream())
     content = new System.IO.StreamReader(receiveStream).ReadToEnd();
 ```
 
--   Req可设置UserAgent和Timeout
--   更改并发数：Req.ServicePoint.ConnectionLimit = int.MaxValue;
--   使用POST：request.Method = "POST";、request.ContentType、request.ContentLength = data.Length;、using request.GetRequestStream().Write(data, 0, data.Length);
--   表单：ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
--   TLS：request.Credentials = CredentialCache.DefaultCredentials;
+* Req可设置UserAgent和Timeout
+* 更改并发数：Req.ServicePoint.ConnectionLimit = int.MaxValue;
+* 使用POST：request.Method = "POST";、request.ContentType、request.ContentLength = data.Length;、using request.GetRequestStream().Write(data, 0, data.Length);
+* 表单：ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+* TLS：request.Credentials = CredentialCache.DefaultCredentials;
 
 ### WebClient
 
@@ -182,7 +182,7 @@ response.Close();
 其它
 ----
 
--   IIS Express：https://zhuanlan.zhihu.com/p/64424475
--   代理：https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/accessing-the-internet-through-a-proxy
+* IIS Express：https://zhuanlan.zhihu.com/p/64424475
+* 代理：https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/accessing-the-internet-through-a-proxy
 
 

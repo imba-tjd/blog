@@ -5,9 +5,9 @@ title: 杂项算法
 计算π的值
 ---------
 
--   [http://blog.csdn.net/xfxyy\_sxfancy/article/details/48378121](http://blog.csdn.net/xfxyy_sxfancy/article/details/48378121)
--   [https://www.zhihu.com/question/20756479](https://www.zhihu.com/question/20756479)
--   pi/2 = 1 +∑( πn / π(2n+1) )
+* [http://blog.csdn.net/xfxyy\_sxfancy/article/details/48378121](http://blog.csdn.net/xfxyy_sxfancy/article/details/48378121)
+* [https://www.zhihu.com/question/20756479](https://www.zhihu.com/question/20756479)
+* pi/2 = 1 +∑( πn / π(2n+1) )
 
 获取序列中随机一个元素
 ----------------------
@@ -78,12 +78,12 @@ define ICE_P(x) (sizeof(int) == sizeof((1 ? ((void)((x) * 0l)) : (int*)1)))
 解整数方程
 ----------
 
--   把一部分多项式移到等式右边，左边遍历计算所有值加到哈希表中，右边遍历计算所有值判断是否在哈希表中；在变量较多的时候，可以把10\*10\*10\*10这样的变成10\*10+10\*10
+* 把一部分多项式移到等式右边，左边遍历计算所有值加到哈希表中，右边遍历计算所有值判断是否在哈希表中；在变量较多的时候，可以把10\*10\*10\*10这样的变成10\*10+10\*10
 
 二分查找
 --------
 
--   mid = first + (last - first) / 2，这样不会溢出
+* mid = first + (last - first) / 2，这样不会溢出
 
 合并两个已经排序好的数组
 ------------------------
@@ -138,9 +138,9 @@ static IEnumerable<IEnumerable<int>> GetSeq(IEnumerable<int> collection)
 Base64
 ------
 
--   使用A-Za-z0-9和加减表示，原文非3字节倍数的补0并在编码后加等号
--   无法缓存，除非缓存整个网页，但HTML/CSS可能变化很快
--   大小变为4/3，不过gzip后差不多
+* 使用A-Za-z0-9和加减表示，原文非3字节倍数的补0并在编码后加等号
+* 无法缓存，除非缓存整个网页，但HTML/CSS可能变化很快
+* 大小变为4/3，不过gzip后差不多
 
 一行GCD(答案结果为y)
 --------------------
@@ -219,10 +219,10 @@ float SqrtByNewton(float x) {
 AC自动机
 --------
 
--   他们的总结是在Trie树上跑KMP
--   https://zhuanlan.zhihu.com/p/80325757
--   https://www.cnblogs.com/jason2003/p/9651073.html
--   https://blog.csdn.net/bestsort/article/details/82947639
+* 他们的总结是在Trie树上跑KMP
+* https://zhuanlan.zhihu.com/p/80325757
+* https://www.cnblogs.com/jason2003/p/9651073.html
+* https://blog.csdn.net/bestsort/article/details/82947639
 
 [表格驱动法](https://www.zhihu.com/question/37943171)
 -----------------------------------------------------
