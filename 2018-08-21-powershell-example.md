@@ -69,6 +69,6 @@ title: PowerShell实例
 创建快捷方式
 ------------
 
--   https://stackoverflow.com/questions/9701840
+* https://stackoverflow.com/questions/9701840
 
 

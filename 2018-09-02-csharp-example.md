@@ -38,18 +38,18 @@ DriveInfo[] di = DriveInfo.GetDrives();
 当前程序的真实路径
 ------------------
 
--   System.Reflection.Assembly.GetExecutingAssembly().Location
--   System.Windows.Forms.Application.ExecutablePath
--   System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName
+* System.Reflection.Assembly.GetExecutingAssembly().Location
+* System.Windows.Forms.Application.ExecutablePath
+* System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName
 
 ### 当前程序的MD5
 
--   https://stackoverflow.com/questions/8875296/how-do-i-get-the-hash-of-current-exe
+* https://stackoverflow.com/questions/8875296/how-do-i-get-the-hash-of-current-exe
 
 设置环境变量
 ------------
 
--   Environment.SetEnvironmentVariable(string name, string path, EnvironmentVariableTarget target)
+* Environment.SetEnvironmentVariable(string name, string path, EnvironmentVariableTarget target)
 
 XDocument 和XmlDocument
 -----------------------
@@ -160,29 +160,29 @@ app.Quit();
 
 > 无法将类型为“Microsoft.Office.Interop.Excel.ApplicationClass”的COM对象强制转换为接口类型“Microsoft.Office.Interop.Excel.\_Application”……
 
--   清理注册表的方法：https://www.cnblogs.com/sunxin88/articles/3456395.html
--   重新安装WPS，再完整卸载
+* 清理注册表的方法：https://www.cnblogs.com/sunxin88/articles/3456395.html
+* 重新安装WPS，再完整卸载
 
 System.Diagnostics.Process类
 ----------------------------
 
--   可以new出来，设置StartInfo属性，然后Start；也可以用静态的StartNew方法，传ProcessStartInfo实例
--   静态方法：GetCurrentProcess、GetProcesses、GetProcessesByName/ID
--   不清楚Close和Kill的区别，看起来都会强行关闭，可能是发送的信号不同
--   WaitForExit()、ExitCode
--   EnableRaisingEvents为true后可用Exited事件
+* 可以new出来，设置StartInfo属性，然后Start；也可以用静态的StartNew方法，传ProcessStartInfo实例
+* 静态方法：GetCurrentProcess、GetProcesses、GetProcessesByName/ID
+* 不清楚Close和Kill的区别，看起来都会强行关闭，可能是发送的信号不同
+* WaitForExit()、ExitCode
+* EnableRaisingEvents为true后可用Exited事件
 
 ### StartInfo
 
--   UseShellExecute：此处的shell包括GUI程序，即与对应文件相关联的外部程序；当不指定真正的exe时这个需要为true，例如FileName为网页和txt文件；需要重定向输入输出流时必须为false；默认值FX为true，Core为false；基本上为false就是在当前控制台中执行
--   WorkingDirectory：当UseShellExecute为true时，为需要执行的文件的路径，如果为空，与自己相同，而工作目录直接与自己相同；为false时，为设定那个文件的工作目录
--   Verb：启动时的谓词，是个字符串，可用Verbs获取所有可用的；一般包括Edit、Print等，不同后缀可用的不同
--   WindowStyle：普通、最小/大化、隐藏；UseShellExecute必须为true
--   CreateNoWindow：默认为false，为true时必须确保目标程序能自己结束，否则就必须用Kill；UseShellExecute为true或是Core会忽略该选项，前者一定会创建新窗口，而后者不支持创建窗口
+* UseShellExecute：此处的shell包括GUI程序，即与对应文件相关联的外部程序；当不指定真正的exe时这个需要为true，例如FileName为网页和txt文件；需要重定向输入输出流时必须为false；默认值FX为true，Core为false；基本上为false就是在当前控制台中执行
+* WorkingDirectory：当UseShellExecute为true时，为需要执行的文件的路径，如果为空，与自己相同，而工作目录直接与自己相同；为false时，为设定那个文件的工作目录
+* Verb：启动时的谓词，是个字符串，可用Verbs获取所有可用的；一般包括Edit、Print等，不同后缀可用的不同
+* WindowStyle：普通、最小/大化、隐藏；UseShellExecute必须为true
+* CreateNoWindow：默认为false，为true时必须确保目标程序能自己结束，否则就必须用Kill；UseShellExecute为true或是Core会忽略该选项，前者一定会创建新窗口，而后者不支持创建窗口
 
 ### 执行CMD命令
 
--   以管理员权限运行程序：Verb="runas"；但UseShellExecute必须为true
+* 以管理员权限运行程序：Verb="runas"；但UseShellExecute必须为true
 
 ```
 // 效果和执行了一个无回显的batch脚本一样，不会显示命令，只会有输出
