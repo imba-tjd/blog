@@ -6,7 +6,9 @@ tags:
     - ASP.NET
 ---
 
-# 基本概念
+## 基本概念
+
+### 初始化
 
 ```bash
 dotnet new webapp [--no-https]
@@ -40,7 +42,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
         app.UseHsts();
     }
 
-// 可手动用appsettings的https_port或services.AddHttpsRedirection(op=>{op.HttpsPort});指定要重定向到的端口；3.0后不手动指定仍会自动重定向到第一个可用的https端口，如果没有可用的就不重定向。此选项并不决定kestrel监听哪个https端口
+    // 可手动用appsettings的https_port或services.AddHttpsRedirection(op=>{op.HttpsPort});指定要重定向到的端口；3.0后不手动指定仍会自动重定向到第一个可用的https端口，如果没有可用的就不重定向。此选项并不决定kestrel监听哪个https端口
     app.UseHttpsRedirection(); // 用的307
 
     // app.UseDefaultFiles(); //测试下来只有Razor路由没有时才生效，增加wwwroot/Default.html和index.html的路由，但路径仍要对应，不会使用Pages下的html
@@ -78,7 +80,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
 
 #### 自定义管道和中间件
 
-```
+```c#
 app.Use(async (context, next) => {
     // Do work that doesn't write to the Response.
     await next.Invoke(); // 不调用它可使请求短路；向客户端发送响应后就不要再用这个方法了
@@ -108,7 +110,7 @@ public class XXXMiddleware {
 
 #### ConfigureServices和依赖注入
 
-```
+```c#
 // 使用方法：using xxx；构造函数接受IT的参数；Razor页面用@inject；在有IApplicationBuilder的时候是app.ApplicationServices.GetService<T>()；不知道需不需要判断为null？
 // DI的优点：没有强依赖，利于单元测试、不需要了解具体的服务类、不需要管理服务类的生命周期。
 public void ConfigureServices(IServiceCollection services) {
@@ -128,7 +130,7 @@ public void ConfigureServices(IServiceCollection services) {
 
 ### Configuration配置
 
-```
+```c#
 // 默认命名：appsettings.json以及appsettings.Development.json
 {
     "str_config": "value1_from_json",
@@ -177,7 +179,7 @@ config.GetSection("...").Exists();
 * 可以有注释和末尾的逗号
 * 可以在dotnet run的时候用--key=value传进去
 
-```
+```json
 {
   "Logging": {
     "LogLevel": {
@@ -189,7 +191,9 @@ config.GetSection("...").Exists();
   },
   "AllowedHosts": "*"
 }
+```
 
+```c#
 自定义选项：public class MyOptions { public int Option {get; set;} = 1 }
 注册：services.Configure<MyOptions>(Configuration); // 如果不在根中，要用GetSection()；参数也可为myOptions=>{}来手动设置值而不读取配置
 在类中使用：
@@ -203,7 +207,7 @@ _options = IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentVa
 * dotnet run会使用profiles中第一个"commandName"为"Project"的条目，代表使用Kestrel；VS里运行才使用那个IIS的配置
 * Linux下绑443等低端口会报错
 
-```
+```json
 "test": {
     "commandName": "Project",
     "launchBrowser": true, // 只对VS里启动有效，dotnet run是无效的
@@ -217,9 +221,9 @@ _options = IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentVa
 
 ### 多环境（environment）
 
-* 默认会读取ASPNETCORE\_ENVIRONMENT环境变量，默认有Development、Staging和Production；如果不设就是Production
+* 默认会读取ASPNETCORE_ENVIRONMENT环境变量，默认有Development、Staging和Production；如果不设就是Production
 * 在代码中，IHostingEnvironment env，env.IsDevelopment()
-* 也可以自定义，用env.IsEnvironment("your\_value")
+* 也可以自定义，用env.IsEnvironment("your_value")
 * 不同环境下会自动使用不同的appsettings.json，如appsettings.Development.json。但它只是会**覆盖**普通的，即如果有条目没覆盖，普通的仍有效
 * 可以手动创建不同的Startup，但要用“接受程序集名称的UseStartup重载”
 * ConfigureXX和ConfigureXXServices也有不同环境版本，且不用特殊调整
@@ -227,7 +231,7 @@ _options = IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentVa
 
 ### 日志
 
-```
+```c#
 // 自定义太复杂了，这里仅记录使用的方法；Application Insides可以图形化查看日志
 services.AddLogging(); // 然而这几个不做也能获得依赖注入和控制台日志
 Configure(ILoggerFactory loggerFac){ // 应该有选项能记录到文件
@@ -252,8 +256,7 @@ public class TodoController : ControllerBase {
 // 未看：https://www.youtube.com/watch?v=oXNslgIXIbQ
 ```
 
-主机
-----
+## 主机
 
 * 现在应使用Host静态类的方法，不要用WebHost类
 * Run()实际上用了RunAsync().GetAwaiter().GetResult();所以它跟直接await RunAsync()是差不多的。会阻止调用线程，直到关闭主机
@@ -262,7 +265,7 @@ public class TodoController : ControllerBase {
 * 如果不用UseStartup，也可以手动webBuilder.UseConfiguration().ConfigureServices().Configure()
 * 配置终结点：默认只会监听localhost的5000和5001，开发者模式下会用launchSettings，然而发布后不会。可在appsettings中用`"urls": "http://localhost;https://localhost"`或在代码中用UseUrls或UseSetting。在Docker中要用0.0.0.0或[::]或\*。端口也可以用\*
 
-```
+```c#
 static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
 
 static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -278,7 +281,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
 
 * 配置HTTPS使用证书：https://devblogs.microsoft.com/aspnet/configuring-https-in-asp-net-core-across-different-platforms/
 
-```
+```c#
 //CreateDefaultBuilder内部调用了UseKestrel；没有用那个才用webBuilder.UseKestrel
 ConfigureWebHostDefaults(webBuilder => {
     webBuilder.ConfigureKestrel(serverOptions => {
@@ -298,7 +301,9 @@ ConfigureWebHostDefaults(webBuilder => {
     .UseStartup<Startup>();
 });
 
-// 也可以用appsettings.json
+也可以用appsettings.json：
+
+```json
 {
   "Kestrel": {
     "Limits": {
@@ -314,10 +319,9 @@ ConfigureServices(IServiceCollection services) {
 }
 ```
 
-会话和应用状态
---------------
+## 会话和应用状态
 
-```
+```c#
 // SignalR 应用不应使用会话状态来存储信息
 
 services.AddDistributedMemoryCache(); // 不加也行？也可使用数据库真正的分布式后备缓存，此时使用Session前必须要用LoadAsync，否则同步获取会造成性能损失；可注册DistributedSession，则不调用LoadAsync时抛异常
@@ -344,15 +348,13 @@ public string Message { get; set; }
 * 一般需要在Cookie里存SessionId，恶意客户端可能一直发空的Cookie
 * 对于多页面只在最后一次提交数据，应该使用localstorage，因为每次访问都会携带所有的cookie，而服务端什么也不会处理；但它的安全性比cookie还差，连httponly都没有，所有JS代码都能读取；或者可以只用前端的方法，只是把多页数据隐藏了，点下一步不发数据
 
-其它类
-------
+## 其它类
 
 ### HttpContext
 
 * HttpContext.Connection.RemoteIpAddress
 
-Razor和MVC和WebApi
-------------------
+## Razor和MVC和WebApi
 
 ### Razor
 
@@ -373,10 +375,10 @@ Razor和MVC和WebApi
 * 用的MVVM思想
 * https://www.learnrazorpages.com
 * 看起来和JSP差不多，都是在HTML里写非前端代码，前后端不分离；而且MVC也一样：https://www.zhihu.com/question/328713931
-* ViewData是个字典，基本上和Model用处差不多，只是是弱类型的；在分布页面的时候需要用到，比如默认在\_Layout中获取了`@ViewData['Title']`设置为title
+* ViewData是个字典，基本上和Model用处差不多，只是是弱类型的；在分布页面的时候需要用到，比如默认在_Layout中获取了`@ViewData['Title']`设置为title
 * 直接访问域名的根会使用**Pages**文件夹（不是Page）下的Index；直接访问其它不带后缀的路径，如果存在文件会用文件，否则会用对应文件夹下的Index；如果还不存在，中间件会往下走，如果还没有，就返回空白页面
 
-```
+```c#
 .cshtml代码，Page：
 @page "..."//后面可跟路由规则。/或~/开头是以Page开始，否则是相对路径；{id}和{参数名:int}可添加参数，后者是约束，还可以是alpha:minlength(4)；{id?}中的问号表示参数可选，能把?id=xxx变成路径；View中可用RouteData.Values["id"];
 @model IndexModel // 可以是IEnumerable<T>，但不知道怎么用；一个viewmodel可以对应多个view
@@ -412,11 +414,11 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 ### 布局
 
 * 使用时路径可以写相对路径或绝对路径，如果是相对路径，寻找顺序为本文件夹、递归父文件夹、/Shared、/Page/Shared（至少分部视图是这样）；所以这些文件可以在子文件夹里创建，用来覆盖父文件夹的设置
-* Pages/\_ViewImports.cshtml中添加@using和@inject语句，且这个using也具有“自动路由”，后缀部分按它和目标之间的文件夹以点分隔，模板生成的前缀是项目名.Pages
-* Pages/\_ViewStart.cshtml中添加每个Page渲染前运行的语句（分部视图除外），默认只有`@{Layout = "_Layout";}`，在具体Page中可手动设为null或其它的
-* Pages/Shared/\_Layout.cshtml中添加大部分的模板，必须使用`@RenderBody()`渲染具体的部分；但又有个IgnoreBody方法，看不懂
+* Pages/_ViewImports.cshtml中添加@using和@inject语句，且这个using也具有“自动路由”，后缀部分按它和目标之间的文件夹以点分隔，模板生成的前缀是项目名.Pages
+* Pages/_ViewStart.cshtml中添加每个Page渲染前运行的语句（分部视图除外），默认只有`@{Layout = "_Layout";}`，在具体Page中可手动设为null或其它的
+* Pages/Shared/_Layout.cshtml中添加大部分的模板，必须使用`@RenderBody()`渲染具体的部分；但又有个IgnoreBody方法，看不懂
 * 区域：在具体Page中写`@section Scripts {...}`，在Layout中写`{@RenderSection("Scripts", required: false)}`，其中Scripts是标识符，required如果不为false，效果是找不到对应区域时报错
-* 分部视图：约定命名为Shared/\_XXXPartitial.cshtml，使用@{await HTML.RenderPartialAsync}渲染，此方法无返回值，性能更好
+* 分部视图：约定命名为Shared/_XXXPartitial.cshtml，使用@{await HTML.RenderPartialAsync}渲染，此方法无返回值，性能更好
 
 ### Tag Helper
 
@@ -458,11 +460,10 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * NoContent、Ok、CreatedAtRoute
 * [FromBody]等：用在函数形参上，推断绑定源，这样参数可以直接是自定义的类，有时不加也行
 * 返回值是Task IActionResult T，return可以直接返回对象，会自动序列化成JSON
-* 创建带有验证的WebApi：https://www.youtube.com/watch?v=\_LdiqQ13NBo；官方文档用的是IdentityServer4
+* 创建带有验证的WebApi：https://www.youtube.com/watch?v=_LdiqQ13NBo；官方文档用的是IdentityServer4
 * 默认输入和输出的都是JSON(Content-Type: application/json)，可以用AddControllers().AddXmlDataContractSerializerFormatters();添加XML的支持；收到不支持的Accept: xxx可以在AddControllers的选项里用ReturnHttpNotAcceptable=true，则会返回406 Not Acceptable
 
-IIS Express
------------
+## IIS Express
 
 * https://github.com/aspnet/AspNetCore/issues/1012
 * https://stackoverflow.com/questions/47899494
@@ -472,14 +473,12 @@ IIS Express
 * UseIISIntegration、UseIIS
 * https://docs.microsoft.com/zh-cn/aspnet/core/host-and-deploy/iis
 
-示例项目
---------
+## 示例项目
 
 * https://github.com/AiursoftWeb/Tracer
 * 获取请求发生的时间：https://stackoverflow.com/questions/50589179
 
-其它
-----
+## 其它
 
 * libman：vs自带的管理前端库的工具，类似于npm，可以直接放到wwwroot中；bundleconfig.json：把css合并起来，需要安装BuildBundlerMinifier，也可以minify。感觉都没什么用
 * 限制IP访问：https://github.com/stefanprodan/AspNetCoreRateLimit
@@ -499,12 +498,9 @@ IIS Express
 * Redis：https://www.bilibili.com/video/av41724451
 * .NET 微服务：适用于容器化 .NET 应用程序的体系结构（书，2.2）：https://docs.microsoft.com/zh-cn/dotnet/architecture/microservices/
 
-参考
-----
+## 参考
 
 * https://zhuanlan.zhihu.com/p/82903204
 * https://zhuanlan.zhihu.com/p/39692934
 * https://www.bilibili.com/video/av65313713
 * https://docs.microsoft.com/zh-cn/aspnet/core/fundamentals/index
-
-
