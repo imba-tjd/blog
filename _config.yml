@@ -1,0 +1,257 @@
+remote_theme: mmistakes/minimal-mistakes@4.17.2
+minimal_mistakes_skin: aqua
+
+# GitHub默认启用且不能禁用: coffeescript, default-layout, gist, github-metadata, optional-front-matter, paginate, readme-index, titles-from-headings, relative-links
+plugins:
+  - jekyll-include-cache
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-feed
+  - jemoji
+  - jekyll-seo-tag
+
+
+locale:              zh-CN
+title:               谭九鼎的博客
+name:                谭九鼎
+#description:         存放我的学习笔记。 # 默认会自动使用仓库的tagline
+#url:                 blog.imba-tjd.tech
+repository:          imba-tjd/imba-tjd.github.io
+logo:                /assets/favicon.png
+breadcrumbs: true
+github_username: imba-tjd
+
+search: true
+search_full_content: true
+# google_site_verification :
+
+author:
+  name   : 谭九鼎
+  avatar : https://avatars.githubusercontent.com/imba-tjd
+  bio    : 一只普通的计算机爱好者。
+  location: China
+  links: # footer也可以加这个
+    - label: Website
+      icon: "fas fa-fw fa-link"
+      url: https://imba-tjd.tech
+    - label: GitHub
+      icon: "fab fa-fw fa-github"
+      url: https://github.com/imba-tjd
+    - label: 知乎
+      icon: "fab fa-fw fa-zhihu"
+      url: https://www.zhihu.com/people/tan-jiu-ding/activities
+    - label: Steam
+      icon: "fab fa-fw fa-steam"
+      url: "https://steamcommunity.com/id/imba-tjd"
+
+
+# https://github.com/iBug/iBug-source/commit/24b88418ae0c954788755bf191568ac322b1ac4d
+footer_scripts:
+  - /assets/js/main.min.js
+  - 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/js/all.min.js" async defer type="text/javascript'
+
+
+include:
+  - _pages
+exclude:
+  - "*.sublime-project"
+  - "*.sublime-workspace"
+  - vendor
+  - .asset-cache
+  - .bundle
+  - .jekyll-assets-cache
+  - .sass-cache
+  - assets/js/plugins
+  - assets/js/_main.js
+  - assets/js/vendor
+  - Capfile
+  - CHANGELOG
+  - config
+  - Gemfile
+  - Gruntfile.js
+  - gulpfile.js
+  - LICENSE
+  - log
+  - node_modules
+  - package.json
+  - package-lock.json
+  - Rakefile
+  - README
+  - tmp
+  - /docs # ignore Minimal Mistakes /docs
+  - /test # ignore Minimal Mistakes /test
+keep_files:
+  - .git
+  - .svn
+
+
+# Markdown Processing
+markdown: GFM # 默认kramdown
+# kramdown:
+#   input: GFM
+#   hard_wrap: false
+#   auto_ids: true
+#   footnote_nr: 1
+#   entity_output: as_char
+#   toc_levels: 1..6
+#   #smart_quotes: lsquo,rsquo,ldquo,rdquo
+#   enable_coderay: false
+#   math_engine: mathjax
+#   parse_block_html: false # true
+#   syntax_highlighter: rouge
+#   syntax_highlighter_opts:
+#     css_class: 'highlight'
+#     span:
+#       line_numbers: false
+#     block:
+#       line_numbers: false
+#       #start_line: 1
+
+
+# Sass/SCSS
+# sass:
+#   sass_dir: _sass
+#   style: compressed
+
+
+# Outputting
+permalink: /:categories/:title/
+paginate: 8 # amount of posts to show
+paginate_path: /page:num/
+timezone:            Asia/Shanghai
+
+
+# Archives
+category_archive:
+  type: liquid
+  path: /categories/
+tag_archive:
+  type: liquid
+  path: /tags/
+jekyll-archives:
+  enabled:
+    - categories
+    - tags
+  layouts:
+    category: archive-taxonomy
+    tag: archive-taxonomy
+  permalinks:
+    category: /categories/:name/
+    tag: /tags/:name/
+
+
+# Defaults
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: # true
+      share: true
+      related: true
+
+
+# Defaults
+# defaults:
+#   - scope:
+#       path: ""
+#     values:
+#       layout: single
+#       author_profile: true
+#       share: true
+#       comments: true
+#       related: false
+#       toc_sticky: true
+#       header:
+#         overlay_image: "/image/header/mountain-1.jpg"
+#         show_overlay_excerpt: false
+#   - scope:
+#       path: ""
+#       type: posts
+#     values:
+#       read_time: true
+#       show_date: true
+#       related: true
+#       toc: true
+#       #toc_label: "On this page"
+#       #toc_icon: "file-alt"
+#   - scope:
+#       path: ""
+#       type: home
+#     values:
+#       #classes: wide
+#       sidebar:
+#         nav: home
+#       no_pagination: true
+#       header:
+#         overlay_image: "/image/header/water-1.jpg"
+#         overlay_filter: 0.1
+#   - scope:
+#       path: ""
+#       type: share
+#     values:
+#       #classes: wide
+#       related: true
+#       sidebar:
+#         nav: home
+#   - scope:
+#       path: ""
+#       type: project
+#     values:
+#       no_date: true
+#       related: false
+#       toc: true
+#       header:
+#         teaser: "/image/project/teaser/default.png"
+#         overlay_image: "/image/header/mountain-2.jpg"
+#   - scope:
+#       path: ""
+#       type: pages
+#     values:
+#       author_profile: false
+#       comments: false
+#       related: false
+#   - scope:
+#       path: ""
+#       type: cn
+#     values:
+#       lang: "zh-CN"
+#       locale: "zh-CN"
+#       read_time: true
+#       show_date: true
+#       comments: true
+#       words_per_minute: 350
+#       sidebar:
+#         nav: home
+#       toc: true
+#       toc_label: "目录"
+#       toc_icon: "th-list"
+#       header:
+#         overlay_image: "/image/header/cloud-1.jpg"
+#         overlay_filter: 0.2
+#   - scope:
+#       path: ""
+#       type: tag
+#     values:
+#       comments: false
+#       related: false
+#       header:
+#         overlay_image: "/image/header/water-2.jpg"
+#   - scope:
+#       path: ""
+#       type: category
+#     values:
+#       comments: false
+#       related: false
+#       header:
+#         overlay_image: "/image/header/water-2.jpg"
+
+# Caution: Inline JavaScript comments can cause problems with compress.html, so be sure to /* comment this way */ and avoid // these sorts of comments.
+
+# Referred from :
+#   - https://github.com/iBug/iBug-source/blob/master/_config.yml
+#   - https://github.com/mmistakes/minimal-mistakes/blob/master/_config.yml
