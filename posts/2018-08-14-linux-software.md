@@ -2,10 +2,7 @@
 title: Linux软件
 ---
 
-软件包
-------
-
-### APT
+## APT
 
 * 使用`grep " install " /var/log/apt/history.log`可查看最近安装的软件，**不包含因为依赖装上的**
 * 清理已删除的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
@@ -18,7 +15,7 @@ title: Linux软件
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
 * netcat
 
-#### Debian阿里源
+### Debian阿里源
 
 ```
 # src是获取源代码时用的，不必要
@@ -31,6 +28,7 @@ deb https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
 # deb-src https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
 deb https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
 # deb-src https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
+
 # testing
 deb https://mirrors.aliyun.com/debian testing main contrib non-free
 deb https://mirrors.aliyun.com/debian testing-updates main contrib non-free
@@ -38,7 +36,9 @@ deb https://mirrors.aliyun.com/debian testing-backports main contrib non-free
 deb https://mirrors.aliyun.com/debian-security testing-security main contrib non-free
 ```
 
-#### Ubuntu
+### Ubuntu
+
+发行版命名，现在最新版是eoan，测试版是focal。可以看出是根据首字母来的。
 
 ```
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco main restricted universe multiverse
@@ -89,14 +89,12 @@ trusted-host = mirrors.aliyun.com
 * [deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)：安装后可安装微信QQ
 * tldr：https://github.com/tldr-pages/tldr，Debian没有，找bash版本
 
-其他
-----
+## 其他
 
 * /usr/games/fortune
 * cowsay
 
-Apache
-------
+## Apache
 
 * 配置文件：/etc/apache2/apache2.conf（Debian系）、/etc/httpd/conf/httpd.conf（RH系）；里面显示端口配置在/etc/apache2/ports.conf
 * 网站目录：/var/www/html/
@@ -108,7 +106,7 @@ Apache
 
 1. Apache1需要去掉`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和adf`Include conf/extra/httpd-vhosts.conf`前的井号。Apache2不是这样。把sites-available下的文件软连接到sites-enable下即可启用，mods同理。ssl默认是不启用的。
 2. Apache1修改conf/extra/httpd-vhosts.conf，Apache2直接改sites-available里的文件。
-3.  修改虚拟主机文件
+3. 修改虚拟主机文件
 
 ```
 <VirtualHost *:80>
@@ -138,10 +136,8 @@ Apache
 * deny 与allow之间没有空格只有一个逗号隔开
 * 如何设置只允许域名访问，不允许直接ip访问？
 * 需要用户名和密码认证才能访问？
--
 
-VMware Tools
-------------
+## VMware Tools
 
 ### 安装
 
@@ -159,9 +155,6 @@ VMware Tools
 * 卸载：sudo perl  /usr/bin/vmware-uninstall-tools.pl
 * 收缩硬盘大小：sudo vmware-toolbox-cmd disk shrink /
 
-LXDE
-----
+## LXDE
 
 * 改变DPI：https://iamjagjeetubhi.wordpress.com/2017/07/01/change-dpi-in-lxde/
-
-
