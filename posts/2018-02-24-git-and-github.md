@@ -5,118 +5,74 @@ title: Git/GitHub笔记
 ## OverView
 
 * git init/git clone username@host:/path/to/repository
-* git pull [--rebase] [upstream master] = git fetch + git
-    merge（到当前分支)，rebase会先stash当前更改，更新后再pop
-* git add
-    -A（所有修改）/.或\*（包括修改和新建，不包括删除）/-u（更新，包括修改和删除，不包括新建）
+* git pull [--rebase] [upstream master] = git fetch + git merge（到当前分支)，rebase会先stash当前更改，更新后再pop
+* git add -A（所有修改）/.或\*（包括修改和新建，不包括删除）/-u（更新，包括修改和删除，不包括新建）
 * git status，加-uno会不检测未跟踪的文件，大大加快执行速度
 * git commit [-m "message"][-a]
 * git push origin master
 
 ## Branch
 
-* git checkout [-b/B] feature_x
-    [o/branchname]：[新建并]切换分支，检出到远端分支时HEAD会变成分离状态。第二个分支可以填跟踪的远端分支，则push时会更新那个分支。文件发送冲突且不想要当前时可用-f直接切换
-* git branch
-    [-avv]：不加显示本地，r仅显示remote，a显示所有，v额外显示最后一次commit信息，vv显示对应的远端分支。加名字进新建分支
+* git checkout [-b/B] feature_x [o/branchname]：[新建并]切换分支，检出到远端分支时HEAD会变成分离状态。第二个分支可以填跟踪的远端分支，则push时会更新那个分支。文件发送冲突且不想要当前时可用-f直接切换
+* git branch [-avv]：不加显示本地，r仅显示remote，a显示所有，v额外显示最后一次commit信息，vv显示对应的远端分支。加名字进新建分支
 * git branch -d/D feature_x：删除本地分支
-* git branch -f patch-1
-    hash：可以把指定分支强制移动到指定位置；patch-1不存在会新建分支
-* git branch -m [oldName]
-    newName：重命名分支，不加旧名就是当前分支；重命名远端的只能先删除
-* git fetch
-    -p或用remote：更新远程上删除了的分支；但本地分支只会显示未发布，不会主动删除
-* 删除远端分支：git push origin --delete [patch-1]或git push origin
-    :patch-1
+* git branch -f patch-1 hash：可以把指定分支强制移动到指定位置；patch-1不存在会新建分支
+* git branch -m [oldName] newName：重命名分支，不加旧名就是当前分支；重命名远端的只能先删除
+* git fetch -p或用remote：更新远程上删除了的分支；但本地分支只会显示未发布，不会主动删除
+* 删除远端分支：git push origin --delete [patch-1]或git push origin :patch-1
 * 发布远端没有的分支： git push -u origin patch-1
-* 把当前内容建立为一个没有历史的分支：git checkout --orphan
-    newBranch；但注意原来commit了的内容会自动stage，注意gitignore
+* 把当前内容建立为一个没有历史的分支：git checkout --orphan newBranch；但注意原来commit了的内容会自动stage，注意gitignore
 
 ### 合并分支
 
-* git merge bugFix
-    [master]：把bugFix分支合并到**当前分支**/master里，bugFix分支指针不变；`--no-ff`可以强制不快速前进
-* git cherry-pick [hash1
-    ...]：选择某几次改动复制到当前branch/HEAD；可用 `A..B`
-    表示范围，A应该更老，但不包括A，如果要包括就用A^
-* git rebase master
-    [bugFix]：把**bugFix**/当前分支以依次复制提交的方式合并到master里，并移动**bugFix**到master的前面（或之后的节点），master分支指针不变；之后需checkout
-    master, rebase bugFix或者换一下参数顺序快速前进
-* git rebase master [bugFix]
-    [-i]：选择当前/bugFix相对于master（可以为HEAD\~n）需要哪些提交或重新排序，**只会更改当前分支**；如果路径上有其他指针，它们会保留；squash最前面必须是pick
-* 注意快速前进是切换到落后的分支，git merge/rebase
-    先进的分支；两者一样是因为rebase没有要复制的，只利用它移动当前到指定之后
+* git merge bugFix [master]：把bugFix分支合并到**当前分支**/master里，bugFix分支指针不变；`--no-ff`可以强制不快速前进
+* git cherry-pick [hash1 ...]：选择某几次改动复制到当前branch/HEAD；可用`A..B`表示范围，A应该更老，但不包括A，如果要包括就用A^
+* git rebase master [bugFix]：把**bugFix**/当前分支以依次复制提交的方式合并到master里，并移动**bugFix**到master的前面（或之后的节点），master分支指针不变；之后需checkout master, rebase bugFix或者换一下参数顺序快速前进
+* git rebase master [bugFix] [-i]：选择当前/bugFix相对于master（可以为HEAD\~n）需要哪些提交或重新排序，**只会更改当前分支**；如果路径上有其他指针，它们会保留；squash最前面必须是pick
+* 注意快速前进是切换到落后的分支，git merge/rebase 先进的分支；两者一样是因为rebase没有要复制的，只利用它移动当前到指定之后
 * git merge -：the '-' is shorthand for the previous branch
-* git rebase -i \<hash\> --autosquash：简单的交互性 rebase，会让 git
-    在正确的位置里设置 fixup；不加-i会直接跳过review
-* git的rebase和GitHub的rebaes不同：都是在目标分支上再现，但git会移动当前分支到目标分支前面，而目标分支不动；GitHub则是目标分支移动，当前分支不变，相当于rebase后ff
-    master且又把“当前”分支切换回原来的
-* 如果要继续在子分支上开发，最好选择merge，这样才能有公共的父结点；否则下一次合并的时候会再把之前的比较一遍，一旦master有提交，就会产生冲突。另一种方法是squash前把master
-    merge进dev，这一步可能产生冲突，是正常现象，否则合并到master本来也会冲突；这样就会产生一个公共结点，再把dev
-    squash进master；如果担心污染dev此处也可以用squash
+* git rebase -i \<hash\> --autosquash：简单的交互性 rebase，会让 git 在正确的位置里设置 fixup；不加-i会直接跳过review
+* git的rebase和GitHub的rebaes不同：都是在目标分支上再现，但git会移动当前分支到目标分支前面，而目标分支不动；GitHub则是目标分支移动，当前分支不变，相当于rebase后ff master且又把“当前”分支切换回原来的
+* 如果要继续在子分支上开发，最好选择merge，这样才能有公共的父结点；否则下一次合并的时候会再把之前的比较一遍，一旦master有提交，就会产生冲突。另一种方法是squash前把master merge进dev，这一步可能产生冲突，是正常现象，否则合并到master本来也会冲突；这样就会产生一个公共结点，再把dev squash进master；如果担心污染dev此处也可以用squash
 
 #### 冲突
 
 * 解决冲突后需要add，然后用git merge --continue，不用加分支
-* git和GitHub不同：后者是把base往source合并一次，然后再无冲突合并回base；前者直接在merge
-    commit中解决了
+* git和GitHub不同：后者是把base往source合并一次，然后再无冲突合并回base；前者直接在merge commit中解决了
 
 ## Remote
 
 * git remote add/remove origin *server*
 * git remote set-url origin ...：修改远端url
-* git branch [-u] origin/master
-    foo：让foo跟踪**远端**的master分支，如果不用-b新建时指定而是之后修改就要这样；如果当前分支是foo则可以省略分支
-* git remote update origin --prune：与git fetch
-    -p效果一样，但不加分支则默认处理所有分支
-* git config branch.master.remote
-    gitee：把master分支的默认push和比较设为指定remote
+* git branch [-u] origin/master foo：让foo跟踪**远端**的master分支，如果不用-b新建时指定而是之后修改就要这样；如果当前分支是foo则可以省略分支
+* git remote update origin --prune：与git fetch -p效果一样，但不加分支则默认处理所有分支
+* git config branch.master.remote gitee：把master分支的默认push和比较设为指定remote
 
 ## 撤销更改
 
-* git reset
-    --soft：把分支往回移，做的改变留在暂存区（stage/index）里，即已跟踪未提交；git
-    reset --mixed：默认选项，做的改变留在本地（working
-    copy），即未跟踪未提交；git reset --hard
-    完全与回移到的地点一致，会丢弃本地更改，但不会丢弃未跟踪（从来没有被添加过）的文件
-* git reset --soft HEAD^：把东西从commit还原到暂存区里；git reset
-    HEAD：去掉暂存区里的东西；git reset --hard
-    HEAD：丢弃在本地的所有改动；git reset --hard
-    origin/master：丢弃在本地的所有改动与提交
+* git reset --soft：把分支往回移，做的改变留在暂存区（stage/index）里，即已跟踪未提交；git reset --mixed：默认选项，做的改变留在本地（working copy），即未跟踪未提交；git reset --hard 完全与回移到的地点一致，会丢弃本地更改，但不会丢弃未跟踪（从来没有被添加过）的文件
+* git reset --soft HEAD^：把东西从commit还原到暂存区里；git reset HEAD：去掉暂存区里的东西；git reset --hard HEAD：丢弃在本地的所有改动；git reset --hard origin/master：丢弃在本地的所有改动与提交
 * 如果reset的不是当前分支，则会进入分离模式
-* git revert
-    pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
-* git commit
-    --amend：修补最后一次的提交（但算作一次新提交），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git
-    rebase -i HEAD\~n把之前需要修改的放到最后（用edit），修改后再放回去
+* git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
+* git commit --amend：修补最后一次的提交（但算作一次新提交），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD\~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup \<hash\>：自动写提交信息，把stage了的提交
-* git checkout -- \<filename\>：此命令会使用 HEAD
-    中的最新内容替换掉你的工作目录中的文件。已添加到暂存区的改动以及新文件都不会受到影响
-* git reset --hard
-    upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
+* git checkout -- \<filename\>：此命令会使用 HEAD 中的最新内容替换掉你的工作目录中的文件。已添加到暂存区的改动以及新文件都不会受到影响
+* git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
 * git checkout --merge br：相当于stash, checkout, stash pop
 
-Config
-------
+## Config
 
 * global的设置在\~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；可以用-e打开文本编辑器进行操作
 * color.ui true：彩色的 git 输出；但默认为auto，不需要更改
-* --global credential.helper
-    store：储存密码，输入一次以后就会明文放在\~/.git-credential里
+* --global credential.helper store：储存密码，输入一次以后就会明文放在\~/.git-credential里
 * --global user.email、--global user.name
-* gc.pruneexpire "30 days"：不在branch上的30天后清理；gc.auto
-    0：关闭gc
+* gc.pruneexpire "30 days"：不在branch上的30天后清理；gc.auto 0：关闭gc
 * core.quotePath false：当路径出现中文时，不会进行转义，即能显示中文
-* git config core.ignorecase
-    false：默认情况下，已经push到远端的文件夹，在本地只修改文件名大小写是不会被检测的；但启用后仅仅只是会push一个另一个大小写的文件过去？可以考虑在Linux端改名，Win端直接删除文件，然后pull
-* git config --global core.editor code
-    ：编辑信息时要使用的编辑器；`"code --wait`是使用VSC；-e可以调用编辑器编辑config
-* git config --global https.https://github.com.proxy
-    socks5://127.0.0.1:1080这样可以只访问github时代理，但对ssh无效，ssh要修改`~/.ssh/config`
-* git config --global http.postBuffer
-    524288000有人说很有效，有人说无效
-* git config --get-all
-    remote.origin.url：获取对应section的值，与--list中看到的一样
+* git config core.ignorecase false：默认情况下，已经push到远端的文件夹，在本地只修改文件名大小写是不会被检测的；但启用后仅仅只是会push一个另一个大小写的文件过去？可以考虑在Linux端改名，Win端直接删除文件，然后pull
+* git config --global core.editor code ：编辑信息时要使用的编辑器；`"code --wait`是使用VSC；-e可以调用编辑器编辑config
+* git config --global https.https://github.com.proxy socks5://127.0.0.1:1080这样可以只访问github时代理，但对ssh无效，ssh要修改`~/.ssh/config`
+* git config --global http.postBuffer 524288000有人说很有效，有人说无效
+* git config --get-all remote.origin.url：获取对应section的值，与--list中看到的一样
 
 ### diff
 
@@ -129,64 +85,39 @@ Config
 
 ## 记录
 
-* git blame [filename]：查看文件每一行是由谁在哪次commit中修改的,
-    按q退出，-w忽略空格变更
-* git show
-    [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；可以查看tag
+* git blame [filename]：查看文件每一行是由谁在哪次commit中修改的, 按q退出，-w忽略空格变更
+* git show [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；可以查看tag
 * git log --stat：查看提交信息及更新的文件
-* git log --graph --oneline --decorate --all：通过 ASCII
-    艺术的树形结构来展示所有的分支
-* git archive --format tar --output /path/to/file.tar master：将
-    master 以 tar 格式打包到指定文件
+* git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
+* git archive --format tar --output /path/to/file.tar master：将 master 以 tar 格式打包到指定文件
 * 使用git diff --check检查行尾有没有多余的空白
 * cat .git/HEAD：显示HEAD的指向
-* git tag [tagname] [hash/-d]；git push
-    --tags：推送所有标签；删除本地标签后再删除远端标签：git push origin
-    :refs/tags/v0.9
+* git tag [tagname] [hash/-d]；git push --tags：推送所有标签；删除本地标签后再删除远端标签：git push origin :refs/tags/v0.9
 * git reflog：查看所有记录，包括reset的
 * git log branch1...branch2：显示branch2比branch1多了哪些提交
 * git whatchanged xxx：查看某文件的修改历史
-* [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)：`git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`；--all会修改所有的分支，prune
-    empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败；如果文件路径里有空格，把外层改成双引号，路径用单引号
+* [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)：`git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`；--all会修改所有的分支，prune empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败；如果文件路径里有空格，把外层改成双引号，路径用单引号
 * 彻底重命名且不会丢失历史：`git filter-branch -f --tree-filter 'git mv -k 原文件名 新文件名' --prune-empty HEAD`；-k忽略文件不存在时报错失败；会修改本分支**所有**的提交，速度比index-filter慢；或用https://stackoverflow.com/questions/3142419
-* git clone
-    --depth=1指的不是只clone跟文件夹，而是不clone之前的记录，当前提交还是完整的
-* git
-    diff：比较工作目录和staged之间的内容，即add了的与没有add之间的比较，如果没有任何add，就与git
-    diff HEAD一样了。git diff
-    --cached/--staged比较的是add了的与HEAD之间的差别。默认会把修改了的内容都显示出来，加--stat可以只显示文件和变化行数
-* git diff master
-    [bugfix]：比较当前分支/bugfix与master/目标分支的差别。可以重定向到.patch中，用git
-    apply恢复
+* git clone --depth=1指的不是只clone跟文件夹，而是不clone之前的记录，当前提交还是完整的
+* git diff：比较工作目录和staged之间的内容，即add了的与没有add之间的比较，如果没有任何add，就与git diff HEAD一样了。git diff --cached/--staged比较的是add了的与HEAD之间的差别。默认会把修改了的内容都显示出来，加--stat可以只显示文件和变化行数
+* git diff master [bugfix]：比较当前分支/bugfix与master/目标分支的差别。可以重定向到.patch中，用git apply恢复
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
-* git format-patch
-    HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git
-    am依次打上，apply的没有记录
-* git bundle create repo.bundle HEAD
-    master可以把当前仓库整个打包成一个二进制文件，之后怎么用还没看懂，好像直接当作仓库fetch
+* git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录
+* git bundle create repo.bundle HEAD master可以把当前仓库整个打包成一个二进制文件，之后怎么用还没看懂，好像直接当作仓库fetch
 
 ## Pull&Push
 
 * 远端分支（o/master）其实是真·远端在本地的镜像，fetch后就是更新的它
-* git push [-u]
-    [-f]：u如果分支与多个远端关联或者没有任何关联，可以用这个设定默认push的主机，等于--set-upstream；f可以强制push，无视远端先于本地和其他冲突，如果不加会被拒绝，只能先pull
-* git push origin
-    \<source\>:\<destination\>：冒号前是源分支（本地分支，其实是refspec），后是目标分支（远端分支的名字，无需前缀，否则会作为名字的一部分），如果两者不同或者远端不存在那个名字的分支，可以不省略目标分支，把未跟踪的分支push过去，但是不会解决冲突
-* git
-    pull也可以指定主机、source（远端分支）、destination（本地分支）。效果是fetch
-    source，把source合并到destination里（如果无法快速前进会被拒绝），再merge（或指定rebase）
-    destination进当前分支（或HEAD）；所以destination不能是HEAD、merge不会改变destination的指针（此时跟source一致），但会改变当前分支
+* git push [-u] [-f]：u如果分支与多个远端关联或者没有任何关联，可以用这个设定默认push的主机，等于--set-upstream；f可以强制push，无视远端先于本地和其他冲突，如果不加会被拒绝，只 pull
+* git push origin \<source\>:\<destination\>：冒号前是源分支（本地分支，其实是refspec），后是目标分支（远端分支的名字，无需前缀，否则会作为名字的一部分），如果两者不同或者远端不存在那个名字的分支，可以不省略目标分支，把未跟踪的分支push过去，但是不会解决冲突
+* git pull也可以指定主机、source（远端分支）、destination（本地分支）。效果是fetch source，把source合并到destination里（如果无法快速前进会被拒绝），再merge（或指定rebase） destination进当前分支（或HEAD）；所以destination不能是HEAD、merge不会改变destination的指针（此时跟source一致），但会改变当前分支
 * git fetch/pull origin :branchname：在HEAD处创建本地分支
 
 ## 其它命令
 
-* git checkout
-    HEAD\~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git
-    checkout HEAD\~3^2
+* git checkout HEAD\~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD\~3^2
 * bash的感叹号有特殊作用，如果commit message里要用，可以用单引号包裹
-* git check-ignore -v
-    xxx：如果配置了.gitignore，提交不了特定的文件，可以用此命令查看对应规则；或者可以add
-    -f
+* git check-ignore -v xxx：如果配置了.gitignore，提交不了特定的文件，可以用此命令查看对应规则；或者可以add -f
 * git gc：手动清理不在分支上的提交
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin）
 * src refspec master does not match any：没有任何commit就push
@@ -197,12 +128,9 @@ Config
 ## Syncing Fork
 
 * (git remote add upstream *url)*
-* git fetch upstream/--all/git remote update + (git checkout master) +
-    git merge upstream/master
-* 但如果本地没有修改，直接用git pull [upstream
-    master]就可以快速前进，不会产生merge commit
-* 一次性同步所有远端分支：原生没有这个命令，git pull
-    -all会fetch所有但只会更新HEAD
+* git fetch upstream/--all/git remote update + (git checkout master) + git merge upstream/master
+* 但如果本地没有修改，直接用git pull [upstream master]就可以快速前进，不会产生merge commit
+* 一次性同步所有远端分支：原生没有这个命令，git pull -all会fetch所有但只会更新HEAD
 
 ## git stash
 
@@ -238,8 +166,7 @@ pop本地更改。
 
 * git pull --recurse-submodulesz只会顺便fetch子模块，不会pull/checkout
 * git config status.submodulesummary 1：git status时显示子模块的信息
-* 修改了子模块但只push了主模块，其他人会遇到问题。git push
-    --recurse-submodules=on-demand可以一并推送子模块，或者用check只警告
+* 修改了子模块但只push了主模块，其他人会遇到问题。git push --recurse-submodules=on-demand可以一并推送子模块，或者用check只警告
 * submodule的meta信息储存在`.gitmodule`中
 * 默认是分离模式，更新时直接checkout最新的提交，不会更改branch指针，可以在submodule.$name.update中指定merge/rebase
 * submodule.$name.branch为要使用的分支
@@ -260,20 +187,15 @@ pop本地更改。
 
 ### 提交时忽略空格更改
 
-* git merge -Xignore-space-change --no-ff
-    patch-1：换行符不会导致自动合并冲突。如果仅仅只有换行符的改变，则不会变；否则**保留更改过后的**。但与`ignore-all-space`参数的区别不明；试过一次没有效果
-* `git diff -U0 -w | git apply --cached --ignore-whitespace --unidiff-zero -`：在未add且未commit时使用；用完后会给warning意义不明，去掉-U0会消失，$?仍是0；末尾的横线用处不明；如果没有可以合并的，会报unrecognized
-    input错误，属正常现象，此时$?不是0。如果某一行发生了更改，末尾的空格改变不会忽略；但是现在遇到了`fatal: corrupt patch at line`的问题，且没有`--no-verify`可用
+* git merge -Xignore-space-change --no-ff patch-1：换行符不会导致自动合并冲突。如果仅仅只有换行符的改变，则不会变；否则**保留更改过后的**。但与`ignore-all-space`参数的区别不明；试过一次没有效果
+* `git diff -U0 -w | git apply --cached --ignore-whitespace --unidiff-zero -`：在未add且未commit时使用；用完后会给warning意义不明，去掉-U0会消失，$?仍是0；末尾的横线用处不明；如果没有可以合并的，会报unrecognized input错误，属正常现象，此时$?不是0。如果某一行发生了更改，末尾的空格改变不会忽略；但是现在遇到了`fatal: corrupt patch at line`的问题，且没有`--no-verify`可用
 
 ### 全局设置
 
-* Windows下：git config --global core.autocrlf
-    true，提交时转换为LF，检出时转换为CRLF
-* Linux下：git config --global core.autocrlf
-    input，提交时转换为LF，本地不会变，检出时不转换
+* Windows下：git config --global core.autocrlf true，提交时转换为LF，检出时转换为CRLF
+* Linux下：git config --global core.autocrlf input，提交时转换为LF，本地不会变，检出时不转换
 * 关闭自动转换：git config --global core.autocrlf false
-* 允许提交混合换行符：git config --global core.safecrlf
-    true/false/warn
+* 允许提交混合换行符：git config --global core.safecrlf true/false/warn
 
 ### 设置.gitattributes
 
@@ -323,11 +245,8 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 > https://pdf-lib.org/Home/Details/407 （有错误）\
 > https://git-scm.com/docs/gitignore\#_pattern_format
 
-* 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录
-    （但其实是下一条的特例）
-* 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于
-    以\*\*/开头
-    ）；如果有，则隐式在最前面加斜杠，此时以\*\*/开头会全局匹配
+* 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录 （但其实是下一条的特例）
+* 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以\*\*/开头 ）；如果有，则隐式在最前面加斜杠，此时以\*\*/开头会全局匹配
 * 星号匹配多个字符（会一直匹配到斜杠才结束），问号匹配单个字符，用方括号表示单个字符匹配列表；以斜杠结尾表示要匹配的是目录（以及里面的），但注意会全局匹配
 * .\*会匹配以点开头的（不管后面有多少个点），\*.\*则只不会匹配无后缀的
 * 当\*\*在中间时，可以匹配那一部分有或没有的路径，理论上可以匹配多层，但实际有不行的
@@ -374,8 +293,7 @@ collapsable content
 ## code owners
 
 * https://help.github.com/en/articles/about-code-owners
-* 把`CODEOWNERS`文件放到`/`、 `.github/`
-    下即可启用，仅对存在此文件的分支的PR有效
+* 把`CODEOWNERS`文件放到`/`、 `.github/` 下即可启用，仅对存在此文件的分支的PR有效
 * 文件匹配+空格+@用户；从后往前匹配，所以单独一个\*要放到最前
 * \*.js匹配所有js；开头不加/则匹配所有的；末尾为/\*不会递归生效，为/才会
 
@@ -388,11 +306,8 @@ collapsable content
 
 ## bare和mirror
 
-* git init --bare
-    xxx.git：用作同步中心，不包含工作区，可以**接受**push，不能使用平常的git命令；命名按照习惯以.git结尾，实际上下下来的就是.git文件夹
-* git clone
-    --mirror：隐含bare；普通的clone会把origin作为直接上游，会有跟踪远端的本地分支，没有origin的上游信息；bare直接是本地分支，没有跟踪分支，也没有origin的上游；mirror则有origin的上游，运行git
-    remote update会覆盖所有的refs，与删掉再clone一致
+* git init --bare xxx.git：用作同步中心，不包含工作区，可以**接受**push，不能使用平常的git命令；命名按照习惯以.git结尾，实际上下下来的就是.git文件夹
+* git clone --mirror：隐含bare；普通的clone会把origin作为直接上游，会有跟踪远端的本地分支，没有origin的上游信息；bare直接是本地分支，没有跟踪分支，也没有origin的上游；mirror则有origin的上游，运行git remote update会覆盖所有的refs，与删掉再clone一致
 * 不通过fork创建重复的仓库：https://help.github.com/cn/github/creating-cloning-and-archiving-repositories/duplicating-a-repository
 
 ## 参考
