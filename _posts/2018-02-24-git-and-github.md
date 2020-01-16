@@ -15,11 +15,11 @@ title: Git/GitHub笔记
 
 ## Branch
 
-* git checkout [-b/B] feature\_x
+* git checkout [-b/B] feature_x
     [o/branchname]：[新建并]切换分支，检出到远端分支时HEAD会变成分离状态。第二个分支可以填跟踪的远端分支，则push时会更新那个分支。文件发送冲突且不想要当前时可用-f直接切换
 * git branch
     [-avv]：不加显示本地，r仅显示remote，a显示所有，v额外显示最后一次commit信息，vv显示对应的远端分支。加名字进新建分支
-* git branch -d/D feature\_x：删除本地分支
+* git branch -d/D feature_x：删除本地分支
 * git branch -f patch-1
     hash：可以把指定分支强制移动到指定位置；patch-1不存在会新建分支
 * git branch -m [oldName]
@@ -298,7 +298,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 ### [SSH](https://help.github.com/en/articles/connecting-to-github-with-ssh)
 
 1. ssh-keygen -o -t rsa -b 4096 -C "email@example.com"
-2. cat \~/.ssh/id\_rsa.pub | clip
+2. cat \~/.ssh/id_rsa.pub | clip
 3. Add your public SSH key to your GitLab account
 4. ssh -T git@gitlab.com
 
@@ -312,7 +312,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 * gcp='git cherry-pick'
 * glods='git log --graph --pretty
 * glum='git pull upstream master'
-* gpsup='git push --set-upstream origin \$(git\_current\_branch)'
+* gpsup='git push --set-upstream origin \$(git_current_branch)'
 * grhh='git reset --hard'
 * gst='git status'
 * gwch='git whatchanged -p --abbrev-commit --pretty=medium'
@@ -321,7 +321,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 
 > https://www.cnblogs.com/kevingrace/p/5690241.html （有错误）\
 > https://pdf-lib.org/Home/Details/407 （有错误）\
-> https://git-scm.com/docs/gitignore\#\_pattern\_format
+> https://git-scm.com/docs/gitignore\#_pattern_format
 
 * 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录
     （但其实是下一条的特例）
@@ -332,7 +332,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 * .\*会匹配以点开头的（不管后面有多少个点），\*.\*则只不会匹配无后缀的
 * 当\*\*在中间时，可以匹配那一部分有或没有的路径，理论上可以匹配多层，但实际有不行的
 * 注释用井号，匹配井号用转义，其他的类似
-* 使用于被版本控制的情形，用户自己单独定义可以用\$GIT\_DIR/info/exclude和core.excludesFile
+* 使用于被版本控制的情形，用户自己单独定义可以用\$GIT_DIR/info/exclude和core.excludesFile
 * 如果仓库原本没有此文件，则可以不提交就忽略自己；如果原本有，则不能不提交就忽略自己
 
 ### 不忽略 （即要包含）

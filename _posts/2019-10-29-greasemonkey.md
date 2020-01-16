@@ -46,22 +46,22 @@ title: 油猴
 ## unsafeWindow
 
 * 其实就是访问window。要尽量避免以防止滥用
-* 可以不用它完成的一些操作：https://wiki.greasespot.net/Category:Coding\_Tips:Interacting\_With\_The\_Page
+* 可以不用它完成的一些操作：https://wiki.greasespot.net/Category:Coding_Tips:Interacting_With_The_Page
 * 如果实在要使用，用`// @grant unsafeWindow`
 
 ## 变化
 
-* 4.0后完全用WebExtension重写了，所有的GM\_开头的都是老的API
-* GM\_log、GM\_addStyle都没了。但有人以js脚本的形式提供了：`@require https://gist.githubusercontent.com/arantius/3123124/raw/grant-none-shim.js`
+* 4.0后完全用WebExtension重写了，所有的GM_开头的都是老的API
+* GM_log、GM_addStyle都没了。但有人以js脚本的形式提供了：`@require https://gist.githubusercontent.com/arantius/3123124/raw/grant-none-shim.js`
 * 储存单域名的数据可以用Web Storage API
 
 ## 其它（编程技巧）
 
 * jQuery非冲突模式：this.\$ = this.jQuery = jQuery.noConflict(true);
-* https://wiki.greasespot.net/XPath\_Helper
-* https://wiki.greasespot.net/Conditional\_Logging
-* https://wiki.greasespot.net/CSS\_Independent\_Content
-* https://wiki.greasespot.net/Capturing\_and\_Bubbling
+* https://wiki.greasespot.net/XPath_Helper
+* https://wiki.greasespot.net/Conditional_Logging
+* https://wiki.greasespot.net/CSS_Independent_Content
+* https://wiki.greasespot.net/Capturing_and_Bubbling
 
 ## 参考
 

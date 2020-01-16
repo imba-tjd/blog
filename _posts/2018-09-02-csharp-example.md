@@ -140,7 +140,7 @@ SendMessage(button1.Handle, BCM_SETSHIELD, 0, (IntPtr)1);
 调用Office
 ----------
 
-\_Workbook和Workbook的区别：基本上一样，后者继承前者；后者表示当前Excel的Application里打开的对象，前者就是Excel对象
+_Workbook和Workbook的区别：基本上一样，后者继承前者；后者表示当前Excel的Application里打开的对象，前者就是Excel对象
 
 例子：https://github.com/dotnet/samples/tree/master/core/extensions/ExcelDemo
 
@@ -158,7 +158,7 @@ app.Quit();
 
 ### 出错
 
-> 无法将类型为“Microsoft.Office.Interop.Excel.ApplicationClass”的COM对象强制转换为接口类型“Microsoft.Office.Interop.Excel.\_Application”……
+> 无法将类型为“Microsoft.Office.Interop.Excel.ApplicationClass”的COM对象强制转换为接口类型“Microsoft.Office.Interop.Excel._Application”……
 
 * 清理注册表的方法：https://www.cnblogs.com/sunxin88/articles/3456395.html
 * 重新安装WPS，再完整卸载

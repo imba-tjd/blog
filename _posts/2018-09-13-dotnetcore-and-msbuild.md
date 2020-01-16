@@ -7,8 +7,8 @@ title: ".NET Core和MSBuild"
 
 * Linux上的运行时：https://docs.microsoft.com/zh-cn/dotnet/core/install/runtime?pivots=os-linux，全都要先做准备工作；Windows上的SDK：https://dotnet.microsoft.com/download；也有自动安装脚本，且支持在没有root权限的情况下安装
 * Linux全部不支持x86
-* DOTNET\_SKIP\_FIRST\_TIME\_EXPERIENCE=1：环境变量，跳过第一次使用的欢迎信息
-* docker映像：https://hub.docker.com/\_/microsoft-dotnet-core/
+* DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1：环境变量，跳过第一次使用的欢迎信息
+* docker映像：https://hub.docker.com/_/microsoft-dotnet-core/
 
 [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)的PropertyGroup
 ----------------------------------------------------------------------------------
@@ -64,8 +64,8 @@ dotnet CLI
 
 * --configuration/c {Debug|Release}
 * --framework/f \<FRAMEWORK\>
-* --output \<OUTPUT\_DIRECTORY\>/-o：指定存放目录，默认是./bin/Dubug/netcoreapp2.2
-* --runtime \<RUNTIME\_IDENTIFIER\>/-r
+* --output \<OUTPUT_DIRECTORY\>/-o：指定存放目录，默认是./bin/Dubug/netcoreapp2.2
+* --runtime \<RUNTIME_IDENTIFIER\>/-r
 * --no-restore：强制不自动还原
 
 ### dotnet publish

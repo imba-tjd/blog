@@ -5,7 +5,7 @@ title: 杂项算法
 计算π的值
 ---------
 
-* [http://blog.csdn.net/xfxyy\_sxfancy/article/details/48378121](http://blog.csdn.net/xfxyy_sxfancy/article/details/48378121)
+* [http://blog.csdn.net/xfxyy_sxfancy/article/details/48378121](http://blog.csdn.net/xfxyy_sxfancy/article/details/48378121)
 * [https://www.zhihu.com/question/20756479](https://www.zhihu.com/question/20756479)
 * pi/2 = 1 +∑( πn / π(2n+1) )
 
