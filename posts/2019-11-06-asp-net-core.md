@@ -365,7 +365,7 @@ public string Message { get; set; }
 * HTML代码中`@表达式`可以使用变量的值，不用加分号。可以是属性，可以调用索引器，可用函数，可用await。其它的一些问题可以加小括号解决
 * 如果表达式是字符串，里面的内容会经过HTML编码，显示出来的就是字符串原来的样子；如果想把字符串当作HTML，用HtmlHelper.Raw；非IHtmlContent的表达式会自动ToString
 * 两个@会转义一个，email中的会自动处理；@星号 星号@是最优先注释
-* 用`@{}`、`@xxx`开头，中间可以写C\#代码，可以声明变量和函数，可以调用函数，可以写C\#的注释。关键是里面也可以写HTML和普通的@：函数可以返回void，函数体只有HTML（Core3）；如果编译器无法分辨语言而报错或者不想有空格，可用text标记把HTML括起来，或者用`@:`表示该行后面都是HTML
+* 用`@{}`、`@xxx`开头，中间可以写C#代码，可以声明变量和函数，可以调用函数，可以写C#的注释。关键是里面也可以写HTML和普通的@：函数可以返回void，函数体只有HTML（Core3）；如果编译器无法分辨语言而报错或者不想有空格，可用text标记把HTML括起来，或者用`@:`表示该行后面都是HTML
 * 支持的以@开头的：if（else和else if就不用@了）、switch、for、foreach、while、dowhile、using、try,catch,finally、lock
 * @functions没看懂有什么用。好像是不用就只能写本地函数，用了能用属性和public以及写OnGet，也可用@Functions.xxx调用；不用PM时可用
 * model：提供Model属性用于访问传递到视图的模型

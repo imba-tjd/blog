@@ -2,7 +2,7 @@
 title: 程序集
 ---
 
-> 文章内容来自于《Illustrated C\# 2012 (4th Edition)》
+> 文章内容来自于《Illustrated C# 2012 (4th Edition)》
 
 程序集结构
 ----------

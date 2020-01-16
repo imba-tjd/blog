@@ -178,7 +178,7 @@ Transact-SQL
 * print函数
 * [查看或更改服务器属性](https://docs.microsoft.com/zh-cn/sql/database-engine/configure-windows/view-or-change-server-properties-sql-server)
 * 单用户模式连接，则本地所有用户都可作为sysadmin连接
-* 创建表时，在名称前加\#可创建会话临时表，结束时自动销毁；加\#\#可创建全局临时表，没有引用时自动销毁
+* 创建表时，在名称前加#可创建会话临时表，结束时自动销毁；加##可创建全局临时表，没有引用时自动销毁
 * 不要使用ntext、text、image，改用nvarchar(max)、varchar、varbinary(max)替代
 * 分离数据库：sp_detach_db，附加数据库：sp_attach_single_file_db
 * 清理日志文件：https://blog.csdn.net/slimboy123/article/details/54575592

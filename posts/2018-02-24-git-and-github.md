@@ -140,17 +140,17 @@ git config rebase.autoStash
 true：每次pull的时候会自动stash当前本地的改动，不用手动stash，并在pull之后stash
 pop本地更改。
 
-> git stash \#此命令把当前branch上的改动(uncommitted
+> git stash #此命令把当前branch上的改动(uncommitted
 > changes)保存到stash缓存区，并恢复代码到未改动状态\
-> git checkout [branchname] \#切换到别的branch\
-> git stash pop \#取出stash缓存区里最顶端的改动，应用到当前branch\
-> git stash list \#列出当前所有的stash缓存区的改动\
-> git stash clear \#清空stash缓存区\
-> git show stash@{0} \#查看stash缓存区顶部的改动 \
+> git checkout [branchname] #切换到别的branch\
+> git stash pop #取出stash缓存区里最顶端的改动，应用到当前branch\
+> git stash list #列出当前所有的stash缓存区的改动\
+> git stash clear #清空stash缓存区\
+> git show stash@{0} #查看stash缓存区顶部的改动 \
 > git stash apply stash@{1}
-> \#将指定版本号为stash@{1}的改动应用到当前branch\
+> #将指定版本号为stash@{1}的改动应用到当前branch\
 > git stash save "work in progress for foo feature"
-> \#为当前未提交改动加一个注释，并保存到stash
+> #为当前未提交改动加一个注释，并保存到stash
 
 ## Submodule
 
@@ -205,7 +205,7 @@ pop本地更改。
 
 ### 转换仓库内所有的换行
 
-* https://help.github.com/articles/dealing-with-line-endings/\#refreshing-a-repository-after-changing-line-endings
+* https://help.github.com/articles/dealing-with-line-endings/#refreshing-a-repository-after-changing-line-endings
 
 ## SSH & GPG Keys
 
@@ -243,7 +243,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 
 > https://www.cnblogs.com/kevingrace/p/5690241.html （有错误）\
 > https://pdf-lib.org/Home/Details/407 （有错误）\
-> https://git-scm.com/docs/gitignore\#_pattern_format
+> https://git-scm.com/docs/gitignore#_pattern_format
 
 * 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录 （但其实是下一条的特例）
 * 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以\*\*/开头 ）；如果有，则隐式在最前面加斜杠，此时以\*\*/开头会全局匹配

@@ -80,7 +80,7 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 
 * https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/security-in-network-programming
 * ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;：fx4.8/core3.0才支持1.3，win7必须设置这个否则只会使用1.0
-* HTTP/2: `AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);`、https://github.com/dotnet/samples/pull/992/files、https://docs.microsoft.com/zh-cn/dotnet/core/whats-new/dotnet-core-3-0\#http2-support
+* HTTP/2: `AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);`、https://github.com/dotnet/samples/pull/992/files、https://docs.microsoft.com/zh-cn/dotnet/core/whats-new/dotnet-core-3-0#http2-support
 * `ServicePointManager.Expect100Continue = true;`
 
 Cookie

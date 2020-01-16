@@ -271,7 +271,7 @@ Profile文件
 -----------------
 
 * 不支持作业控制，fg和bg不可用
-* 其他不可用的cmdlet：https://docs.microsoft.com/zh-cn/powershell/scripting/whats-new/known-issues-ps6?view=powershell-6\#command-availability
+* 其他不可用的cmdlet：https://docs.microsoft.com/zh-cn/powershell/scripting/whats-new/known-issues-ps6?view=powershell-6#command-availability
 * 删除了别名：ls、cp、mv、rm、cat、man、mount、ps，使用的是本地命令。这会允许globbing，比如ls \*.txt，但这将返回字符串
 
 控制台（$host.ui.rawui）
