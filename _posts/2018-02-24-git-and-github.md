@@ -2,19 +2,7 @@
 title: Git/GitHub笔记
 ---
 
-> 参考文章：
->
-> https://rogerdudler.github.io/git-guide/index.zh.html\
-> http://www.boydwang.com/2014/01/git-notes/\
-> https://www.lugir.com/git-basic.html\
-> https://rogerdudler.github.io/git-guide/index.zh.html\
-> https://learngitbranching.js.org/\
-> https://www.cnblogs.com/kidsitcn/p/4513297.html\
-> https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000\
-> https://medium.com/therobinkim/git-add-everything-but-whitespace-changes-deec3dce39f
-
-OverView
---------
+## OverView
 
 * git init/git clone username@host:/path/to/repository
 * git pull [--rebase] [upstream master] = git fetch + git
@@ -25,8 +13,7 @@ OverView
 * git commit [-m "message"][-a]
 * git push origin master
 
-Branch
-------
+## Branch
 
 * git checkout [-b/B] feature\_x
     [o/branchname]：[新建并]切换分支，检出到远端分支时HEAD会变成分离状态。第二个分支可以填跟踪的远端分支，则push时会更新那个分支。文件发送冲突且不想要当前时可用-f直接切换
@@ -74,8 +61,7 @@ Branch
 * git和GitHub不同：后者是把base往source合并一次，然后再无冲突合并回base；前者直接在merge
     commit中解决了
 
-Remote
-------
+## Remote
 
 * git remote add/remove origin *server*
 * git remote set-url origin ...：修改远端url
@@ -86,8 +72,7 @@ Remote
 * git config branch.master.remote
     gitee：把master分支的默认push和比较设为指定remote
 
-撤销更改
---------
+## 撤销更改
 
 * git reset
     --soft：把分支往回移，做的改变留在暂存区（stage/index）里，即已跟踪未提交；git
@@ -142,8 +127,7 @@ Config
     cmd = code --wait --diff $LOCAL $REMOTE
 ```
 
-记录
-----
+## 记录
 
 * git blame [filename]：查看文件每一行是由谁在哪次commit中修改的,
     按q退出，-w忽略空格变更
@@ -181,8 +165,7 @@ Config
 * git bundle create repo.bundle HEAD
     master可以把当前仓库整个打包成一个二进制文件，之后怎么用还没看懂，好像直接当作仓库fetch
 
-Pull&Push
----------
+## Pull&Push
 
 * 远端分支（o/master）其实是真·远端在本地的镜像，fetch后就是更新的它
 * git push [-u]
@@ -195,8 +178,7 @@ Pull&Push
     destination进当前分支（或HEAD）；所以destination不能是HEAD、merge不会改变destination的指针（此时跟source一致），但会改变当前分支
 * git fetch/pull origin :branchname：在HEAD处创建本地分支
 
-Others
-------
+## 其它命令
 
 * git checkout
     HEAD\~3表示把HEAD往回移动3次提交，\^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git
@@ -208,12 +190,11 @@ Others
 * git gc：手动清理不在分支上的提交
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin）
 * src refspec master does not match any：没有任何commit就push
-* git
-    bisect：以二分的方式找需要的记录，[https://www.worldhello.net/2016/02/29/git-bisect-on-git.html](https://www.worldhello.net/2016/02/29/git-bisect-on-git.html)
+* git bisect：以二分的方式找需要的记录，[https://www.worldhello.net/2016/02/29/git-bisect-on-git.html](https://www.worldhello.net/2016/02/29/git-bisect-on-git.html)
 * 在文件夹中添加一个.gitkeep可以上传空文件夹；没有内容的提交：--allow-empty，没有信息的提交：--allow-empty-message
+* 列出所有项目中忽略的文件：git ls-files --others --ignored --exclude-standard
 
-Syncing Fork
-------------
+## Syncing Fork
 
 * (git remote add upstream *url)*
 * git fetch upstream/--all/git remote update + (git checkout master) +
@@ -223,8 +204,7 @@ Syncing Fork
 * 一次性同步所有远端分支：原生没有这个命令，git pull
     -all会fetch所有但只会更新HEAD
 
-git stash
----------
+## git stash
 
 在有改动的情况下(uncommitted
 changes)切换branch，并把改动应用到新的branch上。\
@@ -244,19 +224,15 @@ pop本地更改。
 > git stash save "work in progress for foo feature"
 > \#为当前未提交改动加一个注释，并保存到stash
 
-Submodule
----------
+## Submodule
 
-* git clone --recursive可以自动拉取子模块，否则用git submodule update
-    --init --recursive；--recursive用于子模块也用了submodule
+* git clone --recursive可以自动拉取子模块，否则用git submodule update --init --recursive；--recursive用于子模块也用了submodule
 * git submodule add [-b 目标分支] url [文件夹]：主动添加
-* git submodule update
-    --recursive：相当于cd子模块然后checkout，要加--remote才相当于fetch+checkout
-* git submodule foreach
-    [--recursive]：因为update和clone已经有了recursive，没必要用这个，只有自己想对所有子模块用别的命令时才用
+* git submodule update --recursive：相当于cd子模块然后checkout，要加--remote才相当于fetch+checkout
+* git submodule foreach [--recursive]：因为update和clone已经有了recursive，没必要用这个，只有自己想对所有子模块用别的命令时才用
 * 删除submodule：https://stackoverflow.com/questions/1260748；不存在rm命令
-* git submodule
-    sync：若`.gitmodules`中的url发生了变化，需要使用此命令把信息更新到`.git/config`中
+* git submodule sync：若`.gitmodules`中的url发生了变化，需要使用此命令把信息更新到`.git/config`中
+* 未读：https://github.github.com/training-kit/downloads/submodule-vs-subtree-cheat-sheet/
 
 ### 其它
 
@@ -268,9 +244,7 @@ Submodule
 * 默认是分离模式，更新时直接checkout最新的提交，不会更改branch指针，可以在submodule.\$name.update中指定merge/rebase
 * submodule.\$name.branch为要使用的分支
 * submodule改变后不能直接看到内容，所以（其他人）容易误操作把老的hash推上来了
-* 会出现reset hard加clean
-    df也还是有未staged的情况；以及在另一个分支上添加了子模块，切换到原分支时子模块文件夹会保留，删掉后切换过去又要update
-    --init
+* 会出现reset hard加clean df也还是有未staged的情况；以及在另一个分支上添加了子模块，切换到原分支时子模块文件夹会保留，删掉后切换过去又要update --init
 * 实际内容保存在父仓库的.git里，子模块的.git只有一个指针。所以删除子模块的文件夹也没事
 * 不支持菱形依赖，会出问题：https://stackoverflow.com/questions/1419498；url写成自己时递归更新会无限循环
 * 当切换回原来的某个提交时，必须update一下submodule，否则仍是新的
@@ -311,8 +285,7 @@ Submodule
 
 * https://help.github.com/articles/dealing-with-line-endings/\#refreshing-a-repository-after-changing-line-endings
 
-SSH & GPG Keys
---------------
+## SSH & GPG Keys
 
 ### [GPG](https://help.github.com/en/articles/managing-commit-signature-verification)
 
@@ -329,8 +302,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 3. Add your public SSH key to your GitLab account
 4. ssh -T git@gitlab.com
 
-Oh My Zsh Alias
----------------
+## Oh My Zsh Alias
 
 * gaa='git add --all'
 * gcam='git commit -am'
@@ -345,8 +317,7 @@ Oh My Zsh Alias
 * gst='git status'
 * gwch='git whatchanged -p --abbrev-commit --pretty=medium'
 
-.gitignore
-----------
+## .gitignore
 
 > https://www.cnblogs.com/kevingrace/p/5690241.html （有错误）\
 > https://pdf-lib.org/Home/Details/407 （有错误）\
@@ -381,8 +352,7 @@ Oh My Zsh Alias
 # 再排除foo下所有文件，再包含bar（这两个也不可以互换）
 ```
 
-在issue中标签隐藏过长的代码
----------------------------
+## 在issue中标签隐藏过长的代码
 
 * https://gist.github.com/ericclemmons/b146fe5da72ca1f706b2ef72a20ac39d
 * summary和内容之间需要一个空行，否则markdown样式无法生效
@@ -395,15 +365,13 @@ collapsable content
 </details>
 ```
 
-显示代码片段
-------------
+## 显示代码片段
 
 ```
 [显示名称，可以是文件名](带hash的文件名#L5-L10)
 ```
 
-code owners
------------
+## code owners
 
 * https://help.github.com/en/articles/about-code-owners
 * 把`CODEOWNERS`文件放到`/`、 `.github/`
@@ -411,16 +379,14 @@ code owners
 * 文件匹配+空格+@用户；从后往前匹配，所以单独一个\*要放到最前
 * \*.js匹配所有js；开头不加/则匹配所有的；末尾为/\*不会递归生效，为/才会
 
-License
--------
+## License
 
 * https://zhuanlan.zhihu.com/p/56759711 Github协议详解，详细又易懂
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
 * CC：https://www.zhihu.com/question/265416787
 * 选择开源协议：https://choosealicense.com/
 
-bare和mirror
-------------
+## bare和mirror
 
 * git init --bare
     xxx.git：用作同步中心，不包含工作区，可以**接受**push，不能使用平常的git命令；命名按照习惯以.git结尾，实际上下下来的就是.git文件夹
@@ -429,16 +395,13 @@ bare和mirror
     remote update会覆盖所有的refs，与删掉再clone一致
 * 不通过fork创建重复的仓库：https://help.github.com/cn/github/creating-cloning-and-archiving-repositories/duplicating-a-repository
 
-GitHub Pages
-------------
+## 参考
 
-### 主题
-
-* https://jekyll.github.io/minima/
-* https://pages-themes.github.io/cayman/
-* https://github.com/pages-themes/minimal
-* https://pages-themes.github.io/slate/
-* https://pages-themes.github.io/architect/
-* https://pages-themes.github.io/merlot/
-
-
+* https://rogerdudler.github.io/git-guide/index.zh.html\
+* http://www.boydwang.com/2014/01/git-notes/\
+* https://www.lugir.com/git-basic.html\
+* https://rogerdudler.github.io/git-guide/index.zh.html\
+* https://learngitbranching.js.org/\
+* https://www.cnblogs.com/kidsitcn/p/4513297.html\
+* https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000\
+* https://medium.com/therobinkim/git-add-everything-but-whitespace-changes-deec3dce39f
