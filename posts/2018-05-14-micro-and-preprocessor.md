@@ -66,7 +66,7 @@ Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换�
 
 * 都有的：linux下定义了linux和unix
 * mingw定义了WIN32
-* clang定义了\_\_clang\_\_
+* clang定义了__clang__
 * 但win下的clang没有定义WIN32
 
 ```
@@ -81,13 +81,13 @@ Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换�
 
 ### 预定义符号
 
-* \_\_FILE\_\_：源文件名
-* \_\_LINE\_\_：文件当前的行号。一般要配合宏使用而不能是函数，否则每次调用都相同
-* \_\_DATE\_\_：被编译的日期
-* \_\_TIME\_\_：被编译的时间
-* \_\_STDC\_\_：如果编译器遵循ANSI C，其值为1，否则未定义
-* \_\_STDC\_VERSION\_\_：如果支持C99，值为199901L；如果支持C11，为201112L
-* \_\_func\_\_：函数的定义块内可用，是函数名字的const char[]
+* __FILE__：源文件名
+* __LINE__：文件当前的行号。一般要配合宏使用而不能是函数，否则每次调用都相同
+* __DATE__：被编译的日期
+* __TIME__：被编译的时间
+* __STDC__：如果编译器遵循ANSI C，其值为1，否则未定义
+* __STDC_VERSION__：如果支持C99，值为199901L；如果支持C11，为201112L
+* __func__：函数的定义块内可用，是函数名字的const char[]
 
 ### 预处理指令
 
@@ -120,7 +120,7 @@ Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换�
 
 ### \#pragma
 
-C99提供\_Pragma宏，比如它可以把\_Pragma("abc 123")变为\#pragma abc 123。这样就可以自定义含参宏，调用\_Pragma宏，再展开成\#pragma。
+C99提供_Pragma宏，比如它可以把_Pragma("abc 123")变为\#pragma abc 123。这样就可以自定义含参宏，调用_Pragma宏，再展开成\#pragma。
 
 以下来自于《C Primer Plus》，但我觉得是错的。
 
@@ -143,7 +143,7 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 泛型选择（C11）
 ---------------
 
-* \_Generic ( x, int:0, double:1, default: 2 )
+* _Generic ( x, int:0, double:1, default: 2 )
 * x不会被求值，只判断类型，返回的值为匹配的标签后的值
 * 如果没有default，且类型不匹配，会在编译期失败
 
@@ -166,7 +166,7 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 静态断言
 --------
 
-* \_Static\_assert()可以在编译期检查表达式，如果为假则终止编译并打印错误信息。
+* _Static_assert()可以在编译期检查表达式，如果为假则终止编译并打印错误信息。
 
 ``` {.wp-block-preformatted}
 #include <limits.h>

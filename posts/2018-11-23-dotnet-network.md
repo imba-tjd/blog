@@ -65,7 +65,7 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 --------------
 
 > https://stackoverflow.com/questions/4396598/whats-the-difference-between-escapeuristring-and-escapedatastring
-> https://www.cnblogs.com/dudu/archive/2011/02/25/asp\_net\_UrlEncode.html
+> https://www.cnblogs.com/dudu/archive/2011/02/25/asp_net_UrlEncode.html
 
 * System.Net.WebUtility与System.Web.HttpUtility类似，但后者在.Net Core上是在Web命名空间里唯一的一个类了
 * Uri.EscapeUriString**适合把url中的中文编码掉**；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错； 只支持utf8，没有UnEscapeUriString方法

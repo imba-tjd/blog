@@ -29,7 +29,7 @@ title: PowerShell
 
 * 单独使用Get-Variable(gv)可以看到所有变量
 * \$null，\$true，\$false
-* \$\_管道中当前对象
+* \$_管道中当前对象
 * \$args所有参数的数组
 * \$pid当前ps进程的pid
 * \$home用户目录
@@ -129,7 +129,7 @@ switch [-wildcard/-regex/-case] ($value) # 比较字符串时默认-eq不区分�
 * [switch]类型的参数：使用时只需指定参数名即可，而bool类型的还要传\$True
 * 函数会将所有的表达式结果都算在返回值里，如果有多个就是object数组，接下来如果不赋给变量，就会显示在终端里；如果用了return，前面的表达式的仍会返回，return后就结束函数了；使用Write-Host才会只显示在终端、不算在返回值里
 * 标准输入存放在\$input数组中，但这样效率低
-* 如果使用filter替换function关键字，会变成流模式，每次只需处理\$\_；还可用begin{}process{}end{}块进行统一处理
+* 如果使用filter替换function关键字，会变成流模式，每次只需处理\$_；还可用begin{}process{}end{}块进行统一处理
 
 处理字符串
 ----------
@@ -147,8 +147,8 @@ switch [-wildcard/-regex/-case] ($value) # 比较字符串时默认-eq不区分�
 * -split "\`n"：以换行符分隔字符串
 * -f可以使用跟String.Format类似的用法，如`"{0:N0}" -f 1000`
 * 在字符串前加&，可以把它当作命令处理，如有参数必须在外面
-* Select-String(sls)可使用正则搜索，但正常情况下只会搜索\$\_.ToString()后的结果而不是默认的输出形式，此时可以用`out-string -stream`，或者不用sls而用where的`$_.属性 -match`
-* sls的-Path参数可指定多个文件且可用通配符；如果传进来的不是路径，用`sls .*`可以替代%{\$\_.ToString()}，否则就会显示文件中所有的内容
+* Select-String(sls)可使用正则搜索，但正常情况下只会搜索\$_.ToString()后的结果而不是默认的输出形式，此时可以用`out-string -stream`，或者不用sls而用where的`$_.属性 -match`
+* sls的-Path参数可指定多个文件且可用通配符；如果传进来的不是路径，用`sls .*`可以替代%{\$_.ToString()}，否则就会显示文件中所有的内容
 * 提取字串：用[..]会变成object[]，搜过大概只能用SubString
 
 命令行参数
@@ -171,7 +171,7 @@ switch [-wildcard/-regex/-case] ($value) # 比较字符串时默认-eq不区分�
 
 ### 操作别名本身
 
-* Get-Alias(alias)：查看别名，如果要查找指定的，可以遍历时用\$\_.Name/Definition.Contains
+* Get-Alias(alias)：查看别名，如果要查找指定的，可以遍历时用\$_.Name/Definition.Contains
 * Set-Alias设置别名，需要指定-Name和-Value，或者new-item -path alias:xx -value xxx
 * 删除别名：del alias:*别名*
 * 导出和导入别名：Export-Alias alias.ps1、Import-Alias [-Force] alias.ps1
@@ -211,16 +211,16 @@ CMDLET
 * Get-Content(cat)
 * Get-Process(ps)：获取的对象数组的元素具有kill()方法
 * Start-Transaction：运行后会把当前会话的所有内容记录到文件中
-* 创建软硬连接：https://docs.microsoft.com/zh-cn/powershell/wmf/5.0/feedback\_symbolic；或用cmd -c
+* 创建软硬连接：https://docs.microsoft.com/zh-cn/powershell/wmf/5.0/feedback_symbolic；或用cmd -c
 * prompt：改变每条命令前面的提示字符
 * Start-Transcript：运行后会把当前会话的所有内容保存起来
 
 管道
 ----
 
-* ForEach-Object(foreach和%)：1..3 | % { echo \$\_ }；可指定-Begin、-Process、-End，或直接用三个大括号代替，\$ForEach表示索引
-* Where-Object(where和?)：'You', 'Me' | ? { \$\_ -match 'u' }
-* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl \*；可指定-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={\$\_...}}
+* ForEach-Object(foreach和%)：1..3 | % { echo \$_ }；可指定-Begin、-Process、-End，或直接用三个大括号代替，\$ForEach表示索引
+* Where-Object(where和?)：'You', 'Me' | ? { \$_ -match 'u' }
+* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl \*；可指定-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={\$_...}}
 * Sort-Object(sort)：-Descending降序；如果某个对象不具有所指定的属性之一，则 cmdlet 会将该对象的属性值解释为 NULL，并将其放置在排序顺序的末尾；如果要多字段排序需要传哈希表对象
 * Tee-Object(tee)：保存并显示管道输入的内容，会先创建文件再运行前面的命令；-Variable 变量名（不用加\$）可以把结果保存到变量里
 * Group-Object：进行分组，依据可为表达式；分组后有Count属性用于排序，Name属性为key，Group属性为内容

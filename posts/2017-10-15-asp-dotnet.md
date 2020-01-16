@@ -7,13 +7,13 @@ title: ASP.NET笔记
 ASP.NET网页生命周期和事件
 -------------------------
 
-* 开始：Page\_Preinit
-* 页初始化：Page\_Init
-* 加载：Page\_Load
+* 开始：Page_Preinit
+* 页初始化：Page_Init
+* 加载：Page_Load
 * 验证：验证控件事件
 * 回发事件处理：控件事件
-* 呈现：Page\_PreRender
-* 卸载：Page\_Unload
+* 呈现：Page_PreRender
+* 卸载：Page_Unload
 
 Page类
 ------
@@ -49,13 +49,13 @@ Request对象
 
 * 是System.Collections.Specialized.NameValueCollection集合，实现了索引器
 * Request.ServerVariables["URL"]：当前网页的虚拟路径
-* Request.ServerVariables["PATH\_TRANSLATED"]：实际路径
-* Request.ServerVariables["SERVER\_NAME"]：服务器名或IP
-* Request.ServerVariables["SERVER\_SOFTERWARE"]：软件
-* Request.ServerVariables["SERVER\_PORT"]：服务器连接端口
-* Request.ServerVariables["SERVER\_PROTOCOL"]：HTTP版本
-* Request.ServerVariables["SERVER\_HOST"]：客户主机名
-* Request.ServerVariables["HTTP\_USER\_AGENT"]：浏览器
+* Request.ServerVariables["PATH_TRANSLATED"]：实际路径
+* Request.ServerVariables["SERVER_NAME"]：服务器名或IP
+* Request.ServerVariables["SERVER_SOFTERWARE"]：软件
+* Request.ServerVariables["SERVER_PORT"]：服务器连接端口
+* Request.ServerVariables["SERVER_PROTOCOL"]：HTTP版本
+* Request.ServerVariables["SERVER_HOST"]：客户主机名
+* Request.ServerVariables["HTTP_USER_AGENT"]：浏览器
 
 Server对象
 ----------
@@ -73,7 +73,7 @@ Server对象
 异常处理机制
 ------------
 
-### Page\_Error事件
+### Page_Error事件
 
     protected void Page_Error(object sender, EventArgs e) // try-catch有未处理的异常时触发
     {
@@ -87,10 +87,10 @@ Server对象
 * 可以让页面发生错误时重定向到友好的错误描述页面
 * 要让ErrorPage属性发挥作用，web.config文件中`<customErrors>`配置项的mode属性必须为On
 
-### Application\_Error事件
+### Application_Error事件
 
 * 位于Global.asax文件中
-* 用法和Page\_Error事件差不多
+* 用法和Page_Error事件差不多
 
 ### web.config
 
@@ -137,8 +137,8 @@ HTML服务器控件
 ### 事件
 
 * 对象.Attributes.Add(键, 值);
-* 客户端事件：onclick属性 = "return Submit1\_onclick()"
-* 服务端事件：onserverclick属性 = "Submit1\_onserverclicklick"
+* 客户端事件：onclick属性 = "return Submit1_onclick()"
+* 服务端事件：onserverclick属性 = "Submit1_onserverclicklick"
 * OnClick、OnClientClick、OnServerClick之间的关系：[http://blog.csdn.net/candyzha/article/details/6713413](http://blog.csdn.net/candyzha/article/details/6713413)
 
 #### 常见事件
@@ -374,7 +374,7 @@ Web控件
 
 * 不需要任何服务器资源、实现简单、支持广泛；有安全性风险
 * 发送：Respose.Redirect(“\~/Hello.aspx?key=” + TextBox1.Text.Trim() + "&...");
-* 接收（Page\_Load）：var value = Request.QueryString["key"];
+* 接收（Page_Load）：var value = Request.QueryString["key"];
 * 还有HttpRequest对象的Params属性可以读取查询字符串
 
 ### Cookie
@@ -426,7 +426,7 @@ Web控件
 #### 会话状态模式
 
 * sessionState的mode属性（SessionStateMode枚举）：InProc、StateServer、Custom
-* InProc：进程内模式。储存在内存中，唯一支持Session\_End的模式
+* InProc：进程内模式。储存在内存中，唯一支持Session_End的模式
 * StateServer：状态服务器模式，可以在重启App时保留应用状态。需要设置stateConnectionString="tcpip=服务器：端口"
 
 #### 使用Session
@@ -451,7 +451,7 @@ Web控件
 * EnableTheme=false可以禁用主题
 * 去掉ID和Text等内容，其他的放到skin里
 * 默认外观只能有一个，否则加SkinID
-* 在Page\_PreInit事件中可以动态指定主题，但该事件先于其他事件（button\_click）发生，所以必须加一句redirect
+* 在Page_PreInit事件中可以动态指定主题，但该事件先于其他事件（button_click）发生，所以必须加一句redirect
 
 母版页
 ------

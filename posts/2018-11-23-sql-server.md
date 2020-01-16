@@ -139,31 +139,31 @@ Transact-SQL
 ### 排序规则
 
 * 服务器级别的只能在建立时选择，建立后无法修改；数据库级别的修改用`alter database xxx collate xxx`，查询用`select collation_name from sys.databases`
-* LocalDB默认的是Latin1\_General，无法显示中文；正常的默认是Chinese\_PRC\_CI\_AS，用
+* LocalDB默认的是Latin1_General，无法显示中文；正常的默认是Chinese_PRC_CI_AS，用
 
 ### 预定义数据库角色
 
-* db\_accessadmin
-* db\_backupoperator
-* db\_datareader
-* db\_datawriter
-* db\_ddladmin
-* db\_denydatareader
-* db\_denydatawriter
-* db\_owner：拥有全部权限
-* db\_securityadmin
+* db_accessadmin
+* db_backupoperator
+* db_datareader
+* db_datawriter
+* db_ddladmin
+* db_denydatareader
+* db_denydatawriter
+* db_owner：拥有全部权限
+* db_securityadmin
 * public：所有用户都有
 
 ### 查看数据库角色
 
-* sp\_addrolemember
-* sys.database\_role\_memebers
-* sys.database\_principals
+* sp_addrolemember
+* sys.database_role_memebers
+* sys.database_principals
 
 #### 应用程序角色
 
 * create/alter/drop application role
-* sp\_setapprole、sp\_unsetapprole
+* sp_setapprole、sp_unsetapprole
 
 其他
 ----
@@ -180,7 +180,7 @@ Transact-SQL
 * 单用户模式连接，则本地所有用户都可作为sysadmin连接
 * 创建表时，在名称前加\#可创建会话临时表，结束时自动销毁；加\#\#可创建全局临时表，没有引用时自动销毁
 * 不要使用ntext、text、image，改用nvarchar(max)、varchar、varbinary(max)替代
-* 分离数据库：sp\_detach\_db，附加数据库：sp\_attach\_single\_file\_db
+* 分离数据库：sp_detach_db，附加数据库：sp_attach_single_file_db
 * 清理日志文件：https://blog.csdn.net/slimboy123/article/details/54575592
 * 自定义函数要加as，和mysql不一样；可以返回表：returns table，之后return (select)，如果要自定义表，用`returns @TableName Table(...)`，之后insert再直接return就行
 * 存储过程中用set nocount on可以不显示”n行受影响“信息
@@ -213,7 +213,7 @@ WHERE session_id = @@SPID;
 
 ### 误删数据恢复
 
-* https://blog.csdn.net/dba\_huangzj/article/details/8491327
+* https://blog.csdn.net/dba_huangzj/article/details/8491327
 
 ### 其他博客
 

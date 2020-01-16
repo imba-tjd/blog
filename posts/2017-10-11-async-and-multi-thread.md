@@ -280,7 +280,7 @@ void TimerCallback( object state);
 
 ### System.Windows.Forms.Timer
 
-* 定期把WM\_TIMER消息放到程序的消息队列中。程序从队列获取消息后会在主用户接口线程中同步处理
+* 定期把WM_TIMER消息放到程序的消息队列中。程序从队列获取消息后会在主用户接口线程中同步处理
 
 ### System.Timers.Timer
 
