@@ -1,4 +1,6 @@
---- layout: post title: "《深入理解计算机系统》" date: 2019-03-12 21:54:59.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - 未分类 tags: [] meta: \_wpcom\_is\_markdown: '1' \_publicize\_job\_id: '28552828913' timeline\_notification: '1552398903' \_wp\_old\_slug: "%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f%e5%92%8c%e8%ae%a1%e7%bb%84" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2019/03/12/%e3%80%8a%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f%e3%80%8b/" ---
+---
+title: "《深入理解计算机系统》"
+---
 
 进程的虚拟地址空间：
 

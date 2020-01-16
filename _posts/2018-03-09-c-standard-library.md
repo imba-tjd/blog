@@ -1,4 +1,6 @@
---- layout: post title: C标准函数库 date: 2018-03-09 22:06:38.000000000 -06:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C语言 tags: [] meta: \_wpcom\_is\_markdown: '1' \_rest\_api\_published: '1' timeline\_notification: '1520604400' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '15550060441' author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/03/09/c%e6%a0%87%e5%87%86%e5%87%bd%e6%95%b0%e5%ba%93/" ---
+---
+title: C标准函数库
+---
 
 > 《C和指针》、《C Primer Plus》
 > 别人的整理，未读：http://c.biancheng.net/ref/

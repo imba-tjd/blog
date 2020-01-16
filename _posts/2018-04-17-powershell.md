@@ -1,4 +1,6 @@
---- layout: post title: PowerShell date: 2018-04-17 14:33:30.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - 未分类 tags: [] meta: \_oembed\_5598e64745cf99a7600fa0857c665664: "{{unknown}}" \_oembed\_0e7378cefd1e57849c824630f4c9bab6: "{{unknown}}" \_oembed\_aaa26c01e15cb914b6e5a6de397947d8: "{{unknown}}" \_wpcom\_is\_markdown: '1' \_oembed\_d7338080ffbf24cab54638651582e086: "{{unknown}}" \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '16881917929' timeline\_notification: '1523946812' \_oembed\_8ac68fd9ed91958019183efbdb28c5a2: "{{unknown}}" \_oembed\_cae0ca79fc9a7ce657d3b7a6593f83c8: "{{unknown}}" \_oembed\_b7c865753eca74d97e4a44f0031f0ef9: "{{unknown}}" \_oembed\_0209514aa0e34b25bbdd275864aafb96: "{{unknown}}" \_oembed\_ca3b82ae8906ae3ad8954bf1d932b96a: "{{unknown}}" \_oembed\_fd273e661b44042974795b76bcbbfdcc: "{{unknown}}" \_edit\_last: '119115352' \_oembed\_eb47bb990532fa93fcc65c682ce6f11d: "{{unknown}}" \_oembed\_a69b2a1d4a1855b7fab22bf75105abdb: "{{unknown}}" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/04/17/powershell/" ---
+---
+title: PowerShell
+---
 
 > https://www.jb51.net/article/115518.htm
 > https://mva.microsoft.com/zh-cn/training-courses/powershell-18405

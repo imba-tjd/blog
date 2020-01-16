@@ -1,16 +1,6 @@
---- layout: post title: Markdown笔记 date: 2018-02-22 21:48:48.000000000
--06:00 type: post parent\_id: '0' published: true password: '' status:
-publish categories: - 未分类 tags: [] meta:
-\_oembed\_6f580eb81eda0f7655fe687942e45f01: "{{unknown}}"
-\_wpcom\_is\_markdown: '1' \_oembed\_54b0338fad42ad8465492efa05b8225f:
-"{{unknown}}" timeline\_notification: '1519307332'
-\_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1"
-\_publicize\_job\_id: '15019656696'
-\_oembed\_cc0b5f2dd0f2e74f6729b4a7d339e80b: "{{unknown}}"
-\_oembed\_4fb53ca1242a015f9916264416e5bae5: "{{unknown}}" author: login:
-imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd
-first\_name: '' last\_name: '' permalink:
-"/2018/02/22/markdown%e7%ac%94%e8%ae%b0/" ---
+---
+title: Markdown笔记
+---
 
 > https://www.zhihu.com/question/21652901\
 > https://www.appinn.com/markdown

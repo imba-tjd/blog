@@ -1,4 +1,6 @@
---- layout: post title: 反射、特性和动态类型 date: 2017-08-13 09:11:18.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C\# tags: [] meta: \_wpcom\_is\_markdown: '1' \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '8208346176' \_wp\_old\_slug: "%e5%8f%8d%e5%b0%84%e5%92%8c%e7%89%b9%e6%80%a7" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2017/08/13/%e5%8f%8d%e5%b0%84%e3%80%81%e7%89%b9%e6%80%a7%e5%92%8c%e5%8a%a8%e6%80%81%e7%b1%bb%e5%9e%8b/" ---
+---
+title: 反射、特性和动态类型
+---
 
 > 《Illustrated C\# 2012 (4th Edition)》
 > 《C\# 6.0 学习笔记：从第一行代码到第一个项目设计》

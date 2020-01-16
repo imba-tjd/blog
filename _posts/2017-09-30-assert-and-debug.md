@@ -1,11 +1,6 @@
---- layout: post title: 调试类 date: 2017-09-30 09:36:50.000000000
--05:00 type: post parent\_id: '0' published: true password: '' status:
-publish categories: - C\# tags: [] meta: \_wpcom\_is\_markdown: '1'
-\_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1"
-\_publicize\_job\_id: '9812322767' \_wp\_old\_slug: debug%e7%b1%bb
-author: login: imbalancedweb email: imba.tjd@gmail.com display\_name:
-imba-tjd first\_name: '' last\_name: '' permalink:
-"/2017/09/30/%e8%b0%83%e8%af%95%e7%b1%bb/" ---
+---
+title: 调试类
+---
 
 > 《C\# 6.0 学习笔记：从第一行代码到第一个项目设计》
 

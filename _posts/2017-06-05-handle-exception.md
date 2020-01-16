@@ -1,4 +1,6 @@
---- layout: post title: 异常处理 date: 2017-06-05 21:39:36.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C\# tags: [] meta: \_wpcom\_is\_markdown: '1' \_oembed\_31201fad801bf95add0d7f0a8620be7b: "{{unknown}}" \_oembed\_1d4be7a3dcc36b4a2108dfe82ce4e95f: "{{unknown}}" \_oembed\_6fae9785af420b5d796e4fd664694545: "{{unknown}}" \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '5797079854' \_oembed\_0dad3e97a225993878fcb26c4b29564f: "{{unknown}}" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2017/06/05/%e5%bc%82%e5%b8%b8%e5%a4%84%e7%90%86/" ---
+---
+title: 异常处理
+---
 
 异常类
 ------
