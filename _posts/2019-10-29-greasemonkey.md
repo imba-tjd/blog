@@ -57,7 +57,7 @@ title: 油猴
 
 ## 其它（编程技巧）
 
-* jQuery非冲突模式：this.\$ = this.jQuery = jQuery.noConflict(true);
+* jQuery非冲突模式：this.$ = this.jQuery = jQuery.noConflict(true);
 * https://wiki.greasespot.net/XPath_Helper
 * https://wiki.greasespot.net/Conditional_Logging
 * https://wiki.greasespot.net/CSS_Independent_Content

@@ -36,7 +36,7 @@ title: Linux命令
 * ps ww -alef：查看进程，各种参数的具体用法例子：https://www.tecmint.com/ps-command-examples-for-linux-process-monitoring/
 * date：http://www.runoob.com/linux/linux-comm-date.html
 * fsck：检测文件系统错误
-* cd -：切换到之前的目录，cd !\$：切换到刚刚用mkdir新建的目录
+* cd -：切换到之前的目录，cd !$：切换到刚刚用mkdir新建的目录
 * free -mt：显示内存容量，以MB为单位
 * tail -f：跟踪指定文件，如果有变化立即显示，删除后停止；与less -F相同
 * tasksel：在Debian中快速安装软件
@@ -44,7 +44,7 @@ title: Linux命令
 * which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件
 * xclip：复制到剪切板上，不自带
 * head -10：显示前10行信息
-* nohup：`nohup ./test &`能在exit后继续任务，默认所有信息输出到\$HOME/nohup.out中；不自带
+* nohup：`nohup ./test &`能在exit后继续任务，默认所有信息输出到$HOME/nohup.out中；不自带
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * sha1sum/md5sum -c xxx.sha1：自动验证对应的文件是否符合；不加-c是验证，未指定文件时从stdin读入
 * cp创建链接：-l为硬链接，-s为软链接；但参数顺序意义与ln相同，后者-P为硬链接，-s为软连接，-r为相对链接
@@ -106,7 +106,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * -mtime -1：一天之内修改的；atime是访问时间，ctime是创建时间
 * -print0：与xargs -0匹配使用
 * -delete：直接删除找到的文件
-* 切换到指定文件的目录：cd \$(find . -name \*\*\*)，[不能用xargs](https://www.zhihu.com/question/67430958)
+* 切换到指定文件的目录：cd $(find . -name \*\*\*)，[不能用xargs](https://www.zhihu.com/question/67430958)
 
 ## awk
 
@@ -115,8 +115,8 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 
 ### 选择除第一列以外的列
 
-* awk '{\$1="";print}'，但直接输出结果，会在最前面加个空格
-* awk '{for(i=2;i\<=NF;i++) printf \$i" ";printf "\\n"}'
+* awk '{$1="";print}'，但直接输出结果，会在最前面加个空格
+* awk '{for(i=2;i\<=NF;i++) printf $i" ";printf "\\n"}'
 * 以上两种方法似乎都会对行进行一次排序？总之行序和本来的不同
 
 ## grep
