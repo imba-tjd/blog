@@ -2,18 +2,14 @@
 title: Linux命令
 ---
 
-> http://blogread.cn/it/article.php?id=3285
-
-命令集合网站
-------------
+## 命令集合网站
 
 * https://ss64.com/bash/
 * https://man.linuxde.net/
 * https://www.runoob.com/linux/linux-command-manual.html
 * https://tldr.ostera.io/
 
-简单笔记
---------
+## 简单笔记
 
 * zless：查看压缩文件内容
 * lsblk：列出块设备。除了RAM外，以标准的树状输出格式，整齐地显示块设备。-l参数为列表；lsusb：显示usb设备
@@ -32,7 +28,7 @@ title: Linux命令
 * gcp：有进度条的复制工具，不自带；或者rsync -a --progress src dest
 * fdisk -l：显示磁盘信息；cfdisk：类似图形界面的分区工具；mkfs.ext4：格式化分区
 * basename，dirname：取得路径的文件名与目录名
-* du -sh \<目录名\>：显示目录的占用空间；df -h：显示挂载点的总大小、已用空间、剩余空间
+* du -sh [filename]：显示目录的占用空间；df -h：显示挂载点的总大小、已用空间、剩余空间
 * mount | column -t：显示挂载分区状态
 * mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
 * unar：https://theunarchiver.com/command-line，可以正确解压非Unicode的zip
@@ -61,9 +57,9 @@ title: Linux命令
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
+* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩
 
-at命令
-------
+## at命令
 
 ```
 echo 123 | at now + 1 minutes
@@ -75,7 +71,7 @@ job 2 at Tue Jun 26 16:30:00 2018
 Can't open /var/run/atd.pid to signal atd. No atd running
 ```
 
-* 此命令Debian没有
+* 此命令Debian没有，应该是废弃了
 * 可用-f指定文件来作为标准输入
 * 如果是直接输入，最后要用ctrl + d结束
 * atq或at -l查看at定时队列，atrm或at -d删除某个定时任务
@@ -83,8 +79,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * /etc/at.allow和/etc/at.deny控制哪些用户可用使用at，前者优先级更高
 * service atd status：查看at服务状态，要启用时才有效
 
-tar
----
+## tar
 
 > https://www.cnblogs.com/manong--/p/8012324.html
 
@@ -94,8 +89,7 @@ tar
 * 其它参数：C指定解压目录，v显示详细信息，j代表tar.bz2，-J/--xz代表xz
 * 默认即使用\*也不会打包以点开头的文件，可以加`.[!.]*`匹配上
 
-显示登陆的用户
---------------
+## 显示登陆的用户
 
 * w：显示所有登陆的用户名、终端、时间、cpu使用时间、在做什么。有标题（可关），信息最多；多个会话多条
 * who：显示所有登陆的用户名、终端、时间；没有标题；多个会话多条
@@ -103,8 +97,7 @@ tar
 * who am i：显示自己登陆的用户名、终端、时间；是who的子集，只有一条
 * users：只显示登陆的用户名；多个会话多条
 
-find
-----
+## find
 
 * -type指定文件类型，f为普通文件，l为链接文件（f不包含这一项），d为文件夹
 * `find path -name '*.txt' -exec wc -l {}\;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件；也可以使用|xargs
@@ -115,8 +108,7 @@ find
 * -delete：直接删除找到的文件
 * 切换到指定文件的目录：cd \$(find . -name \*\*\*)，[不能用xargs](https://www.zhihu.com/question/67430958)
 
-awk
----
+## awk
 
 * 如果以文件作为参数，记得用xargs
 * 如果分隔符是分号，要用单引号包裹
@@ -127,8 +119,7 @@ awk
 * awk '{for(i=2;i\<=NF;i++) printf \$i" ";printf "\\n"}'
 * 以上两种方法似乎都会对行进行一次排序？总之行序和本来的不同
 
-grep
-----
+## grep
 
 * 如果直接使用管道传递给grep，会被当作标准输入而不是参数，因此如果要把文件作为参数传给它，要用xargs；如果是选取文件名本身，才用find和非xargs的grep
 * grep *option* *pattern* *filename ...*，其中文件名可以是\*；如果文件名有多个，会在每一行前面打印出匹配到内容的文件名，可用-h隐藏；如果文件名只有一个，可用-H强制显示出来（用find -exec就是这种情况）；如果只想显示出文件名，可用-l；显示的路径风格和提供的相同
@@ -138,8 +129,7 @@ grep
 * fgrep：只查找指定的表达式，没有通配符和正则，但速度快
 * grep "aaa" file\* -lZ | xargs -0 rm：删除多个文件，Z为0字节后缀输出
 
-xargs
------
+## xargs
 
 * 把由管道获得的标准输入变成指定命令的参数，默认命令是echo
 * 不会从标准输入读取的程序：kill、rm
@@ -149,8 +139,7 @@ xargs
 * -P 并行处理；默认每次只获取一部分数据
 * `ls *.jpg | xargs -n1 -I cp {} /data/images`：复制所有图片文件到 /data/images 目录下。-I指定一个替换字符串，默认为{}，这个字符串在xargs扩展时会被替换掉，每一个参数命令都会被执行一次
 
-curl
-----
+## curl
 
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 * 支持多种协议，默认限时内容；-I仅下载Header，-i也显示Header
@@ -186,18 +175,15 @@ curl
 * -\>\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示与DNS服务器响应超时；这两者ANSWER字段为0；成功是是NOERROR，ANSWER字段为2
 * 另外还有kdig（knot-utils）和host命令
 
-crontab
--------
+## crontab
 
 * 分布式的：cronsun，国人开发的
 
-iproute2
---------
+## iproute2
 
 * 替代net-tools(ifconfig, arp, route, netstat)
 
-rsync
------
+## rsync
 
 * rsync from to，其中远端用user@host:/path，from是文件，to是目标文件夹；-r复制整个文件夹，如果是复制文件夹里的所有内容，from保留末尾的/
 * -avPH：a保留文件所有属性且递归，v详细模式，P断点续传，H保留硬链接
@@ -206,28 +192,21 @@ rsync
 * https://zhuanlan.zhihu.com/p/40022680
 * https://zhuanlan.zhihu.com/p/85087767
 
-sed
----
+## sed
 
 ```
 sed -i "15i Contents" Lab.txt # 在文件的第15行插入指定内容
 find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐藏文件夹
 ```
 
-增加系统的熵
-------------
-
-* cat /proc/sys/kernel/random/entropy\_avail
-* apt install rng-tools
-* rngd -r /dev/urandom 这个用法是错的没边，相当于把/dev/urandom重新导入/dev/random，欺骗内核让他认为有足够的熵源
-* 必须要有/dev/hwrng才行。如果是在虚拟环境中，rngd会报Cannot find a hardware RNG device to use。如果还想用，必须编辑虚拟机本身的环境，用/dev/hwrng
-* 可以用apt install haveged，貌似是傻瓜式的
-* 用cat /dev/random | rngtest -c 1000可以测试生成速度
+## TODO
 
 tmux、screen、nohup、systemctl、supervisor(python)、PM2 (for node.js)
 
-vmstat、lsof -i:\$PORT
+vmstat、lsof -i:$PORT
+
+fdisk、killall
 
 nftables：https://zhuanlan.zhihu.com/p/88981486
 
-
+https://www.oschina.net/translate/useful-linux-commands-for-newbies
