@@ -194,9 +194,11 @@ config.GetSection("...").Exists();
 ```
 
 ```c#
-自定义选项：public class MyOptions { public int Option {get; set;} = 1 }
-注册：services.Configure<MyOptions>(Configuration); // 如果不在根中，要用GetSection()；参数也可为myOptions=>{}来手动设置值而不读取配置
-在类中使用：
+// 自定义选项：
+public class MyOptions { public int Option {get; set;} = 1 }
+// 注册；如果不在根中，要用GetSection()；参数也可为myOptions=>{}来手动设置值而不读取配置
+services.Configure<MyOptions>(Configuration);
+// 在类中使用：
 using Microsoft.Extensions.Options;
 _options = IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentValue/Value/Get("Key") // 用构造函数，此处略写
 ```
@@ -263,7 +265,7 @@ public class TodoController : ControllerBase {
 * RunConsoleAsync()会启用控制台支持？
 * Start()是同步运行的，StartAsync()可用于延迟启动，不阻塞；直接使用它们会不响应Ctrl+C，导致直接走到退出的地方然后卡住，要用using包裹host。一般用于非Web的程序使用host，不是单独用的
 * 如果不用UseStartup，也可以手动webBuilder.UseConfiguration().ConfigureServices().Configure()
-* 配置终结点：默认只会监听localhost的5000和5001，开发者模式下会用launchSettings，然而发布后不会。可在appsettings中用`"urls": "http://localhost;https://localhost"`或在代码中用UseUrls或UseSetting。在Docker中要用0.0.0.0或[::]或\*。端口也可以用\*
+* 配置终结点：默认只会监听localhost的5000和5001，开发者模式下会用launchSettings，然而发布后不会。可在appsettings或命令行中用`"urls": "http://localhost;https://localhost"`或在代码中用UseUrls或UseSetting。在Docker中要用0.0.0.0或[::]或\*。端口也可以用\*
 
 ```c#
 static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
