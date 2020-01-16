@@ -19,7 +19,7 @@ title: Firefox和Chrome
 ### DNS over HTTPS
 
 * network.trr.mode：3为强制，2为允许fallback
-* network.trr.uri：https://1.1.1.1/dns-query或https://mozilla.cloudflare-dns.com/dns-query
+* network.trr.uri：https://1.1.1.1/dns-query 或 https://mozilla.cloudflare-dns.com/dns-query
 * network.trr.bootstrapAddress：1.1.1.1
 * network.security.esni.enabled：true开启esni
 * ttr的reference：https://bagder.github.io/TRRprefs/
@@ -36,18 +36,18 @@ title: Firefox和Chrome
 * 我的头像：http://www.tokkoro.com/2811634-mozilla-firefox-space-abstract.html ，原作者未知
 * quantum版：https://design.firefox.com/photon/visuals/product-identity-assets.html、https://github.com/FirefoxUX/product-identity ；第一个网址里也有许可信息
 * https://wiki.mozilla.org/Category:Logos ；但里面没有quantum和新的
-* 新quantum版：https://commons.wikimedia.org/wiki/File:Firefox\_logo,\_2019.svg?uselang=zh
+* 新quantum版：https://commons.wikimedia.org/wiki/File:Firefox_logo,_2019.svg?uselang=zh
 
 ### 更改语言
 
-1.  https://support.mozilla.org/zh-CN/kb/%E4%BD%BF%E7%94%A8%E8%AF%AD%E8%A8%80%E5%8C%85%E6%94%B9%E5%8F%98Firefox%E7%95%8C%E9%9D%A2%E8%AF%AD%E8%A8%80
+1.  https://support.mozilla.org/zh-CN/kb/使用语言包改变Firefox界面语言
 2.  https://addons.mozilla.org/zh-CN/firefox/language-tools/
 3.  about:config：右键，新建，字符串。`intl.locale.requested: en-US`
 
 ### 编辑右键菜单
 
-* https://www.reddit.com/r/firefox/comments/7lsqn2/is\_it\_possible\_to\_remove\_some\_options\_from\_right/
-* https://www.reddit.com/r/firefox/comments/7dvtw0/guide\_how\_to\_edit\_your\_context\_menu/
+* https://www.reddit.com/r/firefox/comments/7lsqn2/is_it_possible_to_remove_some_options_from_right/
+* https://www.reddit.com/r/firefox/comments/7dvtw0/guide_how_to_edit_your_context_menu/
 
 ### 扩展（Add-ons）
 
