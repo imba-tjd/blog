@@ -1,4 +1,6 @@
---- layout: post title: 算法导论 date: 2018-11-16 18:55:17.000000000 -06:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - 未分类 tags: [] meta: \_oembed\_3c109d77e35f72272a048c1fa583caf0: "{{unknown}}" \_oembed\_e80de080d99330d6f3451b55c2024d3d: "{{unknown}}" \_wpcom\_is\_markdown: '1' \_publicize\_job\_id: '24322266308' timeline\_notification: '1542365722' \_oembed\_066a5411b19af47559b8c13b489c3b10: "{{unknown}}" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/11/16/%e7%ae%97%e6%b3%95%e5%af%bc%e8%ae%ba/" ---
+---
+title: 算法导论
+---
 
 算法基础
 --------

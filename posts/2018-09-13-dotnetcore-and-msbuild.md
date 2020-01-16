@@ -1,4 +1,6 @@
---- layout: post title: ".NET Core和MSBuild" date: 2018-09-13 16:12:13.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C\# tags: [] meta: \_wpcom\_is\_markdown: '1' timeline\_notification: '1536826337' \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '22094425936' author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/09/13/net-core/" ---
+---
+title: ".NET Core和MSBuild"
+---
 
 安装
 ----

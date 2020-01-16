@@ -1,4 +1,6 @@
---- layout: post title: Makefile和gcc date: 2018-06-16 20:15:37.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C语言 tags: [] meta: \_oembed\_7aacb66ed7ae4921fe841a6dc445249a: "{{unknown}}" \_wpcom\_is\_markdown: '1' \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '19025542908' timeline\_notification: '1529151340' \_oembed\_e1b99d3cc39486de1e16e9419c3a8d89: "{{unknown}}" \_oembed\_dbdb12e841b4c4dbca0bf5a1980f96f4: "{{unknown}}" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/06/16/makefile/" ---
+---
+title: Makefile和gcc
+---
 
 > https://blog.csdn.net/haoel/article/details/2886
 > 未读：https://zhuanlan.zhihu.com/p/78091632

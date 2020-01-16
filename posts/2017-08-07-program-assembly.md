@@ -1,4 +1,6 @@
---- layout: post title: 程序集 date: 2017-08-07 17:21:34.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C\# tags: [] meta: \_wpcom\_is\_markdown: '1' \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '7994500417' author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2017/08/07/%e7%a8%8b%e5%ba%8f%e9%9b%86/" ---
+---
+title: 程序集
+---
 
 > 文章内容来自于《Illustrated C\# 2012 (4th Edition)》
 

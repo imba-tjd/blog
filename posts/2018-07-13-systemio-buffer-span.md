@@ -1,8 +1,6 @@
---- layout: post title: System.IO、Buffer和Span date: 2018-07-13 11:36:39.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C\# tags: [] meta: \_oembed\_eac579f4649f5936e4f160b48f827ba9: "{{unknown}}" \_oembed\_time\_412ff0b9db0d6347763f9972c56c2a30: '1572428993' \_oembed\_20a122cfbcbb7c2d9639952b08e77ceb: "{{unknown}}" \_oembed\_e8bdaa34db5f81babac11d0e83c8232e: "{{unknown}}" \_wpcom\_is\_markdown: '1' \_oembed\_07aae1c7cff350230fa222a5eeec32f1: "{{unknown}}" timeline\_notification: '1531453003' \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '19954955274' \_oembed\_faf0944e1083695d7fe32e1ea315e62e: "{{unknown}}" \_oembed\_412ff0b9db0d6347763f9972c56c2a30: '
-
-> [C\# 7 Series, Part 10: Span\<T\> and universal memory management](https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/)
-
-' \_oembed\_725f7383ef761e3002a305f49650ec4e: "{{unknown}}" author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/07/13/system-io/" ---
+---
+title: System.IO、Buffer和Span
+---
 
 > 参考文章
 >
@@ -10,6 +8,7 @@
 > https://docs.microsoft.com/zh-cn/dotnet/api/system.io?view=netcore-2.1
 > 未读：https://zhuanlan.zhihu.com/p/39223648 Pipelines
 > ArrayPool\<T\>，需安装System.Buffers
+> [C\# 7 Series, Part 10: Span\<T\> and universal memory management](https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/)
 
 System.IO
 ---------

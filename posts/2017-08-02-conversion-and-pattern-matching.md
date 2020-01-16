@@ -1,4 +1,6 @@
---- layout: post title: 类的转换和模式匹配 date: 2017-08-02 11:00:59.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C\# tags: [] meta: \_wpcom\_is\_markdown: '1' \_wp\_old\_slug: "%e8%bd%ac%e6%8d%a2" \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '7785693306' author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2017/08/02/%e7%b1%bb%e7%9a%84%e8%bd%ac%e6%8d%a2/" ---
+---
+title: 类的转换和模式匹配
+---
 
 > 《Illustrated C\# 2012 (4th Edition)》
 

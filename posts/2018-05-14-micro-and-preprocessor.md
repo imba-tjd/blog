@@ -1,4 +1,6 @@
---- layout: post title: C的宏和预处理器 date: 2018-05-14 12:19:45.000000000 -05:00 type: post parent\_id: '0' published: true password: '' status: publish categories: - C语言 tags: [] meta: \_wpcom\_is\_markdown: '1' timeline\_notification: '1526271589' \_rest\_api\_published: '1' \_rest\_api\_client\_id: "-1" \_publicize\_job\_id: '17821627046' author: login: imbalancedweb email: imba.tjd@gmail.com display\_name: imba-tjd first\_name: '' last\_name: '' permalink: "/2018/05/14/c%e7%9a%84%e5%ae%8f%e5%92%8c%e9%a2%84%e5%a4%84%e7%90%86%e5%99%a8/" ---
+---
+title: C的宏和预处理器
+---
 
 > 《C和指针》、《C Primer Plus》
 
