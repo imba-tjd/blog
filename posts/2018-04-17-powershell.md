@@ -35,7 +35,7 @@ title: PowerShell
 * $home用户目录
 * $host显示ps的基本信息
 * $?显示上一次命令是否成功，为布尔类型，$LastExitCode为上一次命令返回的数字值
-* $$：上一次执行的代码的最后一个参数字符串，$\^：第一个参数字符串
+* $$：上一次执行的代码的最后一个参数字符串，$^：第一个参数字符串
 * $MyInvocation：具有有关当前命令的信息，如脚本的路径和文件名$myinvocation.mycommand.path或函数的名称$myinvocation.mycommand.name
 * $Profile显示配置文件路径
 * $PSHome：PS的安装路径

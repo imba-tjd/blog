@@ -156,8 +156,8 @@ math.h
 
 ### 浮点表示形式
 
-* double frexp( double value, int\* exponent )：fraction × 2\^exponent = value，提供value；返回小数(fraction)，在0.5到1之间；把exponent存到第二个参数的内存里
-* double ldexp( double fraction, int exponent )：返回fraction × 2\^exponent，也就是上面的value
+* double frexp( double value, int\* exponent )：fraction × 2^exponent = value，提供value；返回小数(fraction)，在0.5到1之间；把exponent存到第二个参数的内存里
+* double ldexp( double fraction, int exponent )：返回fraction × 2^exponent，也就是上面的value
 * double modf( double value, int\* ipart )：把一个浮点数分成整数和小数两个部分，符号和原数一样。返回的是小数部分。
 
 ### tgmath.h
