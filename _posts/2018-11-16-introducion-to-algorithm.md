@@ -22,9 +22,9 @@ title: 算法导论
 * T(n)=2T(n/2)+n -\> T(n)=O(nlgn)
 * T(n)=2T(n/2)+c -\> T(n)=O(n)
 * T(n)=2T(sqrt(n))+lgn -\> 令m=lgn, T(n)=O(mlgm)
-* T(n)=9T(n/3)+n -\> T(n)=O(n\^2)
+* T(n)=9T(n/3)+n -\> T(n)=O(n^2)
 * T(n)=T(2n/3)+c -\> T(n)=O(lgn)
-* T(n)=8T(n/2)+n\^2 -\> T(n)=O(n\^3)
+* T(n)=8T(n/2)+n^2 -\> T(n)=O(n^3)
 
 ### 在线雇佣
 
@@ -38,7 +38,7 @@ title: 算法导论
 
 ### 随机化数组
 
-1. 对每个元素随机产生一个1到n\^3的优先级，然后按优先级排序。
+1. 对每个元素随机产生一个1到n^3的优先级，然后按优先级排序。
 2. Fisher–Yates shuffle 洗牌算法：遍历数组，每个元素与i到n的随机一个元素交换；或者从后往前操作；实际上就是随机取出一个后去掉它，只是次法原地操作了。交换时不能在所有元素中选，也不能用sort(0.5\>rand())
 
 ### 产生不重复随机数
@@ -146,7 +146,7 @@ CountingSort(int A[], int B[], int k){ // A为原数组，B为排序后的数组
 * 钢条切割、矩阵链乘：自底向上，f(x)=max/min{g(分割点i)}
 * 0-1背包问题：价值 arr[重量]，arr[x]=max{arr[x-w(i)]+v(i)}；找钱问题：RMB可用贪心，但如面额只有11、5、1，找15时只能用DP，数量 arr[金额]
 * 最长公共子序列（LCS）：对于两个序列X和Y来说，如果最后一个元素相等，则LCS去掉最后一个元素形成的序列Z-1是X-1和Y-1的LCS；如果不等，则X和Y的LCS=max{(X-1,Y), (X,Y-1)}，它有重叠子问题(X-1,Y-1)。一直到(X,0)和(0,Y)=空
-* 最长递增子序列（LIS）：dp[x]表示**以第 x 元素为结尾的LIS**的长度，则=max{dp[i]+1, if arr[x]\>arr[i]}，这样复杂度为O(n\^2)，还有[nlogn的做法](https://blog.csdn.net/joylnwang/article/details/6766317)；可以建树但想不清复杂度是多少
+* 最长递增子序列（LIS）：dp[x]表示**以第 x 元素为结尾的LIS**的长度，则=max{dp[i]+1, if arr[x]\>arr[i]}，这样复杂度为O(n^2)，还有[nlogn的做法](https://blog.csdn.net/joylnwang/article/details/6766317)；可以建树但想不清复杂度是多少
 
 贪心算法
 --------

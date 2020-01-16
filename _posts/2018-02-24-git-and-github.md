@@ -38,7 +38,7 @@ title: Git/GitHub笔记
     [master]：把bugFix分支合并到**当前分支**/master里，bugFix分支指针不变；`--no-ff`可以强制不快速前进
 * git cherry-pick [hash1
     ...]：选择某几次改动复制到当前branch/HEAD；可用 `A..B`
-    表示范围，A应该更老，但不包括A，如果要包括就用A\^
+    表示范围，A应该更老，但不包括A，如果要包括就用A^
 * git rebase master
     [bugFix]：把**bugFix**/当前分支以依次复制提交的方式合并到master里，并移动**bugFix**到master的前面（或之后的节点），master分支指针不变；之后需checkout
     master, rebase bugFix或者换一下参数顺序快速前进
@@ -79,7 +79,7 @@ title: Git/GitHub笔记
     reset --mixed：默认选项，做的改变留在本地（working
     copy），即未跟踪未提交；git reset --hard
     完全与回移到的地点一致，会丢弃本地更改，但不会丢弃未跟踪（从来没有被添加过）的文件
-* git reset --soft HEAD\^：把东西从commit还原到暂存区里；git reset
+* git reset --soft HEAD^：把东西从commit还原到暂存区里；git reset
     HEAD：去掉暂存区里的东西；git reset --hard
     HEAD：丢弃在本地的所有改动；git reset --hard
     origin/master：丢弃在本地的所有改动与提交
@@ -160,7 +160,7 @@ Config
     apply恢复
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
 * git format-patch
-    HEAD\^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git
+    HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git
     am依次打上，apply的没有记录
 * git bundle create repo.bundle HEAD
     master可以把当前仓库整个打包成一个二进制文件，之后怎么用还没看懂，好像直接当作仓库fetch
@@ -181,8 +181,8 @@ Config
 ## 其它命令
 
 * git checkout
-    HEAD\~3表示把HEAD往回移动3次提交，\^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git
-    checkout HEAD\~3\^2
+    HEAD\~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git
+    checkout HEAD\~3^2
 * bash的感叹号有特殊作用，如果commit message里要用，可以用单引号包裹
 * git check-ignore -v
     xxx：如果配置了.gitignore，提交不了特定的文件，可以用此命令查看对应规则；或者可以add
