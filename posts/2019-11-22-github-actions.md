@@ -9,7 +9,7 @@ tags:
 
 * 自带python 2.7和3.6，pip9，但需要pip3 install wheel。而pip升级会失败：ImportError: cannot import name main
 * 安装不需要加--user，好像是用了虚拟环境，但安装包又不是在当前目录下，不懂
-* 需要PATH=\$PATH:\~/.local/bin，注意不同step应该是不共享的。但也可以直接用python3 -m来调用
+* 需要PATH=$PATH:\~/.local/bin，注意不同step应该是不共享的。但也可以直接用python3 -m来调用
 
 ### 自带的包
 

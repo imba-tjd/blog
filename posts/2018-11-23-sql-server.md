@@ -9,7 +9,7 @@ title: SQL Server
 * 打开防火墙端口：`netsh firewall set portopening protocol = TCP port = 1433 name = SQLPort mode = ENABLE scope = SUBNET profile = CURRENT`；其他端口参见[安装文档](https://docs.microsoft.com/zh-cn/sql/sql-server/install/configure-the-windows-firewall-to-allow-sql-server-access?view=sql-server-2017)
 * Windows系统需要打开网络发现，否则连ping都不让
 * 连接服务器名=[协议名加冒号]+计算机名或ip+反斜杠加实例名或逗号加端口（默认1433）；有端口时即使指定实例名也会忽略
-* 如果不设置实例名，则默认实例名为MSSQLSERVER但连接时不需也不能用到，命名实例默认为SQLEXPRESS；实例名不区分大小写，实例无法重命名但可以建立别名，不能有除下划线和\$以外的特殊字符
+* 如果不设置实例名，则默认实例名为MSSQLSERVER但连接时不需也不能用到，命名实例默认为SQLEXPRESS；实例名不区分大小写，实例无法重命名但可以建立别名，不能有除下划线和$以外的特殊字符
 * 启用SQL Server Browser服务和UDP 1434端口，再在防火墙中允许Sqlservr.exe入站，则可用实例名访问且可用动态端口；否则无法用实例名访问命名实例（本地计算机名除外，但包括本地ip），但可用静态端口访问
 * 如果安装时选择了区分大小写的排序规则，则登录名也将区分大小写
 * 实例默认路径：C:\\Program Files\\Microsoft SQL Server\\MSSQL14.MyInstance\\

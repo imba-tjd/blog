@@ -241,8 +241,8 @@ pop本地更改。
 * 修改了子模块但只push了主模块，其他人会遇到问题。git push
     --recurse-submodules=on-demand可以一并推送子模块，或者用check只警告
 * submodule的meta信息储存在`.gitmodule`中
-* 默认是分离模式，更新时直接checkout最新的提交，不会更改branch指针，可以在submodule.\$name.update中指定merge/rebase
-* submodule.\$name.branch为要使用的分支
+* 默认是分离模式，更新时直接checkout最新的提交，不会更改branch指针，可以在submodule.$name.update中指定merge/rebase
+* submodule.$name.branch为要使用的分支
 * submodule改变后不能直接看到内容，所以（其他人）容易误操作把老的hash推上来了
 * 会出现reset hard加clean df也还是有未staged的情况；以及在另一个分支上添加了子模块，切换到原分支时子模块文件夹会保留，删掉后切换过去又要update --init
 * 实际内容保存在父仓库的.git里，子模块的.git只有一个指针。所以删除子模块的文件夹也没事
@@ -262,8 +262,8 @@ pop本地更改。
 
 * git merge -Xignore-space-change --no-ff
     patch-1：换行符不会导致自动合并冲突。如果仅仅只有换行符的改变，则不会变；否则**保留更改过后的**。但与`ignore-all-space`参数的区别不明；试过一次没有效果
-* `git diff -U0 -w | git apply --cached --ignore-whitespace --unidiff-zero -`：在未add且未commit时使用；用完后会给warning意义不明，去掉-U0会消失，\$?仍是0；末尾的横线用处不明；如果没有可以合并的，会报unrecognized
-    input错误，属正常现象，此时\$?不是0。如果某一行发生了更改，末尾的空格改变不会忽略；但是现在遇到了`fatal: corrupt patch at line`的问题，且没有`--no-verify`可用
+* `git diff -U0 -w | git apply --cached --ignore-whitespace --unidiff-zero -`：在未add且未commit时使用；用完后会给warning意义不明，去掉-U0会消失，$?仍是0；末尾的横线用处不明；如果没有可以合并的，会报unrecognized
+    input错误，属正常现象，此时$?不是0。如果某一行发生了更改，末尾的空格改变不会忽略；但是现在遇到了`fatal: corrupt patch at line`的问题，且没有`--no-verify`可用
 
 ### 全局设置
 
@@ -312,7 +312,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 * gcp='git cherry-pick'
 * glods='git log --graph --pretty
 * glum='git pull upstream master'
-* gpsup='git push --set-upstream origin \$(git_current_branch)'
+* gpsup='git push --set-upstream origin $(git_current_branch)'
 * grhh='git reset --hard'
 * gst='git status'
 * gwch='git whatchanged -p --abbrev-commit --pretty=medium'
@@ -332,7 +332,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 * .\*会匹配以点开头的（不管后面有多少个点），\*.\*则只不会匹配无后缀的
 * 当\*\*在中间时，可以匹配那一部分有或没有的路径，理论上可以匹配多层，但实际有不行的
 * 注释用井号，匹配井号用转义，其他的类似
-* 使用于被版本控制的情形，用户自己单独定义可以用\$GIT_DIR/info/exclude和core.excludesFile
+* 使用于被版本控制的情形，用户自己单独定义可以用$GIT_DIR/info/exclude和core.excludesFile
 * 如果仓库原本没有此文件，则可以不提交就忽略自己；如果原本有，则不能不提交就忽略自己
 
 ### 不忽略 （即要包含）
