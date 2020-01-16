@@ -25,17 +25,17 @@ imba-tjd first\_name: '' last\_name: '' permalink:
 Assert类的静态方法
 ------------------
 
--   Assert.Inconclusive() 表示一个未验证的测试
--   Assert.AreEqual()，Assert.AreNotEqual()
+* Assert.Inconclusive() 表示一个未验证的测试
+* Assert.AreEqual()，Assert.AreNotEqual()
     测试指定的值是否相等，如果相等（不相等），则测试通过
--   Assert.AreSame()，Assert.AreNotSame()
+* Assert.AreSame()，Assert.AreNotSame()
     测试指定的两个对象变量是否指向相同（不同）的对象，如果相同（不同），则测试通过
--   Assert.IsTrue()，Assert.IsFalse()
+* Assert.IsTrue()，Assert.IsFalse()
     测试指定的条件是否为True（False），如果为True（False），则测试通过
--   Assert.IsNull()，Assert.IsNotNull()
+* Assert.IsNull()，Assert.IsNotNull()
     测试指定的对象是否为空引用，如果为空（不为空），则测试通过
--   Asset.IsInstanceOfType，Asset.IsNotInstanceOfType 测试对象是否为指定类型的实例，如果是（不是），则测试通过
--   Asset.Fail 不进行任何检查，直接报告断言失败
+* Asset.IsInstanceOfType，Asset.IsNotInstanceOfType 测试对象是否为指定类型的实例，如果是（不是），则测试通过
+* Asset.Fail 不进行任何检查，直接报告断言失败
 
 使用日志文件
 ------------
