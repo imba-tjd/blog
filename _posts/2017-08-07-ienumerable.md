@@ -2,8 +2,8 @@
 title: 枚举器和迭代器
 ---
 
-> 《Illustrated C\# 2012 (4th Edition)》
-> 《C\# in depth》
+> 《Illustrated C# 2012 (4th Edition)》
+> 《C# in depth》
 
 迭代器语法
 ----------

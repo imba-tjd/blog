@@ -146,7 +146,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * -o或者\>写入文件，-O使用网站提供的名字
 * -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开
 * -c/--cookie-jar加文件名保存cookie，-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie
-* -\#显示进度条，在-O或者重定向输出时默认会有
+* -#显示进度条，在-O或者重定向输出时默认会有
 * -x使用proxy
 * -C断点续传
 * -e/--referer提供referer

@@ -59,7 +59,7 @@ assert关键字本意上是为测试调试程序时使用的，但如果不小�
 
 如果代码书写完全正确，但因外界环境或者用户操作仍然可能发生的事件，则不适合用断言。可以使用异常，或者条件判断处理。
 
-C\#的Assert只在System.Diagnostics里有，且控制台应用无效。
+C#的Assert只在System.Diagnostics里有，且控制台应用无效。
 
 C++的异常：https://www.zhihu.com/question/22889420
 

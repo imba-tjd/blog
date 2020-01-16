@@ -101,8 +101,8 @@ VS中可以直接右键Update Model from Database和Generate Database from Medel
 [Dapper](https://github.com/StackExchange/Dapper)
 -------------------------------------------------
 
-* https://www.youtube.com/watch?v=QVkpzuiiVtw SQL Transactions in C\# using Dapper
-* https://www.youtube.com/watch?v=Et2khGnrIqc How to connect C\# to SQL (the easy way)
+* https://www.youtube.com/watch?v=QVkpzuiiVtw SQL Transactions in C# using Dapper
+* https://www.youtube.com/watch?v=Et2khGnrIqc How to connect C# to SQL (the easy way)
 
 ```
 IEnumerable<Person> Fun(string name) =>

@@ -4,8 +4,8 @@ title: 异步和多线程
 
 > 参考文章：
 >
-> 《Illustrated C\# 2012 (4th Edition)》
-> 《C\# in depth》
+> 《Illustrated C# 2012 (4th Edition)》
+> 《C# in depth》
 > https://docs.microsoft.com
 > https://www.cnblogs.com/lxblog/archive/2013/01/05/2846026.html
 > https://www.zhihu.com/question/35284600/answer/583728189
@@ -22,8 +22,8 @@ Async/Await
 * 异步方法的参数不能为out或ref参数
 * 如果工作为IO绑定，使用await和普通的异步函数，不要使用并行库；如果是CPU绑定，使用await Task.Run(()=\>*Function()*)
 * 最好不要把async和LINQ结合，因为后者会延迟执行，可能会阻塞；可用ToList去掉lazy特性
-* ~~不能在catch和finally块~~ C\#6可以了、非异步匿名函数、lock语句块或不安全代码中使用
-* 不要在一个表达式中直接多次使用await，如`a=await F1()*await F2()`，这样无法并行任务，因为C\#规定先对左边求值再对右边求值
+* ~~不能在catch和finally块~~ C#6可以了、非异步匿名函数、lock语句块或不安全代码中使用
+* 不要在一个表达式中直接多次使用await，如`a=await F1()*await F2()`，这样无法并行任务，因为C#规定先对左边求值再对右边求值
 * 如果需要对参数进行验证，需要编写一个同步的方法验证参数，再return调用异步（async）方法 （可以用匿名函数），这样可以非lazy处理
 * 对于控制台的Main：.net core貌似不能用async void而VS无法正常识别async Task，https://developercommunity.visualstudio.com/content/problem/406058/doesnt-recognize-async-task-main.html
 * TaskFactory.StartNew的一个重载允许线程长时间运行，其他时候使用Task.Run就好
@@ -306,7 +306,7 @@ Lock、Monitor、Mutex可用于进程间同步，用到了Win32内核对象；4.
 * 因为重排序，如果没有volatile，以下代码可能出现instance已被赋值，但却未初始化的情况？
 * 另一种方式是使用静态构造函数，也可以直接把单例对象直接初始化赋值给静态或readonly成员，但是这样会在加载这个类的时候就占资源
 * 但是.NET 2.0以后可不用volatile了，lock的barrier更“有效”
-* 具体的单例代码移到了总的C\#笔记里
+* 具体的单例代码移到了总的C#笔记里
 
 ``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
 class A {

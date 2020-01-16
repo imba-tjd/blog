@@ -68,4 +68,4 @@ title: 油猴
 * https://cologler.gitbooks.io/greasemonkey/content/
 * https://www.52pojie.cn/thread-614101-1-1.html
 * https://wiki.greasespot.net
-* https://jixunmoe.github.io/gmDevBook/\#/doc/intro/gmScript
+* https://jixunmoe.github.io/gmDevBook/#/doc/intro/gmScript

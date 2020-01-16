@@ -2,8 +2,8 @@
 title: 反射、特性和动态类型
 ---
 
-> 《Illustrated C\# 2012 (4th Edition)》
-> 《C\# 6.0 学习笔记：从第一行代码到第一个项目设计》
+> 《Illustrated C# 2012 (4th Edition)》
+> 《C# 6.0 学习笔记：从第一行代码到第一个项目设计》
 
 反射
 ====
@@ -79,7 +79,7 @@ System.Type类部分成员
 
 允许我们包括或排斥特定方法的所有调用。为方法声明应用Conditional特性并把编译符作为参数使用。
 
-如果定义（\#define）了编译符号，则和普通方法没有区别。如果没有定义，那么编译器会忽略这个方法的所有调用，代码仍包含在程序集中。
+如果定义（#define）了编译符号，则和普通方法没有区别。如果没有定义，那么编译器会忽略这个方法的所有调用，代码仍包含在程序集中。
 
     [Conditional("DEBUG")]
     public static void Print(string message);
@@ -328,9 +328,9 @@ DLR
 
 * TryBinaryOperation：二元运算，如x + y
 * TryConvert：转换，如(Target)x
-* TryCreateInstance：创建对象表达式，C\#中没有等价的操作
-* TryDeleteIndex：移除索引的操作，C\#中没有等价的操作
-* TryDeleteMember：移除属性的操作，C\#中没有等价的操作
+* TryCreateInstance：创建对象表达式，C#中没有等价的操作
+* TryDeleteIndex：移除索引的操作，C#中没有等价的操作
+* TryDeleteMember：移除属性的操作，C#中没有等价的操作
 * TryGetIndex：获取索引器中的项，如x[10]
 * TryGetMember：获取属性的值，如x.Property
 * TryInvoke：视为函数（委托）调用，如x(10)
@@ -353,7 +353,7 @@ Marshal
 * Copy
 * SizeOf
 * GetDelegateForFunctionPointer、GetFunctionPointerForDelegate：仅用于C
-* C调用C\#的函数：https://www.zhihu.com/question/58336072
+* C调用C#的函数：https://www.zhihu.com/question/58336072
 
 ### IntPtr
 
@@ -366,7 +366,7 @@ P/Invoke
 
 * win32的API可直接用http://pinvoke.net/
 * c++会对函数名进行改写，需要用`extern "C"`；但`__stdcall`好像也会修改函数名；官方推荐c++写COM
-* WinAPI的long是32位的，而C\#的long是64位的，直接用int就好；char对应sbyte，wchar_t对应char，const char\*对应string，char\*对应StringBuilder；MarshalAs数组时可以指定SizeConst；其它的参考：http://www.cnblogs.com/wangjt18/archive/2011/10/08/2202365.html
+* WinAPI的long是32位的，而C#的long是64位的，直接用int就好；char对应sbyte，wchar_t对应char，const char\*对应string，char\*对应StringBuilder；MarshalAs数组时可以指定SizeConst；其它的参考：http://www.cnblogs.com/wangjt18/archive/2011/10/08/2202365.html
 * 具体情况具体分析，还可以使用共享内存，消息，IPC，管道，Socket，文件，数据库，队列，COM等等
 * 例子：https://zhuanlan.zhihu.com/p/29161824
 
