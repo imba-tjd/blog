@@ -28,7 +28,7 @@ title: Git/GitHub笔记
 * git merge bugFix [master]：把bugFix分支合并到**当前分支**/master里，bugFix分支指针不变；`--no-ff`可以强制不快速前进
 * git cherry-pick [hash1 ...]：选择某几次改动复制到当前branch/HEAD；可用`A..B`表示范围，A应该更老，但不包括A，如果要包括就用A^
 * git rebase master [bugFix]：把**bugFix**/当前分支以依次复制提交的方式合并到master里，并移动**bugFix**到master的前面（或之后的节点），master分支指针不变；之后需checkout master, rebase bugFix或者换一下参数顺序快速前进
-* git rebase master [bugFix] [-i]：选择当前/bugFix相对于master（可以为HEAD\~n）需要哪些提交或重新排序，**只会更改当前分支**；如果路径上有其他指针，它们会保留；squash最前面必须是pick
+* git rebase master [bugFix] [-i]：选择当前/bugFix相对于master（可以为HEAD~n）需要哪些提交或重新排序，**只会更改当前分支**；如果路径上有其他指针，它们会保留；squash最前面必须是pick
 * 注意快速前进是切换到落后的分支，git merge/rebase 先进的分支；两者一样是因为rebase没有要复制的，只利用它移动当前到指定之后
 * git merge -：the '-' is shorthand for the previous branch
 * git rebase -i \<hash\> --autosquash：简单的交互性 rebase，会让 git 在正确的位置里设置 fixup；不加-i会直接跳过review
@@ -54,7 +54,7 @@ title: Git/GitHub笔记
 * git reset --soft HEAD^：把东西从commit还原到暂存区里；git reset HEAD：去掉暂存区里的东西；git reset --hard HEAD：丢弃在本地的所有改动；git reset --hard origin/master：丢弃在本地的所有改动与提交
 * 如果reset的不是当前分支，则会进入分离模式
 * git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
-* git commit --amend：修补最后一次的提交（但算作一次新提交），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD\~n把之前需要修改的放到最后（用edit），修改后再放回去
+* git commit --amend：修补最后一次的提交（但算作一次新提交），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup \<hash\>：自动写提交信息，把stage了的提交
 * git checkout -- \<filename\>：此命令会使用 HEAD 中的最新内容替换掉你的工作目录中的文件。已添加到暂存区的改动以及新文件都不会受到影响
 * git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
@@ -62,9 +62,9 @@ title: Git/GitHub笔记
 
 ## Config
 
-* global的设置在\~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；可以用-e打开文本编辑器进行操作
+* global的设置在~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；可以用-e打开文本编辑器进行操作
 * color.ui true：彩色的 git 输出；但默认为auto，不需要更改
-* --global credential.helper store：储存密码，输入一次以后就会明文放在\~/.git-credential里
+* --global credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里
 * --global user.email、--global user.name
 * gc.pruneexpire "30 days"：不在branch上的30天后清理；gc.auto 0：关闭gc
 * core.quotePath false：当路径出现中文时，不会进行转义，即能显示中文
@@ -115,7 +115,7 @@ title: Git/GitHub笔记
 
 ## 其它命令
 
-* git checkout HEAD\~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD\~3^2
+* git checkout HEAD~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD~3^2
 * bash的感叹号有特殊作用，如果commit message里要用，可以用单引号包裹
 * git check-ignore -v xxx：如果配置了.gitignore，提交不了特定的文件，可以用此命令查看对应规则；或者可以add -f
 * git gc：手动清理不在分支上的提交
@@ -220,7 +220,7 @@ https://help.github.com/cn/articles/about-commit-signature-verification
 ### [SSH](https://help.github.com/en/articles/connecting-to-github-with-ssh)
 
 1. ssh-keygen -o -t rsa -b 4096 -C "email@example.com"
-2. cat \~/.ssh/id_rsa.pub | clip
+2. cat ~/.ssh/id_rsa.pub | clip
 3. Add your public SSH key to your GitLab account
 4. ssh -T git@gitlab.com
 
