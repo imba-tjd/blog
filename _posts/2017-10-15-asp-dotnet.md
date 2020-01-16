@@ -373,7 +373,7 @@ Web控件
 ### 查询字符串
 
 * 不需要任何服务器资源、实现简单、支持广泛；有安全性风险
-* 发送：Respose.Redirect(“\~/Hello.aspx?key=” + TextBox1.Text.Trim() + "&...");
+* 发送：Respose.Redirect(“~/Hello.aspx?key=” + TextBox1.Text.Trim() + "&...");
 * 接收（Page_Load）：var value = Request.QueryString["key"];
 * 还有HttpRequest对象的Params属性可以读取查询字符串
 

@@ -68,7 +68,7 @@ Transact-SQL
 * while ... continue ... break：用到begin ... end
 * waitfor [delay|time] '*时间*' ...：delay是倒计时，time是“闹钟”
 * goto
-* return：保留-1\~-99作为系统使用
+* return：保留-1~-99作为系统使用
 
 ### 常用命令
 
