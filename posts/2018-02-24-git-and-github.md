@@ -362,16 +362,16 @@ SSH & GPG Keys
 
 https://help.github.com/cn/articles/about-commit-signature-verification
 
-1.  gpg2 --list-key *邮件地址*
-2.  git config user.signingkey ...
-3.  需要用的时候必须git commit -S
+1. gpg2 --list-key *邮件地址*
+2. git config user.signingkey ...
+3. 需要用的时候必须git commit -S
 
 ### [SSH](https://help.github.com/en/articles/connecting-to-github-with-ssh)
 
-1.  ssh-keygen -o -t rsa -b 4096 -C "email@example.com"
-2.  cat \~/.ssh/id\_rsa.pub | clip
-3.  Add your public SSH key to your GitLab account
-4.  ssh -T git@gitlab.com
+1. ssh-keygen -o -t rsa -b 4096 -C "email@example.com"
+2. cat \~/.ssh/id\_rsa.pub | clip
+3. Add your public SSH key to your GitLab account
+4. ssh -T git@gitlab.com
 
 Oh My Zsh Alias
 ---------------
