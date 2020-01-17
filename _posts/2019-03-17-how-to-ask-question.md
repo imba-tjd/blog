@@ -13,5 +13,3 @@ title: 如何更好地提问
 Code of Conduct: [https://stackoverflow.com/conduct](https://stackoverflow.com/conduct)
 
 Avoid Ask: [https://stackoverflow.com/help/dont-ask](https://stackoverflow.com/help/dont-ask)
-
-
