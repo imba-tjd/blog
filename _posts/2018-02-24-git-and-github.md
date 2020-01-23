@@ -305,6 +305,12 @@ collapsable content
 * git clone --mirror：隐含bare；普通的clone会把origin作为直接上游，会有跟踪远端的本地分支，没有origin的上游信息；bare直接是本地分支，没有跟踪分支，也没有origin的上游；mirror则有origin的上游，运行git remote update会覆盖所有的refs，与删掉再clone一致
 * 不通过fork创建重复的仓库：https://help.github.com/cn/github/creating-cloning-and-archiving-repositories/duplicating-a-repository
 
+## 其它问题
+
+### fatal: index file corrupt
+
+删掉`.git/index`再reset一下就好，不过可能未提交的会丢失。
+
 ## 参考
 
 * https://rogerdudler.github.io/git-guide/index.zh.html\

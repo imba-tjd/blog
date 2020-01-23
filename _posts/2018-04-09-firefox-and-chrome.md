@@ -15,6 +15,7 @@ title: Firefox和Chrome
 * network.prefetch有一些预读的选项，但是可能有隐私问题
 * browser.cache.disk.enable可以设置是否在硬盘上缓存数据，默认最大大小可能有1G。在about:cache可以看到
 * media.videocontrols.picture-in-picture.enabled视频的画中画图标
+* network.captive-portal-service.enabled检测网络是否需要登录
 
 ### DNS over HTTPS
 
