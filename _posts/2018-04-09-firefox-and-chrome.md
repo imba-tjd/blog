@@ -14,7 +14,7 @@ title: Firefox和Chrome
 * 使用MacType渲染（已经失效，cairo在69移除了）：gfx.content.azure.backends: gfx.content.azure.backends;direct2d1.1,cairo,skia；gfx.direct2d.disabled: true
 * network.prefetch有一些预读的选项，但是可能有隐私问题
 * browser.cache.disk.enable可以设置是否在硬盘上缓存数据，默认最大大小可能有1G。在about:cache可以看到
-* media.videocontrols.picture-in-picture.enabled视频的画中画图标
+* media.videocontrols.picture-in-picture.enabled视频的画中画图标，除了它还要改xxx.video-toggle.enabled才能生效
 * network.captive-portal-service.enabled检测网络是否需要登录
 
 ### DNS over HTTPS
