@@ -145,7 +145,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * 支持多种协议，默认限时内容；-I仅下载Header，-i也显示Header
 * -o或者\>写入文件，-O使用网站提供的名字
 * -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开
-* -c/--cookie-jar加文件名保存cookie，-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie
+* -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
 * -#显示进度条，在-O或者重定向输出时默认会有
 * -x使用proxy
 * -C断点续传
@@ -158,6 +158,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * url里用中括号加数字范围可以批量下载
 * --http2允许用HTTP/2，如果服务器不支持仍可用1.1，需--version中有模块
 * 访问httpbin/get可以看到服务器收到的信息
+* 如果头中有`accept-encoding: gzip`，必须加`--compress`参数，否则获得的是二进制结果。但win下不支持后者
 
 ### dig
 
