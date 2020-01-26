@@ -124,7 +124,7 @@ C99提供_Pragma宏，比如它可以把_Pragma("abc 123")变为#pragma abc 123�
 
 以下来自于《C Primer Plus》，但我觉得是错的。
 
-``` {.wp-block-preformatted}
+```c
 #define PRAGMA(X) _Pragma(#X) // 井号把X变成字符串，但难道不是只对STDC有效吗
 #define LIMRG(X) PRAGMA(STDC CX_LIMITED_RANGE X)
 LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
@@ -147,7 +147,7 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 * x不会被求值，只判断类型，返回的值为匹配的标签后的值
 * 如果没有default，且类型不匹配，会在编译期失败
 
-``` {.wp-block-preformatted}
+```c
 #define MYTYPE(X) _Generic((X),\
     int: "int",\
     double: "double",\
@@ -155,7 +155,7 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 )
 ```
 
-``` {.wp-block-preformatted}
+```c
 #define SQRT(X) _Generic((X),\
    long double: sqrtl,\
    default: sqrt,\ // 可以是int和double
@@ -168,9 +168,7 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 
 * _Static_assert()可以在编译期检查表达式，如果为假则终止编译并打印错误信息。
 
-``` {.wp-block-preformatted}
+```c
 #include <limits.h>
 _Static_assert(CHAR_BIT == 16, "16-bit char falsesly assumed");
 ```
-
-

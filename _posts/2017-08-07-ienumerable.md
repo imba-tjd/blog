@@ -94,7 +94,7 @@ IEnumerable\<T\>接口 : IEnumerable
 * 在不知道序列中有多少元素的情况下，经过一次遍历就获取序列中随机一个元素，并且获取到每个元素的概率相等（为1/n）
 * 伪代码见《杂项算法》
 
-``` {.wp-block-preformatted}
+```c#
 public static T RandomElement<T>(this IEnumerable<T> source, Random random)
 {
     if (source == null)

@@ -198,7 +198,7 @@ time.h
 * void longjmp( jump_buf state, int value )：跳转到最开始setjmp(state)的位置，并且让setjmp(state)以后每次调用都返回value值
 * 顶层函数返回后再调用longjmp很可能会失败
 
-``` {.wp-block-preformatted}
+```c
 jmp_buf restart;
 
 int mian(void)
@@ -239,7 +239,7 @@ size_t strcspn( const char\* str, const char\* group)
 group指示一个或多个字符，strspn返回str起始部分匹配group中任意字符的数目，空格等空白字符和标点也有效。str + strspn可获得指针。strcspn对不符合group的字符计数。
 如：
 
-``` {.wp-block-preformatted}
+```c
 strspn( "25,142,330,abc", "0123456789" ); // 2
 strspn( "25,142,330,abc", ",0123456789" ); // 11
 ```
@@ -248,7 +248,7 @@ strspn( "25,142,330,abc", ",0123456789" ); // 11
 char\* strtok( char\* str, const char\* sep );
 sep指示用作分隔符的字符集合。当strtok函数执行时，它将会修改它所处理的字符串，如果源字符串不可修改，需要自己先复制一份，再传递给strtok函数。当函数第一次调用时，它会保存局部状态信息，所以不能用它同时解析两个字符串。当第一个参数为NULL时，函数会在保存好的字符串中继续查找;第二个参数可以变化，这样调用它的时候会查找不同的字符集合。
 
-``` {.wp-block-preformatted}
+```c
 void print_tokens( char* line )
 {
     static char whitespace[] = " \t\f\r\v\n";
@@ -356,7 +356,7 @@ stdarg.h
 * 这些宏无法判断每个参数的类型，如果指定了错误的类型，结果是不可预测的
 * 许多库实现了getopt函数用于处理命令行参数，但它不是标准库函数
 
-``` {.wp-block-preformatted}
+```c
 #include <stdarg.h>
 
 double average(int num,...)
@@ -381,7 +381,7 @@ double average(int num,...)
 
 ### 变参宏
 
-``` {.wp-block-preformatted}
+```c
 #define PR(...) printf(__VA_ARGS__)
 PR("weight = %d", wt); // 可以接受多个宏参数
 ```
