@@ -2,10 +2,11 @@
 title: Makefile和gcc
 ---
 
-> https://blog.csdn.net/haoel/article/details/2886
-> 未读：https://zhuanlan.zhihu.com/p/78091632
+## Makefile
 
-```
+* 缩进只能用tab
+
+```makefile
 include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通配符和变量
 
 # 变量定义
@@ -44,8 +45,7 @@ cleandiff :
     rm *.diff
 ```
 
-文件搜寻
---------
+### 文件搜寻
 
 * 在一些大的工程中，有大量的源文件。通常的做法是把这许多的源文件分类，并存放在不同的目录中。所以，当make需要去找寻文件的依赖关系时，你可以在文件前加上路径。但最好的方法是把一个路径告诉make，让make在自动去找：VPATH = src:../headers（src和headers是目录名）
 * 当然，当前目录永远是最高优先搜索的地方
@@ -58,8 +58,7 @@ cleandiff :
 
 pattern中%表示0或任意字符；路径可以用冒号分隔多个
 
-一次生成多个文件
-----------------
+### 一次生成多个文件
 
 ```
 # 伪目标的所有依赖总会被执行
@@ -78,13 +77,11 @@ prog3 : prog3.o sort.o utils.o
 
 如果command相似，可以使用此功能，会进行一些扩展。见《[跟我一起写 Makefile（五）](https://blog.csdn.net/haoel/article/details/2890)》
 
-自动生成依赖性
---------------
+### 其它
 
-太复杂……
+* 自动生成依赖性：太复杂……
 
-gcc手动编译
------------
+## gcc
 
 1. gcc -E 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
 2. gcc -S -masm=intel可生成intel风格的汇编，否则是AT&T风格的；加-fverbose-asm可生成与源代码对应的注释
@@ -97,5 +94,9 @@ gcc手动编译
 
 * gcc -o如果没有后缀，会自动加exe；touch也是这样
 * 链接过程中，需要进行符号解析，并且是按照顺序解析；如果库链接在前，就可能出现库中的符号不会被需要，链接器不会把它加到未解析的符号集合中，那么后面引用这个符号的目标文件就不能解析该引用，导致最后链接失败。因此链接库的一般准则是将它们放在命令行的结尾
+* ccache可以缓存编译信息
 
+## 参考
 
+* https://blog.csdn.net/haoel/article/details/2886
+* 未读：https://zhuanlan.zhihu.com/p/78091632
