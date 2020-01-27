@@ -142,7 +142,7 @@ FindServicePoint的参数只会考虑scheme、host和port
 
 ### HttpWebRequest
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 // 可直接用HttpClient.GetByteArrayAsync替代
 byte[] GetURLContents(string url)
 {
@@ -172,7 +172,7 @@ using (var receiveStream = response.GetResponseStream())
 
 ### WebClient
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 WebClient myClient = new WebClient();
 Stream response = myClient.OpenRead("http://www.contoso.com/index.htm");
 // The stream data is used here.

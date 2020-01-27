@@ -152,30 +152,30 @@ while(x^=y^=x^=y%=x);
 生成素数
 --------
 
-``` {.wp-block-syntaxhighlighter-code}
-    static IEnumerable<int> GetEvens() // 获取从3开始所有的奇数
+```c#
+static IEnumerable<int> GetEvens() // 获取从3开始所有的奇数
+{
+    int i = 1;
+    while (true)
+        yield return i += 2;
+}
+static IEnumerable<int> GetPrimes()
+{
+    yield return 2;
+    var nums = GetEvens();
+    while (true)
     {
-        int i = 1;
-        while (true)
-            yield return i += 2;
+        int n = nums.First();
+        yield return n;
+        nums = nums.Where(x => x % n != 0); // n会被捕获；且因为是赋给自己，会链式调用
     }
-    static IEnumerable<int> GetPrimes()
-    {
-        yield return 2;
-        var nums = GetEvens();
-        while (true)
-        {
-            int n = nums.First();
-            yield return n;
-            nums = nums.Where(x => x % n != 0); // n会被捕获；且因为是赋给自己，会链式调用
-        }
-    }
-    public static void Main()
-    {
-        var list = GetPrimes();
-        foreach (var item in list.Take(10)) // 能获取到无限的素数
-            Console.WriteLine(item);
-    }
+}
+public static void Main()
+{
+    var list = GetPrimes();
+    foreach (var item in list.Take(10)) // 能获取到无限的素数
+        Console.WriteLine(item);
+}
 ```
 
 把数组按负数、0、正数顺序排列

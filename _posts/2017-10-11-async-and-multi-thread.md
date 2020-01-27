@@ -51,7 +51,7 @@ t.Result获取结果，t.Status、t.IsFault、IsCompleted(包括成功、取消�
 
 ### Task.Run的重载
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 Task Task.Run ( Action action );
 Task Task.Run ( Action action, CancellationToken token ); // 以下略
 Task<TResult> Task.Run ( Func<TResult> function ); // 返回一个普通的类型
@@ -71,7 +71,7 @@ int value = await Task.Run(() => Task.Run(() => 4)); // Task<TResult> Func
 * 以上两种方法在有同步上下文时都会造成死锁
 * 在异步方法里调用异步方法，需要在调用的方法前加await关键字。可以直接声明T保存`Task<T>`的结果。使用await Task.WhenAll和await Task.WhenAny异步等待多个任务
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 static void Main(string[] args)
 {
     Task<int> task = SumAsync(1, 2);
@@ -99,7 +99,7 @@ async static Task<int> SumAsync2(int a, int b) => await Task.Run(() => a + b);
 * 对已取消的任务调用Start会抛InvalidOperationException
 * CancelAfter可以指定超时时间
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 CancellationTokenSource cts = new CancellationTokenSource();
 CancellationToken token = cts.Token;
 Task t = new Task(fun(..., token)/()=>{....;token.ThrowIfCancellationRequested()}, token);
@@ -116,7 +116,7 @@ cts.Cancel();
 * 任务取消时，如果它只有一个线程，Status会变为Canceled，await会抛出TaskCanceledException；如果有多个线程，Status会变为Faulted，await会抛出AggregateException
 * async void方法抛的异常永远也不会捕获到
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 static void Main(string[] args)
 {
     Task t = BadAsync();
@@ -152,7 +152,7 @@ static async Task BadAsync()
 
 阻塞等待：
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 // WPF程序，点击按钮后的效果：文本不会改变，按钮不会禁用，直接无响应
 // 而winform会处理前两条语句然后无响应
 private void btnDoStuff_Click( object sender, RoutedEventArgs e )
@@ -181,7 +181,7 @@ private void btnDoStuff_Click( object sender, RoutedEventArgs e )
 
 ### 按完成顺序重新组合任务序列
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 public static IEnumerable<Task<T>> InCompletionOrder<T>(this IEnumerable<Task<T>> source)
 {
     var inputs = source.ToList();
@@ -268,7 +268,7 @@ SynchronizationContext
 
 ### System.Threading.Timer
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 Timer( TimerCallBack callback, object state, uint dueTime, uint period);
 void TimerCallback( object state);
 ```
@@ -308,7 +308,7 @@ Lock、Monitor、Mutex可用于进程间同步，用到了Win32内核对象；4.
 * 但是.NET 2.0以后可不用volatile了，lock的barrier更“有效”
 * 具体的单例代码移到了总的C#笔记里
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 class A {
     volatile static A instance;
     A() { } // hide construction method
@@ -338,7 +338,7 @@ class A {
 
 ### SpinLock
 
-``` {.wp-block-syntaxhighlighter-code .brush: .csharp; .notranslate}
+```c#
 static SpinLock _spinlock = new SpinLock();
 bool lockTaken = false;
 try {
