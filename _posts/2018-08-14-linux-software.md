@@ -14,6 +14,12 @@ title: Linux软件
 * mtr： traceroute + ping
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
 * netcat
+* ag/rg：比grep、ack更快地递归搜索文件内容
+* jq：json文件处理以及格式化显示，支持高亮；json_pp是perl自带
+* fpp：用管道传递给它可以自动把文件染色
+* axel：多线程下载工具
+* cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
+* https://github.com/sharkdp/fd 现代版的find
 
 ### Debian阿里源
 
@@ -32,8 +38,8 @@ deb https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
 # testing
 deb https://mirrors.aliyun.com/debian testing main contrib non-free
 deb https://mirrors.aliyun.com/debian testing-updates main contrib non-free
-deb https://mirrors.aliyun.com/debian testing-backports main contrib non-free
 deb https://mirrors.aliyun.com/debian-security testing-security main contrib non-free
+#deb https://mirrors.aliyun.com/debian testing-backports main contrib non-free
 ```
 
 ### Ubuntu
@@ -181,3 +187,7 @@ trusted-host = mirrors.aliyun.com
 ## LXDE
 
 * 改变DPI：https://iamjagjeetubhi.wordpress.com/2017/07/01/change-dpi-in-lxde/
+
+## 参考
+
+* https://zhuanlan.zhihu.com/p/101601709

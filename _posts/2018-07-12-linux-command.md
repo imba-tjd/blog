@@ -58,6 +58,7 @@ title: Linux命令
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
 * scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩
+* ps auxf：显示所有进程
 
 ## at命令
 
