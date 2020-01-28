@@ -14,12 +14,13 @@ title: Linux软件
 * mtr： traceroute + ping
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
 * netcat
-* ag/rg：比grep、ack更快地递归搜索文件内容
+* ag/rg：比grep、ack更快地递归搜索文件内容；https://einverne.github.io/post/2019/09/ripgrep-recursively-searches-directories-using-regex-pattern.html
 * jq：json文件处理以及格式化显示，支持高亮；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
 * axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
 * https://github.com/sharkdp/fd 现代版的find
+* https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP
 
 ### Debian阿里源
 

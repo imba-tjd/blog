@@ -53,7 +53,7 @@ title: Linux命令
 * shred：粉碎文件
 * ldd --version：查看glibc版本
 * sshfs：把远程目录挂载到本地，不自带
-* adduser可以交互式添加用户，useradd只有一大堆参数
+* adduser可以交互式添加用户，useradd只有一大堆参数；passwd修改密码
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
@@ -179,7 +179,13 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 
 ## crontab
 
-* 分布式的：cronsun，国人开发的
+* crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}`
+* crontab -e：编辑；-r：删除
+* 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
+
+每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
+
+分布式的：cronsun，国人开发的。
 
 ## iproute2
 
@@ -212,3 +218,5 @@ fdisk、killall
 nftables：https://zhuanlan.zhihu.com/p/88981486
 
 https://www.oschina.net/translate/useful-linux-commands-for-newbies
+
+https://einverne.github.io/categories.html#每天学习一个命令
