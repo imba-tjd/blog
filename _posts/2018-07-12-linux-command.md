@@ -53,11 +53,11 @@ title: Linux命令
 * shred：粉碎文件
 * ldd --version：查看glibc版本
 * sshfs：把远程目录挂载到本地，不自带
-* adduser可以交互式添加用户，useradd只有一大堆参数；passwd修改密码
+* adduser可以交互式添加用户，第二个参数可以把已存在的用户添加到group里，useradd只有一大堆参数；passwd修改密码
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
-* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩
+* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩；src可有多个文件
 * ps auxf：显示所有进程
 
 ## at命令
@@ -199,6 +199,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * -e 'ssh -p 22'可以通过ssh传输
 * https://zhuanlan.zhihu.com/p/40022680
 * https://zhuanlan.zhihu.com/p/85087767
+* https://zhuanlan.zhihu.com/p/100531052
 
 ## sed
 

@@ -106,6 +106,7 @@ trusted-host = mirrors.aliyun.com
 * mssql-cli
 * [httpie](https://httpie.org/)：专注于http协议的curl的替代品；中文翻译文档：https://keelii.com/2018/09/03/HTTPie/
 * qrcode：装好后用管道把东西传给它。貌似命令行也可用（只要字体支持）
+* `sublist3r.py -d example.com -e Baidu,Yahoo,Google,Bing,Ask,Netcraft,Virustotal,SSL`：搜寻子域名
 
 ## Ruby
 

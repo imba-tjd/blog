@@ -65,4 +65,9 @@ ELF
 
 句柄可以理解为指针的指针；如果只是一层指针，比如malloc返回的，那对于托管堆来说就不能随意移动了；所以就是二重指针；作用可以理解为数据库的主键
 
+## TODO
 
+* http://csapp.cs.cmu.edu/3e/labs.html
+* http://www.cs.cmu.edu/~213/schedule.html
+* https://wdxtub.com/2016/04/16/thin-csapp-0/
+* https://nju-ics.gitbooks.io/ics2018-programming-assignment/content/
