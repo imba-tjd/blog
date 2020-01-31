@@ -17,6 +17,12 @@ title: Firefox和Chrome
 * media.videocontrols.picture-in-picture.enabled视频的画中画图标，除了它还要改xxx.video-toggle.enabled才能生效
 * network.captive-portal-service.enabled检测网络是否需要登录
 
+#### 页面翻译
+
+* https://zhuanlan.zhihu.com/p/24180927
+* https://bbs.kafan.cn/thread-2165299-1-1.html
+* https://wiki.mozilla.org/QA/Translation
+
 ### DNS over HTTPS
 
 * network.trr.mode：3为强制，2为允许fallback
