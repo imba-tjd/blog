@@ -59,6 +59,15 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-security main restricted 
 # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-security main restricted universe multiverse
 ```
 
+### 其它源
+
+* ftp.cn.debian.org
+* ftp2.cn.debian.org
+* mirrors.tuna.tsinghua.edu.cn
+* mirros.ustc.edu.cn
+* mirrors.163.com
+* mirrors.huaweicloud.com
+
 ## PIP
 
 ### 安装和升级

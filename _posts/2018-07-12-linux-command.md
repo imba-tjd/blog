@@ -57,7 +57,7 @@ title: Linux命令
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
-* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩；src可有多个文件
+* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩,-P指定端口；src可有多个文件
 * ps auxf：显示所有进程
 
 ## at命令
@@ -149,7 +149,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
 * -#显示进度条，在-O或者重定向输出时默认会有
 * -x使用proxy
-* -C断点续传
+* -C断点续传，但不清楚效果如何
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
