@@ -59,6 +59,8 @@ title: Linux命令
 * htpasswd -nb -B admin password | cut -d ":" -f 2
 * scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩,-P指定端口；src可有多个文件
 * ps auxf：显示所有进程
+* cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹
+* iconv -f gbk -t utf-8 source-file -o target-file
 
 ## at命令
 
@@ -182,6 +184,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}`
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
+* systemctl list-timers
 
 每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
 

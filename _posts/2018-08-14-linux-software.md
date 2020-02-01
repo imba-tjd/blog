@@ -182,12 +182,14 @@ trusted-host = mirrors.aliyun.com
 
 ### 安装
 
-1. mkdir -p /media/cdrom0
-2. sudo mount /dev/cdrom /media/cdrom0
-3. cd /media/cdrom0
-4. tar xvf VMwareTools\* -C /tmp
-5. sudo perl /tmp/vmware-tools-distrib/vmware-install.pl-d default
+1. ~~mkdir -p /media/cdrom0~~
+2. ~~sudo mount /dev/cdrom /media/cdrom0~~
+3. tar xf /media/cdrom0/VMwareTools* -C /tmp
+4. sudo perl /tmp/vmware-tools-distrib/vmware-install.pl
+5. 一路回车。上一条命令最后好像能跟default使得所有询问都相当于回车，但除了第一个询问，如果开源版本的tools可用，默认值是no，导致退出
 6. ~~sudo umount /media/cdrom0~~
+
+那个`run_upgrader.sh`好像无法使用，反正至少无法用来安装。
 
 有个开源的版本叫做open-vm-toolbox，但是会和闭源的冲突，功能也不全。
 
