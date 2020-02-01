@@ -4,7 +4,7 @@ title: "《深入理解计算机系统》"
 
 进程的虚拟地址空间：
 
-![]({{%20site.baseurl%20}}/assets/v2-1bbda4e5bdc297b5d4a9e88fc0e43c14_hd.jpg)
+![]({{%20site.baseurl%20}}/assets/img/v2-1bbda4e5bdc297b5d4a9e88fc0e43c14_hd.jpg)
 
 * * * * *
 
