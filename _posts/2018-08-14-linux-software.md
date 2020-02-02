@@ -6,6 +6,7 @@ title: Linux软件
 
 * 使用`grep " install " /var/log/apt/history.log`可查看最近安装的软件，**不包含因为依赖装上的**
 * 清理已删除的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
+* 可以使用apt install ./xxx.deb直接安装本地的deb包
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
 * apt-transport-https、ca-certificates：使得APT支持https？
@@ -22,6 +23,7 @@ title: Linux软件
 * https://github.com/sharkdp/fd 现代版的find
 * https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP
 * authbind：允许普通用户绑定1024以下的端口
+* tldr
 
 ### Debian阿里源
 
@@ -128,12 +130,13 @@ trusted-host = mirrors.aliyun.com
 * [chafa](https://github.com/hpjansson/chafa)：在终端中显示图像，支持gif，不过是像素化显示的
 * [browsh](https://github.com/browsh-org/browsh)：基于文本的运行于终端的浏览器，图片是像素化显示的
 * [deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)：安装后可安装微信QQ
-* tldr：https://github.com/tldr-pages/tldr，Debian没有，找bash版本
+* VSC 32bit：https://go.microsoft.com/fwlink/?LinkID=760680 官方最后的版本是1.35.1
 
 ## 其他
 
 * /usr/games/fortune
 * cowsay
+* gnome-tweak
 
 ## Apache
 

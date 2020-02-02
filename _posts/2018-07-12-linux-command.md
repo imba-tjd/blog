@@ -23,7 +23,6 @@ title: Linux命令
 * top：显示进程内存/cpu占用信息，会自动更新；htop：多彩的界面，不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
 * screen：窗口管理器的命令行界面版本
 * uname -a：查看内核版本
-* fg：把ctrl+z挂起的程序恢复到前台；bg：让ctrl+z挂起的程序在后台运行（输命令时在最后加个&会默认在后台运行）；jobs：显示后台挂起的任务
 * chroot：改变根目录
 * gcp：有进度条的复制工具，不自带；或者rsync -a --progress src dest
 * fdisk -l：显示磁盘信息；cfdisk：类似图形界面的分区工具；mkfs.ext4：格式化分区
@@ -41,24 +40,23 @@ title: Linux命令
 * tail -f：跟踪指定文件，如果有变化立即显示，删除后停止；与less -F相同
 * tasksel：在Debian中快速安装软件
 * cat \<\<EOF\>out.txt：输入以后继续输入文字，当最后一行输入EOF文本的时候结束输入，用-EOF可以忽略空白字符
-* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件
+* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件；type可以区分内置还是外置命令
 * xclip：复制到剪切板上，不自带
 * head -10：显示前10行信息
 * nohup：`nohup ./test &`能在exit后继续任务，默认所有信息输出到$HOME/nohup.out中；不自带
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * sha1sum/md5sum -c xxx.sha1：自动验证对应的文件是否符合；不加-c是验证，未指定文件时从stdin读入
-* cp创建链接：-l为硬链接，-s为软链接；但参数顺序意义与ln相同，后者-P为硬链接，-s为软连接，-r为相对链接
+* ln：参数意义与cp相同，-P硬链接（默认？），-s软连接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软连接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
 * sudo update-grub：自动修复引导
 * lscpu：相比于`cat /proc/cpuinfo`，不会每个核都显示一遍
 * shred：粉碎文件
 * ldd --version：查看glibc版本
 * sshfs：把远程目录挂载到本地，不自带
-* adduser可以交互式添加用户，第二个参数可以把已存在的用户添加到group里，useradd只有一大堆参数；passwd修改密码
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
 * scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩,-P指定端口；src可有多个文件
-* ps auxf：显示所有进程
+* ps auxf：显示所有进程，且显示父子进程关系，但这样就不完全按时间排序了，想要后者就去掉f；pstree：以简单形式显示父子进程关系，不会有pid
 * cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹
 * iconv -f gbk -t utf-8 source-file -o target-file
 
@@ -84,21 +82,11 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 
 ## tar
 
-> https://www.cnblogs.com/manong--/p/8012324.html
-
 * 压缩：tar czf jpg.tar.gz \*.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
 * 解压：tar xf abc.tar.gz（x为解压缩；类型现在都可以自动识别了；最后可跟路径来只解压指定的部分文件）
 * 其他主选项：t查看内容，r追加，u更新；这仨和c和x只能选其中一个
 * 其它参数：C指定解压目录，v显示详细信息，j代表tar.bz2，-J/--xz代表xz
 * 默认即使用\*也不会打包以点开头的文件，可以加`.[!.]*`匹配上
-
-## 显示登陆的用户
-
-* w：显示所有登陆的用户名、终端、时间、cpu使用时间、在做什么。有标题（可关），信息最多；多个会话多条
-* who：显示所有登陆的用户名、终端、时间；没有标题；多个会话多条
-* whoami：显示自己的用户，相当于id -un；只有一条？
-* who am i：显示自己登陆的用户名、终端、时间；是who的子集，只有一条
-* users：只显示登陆的用户名；多个会话多条
 
 ## find
 
@@ -125,12 +113,13 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 ## grep
 
 * 如果直接使用管道传递给grep，会被当作标准输入而不是参数，因此如果要把文件作为参数传给它，要用xargs；如果是选取文件名本身，才用find和非xargs的grep
-* grep *option* *pattern* *filename ...*，其中文件名可以是\*；如果文件名有多个，会在每一行前面打印出匹配到内容的文件名，可用-h隐藏；如果文件名只有一个，可用-H强制显示出来（用find -exec就是这种情况）；如果只想显示出文件名，可用-l；显示的路径风格和提供的相同
+* grep *option* *pattern* *filenames*，其中文件名可以是\*；如果文件名有多个，会在每一行前面打印出匹配到内容的文件名，可用-h隐藏；如果文件名只有一个，可用-H强制显示出来（用find -exec就是这种情况）；如果只想显示出文件名，可用-l；显示的路径风格和提供的相同
 * 使用正则表达式可用grep -E或egrep，但前者用某些元字符（比如大括号）需要转义，后者不需要；-o可以只显示匹配到的内容而不显示一整行
 * 统计每个文件内匹配到了多少次用-c，多个文件会显示文件名；顺便输出行号用-n；递归搜索用-r；忽略大小写用-i；pattern之间-e匹配多个模式，相当于或；不输出结果用-q，可用于返回值判断
 * 打印匹配文本之前、之后、两边的几行，分别用-A、-B、-C
 * fgrep：只查找指定的表达式，没有通配符和正则，但速度快
 * grep "aaa" file\* -lZ | xargs -0 rm：删除多个文件，Z为0字节后缀输出
+* grep -- -a：`-a`不会被认为是grep的参数
 
 ## xargs
 
@@ -192,7 +181,10 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 
 ## iproute2
 
-* 替代net-tools(ifconfig, arp, route, netstat)
+替代net-tools(ifconfig, arp, route, netstat)。
+
+* ip
+* ss：-t查看TCP，-u查看UDP，`ss state all sport = :8009`查看指定端口
 
 ## rsync
 
@@ -211,9 +203,21 @@ sed -i "15i Contents" Lab.txt # 在文件的第15行插入指定内容
 find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐藏文件夹
 ```
 
+## 持续运行
+
+* ctrl+z：相当于运行了suspend
+* fg：把ctrl+z挂起的程序恢复到前台
+* bg：让ctrl+z挂起的程序在后台运行
+* jobs：显示后台挂起的任务
+* 输命令时在最后加个&会默认在后台运行，一般会用`>log.txt 2>&1 &`不让输出到屏幕上；如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样
+* 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；但这样的程序无法用fg恢复；默认会自动把输出重定向到nohup.out中
+* 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
+* wait命令可以等待后台任务执行完
+* 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
+
 ## TODO
 
-tmux、screen、nohup、systemctl、supervisor(python)、PM2 (for node.js)
+tmux、systemctl、supervisor(python)、PM2 (for node.js)
 
 vmstat、lsof -i:$PORT
 
@@ -224,3 +228,8 @@ nftables：https://zhuanlan.zhihu.com/p/88981486
 https://www.oschina.net/translate/useful-linux-commands-for-newbies
 
 https://einverne.github.io/categories.html#每天学习一个命令
+
+
+## 参考
+
+* https://www.cnblogs.com/manong--/p/8012324.html
