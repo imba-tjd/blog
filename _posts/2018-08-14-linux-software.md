@@ -24,6 +24,9 @@ title: Linux软件
 * https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP
 * authbind：允许普通用户绑定1024以下的端口
 * tldr
+* gparted：图形化的管理磁盘分区的工具
+* networkmanager：为了使网络配置尽可能简单而开发的网络管理软件包
+* axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
 
 ### Debian阿里源
 
@@ -119,6 +122,8 @@ trusted-host = mirrors.aliyun.com
 * [httpie](https://httpie.org/)：专注于http协议的curl的替代品；中文翻译文档：https://keelii.com/2018/09/03/HTTPie/
 * qrcode：装好后用管道把东西传给它。貌似命令行也可用（只要字体支持）
 * `sublist3r.py -d example.com -e Baidu,Yahoo,Google,Bing,Ask,Netcraft,Virustotal,SSL`：搜寻子域名
+* [trash-cli](https://github.com/andreafrancia/trash-cli)：把文件移动到`.Trash`中
+* [bleachbit](https://github.com/bleachbit/bleachbit)：清理垃圾的
 
 ## Ruby
 
@@ -131,6 +136,7 @@ trusted-host = mirrors.aliyun.com
 * [browsh](https://github.com/browsh-org/browsh)：基于文本的运行于终端的浏览器，图片是像素化显示的
 * [deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)：安装后可安装微信QQ
 * VSC 32bit：https://go.microsoft.com/fwlink/?LinkID=760680 官方最后的版本是1.35.1
+* [uGet](https://ugetdm.com/)：下载工具，开源但不在GitHub上
 
 ## 其他
 
