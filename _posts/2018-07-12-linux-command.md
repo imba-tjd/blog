@@ -62,33 +62,13 @@ title: Linux命令
 * eval
 * vmstat：监控系统状况的程序。`vmstat 5 5`：在5秒时间内进行5次采样；-f显示从系统启动至今的fork数量，-s显示内存相关统计信息，-d查看磁盘的读写，-m查看slab信息
 
-## at命令
-
-```
-echo 123 | at now + 1 minutes
-at now + 1 minutes
-warning: commands will be executed using /bin/sh
-at> echo 123
-at>
-job 2 at Tue Jun 26 16:30:00 2018
-Can't open /var/run/atd.pid to signal atd. No atd running
-```
-
-* 此命令Debian没有，应该是废弃了
-* 可用-f指定文件来作为标准输入
-* 如果是直接输入，最后要用ctrl + d结束
-* atq或at -l查看at定时队列，atrm或at -d删除某个定时任务
-* 任务都存放在/var/spool/at里，也可以用rm删
-* /etc/at.allow和/etc/at.deny控制哪些用户可用使用at，前者优先级更高
-* service atd status：查看at服务状态，要启用时才有效
-
 ## tar
 
-* 压缩：tar czf jpg.tar.gz \*.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
+* 压缩：tar czf jpg.tar.gz *.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
 * 解压：tar xf abc.tar.gz（x为解压缩；类型现在都可以自动识别了；最后可跟路径来只解压指定的部分文件）
 * 其他主选项：t查看内容，r追加，u更新；这仨和c和x只能选其中一个
 * 其它参数：C指定解压目录，v显示详细信息，j代表tar.bz2，-J/--xz代表xz
-* 默认即使用\*也不会打包以点开头的文件，可以加`.[!.]*`匹配上
+* 默认即使用*也不会打包以点开头的文件，可以加`.[!.]*`匹配上
 
 ## find
 
@@ -99,7 +79,6 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * -mtime -1：一天之内修改的；atime是访问时间，ctime是创建时间
 * -print0：与xargs -0匹配使用
 * -delete：直接删除找到的文件
-* 切换到指定文件的目录：cd $(find . -name \*\*\*)，[不能用xargs](https://www.zhihu.com/question/67430958)
 
 ## awk
 
@@ -115,12 +94,12 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 ## grep
 
 * 如果直接使用管道传递给grep，会被当作标准输入而不是参数，因此如果要把文件作为参数传给它，要用xargs；如果是选取文件名本身，才用find和非xargs的grep
-* grep *option* *pattern* *filenames*，其中文件名可以是\*；如果文件名有多个，会在每一行前面打印出匹配到内容的文件名，可用-h隐藏；如果文件名只有一个，可用-H强制显示出来（用find -exec就是这种情况）；如果只想显示出文件名，可用-l；显示的路径风格和提供的相同
+* grep *option* *pattern* *filenames*，其中文件名可以是*；如果文件名有多个，会在每一行前面打印出匹配到内容的文件名，可用-h隐藏；如果文件名只有一个，可用-H强制显示出来（用find -exec就是这种情况）；如果只想显示出文件名，可用-l；显示的路径风格和提供的相同
 * 使用正则表达式可用grep -E或egrep，但前者用某些元字符（比如大括号）需要转义，后者不需要；-o可以只显示匹配到的内容而不显示一整行
-* 统计每个文件内匹配到了多少次用-c，多个文件会显示文件名；顺便输出行号用-n；递归搜索用-r；忽略大小写用-i；pattern之间-e匹配多个模式，相当于或；不输出结果用-q，可用于返回值判断
+* 统计每个文件内匹配到了多少次用-c，多个文件会显示文件名；顺便输出行号用-n；递归搜索用-r；忽略大小写用-i；pattern之间-e匹配多个模式，相当于或；不输出结果用-q，可用于返回值判断；-v反向查找
 * 打印匹配文本之前、之后、两边的几行，分别用-A、-B、-C
 * fgrep：只查找指定的表达式，没有通配符和正则，但速度快
-* grep "aaa" file\* -lZ | xargs -0 rm：删除多个文件，Z为0字节后缀输出
+* grep "aaa" file* -lZ | xargs -0 rm：删除多个文件，Z为0字节后缀输出
 * grep -- -a：`-a`不会被认为是grep的参数
 
 ## xargs
@@ -132,6 +111,7 @@ Can't open /var/run/atd.pid to signal atd. No atd running
 * -d指定分隔符，默认是换行符；分隔符会去掉不要然后加上空格
 * -P 并行处理；默认每次只获取一部分数据
 * `ls *.jpg | xargs -n1 -I cp {} /data/images`：复制所有图片文件到 /data/images 目录下。-I指定一个替换字符串，默认为{}，这个字符串在xargs扩展时会被替换掉，每一个参数命令都会被执行一次
+* 无法用`... | xargs cd`，因为后者会变成/bin/cd，但只用bash的内置cd命令才能改变当前目录；可用`cd $(...)`
 
 ## curl
 
