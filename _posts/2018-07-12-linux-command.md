@@ -55,9 +55,9 @@ title: Linux命令
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
-* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩,-P指定端口；src可有多个文件
+* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩,-P指定端口；src可有多个文件；win下的好像无法识别中文路径；-3可以（通过本机）在两个服务器之间传文件
 * ps auxf：显示所有进程，且显示父子进程关系，但这样就不完全按时间排序了，想要后者就去掉f；pstree：以简单形式显示父子进程关系，不会有pid
-* cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软连接，可以追踪到源文件
+* cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软连接，可以追踪到源文件；cp -a：相当于-dpR
 * iconv -f gbk -t utf-8 source-file -o target-file
 * eval
 * vmstat：监控系统状况的程序。`vmstat 5 5`：在5秒时间内进行5次采样；-f显示从系统启动至今的fork数量，-s显示内存相关统计信息，-d查看磁盘的读写，-m查看slab信息
@@ -69,6 +69,19 @@ title: Linux命令
 * 其他主选项：t查看内容，r追加，u更新；这仨和c和x只能选其中一个
 * 其它参数：C指定解压目录，v显示详细信息，j代表tar.bz2，-J/--xz代表xz
 * 默认即使用*也不会打包以点开头的文件，可以加`.[!.]*`匹配上
+
+### xz
+
+* 不做把多个文件打包成一个文件的工作
+* 流压缩：cat a.txt | xz -9e > a.txt.xz；注意源文件名不会保留，解压后的名字就是去掉.xz的部分
+* 分别压缩多个文件：xz -9e files；默认压缩完了就把源文件删了，-k可以保留
+* 解压：xz -d file.xz；加-c可以写到stdout中
+
+### unzip
+
+* 不自带；可以考虑使用`python -m zipfile`替代
+* -p写到stdout中
+* tldr的文档是错的
 
 ## find
 
