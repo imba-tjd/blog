@@ -61,6 +61,8 @@ title: Linux命令
 * iconv -f gbk -t utf-8 source-file -o target-file
 * eval
 * vmstat：监控系统状况的程序。`vmstat 5 5`：在5秒时间内进行5次采样；-f显示从系统启动至今的fork数量，-s显示内存相关统计信息，-d查看磁盘的读写，-m查看slab信息
+* cat > file：接下来输入内容，ctrl+d结束；可以快速地创建一个有内容的文件
+* less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 
 ## tar
 
@@ -73,15 +75,16 @@ title: Linux命令
 ### xz
 
 * 不做把多个文件打包成一个文件的工作
-* 流压缩：cat a.txt | xz -9e > a.txt.xz；注意源文件名不会保留，解压后的名字就是去掉.xz的部分
+* 流压缩：cat a.txt | xz -9e > a.txt.xz；注意源文件名不会保留，解压后的名字就是去掉.xz的部分；不加文件名或文件名是-就是这种模式
 * 分别压缩多个文件：xz -9e files；默认压缩完了就把源文件删了，-k可以保留
-* 解压：xz -d file.xz；加-c可以写到stdout中
+* 解压：xz -d file.xz；加-c可以写到stdout中；也可以使用unxz，则不用加-d，其实就是xz的软连接
 
 ### unzip
 
 * 不自带；可以考虑使用`python -m zipfile`替代
 * -p写到stdout中
 * tldr的文档是错的
+* gunzip是用来解压gzip(gz)的，不是用来解压zip的
 
 ## find
 

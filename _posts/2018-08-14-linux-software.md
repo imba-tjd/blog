@@ -10,7 +10,7 @@ title: Linux软件
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
 * apt-transport-https、ca-certificates：使得APT支持https？
-* curl、~~software-properties-common~~
+* curl、~~software-properties-common~~（含有add-apt-repository）
 * autoremove python(2)以后会被删除的包：sudo
 * mtr： traceroute + ping
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
@@ -20,13 +20,16 @@ title: Linux软件
 * fpp：用管道传递给它可以自动把文件染色
 * axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
-* https://github.com/sharkdp/fd 现代版的find
+* https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat
 * https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP
 * authbind：允许普通用户绑定1024以下的端口
 * tldr
 * gparted：图形化的管理磁盘分区的工具
 * networkmanager：为了使网络配置尽可能简单而开发的网络管理软件包
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
+* pv：用于显示进度，放在两个管道之间
+* checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
+* ripgrep：快速的正则搜索程序
 
 ### Debian阿里源
 
