@@ -25,7 +25,7 @@ title: Linux软件
 * authbind：允许普通用户绑定1024以下的端口
 * tldr
 * gparted：图形化的管理磁盘分区的工具
-* networkmanager：为了使网络配置尽可能简单而开发的网络管理软件包
+* network-manager、network-manager-gnome：为了使网络配置尽可能简单而开发的网络管理软件包
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
 * pv：用于显示进度，放在两个管道之间
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载

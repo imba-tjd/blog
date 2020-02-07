@@ -305,6 +305,21 @@ collapsable content
 * git clone --mirror：隐含bare；普通的clone会把origin作为直接上游，会有跟踪远端的本地分支，没有origin的上游信息；bare直接是本地分支，没有跟踪分支，也没有origin的上游；mirror则有origin的上游，运行git remote update会覆盖所有的refs，与删掉再clone一致
 * 不通过fork创建重复的仓库：https://help.github.com/cn/github/creating-cloning-and-archiving-repositories/duplicating-a-repository
 
+## [hub命令行工具](https://github.com/github/hub)
+
+* sudo apt install hub; hub version
+* 第一次使用会提示输入用户名和密码，可设置`GITHUB_USER`和`GITHUB_PASSWORD`避免交互，会创建OAuthToken放在`~/.config/hub`；也可用`GITHUB_TOKEN`，这种不会写入config，但可能就每次都要设置（与Actions结合比较方便）
+* 好像会默认使用https因为有个issue说它可以用gcm ；config中设置`hub.protocol ssh`可指定协议为ssh
+* (commit); hub create; git push -u origin HEAD：自动创建GitHub上的仓库，也可用hub init
+* hub clone myrepo：无需写完整UR
+* hub clone user/repo; (cd;checkout;commit); hub fork --remote-name origin; hub pull-request：clone别人仓库后方便地fork出自己的，并打开editor提交PR
+* hub sync：fast-forward all local branches to match the latest state on the remote
+* hub browse -- issues：浏览当前仓库的issue区，如果是其它仓库就把横杠换掉；但我运行的时候说`Please set $BROWSER to a web launcher`
+* hub gist create --copy build.log：自动把文件变成gist
+* hub ci-status --verbose
+* hub release create --copy -F release-notes.txt v2.3.0
+* 还有一些操作issue和pr的功能，包括浏览（可指定过滤条件）、创建（可assign）、close、merge；宣传说所有原本的git命令都可用，hub只是做了扩充，可以直接设为git的alias
+
 ## 其它问题
 
 ### fatal: index file corrupt
