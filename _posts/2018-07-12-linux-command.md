@@ -104,7 +104,7 @@ title: Linux命令
 ### 选择除第一列以外的列
 
 * awk '{$1="";print}'，但直接输出结果，会在最前面加个空格
-* awk '{for(i=2;i\<=NF;i++) printf $i" ";printf "\\n"}'
+* awk '{for(i=2;i\<=NF;i++) printf $i" ";printf "\n"}'
 * 以上两种方法似乎都会对行进行一次排序？总之行序和本来的不同
 
 ## grep

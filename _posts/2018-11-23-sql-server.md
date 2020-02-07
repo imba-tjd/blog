@@ -12,7 +12,7 @@ title: SQL Server
 * 如果不设置实例名，则默认实例名为MSSQLSERVER但连接时不需也不能用到，命名实例默认为SQLEXPRESS；实例名不区分大小写，实例无法重命名但可以建立别名，不能有除下划线和$以外的特殊字符
 * 启用SQL Server Browser服务和UDP 1434端口，再在防火墙中允许Sqlservr.exe入站，则可用实例名访问且可用动态端口；否则无法用实例名访问命名实例（本地计算机名除外，但包括本地ip），但可用静态端口访问
 * 如果安装时选择了区分大小写的排序规则，则登录名也将区分大小写
-* 实例默认路径：C:\\Program Files\\Microsoft SQL Server\\MSSQL14.MyInstance\\
+* 实例默认路径：C:\Program Files\Microsoft SQL Server\MSSQL14.MyInstance\
 * 修改SQL的身份验证模式：`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.SQLEXPRESS\MSSQLServer`节点下有个LoginMode的键，把值从1（代表Windows验证模式）修改为2（代表混合验证模式）即可。如果这里没有，到Wow6432Node下面去看看有没有
 
 命令行工具
@@ -171,7 +171,7 @@ Transact-SQL
 * 保存有所有数据库的基本信息的数据库：sys.databases
 * 字符串前加N表示NVARCHAR，系统自带的部分都是这样的？
 * 对象的标准写法是databasename.databaseownername.objectname，默认是当前数据库和登陆的用户，而每个数据库都会有一个叫dbo的schema，相当于全局的吧
-* 清除SSMS登陆的用户名和密码：删除%AppData%\\Microsoft\\SQL Server Management Studio\\18.0\\SqlStudio.bin
+* 清除SSMS登陆的用户名和密码：删除%AppData%\Microsoft\SQL Server Management Studio\18.0\SqlStudio.bin
 * 启用账户：alter login sa enable；修改密码：alter login sa with password='sa'，启用后要重启服务？
 * Select @@ServerName：计算机名
 * 控制Windows服务：用net还是sc?

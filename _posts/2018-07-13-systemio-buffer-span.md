@@ -97,7 +97,7 @@ System.IO
 * GetFileName：包含扩展名；如果是目录分隔符，返回空字符串
 * GetFileNameWithoutExtension
 * GetFullPath：基于当前路径，把相对路径变成绝对路径；.net core2.1以后允许指定基路径，之前可先用Combine
-* GetPathRoot：如果参数没有根目录，会返回空字符串而不会报错；否则返回C:\\这样的
+* GetPathRoot：如果参数没有根目录，会返回空字符串而不会报错；否则返回C:\这样的
 
 #### 其他方法
 

@@ -113,7 +113,7 @@ index-url = https://mirrors.aliyun.com/pypi/simple/
 trusted-host = mirrors.aliyun.com
 ```
 
-* 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\\Python\\Python38\\Scripts。Linux用PATH=$PATH:...添加，但好像全局的是默认添加的
+* 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\Python\Python38\Scripts。Linux用PATH=$PATH:...添加，但好像全局的是默认添加的
 * 程序安装位置，用pip show能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
 * 安装pip本身和一些库：python3-dev python3-venv python3-pip，Linux下安装后的名称只会是pip3
 * 删除python2：apt purge python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln

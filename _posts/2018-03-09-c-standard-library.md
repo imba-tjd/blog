@@ -74,16 +74,16 @@ setvbuf更常用。mode指定缓冲的类型：_IOFBF指定一个完全缓冲的
 #### fgets
 
 * char\* fgets( char\* str, int buffer_size, FILE\* stream );，返回指向str的指针或NULL
-* fgets读取直到遇到的第一个换行符，并且储存它，然后储存'\\0'
-* fgets的第二个参数指明了读入字符的最大数量，如果为n，它最多读入n-1个字符，然后储存'\\0'
+* fgets读取直到遇到的第一个换行符，并且储存它，然后储存'\0'
+* fgets的第二个参数指明了读入字符的最大数量，如果为n，它最多读入n-1个字符，然后储存'\0'
 * 出错和到末尾都会返回NULL？可使用feof判断指定流是否到末尾
-* fputs会把字符串直到'\\0'按原样输出到流，不会在最后换行；所以即使fgets读满了，下一次fputs也可以继续断的地方输出
+* fputs会把字符串直到'\0'按原样输出到流，不会在最后换行；所以即使fgets读满了，下一次fputs也可以继续断的地方输出
 
 #### gets_s
 
 * 它只从标准输入中读取数据
-* 如果遇到换行符，丢弃它并储存'\\0'
-* 如果读满了，它会把目标数组首字符设为'\\0'、读取并丢弃标准输入直到遇到换行符或EOF，然后返回空指针、调用其他“处理函数”
+* 如果遇到换行符，丢弃它并储存'\0'
+* 如果读满了，它会把目标数组首字符设为'\0'、读取并丢弃标准输入直到遇到换行符或EOF，然后返回空指针、调用其他“处理函数”
 
 stdlib.h
 --------
@@ -171,7 +171,7 @@ time.h
 
 * clock_t clock( void )：返回从程序开始执行起处理器所消耗的时间（不是经过的时间），除以CLOCKS_PER_SEC以后就得出消耗的秒数。如果无法表示，返回-1
 * time_t time( time_t\* return_value )：如果参数不为NULL，也会储存在这个指针里。如果无法表示（2038年时会溢出？），返回-1。标准未规定time_t的编码方式，常见的为1970年1月1日0点0分0秒
-* char\* ctime( const time_t\* time_value )：输出固定格式的时间Sun Jul 4 04:02:48 1976\\n\\0。下一次调用时，这个字符串会被覆盖。ctime实际上可能以asctime( localtime( time_value ) )实现
+* char\* ctime( const time_t\* time_value )：输出固定格式的时间Sun Jul 4 04:02:48 1976\n\0。下一次调用时，这个字符串会被覆盖。ctime实际上可能以asctime( localtime( time_value ) )实现
 * double difftime( time_t time1, time_t time12 )：计算time1 - time2，结果为秒
 * struct tm\* gmtime( const time_t\* time_value )：把时间值转换为UTC，以前被叫做GMT
 * struct tm\* localtime( const time_t\* time_value )：把时间值转换为当地时间
@@ -222,8 +222,8 @@ if( strlen(x) - strlen(y) \>= 0 )
 
 因为返回值的缘故，连接字符串可以嵌套调用：strcat( strcpy( dst, a), b);如果源字符串和目标字符串重叠，结果未定义；小心溢出；如果目标未初始化，用strcpy而不是strcat，否则会有垃圾值。
 
-strncpy：如果源数组复制完了，指定数目的剩下的空间用'\\0'填充；如果达到了指定数目还没有复制完，不会添加'\\0'。
-strncat：最多复制指定数目的字符，并添加一个'\\0'。
+strncpy：如果源数组复制完了，指定数目的剩下的空间用'\0'填充；如果达到了指定数目还没有复制完，不会添加'\0'。
+strncat：最多复制指定数目的字符，并添加一个'\0'。
 strncmp：不要把返回值当作布尔值。
 
 在一个字符串中查找特定字符，区分大小写，如果不存在则返回NULL，获取索引可以减去str。第二个函数查找最后一次出现的位置，第三个查找匹配group中任意一个字符的字符：
@@ -276,7 +276,7 @@ putchar("0123456789ABCDEF"[value%16]);
 内存操作函数（位于string.h中）
 ------------------------------
 
-与字符串的那些函数类似，但是不会以'\\0'来结束。
+与字符串的那些函数类似，但是不会以'\0'来结束。
 
 * void\* memcpy( void\* dst, const void\* src, size_t length); // 不能重叠，如果类型相同，length可以为sizeof( src )；如果需要指定长度，count \* sizeof( src[0] )
 * void\* memmove( void\* dst, const void\* src, size_t length); // 可以重叠（src会先复制到临时位置）
@@ -298,7 +298,7 @@ ctype.h
 -------
 
 * iscntrl：任何控制字符
-* isspace：空白字符，包括空格、换页\\f、换行\\n、回车\\r、制表符\\t、垂直制表符\\v
+* isspace：空白字符，包括空格、换页\f、换行\n、回车\r、制表符\t、垂直制表符\v
 * isdigit：十进制数字0-9
 * isxdigit：十六进制数字，包括十进制数字、小写字母a-f、大写字母A-F
 * islower：小写字母a-z
