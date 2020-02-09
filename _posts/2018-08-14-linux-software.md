@@ -29,7 +29,8 @@ title: Linux软件
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
 * pv：用于显示进度，放在两个管道之间
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
-* ripgrep：快速的正则搜索程序
+* ripgrep：快速的正则搜索程序，安装后使用rg命令
+* ssl-cert：方便地自签证书
 
 ### Debian阿里源
 
