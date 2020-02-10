@@ -63,6 +63,8 @@ title: Linux命令
 * vmstat：监控系统状况的程序。`vmstat 5 5`：在5秒时间内进行5次采样；-f显示从系统启动至今的fork数量，-s显示内存相关统计信息，-d查看磁盘的读写，-m查看slab信息
 * cat > file：接下来输入内容，ctrl+d结束；可以快速地创建一个有内容的文件
 * less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
+* fc：在editor中编辑上一条输入的命令，并在退出时执行
+* factor：求一个数的所有因数；
 
 ## tar
 
@@ -95,6 +97,7 @@ title: Linux命令
 * -mtime -1：一天之内修改的；atime是访问时间，ctime是创建时间
 * -print0：与xargs -0匹配使用
 * -delete：直接删除找到的文件
+* -maxdepth：最大搜索深度
 
 ## awk
 
@@ -194,6 +197,7 @@ title: Linux命令
 * filter过滤连接状态：`ss state/exclude all/connected/各种TCP状态`，help里有
 * expression过滤ip和端口：`ss src = :22`，也可用`sport = :22`或`sport 22`，而`src xxx`就只指IP了；Peer地址用dst，端口用dport；可以用and和or连接多个条件，则需要再在外面加个单引号；IP可以用`192.168.0/24`这种形式；运算符可用==、=、!=、ge、le、gt、lt
 * Local Address指的就是本机，但它既可以是Listen的，也可以是发出的；Perr Address就是“另一端”
+* 监听地址为*的就是双栈，`[::]`就只是V6
 
 ## rsync
 
@@ -228,6 +232,19 @@ find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐�
 
 * systemctl start（当前启动一次）、enable（开机自启）、disable（禁止自启）、status、restart；查看所有已启动的服务 systemctl list -units --type=service
 
+## nmap
+
+* nmap -T4 -s[scan method] -p[portrange] targetip
+* ip范围可以用-和/和逗号；端口范围可以用-和逗号，且可在前面加U:和T:表示UDP和TCP
+* 默认扫描TOP1000的端口，-F扫TOP100的；-r不打乱端口顺序
+* -T0-5为扫描时序，越高速度越快约容易被封；-A为进攻性(Aggressive)扫描，会完整全面地扫描
+* 列表扫描(-sL)：仅将指定的目标的IP列举出来
+* 主机发现(-sn)：默认会发ICMP和80和443，只要有一个回复就说明在线，局域网内是ARP；-Pn跳过主机发现，将所有指定的主机视作开启的
+* 端口扫描：，-sS/sT/sA/sW/sM/sN/sF/sX分别为TCP SYN/Connect()/ACK/Window/Maimon/Null/FIN/Xmas，后三种比较隐蔽，为秘密扫描方式；-sU使用UDP
+* 服务与版本侦测(-sV)：用于确定目标主机开放端口上运行的具体的应用程序及版本信息，--version-light使用轻量侦测，--version-all尝试使用所有的probes进行侦测；
+* 操作系统扫描(-O)：--osscan-guess大胆猜测系统类型，准确性会下降不少，结果变多
+* 指定后面的项目会把前面的也都进行一遍；扫描方式可以同时使用多个，如果什么都不加应该就是SYN，也有一种说法是会用四种方式
+* 规避技巧：-S伪造源IP，--spoof-mac伪造mac，--data-length随机填充数据到指定长度，--badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙
 
 ## TODO
 
@@ -245,3 +262,4 @@ https://einverne.github.io/categories.html#每天学习一个命令
 ## 参考
 
 * https://www.cnblogs.com/manong--/p/8012324.html
+* https://blog.csdn.net/aspirationflow/article/details/7694274

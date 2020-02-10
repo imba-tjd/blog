@@ -27,10 +27,13 @@ title: Linux软件
 * gparted：图形化的管理磁盘分区的工具
 * network-manager、network-manager-gnome：为了使网络配置尽可能简单而开发的网络管理软件包
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
-* pv：用于显示进度，放在两个管道之间
+* pv：用于显示进度，放在两个管道之间或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
 * ripgrep：快速的正则搜索程序，安装后使用rg命令
 * ssl-cert：方便地自签证书
+* nmap
+* neofetch：显示一些基本信息，不过需要安装较多依赖。linuxlogo可替代一小部分
+* iotop
 
 ### Debian阿里源
 
@@ -128,6 +131,8 @@ trusted-host = mirrors.aliyun.com
 * `sublist3r.py -d example.com -e Baidu,Yahoo,Google,Bing,Ask,Netcraft,Virustotal,SSL`：搜寻子域名
 * [trash-cli](https://github.com/andreafrancia/trash-cli)：把文件移动到`.Trash`中
 * [bleachbit](https://github.com/bleachbit/bleachbit)：清理垃圾的
+* ps_mem：显示各个进程的内存占用情况
+* Glances：监控所有系统信息（类似于vmstat）
 
 ## Ruby
 
