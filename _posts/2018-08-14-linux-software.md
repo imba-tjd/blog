@@ -9,8 +9,9 @@ title: Linux软件
 * 可以使用apt install ./xxx.deb直接安装本地的deb包
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
-* apt-transport-https、ca-certificates：使得APT支持https？
-* curl、~~software-properties-common~~（含有add-apt-repository）
+* apt-transport-https、~~ca-certificates~~：使得APT支持https？后者装curl的时候会自动装上
+* curl：还会顺带装openssl
+* software-properties-common：含有add-apt-repository
 * autoremove python(2)以后会被删除的包：sudo
 * mtr： traceroute + ping
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新

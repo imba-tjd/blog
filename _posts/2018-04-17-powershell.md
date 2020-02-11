@@ -135,7 +135,7 @@ switch [-wildcard/-regex/-case] ($value) # 比较字符串时默认-eq不区分�
 ----------
 
 * PS的字符串是个字符串类型的值，bash的是个命令
-* +：合并字符串，但必须赋给一个变量或者加括号，否则加号可能被认为是普通的字符串的一部分；数字运算同理
+* +：合并字符串，但必须赋给一个变量或者**加括号**，否则加号可能被认为是普通的字符串的一部分；数字运算同理
 * -eq：判断字符串相等
 * 替换：源文本 -replace *匹配模式*, *替换内容*；支持且必须用正则所以有的符号要转义，逗号不可忽略
 * -like使用dos通配符，\*代表多个字符
@@ -243,6 +243,7 @@ CMDLET
 ### 输出
 
 * Write-Host：向控制台写文本，可用字符串插值（双引号内直接用$变量名），或者用类似`"asdf" $_ "asdf"`这样的式子，但空格还是会保留且不可省，除非加括号用字符串的处理方式；与echo(write-output)的区别是echo会把以空格分开的每个参数（当作$args数组？）在单独的一行输出，而它会把每个参数只用一个空格分隔后在一行输出
+* echo不换行：`Write-Host "xxx" -NoNewLine`，但注意如果重定向输出，仍会输出到屏幕上
 * Write-Debug：默认情况下（"SilentlyContinue"）不会往终端输出，$DebugPreference为"stop"时不允许使用此命令，为"Continue"时会显示，为"Inqure"时会显示并询问是否继续
 * $ErrorActionPreference与debug类似，"SilentlyContinue"为隐藏，"Continue"为输出
 * $host.UI.WriteErrorLine，WriteVerboseLine，WriteWarningLine：不受$DebugPreference控制
