@@ -71,7 +71,7 @@ System.IO
 #### Directory/DirectoryInfo
 
 * DirectoryInfo独有：Name：文件夹的基本名、FullName：绝对路径，末尾没有斜杠、Root：根目录、Parent：父目录Info、CreateDirectory：以该info为相对路径创建文件夹
-* GetFiles/EnumerateFiles：前者返回string[]和FileInfo[]，必须等数组完全建立好才行；后者返回IEnumerable string/FileInfo，等到枚举开始时才获取内容，不会缓存结果，每次获取枚举内容都会重新检索一遍；searchPattern中可以使用通配符，但如果基本名使用\*并且后缀名只有三个字母，则会把多于三个字母后缀的文件也匹配了（DOS遗留问题，CMD也是如此但PS不是这样）。**小心隐藏文件**。
+* GetFiles/EnumerateFiles：前者返回string[]和FileInfo[]，必须等数组完全建立好才行；后者返回IEnumerable string/FileInfo，等到枚举开始时才获取内容，不会缓存结果，每次获取枚举内容都会重新检索一遍；searchPattern中可以使用通配符，但如果基本名使用*并且后缀名只有三个字母，则会把多于三个字母后缀的文件也匹配了（DOS遗留问题，CMD也是如此但PS不是这样）。**小心隐藏文件**。
 * Directory.GetFiles/EnumerateFiles：如果path是相对路径，返回的也是；DirectoryInfo的见FileInfo.ToString
 * CreateDirectory(string path).ToString()的返回值与path相同，如果只写文件夹名不写完整路径，返回的也只有文件夹名，当然创建文件夹会成功
 * ToString：如果用的是构造函数，返回原始的路径；如果是GetDirectory创建的，返回基本名

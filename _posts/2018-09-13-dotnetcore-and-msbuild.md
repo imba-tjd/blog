@@ -78,9 +78,9 @@ dotnet CLI
 
 ### dotnet sln、reference、package
 
-* dotnet sln todo.sln add \*\*/\*.csproj
+* dotnet sln todo.sln add **/*.csproj
 * dotnet sln remove
-* dotnet add app/app.csproj reference \*\*/\*.csproj
+* dotnet add app/app.csproj reference **/*.csproj
 * dotnet list reference、dotnet remove reference
 * dotnet add package Newtonsoft.Json [--version 1.0.0]、dotnet remove package
 

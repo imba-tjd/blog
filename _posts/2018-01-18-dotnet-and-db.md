@@ -338,7 +338,7 @@ cmd.Parameters.AddWithValue("@UserID",UserID);
 
 * **用于DataSet跟和数据库交互**
 * New的时候可以接受SqlCommand或接受Sql语句和SqlConnection/连接字符串；如果是后者，使用DataAdapter的方法时会自动连接数据库，好了以后自动关闭
-* Fill方法（相当于Select \* from*TableName*）和SelectCommand方法，接受DataSet对象和数据库名，把内容复制到DataSet中
+* Fill方法（相当于Select * from *TableName*）和SelectCommand方法，接受DataSet对象和数据库名，把内容复制到DataSet中
 * InsertCommand、UpdateCommand、DeleteCommand方法：逐行检查RowState属性，进行写入数据库操作
 * Update方法可以接受表，把数据从内存中写回数据库。因为DataAdapter也是以表进行操作的
 

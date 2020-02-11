@@ -6,7 +6,7 @@ title: Git/GitHub笔记
 
 * git init/git clone username@host:/path/to/repository
 * git pull [--rebase] [upstream master] = git fetch + git merge（到当前分支）；rebase会先stash当前更改，更新后再pop
-* git add -A（所有修改）/.或\*（包括修改和新建，不包括删除）/-u（更新，包括修改和删除，不包括新建）
+* git add -A（所有修改）/.或*（包括修改和新建，不包括删除）/-u（更新，包括修改和删除，不包括新建）
 * git status；加-uno会不检测未stage的文件，大大加快执行速度
 * git commit -[a]m "message"
 * git push origin master
@@ -197,9 +197,9 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 
 ### 设置.gitattributes
 
-* 自动转换：\* text=auto
-* 整个仓库固定CRLF/LF：\* text=crlf/lf；指定文件：\*.txt eol=crlf
-* 不进行自动转换：\*.txt binary
+* 自动转换：* text=auto
+* 整个仓库固定CRLF/LF：* text=crlf/lf；指定文件：*.txt eol=crlf
+* 不进行自动转换：*.txt binary
 * 修改后可用`git add --renormalize .`改变已有文件的换行；使用前需要把当前文件都提交
 
 ## SSH & GPG Keys
@@ -239,10 +239,10 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 * https://git-scm.com/docs/gitignore#_pattern_format
 
 * 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录 （但其实是下一条的特例）
-* 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以\*\*/开头 ）；如果有，则隐式在最前面加斜杠，此时以\*\*/开头会全局匹配
+* 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以**/开头 ）；如果有，则隐式在最前面加斜杠，此时以**/开头会全局匹配
 * 星号匹配多个字符（会一直匹配到斜杠才结束），问号匹配单个字符，用方括号表示单个字符匹配列表；以斜杠结尾表示要匹配的是目录（以及里面的），但注意会全局匹配
-* .\*会匹配以点开头的（不管后面有多少个点），\*.\*则只不会匹配无后缀的
-* 当\*\*在中间时，可以匹配那一部分有或没有的路径，理论上可以匹配多层，但实际有不行的
+* .*会匹配以点开头的（不管后面有多少个点），*.*则只不会匹配无后缀的
+* 当**在中间时，可以匹配那一部分有或没有的路径，理论上可以匹配多层，但实际有不行的
 * 注释用井号，匹配井号用转义，其他的类似
 * 使用于被版本控制的情形，用户自己单独定义可以用$GIT_DIR/info/exclude和core.excludesFile
 * 如果仓库原本没有此文件，则可以不提交就忽略自己；如果原本有，则不能不提交就忽略自己
@@ -252,7 +252,7 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 * 在开头使用叹号
 * 无法递归生效；如果父目录被排除，子目录无法再被包含
 * 网上的文章说是从上到下解析？但下面这个例子却是从下到上的解析规则
-* 只有用了忽略，结尾不加\*、加\*、加\*\*才会不同
+* 只有用了忽略，结尾不加*、加*、加**才会不同
 
 ```
 # 排除所有内容，除了foo/bar：（必须这么写）
@@ -289,8 +289,8 @@ collapsable content
 
 * https://help.github.com/en/articles/about-code-owners
 * 把`CODEOWNERS`文件放到`/`、 `.github/` 下即可启用，仅对存在此文件的分支的PR有效
-* 文件匹配+空格+@用户；从后往前匹配，所以单独一个\*要放到最前
-* \*.js匹配所有js；开头不加/则匹配所有的；末尾为/\*不会递归生效，为/才会
+* 文件匹配+空格+@用户；从后往前匹配，所以单独一个*要放到最前
+* *.js匹配所有js；开头不加/则匹配所有的；末尾为/*不会递归生效，为/才会
 
 ## License
 

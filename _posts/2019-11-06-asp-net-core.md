@@ -265,7 +265,7 @@ public class TodoController : ControllerBase {
 * RunConsoleAsync()会启用控制台支持？
 * Start()是同步运行的，StartAsync()可用于延迟启动，不阻塞；直接使用它们会不响应Ctrl+C，导致直接走到退出的地方然后卡住，要用using包裹host。一般用于非Web的程序使用host，不是单独用的
 * 如果不用UseStartup，也可以手动webBuilder.UseConfiguration().ConfigureServices().Configure()
-* 配置终结点：默认只会监听localhost的5000和5001，开发者模式下会用launchSettings，然而发布后不会。可在appsettings或命令行中用`"urls": "http://localhost;https://localhost"`或在代码中用UseUrls或UseSetting。在Docker中要用0.0.0.0或[::]或\*。端口也可以用\*
+* 配置终结点：默认只会监听localhost的5000和5001，开发者模式下会用launchSettings，然而发布后不会。可在appsettings或命令行中用`"urls": "http://localhost;https://localhost"`或在代码中用UseUrls或UseSetting。在Docker中要用0.0.0.0或[::]或*。端口也可以用*
 
 ```c#
 static void Main(string[] args) => CreateHostBuilder(args).Build().Run();

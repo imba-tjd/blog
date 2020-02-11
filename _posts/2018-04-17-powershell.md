@@ -138,7 +138,7 @@ switch [-wildcard/-regex/-case] ($value) # 比较字符串时默认-eq不区分�
 * +：合并字符串，但必须赋给一个变量或者**加括号**，否则加号可能被认为是普通的字符串的一部分；数字运算同理
 * -eq：判断字符串相等
 * 替换：源文本 -replace *匹配模式*, *替换内容*；支持且必须用正则所以有的符号要转义，逗号不可忽略
-* -like使用dos通配符，\*代表多个字符
+* -like使用dos通配符，*代表多个字符
 * -match使用正则（成功时填充$Matches）
 * -contains完全匹配
 * 这几个命令最前面都可以加no来取相反的集合，可以再在前面加c表示区分大小写（默认不区分）
@@ -198,7 +198,7 @@ CMDLET
 --------
 
 * Get-Location(pwd)：（以表格形式）显示当前路径；Get-Location | select -ExpandProperty Path的输出就和pwd一样了，或者先赋给变量，再用属性
-* Get-Command \*：获取所有的cmd-let，不用\*就是一般关键的，加上-ListImported只列出特别关键的，-CommandType指定命令类型。但只会显示一些属性，不会有用法
+* Get-Command *：获取所有的cmd-let，不用*就是一般关键的，加上-ListImported只列出特别关键的，-CommandType指定命令类型。但只会显示一些属性，不会有用法
 * Get-History、Invoke-History *id*
 
 未分类
@@ -220,7 +220,7 @@ CMDLET
 
 * ForEach-Object(foreach和%)：1..3 | % { echo $_ }；可指定-Begin、-Process、-End，或直接用三个大括号代替，$ForEach表示索引
 * Where-Object(where和?)：'You', 'Me' | ? { $_ -match 'u' }
-* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl \*；可指定-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
+* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl *；可指定-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
 * Sort-Object(sort)：-Descending降序；如果某个对象不具有所指定的属性之一，则 cmdlet 会将该对象的属性值解释为 NULL，并将其放置在排序顺序的末尾；如果要多字段排序需要传哈希表对象
 * Tee-Object(tee)：保存并显示管道输入的内容，会先创建文件再运行前面的命令；-Variable 变量名（不用加$）可以把结果保存到变量里
 * Group-Object：进行分组，依据可为表达式；分组后有Count属性用于排序，Name属性为key，Group属性为内容
@@ -236,7 +236,7 @@ CMDLET
 * ConvertTo-Html: 将 Microsoft .NET Framework 对象转换为可在 Web 浏览器中显示的 HTML
 * Export/Import-Clixml: 创建对象的基于 XML 的表示形式并将其存储在文件中
 * Export/Import-Csv: 将 Microsoft .NET Framework 对象转换为一系列以逗号分隔的、长度可变的 (CSV) 字符串，并将这些字符串保存到一个 CSV 文件中
-* Format-List(fl): 将输出的格式设置为属性列表，其中每个属性均各占一行显示。适合属性类型不同的情况。未知对象属性大于4个时会采用；fl \*会显示所有属性
+* Format-List(fl): 将输出的格式设置为属性列表，其中每个属性均各占一行显示。适合属性类型不同的情况。未知对象属性大于4个时会采用；fl *会显示所有属性
 * Format-Table(ft): 将输出的格式设置为表，适合用于显示键值对，后可跟KeyName和对每一项的计算（比如/1KB）；-Autosize(auto) -Wrap：强制显示所有内容，如果不用，过长的字符串会显示...，这是因为PS是流模式，下一条命令的长度未知；如果要手动指定宽度和对齐方式等，每个键需要传一个哈希表给Property属性：`@{expression="KeyName"; width=40;label="Header"; alignment="center"}`；有一个-GroupBy参数可以在保持表格的情况下分组
 * Format-Wide: 将对象的格式设置为只能显示每个对象的一个属性的宽表，样式类似于bash默认的ls
 
@@ -273,7 +273,7 @@ Profile文件
 
 * 不支持作业控制，fg和bg不可用
 * 其他不可用的cmdlet：https://docs.microsoft.com/zh-cn/powershell/scripting/whats-new/known-issues-ps6?view=powershell-6#command-availability
-* 删除了别名：ls、cp、mv、rm、cat、man、mount、ps，使用的是本地命令。这会允许globbing，比如ls \*.txt，但这将返回字符串
+* 删除了别名：ls、cp、mv、rm、cat、man、mount、ps，使用的是本地命令。这会允许globbing，比如ls *.txt，但这将返回字符串
 
 控制台（$host.ui.rawui）
 -------------------------
