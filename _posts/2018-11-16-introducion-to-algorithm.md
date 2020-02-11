@@ -19,12 +19,12 @@ title: 算法导论
 代入法
 
 * 失败时可以考虑**减去**一个低阶项
-* T(n)=2T(n/2)+n -\> T(n)=O(nlgn)
-* T(n)=2T(n/2)+c -\> T(n)=O(n)
-* T(n)=2T(sqrt(n))+lgn -\> 令m=lgn, T(n)=O(mlgm)
-* T(n)=9T(n/3)+n -\> T(n)=O(n^2)
-* T(n)=T(2n/3)+c -\> T(n)=O(lgn)
-* T(n)=8T(n/2)+n^2 -\> T(n)=O(n^3)
+* T(n)=2T(n/2)+n -> T(n)=O(nlgn)
+* T(n)=2T(n/2)+c -> T(n)=O(n)
+* T(n)=2T(sqrt(n))+lgn -> 令m=lgn, T(n)=O(mlgm)
+* T(n)=9T(n/3)+n -> T(n)=O(n^2)
+* T(n)=T(2n/3)+c -> T(n)=O(lgn)
+* T(n)=8T(n/2)+n^2 -> T(n)=O(n^3)
 
 ### 在线雇佣
 

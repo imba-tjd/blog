@@ -167,7 +167,7 @@ title: Linux命令
 * -p 5353：指定端口
 * AAAA：查询ipv6的记录（有可能返回一个网址，原因不明，大概是不支持吧）；A：ipv4的记录；MX：邮件服务器记录；NS：该域名由哪个dns服务器负责解析；CNAME：查询别名；-x：查询PTR记录，只能这样，前面的方法不适用
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
-* -\>\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示与DNS服务器响应超时；这两者ANSWER字段为0；成功是是NOERROR，ANSWER字段为2
+* ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示与DNS服务器响应超时；这两者ANSWER字段为0；成功是是NOERROR，ANSWER字段为2
 * 另外还有kdig（knot-utils）和host命令
 
 ## crontab

@@ -15,7 +15,7 @@ System.IO
 
 ### 读写器
 
-* TextReader(abstract) -\> StreamReader(Stream/string path)、StringReader(string src)
+* TextReader(abstract) -> StreamReader(Stream/string path)、StringReader(string src)
 * Synchronized静态方法返回线程安全的实例
 * BaseStream返回底层的流
 * TextWriter的AutoFlush指定是否每次Write后都flush
@@ -27,7 +27,7 @@ System.IO
 ### 流
 
 * BinaryReader(File.Open(fileName, FileMode.Open))
-* Stream -\> (BufferedStream、FileStream、MemoryStream、NetworkStream、PipeStream)：Read、Write、Seek、CanRead、CanWrite、CanSeek、Position、**Length**、SetLength；FlushAsync、Read/WriteAsync、Read/WriteByte
+* Stream -> (BufferedStream、FileStream、MemoryStream、NetworkStream、PipeStream)：Read、Write、Seek、CanRead、CanWrite、CanSeek、Position、**Length**、SetLength；FlushAsync、Read/WriteAsync、Read/WriteByte
 * Null：空流
 * Synchronized：静态方法，接受Stream，返回线程安全的流
 * 定位到流末尾：Seek(0, SeekOrigin.End)
