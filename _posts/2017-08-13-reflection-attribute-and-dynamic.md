@@ -2,18 +2,13 @@
 title: 反射、特性和动态类型
 ---
 
-> 《Illustrated C# 2012 (4th Edition)》
-> 《C# 6.0 学习笔记：从第一行代码到第一个项目设计》
-
-反射
-====
+## 反射
 
 * 有关程序及其类型的数据被称为元数据，它们保存在程序的程序集中
 * 程序在运行时，可以查看其他程序集或其本身的元数据，这种行为叫做反射
 * 使用GetType方法和typeof运算符来获取Type对象
 
-System.Type类部分成员
----------------------
+### System.Type类的部分成员
 
 * Name
 * Namespace
@@ -24,21 +19,20 @@ System.Type类部分成员
 * GetCustomAttributes
 * IsDefined：是否应用了某个特性
 
-返回该类所有属性及其值
-----------------------
+### 返回一个类的所有属性及其值
 
-    string ObjToStr()
-    {
-        string ret_str = this.GetType().Name + "的属性信息：\n";
-        PropertyInfo[] props = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        foreach (var p in props)
-            ret_str += $"{p.Name} : {p.GetValue(this)?.ToString() ?? "null"}\n";
+```c#
+string ObjToStr() {
+    string ret_str = this.GetType().Name + "的属性信息：\n";
+    PropertyInfo[] props = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+    foreach (var p in props)
+        ret_str += $"{p.Name} : {p.GetValue(this)?.ToString() ?? "null"}\n";
 
-        return ret_str;
-    }
+    return ret_str;
+}
+```
 
-特性
-====
+## 特性
 
 * 将应用了特性的程序结构叫做目标
 * 设计用来获取和使用元数据的程序叫做特性的消费者（编译器、CLR、浏览器）
@@ -49,9 +43,7 @@ System.Type类部分成员
 
 ### 将特性应用于目标对象的完整格式
 
-默认条件下，特性将应用于跟随其后的对象。但是在用于方法的返回值时必须使用完整格式：
-
-    [<目标> : <特性列表>]
+默认条件下，特性将应用于跟随其后的对象。但是在用于方法的返回值时必须使用完整格式：`[<目标> : <特性列表>]`
 
 特性目标关键字：
 
@@ -65,15 +57,16 @@ System.Type类部分成员
 * assembly 用于当前程序集
 * module 用于当前模块
 
-预定义保留的特性
-----------------
+## 预定义保留的特性
 
 ### Obsolete特性
 
 将程序结构标注为过期的，并且在代码编译时显示有用的警告信息
 
-    [Obsolete("Message")]
-    [Obsolete("Message"), true] // bool类型的第二个参数指定目标被标记为错误
+```c#
+[Obsolete("Message")]
+[Obsolete("Message"), true] // bool类型的第二个参数指定目标被标记为错误
+```
 
 ### Conditional特性
 
@@ -81,41 +74,43 @@ System.Type类部分成员
 
 如果定义（#define）了编译符号，则和普通方法没有区别。如果没有定义，那么编译器会忽略这个方法的所有调用，代码仍包含在程序集中。
 
-    [Conditional("DEBUG")]
-    public static void Print(string message);
+```c#
+[Conditional("DEBUG")]
+public static void Print(string message);
+```
 
 ### 调用者信息特性
 
 * 可以使程序访问文件路径、代码行数、调用成员的名称等源代码信息
 * 这些特性只能用于方法中的可选参数，无法用于动态类型。
 
-<!-- -->
+```c#
+using System;
+using System.Runtime.CompilerServices;
 
-    using System;
-    using System.Runtime.CompilerServices;
+namespace CSharpConsoleTest
+{
+    class Program
+    {
+        static void MyTrace(string message,
+            [CallerFilePath] string fileName = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string callingMember = "")
+        {
+            Console.WriteLine($"Message:       {message}");
+            Console.WriteLine($"FileName:      {fileName}");
+            Console.WriteLine($"Line:          {lineNumber}");
+            Console.WriteLine($"Called From:   {callingMember}");
+        }
 
-    namespace CSharpConsoleTest
-    {
-        class Program
-        {
-            static void MyTrace(string message,
-                [CallerFilePath] string fileName = "",
-                [CallerLineNumber] int lineNumber = 0,
-                [CallerMemberName] string callingMember = "")
-            {
-                Console.WriteLine($"Message:       {message}");
-                Console.WriteLine($"FileName:      {fileName}");
-                Console.WriteLine($"Line:          {lineNumber}");
-                Console.WriteLine($"Called From:   {callingMember}");
-            }
-
-            static void Main()
-            {
-                MyTrace("test");
-                Console.ReadKey();
-            }
-        }
-    }
+        static void Main()
+        {
+            MyTrace("test");
+            Console.ReadKey();
+        }
+    }
+}
+```
 
 ### DebuggerStepThrough特性
 
@@ -135,8 +130,10 @@ System.Type类部分成员
 
 接受单个位置参数，使用按位或运算符来组合使用类型。例如，在下面的代码中，被装饰的特性只能应用到方法和构造函数上。
 
-    [AttributeUsage(AttributeTarget.Method|AttributeTarget.Constructor)]
-    public sealed class MyAttributeAttribute:System.Attribute{...}
+```c#
+[AttributeUsage(AttributeTarget.Method|AttributeTarget.Constructor)]
+public sealed class MyAttributeAttribute:System.Attribute{...}
+```
 
 #### AttributeTarget枚举的成员
 
@@ -159,8 +156,10 @@ System.Type类部分成员
 
 ### 友元程序集
 
-    [assembly:InternalVisibleTo("...")]
-    [assembly:InternalVisibleTo("..."), PublicKey="..."]
+```c#
+[assembly:InternalVisibleTo("...")]
+[assembly:InternalVisibleTo("..."), PublicKey="..."]
+```
 
 其中PublicKey可由`sn -Tp xxx.dll`得到，且需要Key而不是Key token。
 
@@ -174,8 +173,7 @@ System.Type类部分成员
 |DLLImport|声明是非托管代码实现的|
 |WebMethod|声明方法应该被作为XML Web服务的一部分暴露|
 
-自定义特性
-----------
+## 自定义特性
 
 * 继承自System.Attribute的类即可
 * 特性类应该表示目标结构的一些状态
@@ -184,11 +182,9 @@ System.Type类部分成员
 * 为了更安全，把特性类声明为sealed
 * 在特性声明中使用AttributeUsage来显式指定特性目标组
 
-动态类型
-========
+## 动态类型
 
-特点
-----
+### 特点
 
 * 在CLR级别，dynamic就是应用了DynamicAttribute的object
 * 几乎所有的CLR类型都可以隐式转换为dynamic（和object，所有dynamic类型的表达式都可以隐式转换为CLR类型，但在类型推断时不认为dynamic类型能隐式转换为其他类型（而是别的转换为它）
@@ -203,97 +199,94 @@ System.Type类部分成员
 * 构造函数无法返回动态类型的对象，但是可以用工厂方法
 * 不能声明基类为dynamic的类，不能用于泛型类型参数的约束(where T: dynamic)，不能用于实现泛型接口的类型参数(:IEnumerable\<dynamic\>)；可以用于实现泛型类的类型参数(:List\<dynamic\>)或泛型接口变量
 
-使用实例
---------
-
 ### 静态方法动态调用
 
-    private static bool AddConditionallyImpl<T>(IList<T> list, T item)
-    {
-        if (list.Count > 10)
-        {
-            list.Add(item);
-            return true;
-        }
-        return false;
+```c#
+private static bool AddConditionallyImpl<T>(IList<T> list, T item) {
+    if (list.Count > 10) {
+        list.Add(item);
+        return true;
     }
+    return false;
+}
 
-    public static bool AddConditionally(dynamic list, dynamic item)
-    {
-        return AddConditionallyImpl(list, item);
-    }
+public static bool AddConditionally(dynamic list, dynamic item) =>
+    AddConditionallyImpl(list, item);
+```
 
 ### 弥补泛型操作符不足
 
 * 不要声明成IEnumerable\<dynamic\>，因为协变性无法用于值类型
 
-<!-- -->
+```c#
+public static T DynamicSum<T>(this IEnumerable<T> source) {
+    dynamic total = default(T);
+    foreach (T element in source)
+        total = (T) (total + element); // 如果不强制转换，运算时会进行提升；如果T为byte，返回时就会异常
 
-    public static T DynamicSum<T>(this IEnumerable<T> source)
-    {
-        dynamic total = default(T);
-        foreach (T element in source)
-        {
-            total = (T) (total + element); // 如果不强制转换，运算时会进行提升；如果T为byte，返回时就会异常
-        }
-        return total;
-    }
+    return total;
+}
+```
 
-动态语言
---------
+## IronPython
 
 ### 使用脚本
 
-                ScriptEngine engine = Python.CreateEngine();
-                engine.Execute("print 'hello, world'");
-                engine.ExecuteFile("HelloWorld.py");
+```
+ScriptEngine engine = Python.CreateEngine();
+engine.Execute("print 'hello, world'");
+engine.ExecuteFile("HelloWorld.py");
+```
 
 ### 使用变量
 
-                string python = @"
-    text = 'hello'
-    output = input + 1
-    ";
-                ScriptEngine engine = Python.CreateEngine();
-                ScriptScope scope = engine.CreateScope();
-                scope.SetVariable("input", 10);
-                engine.Execute(python, scope);
-                Console.WriteLine(scope.GetVariable("text"));
-                Console.WriteLine(scope.GetVariable("input"));
-                Console.WriteLine(scope.GetVariable("output"));
+```c#
+string python = @"
+text = 'hello'
+output = input + 1
+";
+ScriptEngine engine = Python.CreateEngine();
+ScriptScope scope = engine.CreateScope();
+scope.SetVariable("input", 10);
+engine.Execute(python, scope);
+Console.WriteLine(scope.GetVariable("text"));
+Console.WriteLine(scope.GetVariable("input"));
+Console.WriteLine(scope.GetVariable("output"));
+```
 
 ### 使用函数
 
-                string python = @"
-    def sayHello(user):
-        print 'Hello %(name)s' % {'name' : user}
-    ";
-                ScriptEngine engine = Python.CreateEngine();
-                ScriptScope scope = engine.CreateScope();
-                engine.Execute(python, scope);
-                dynamic function = scope.GetVariable("sayHello");
-                function("Jon");
+```c#
+string python = @"
+def sayHello(user):
+    print 'Hello %(name)s' % {'name' : user}
+";
+ScriptEngine engine = Python.CreateEngine();
+ScriptScope scope = engine.CreateScope();
+engine.Execute(python, scope);
+dynamic function = scope.GetVariable("sayHello");
+function("Jon");
+```
 
 ### 最佳可访问类型
 
-    static void Execute(dynamic x, string y) => Console.WriteLine("dynamic string");
-    static void Execute(dynamic x, object y) => Console.WriteLine("dynamic object");
-    static void Main()
-    {
-        object text = "text";
-        dynamic d = 10;
-        Execute(d, text); // dynamic object
-        Execute(d, (dynamic)text); // dynamic string
-    }
+```c#
+static void Execute(dynamic x, string y) => Console.WriteLine("dynamic string");
+static void Execute(dynamic x, object y) => Console.WriteLine("dynamic object");
+static void Main() {
+    object text = "text";
+    dynamic d = 10;
+    Execute(d, text); // dynamic object
+    Execute(d, (dynamic)text); // dynamic string
+}
+```
 
-DLR
----
+## DLR
 
 * 调用点、接收器、绑定器
 * 多级缓存
 
-实现动态行为
-------------
+### 实现动态行为
 
 * 位于System.Dynamic下
 * 可用于DOM树
@@ -306,15 +299,15 @@ DLR
 * 无法自定义它本身的索引器
 * 赋值的时候是复制的值，它在建立的时候就需要生成整个树
 
-<!-- -->
+```c#
+dynamic expando = new ExpandoObject();
+IDictionary<string, object> dictionary = expando;
+expando.First = "value set dynamically";
+Console.WriteLine(dictionary["First"]);
 
-    dynamic expando = new ExpandoObject();
-    IDictionary<string, object> dictionary = expando;
-    expando.First = "value set dynamically";
-    Console.WriteLine(dictionary["First"]);
-
-    dictionary["Second"] = "value set with dictionary";
-    Console.WriteLine(expando.Second);
+dictionary["Second"] = "value set with dictionary";
+Console.WriteLine(expando.Second);
+```
 
 ### DynamicObject
 
@@ -343,8 +336,7 @@ DLR
 
 * 太复杂，看不懂
 
-Marshal
--------
+## Marshal
 
 * AllocHGlobal、FreeHGlobal、ReAllocHGlobal
 * StringToHGlobalAnsi、PtrToStringAnsi、Auto、UTF8、Uni，HGlobalToString...
@@ -361,8 +353,7 @@ Marshal
 * 等价于Handle或者void*，是一些Marshal类方法的返回类型
 * ToPointer方法就可以转换成void*
 
-P/Invoke
---------
+## P/Invoke
 
 * win32的API可直接用http://pinvoke.net/
 * c++会对函数名进行改写，需要用`extern "C"`；但`__stdcall`好像也会修改函数名；官方推荐c++写COM
@@ -370,7 +361,7 @@ P/Invoke
 * 具体情况具体分析，还可以使用共享内存，消息，IPC，管道，Socket，文件，数据库，队列，COM等等
 * 例子：https://zhuanlan.zhihu.com/p/29161824
 
-```
+```c#
 int __declspec(dllexport) __stdcall multiply(int a, int b) { return a*b; }
 ----
 using System.Runtime.InteropServices;
@@ -379,10 +370,9 @@ using System.Runtime.InteropServices;
 static extern void print(string message);
 ```
 
-序列化
-------
+## 序列化
 
-```
+```c#
 [DataContract(Name="error"), Serializable]
 public class Error
 {
@@ -398,7 +388,7 @@ var serializer = new DataContractJsonSerializer(typeof(Error));
 var result = (T)serializer.ReadObject(stream); // 或用as；不能用string
 ```
 
-```
+```c#
 using System.Runtime.Serialization
 using System.Runtime.Serialization.Formatters.Binary;
 var stream = new MemoryStream();
@@ -411,4 +401,7 @@ var writer = new XmlSerializer(typeof(x));
 writer.Serialize("file.xml", new x);
 ```
 
+## 参考
 
+* 《Illustrated C# 2012 (4th Edition)》
+* 《C# 6.0 学习笔记：从第一行代码到第一个项目设计》

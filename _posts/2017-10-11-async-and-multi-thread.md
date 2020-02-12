@@ -2,19 +2,7 @@
 title: 异步和多线程
 ---
 
-> 参考文章：
->
-> 《Illustrated C# 2012 (4th Edition)》
-> 《C# in depth》
-> https://docs.microsoft.com
-> https://www.cnblogs.com/lxblog/archive/2013/01/05/2846026.html
-> https://www.zhihu.com/question/35284600/answer/583728189
-> 未读：System.Threading.SemaphoreSlim：信号量，相比于lock对异步更友好
-> ThreadPool.QueueUserWorkItem
-> https://docs.microsoft.com/zh-cn/dotnet/standard/threading/
-
-Async/Await
------------
+## Async/Await
 
 * 引用System.Threading.Task命名空间
 * 方法头中包含async修饰符，方法体内包含一个或多个await表达式，表示可以异步完成的任务，会自动生成隐式的自动机
@@ -238,8 +226,7 @@ private static void PropagateResult<T>(Task<T> completedTask,
 * Task.FromResult、Task.FromException、Task.CompletedTask：return它可以直接以Task包裹来返回确定的值或异常，不用async关键字，不会生成自动机，有利于提高性能。或者可以把同步方法封装成异步方法，而Task.Run会开线程。其实就是直接返回Task类型而不是return await Task类型，例外是主动想等待全部完成，或者要抓异常，或者用了using
 * 与Parallel结合使用，可以创建一个Task，内部调用Parallel，await它；但注意如果Parallel出现异常，它本身会就抛AggregateException，await以后就还是它（Wait就是两层了）
 
-SynchronizationContext
-----------------------
+## SynchronizationContext
 
 * GUI 应用运行的时候有默认的 SynchronizationContext（同步上下文）。在异步操作结束的时候， 后续步骤的回调被交给该上下文，以让窗口处理完当前所有消息后执行该回调。这样你会看到异步操作前后都是在该窗口所在的（主）线程上。与STAThread无关，这个东西只和COM有关，完全没用
 * 控制台应用并没有默认的 SC。在这种情况下，异步操作结束后回调被交给默认的 TaskScheduler 处理，而默认的 TS 就是调用线程池。于是前后都是在不同的线程上
@@ -257,14 +244,12 @@ SynchronizationContext
 * 读写文件，访问网络等IO阻塞操作不会产生死锁，因为没有产生线程
 * 正常的异步转同步的方式是用TaskCompletionSource，但也可能死锁
 
-线程池
-------
+## 线程池
 
 * 默认情况下，“最小线程数量”与CPU的线程数相同。如果需求的线程数量少于这个数，会直接开线程；如果大于，会等待1秒看看有没有已有的空出来，然后才开
 * 设ThreadPoolTaskScheduler的CreateOptions为LongRunning会直接开
 
-计时器
-------
+## 计时器
 
 ### System.Threading.Timer
 
@@ -286,8 +271,7 @@ void TimerCallback( object state);
 
 * 这个类很复杂，包含了很多成员，使我们可以通过属性和方法来操作计时器。可以运行在用户接口线程或工作线程上
 
-互斥与同步机制
---------------
+## 互斥与同步机制
 
 总共要解决三个问题：原子性、有序性、可见性（读到的一定是最后一次写入的，不会缓存到寄存器里）
 
@@ -369,4 +353,16 @@ try {
 * [MethodImplAttribute(MethodImplOptions.Synchronized)]标签应用到实例方法，相当于对当前实例加锁lock(this)；[MethodImplAttribute(MethodImplOptions.Synchronized)]标签应用到静态方法，相当于当前类型加锁，相当于 lock (typeof(Account))
 * [Synchronization(SynchronizationAttribute.REQUIRED, true)]，类需要继承ContextBoundObject
 
+## 参考
 
+* 《Illustrated C# 2012 (4th Edition)》
+* 《C# in depth》
+* https://docs.microsoft.com
+* https://www.cnblogs.com/lxblog/archive/2013/01/05/2846026.html
+* https://www.zhihu.com/question/35284600/answer/583728189
+
+### TODO
+
+* System.Threading.SemaphoreSlim：信号量，相比于lock对异步更友好
+* ThreadPool.QueueUserWorkItem
+* https://docs.microsoft.com/zh-cn/dotnet/standard/threading/

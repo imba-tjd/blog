@@ -5,7 +5,7 @@ title: ".NET 与数据库"
 EF Core
 -------
 
-```
+```c#
 // appsettings.json
   "ConnectionStrings": { // 对于sqlite，只要指定名字就好，数据库会自动创建
     "CustomerContext": "Data Source=Customers.db"
@@ -346,5 +346,3 @@ cmd.Parameters.AddWithValue("@UserID",UserID);
 
 * SqlCommandBuilder sb = new SqlCommandBuilder(DataAdapter);
 * 可以根据SelectCommand属性自动设置其他三个Command属性
-
-

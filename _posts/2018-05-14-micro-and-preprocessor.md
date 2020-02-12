@@ -2,10 +2,7 @@
 title: C的宏和预处理器
 ---
 
-> 《C和指针》、《C Primer Plus》
-
-宏定义
-------
+## 宏定义
 
 ### 优点
 
@@ -32,7 +29,7 @@ title: C的宏和预处理器
 
 如果宏定义里有分号，某些情况下是空语句，没什么问题。但扩展后是多条语句，则在有些情况下有问题。
 
-```
+```c#
 #define NL putchar('\n')
 #define PRINT(a) printf(#a " = %d", (int) (a)); NL
 #define TRACE if(1) printf("Done")
@@ -56,7 +53,7 @@ int main(void)
 
 C和指针的解决办法：把PRINT宏定义里的分号换成逗号；在TRACE宏的末尾加上一条空else语句（而且这个加花括号没用）。
 
-Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换行还是要用反斜杠的。但这样不可以作为表达式
+Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换行还是要用反斜杠的。但这样不可以作为表达式。
 
 ### 获取编译器所有的预定义宏
 
@@ -69,15 +66,14 @@ Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换�
 * clang定义了__clang__
 * 但win下的clang没有定义WIN32
 
-```
+```c
 #if defined __clang__ && !(defined WIN32 || defined linux || defined unix)
 #define WIN32
 #endif
 // 或者直接#ifdef linux 做与linux有关的操作 #else 做与win有关的操作
 ```
 
-预处理器
---------
+## 预处理器
 
 ### 预定义符号
 
@@ -108,7 +104,7 @@ Milo Yip的解决办法：用 `do { ... } while(0)` 包裹成单个语句，换�
 * #：把后面的内容变成字符串
 * ##：把两边的标识符连起来
 
-```
+```c
 #define M(ch) putchar('\ch') // 无法做单引号和双引号内部的字符替换
 #define M(X) ((#X)[0]) // 虽然M(a)可以返回'a'，但还不如直接要求输入'a'
 ```
@@ -131,17 +127,13 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 // 不能是#define LIMRG(X) _Pragma( "STDC CX_LIMITED_RANGE " #X )，因为预处理之后才会串联字符串？
 ```
 
-三字母词
---------
+## 三字母词
 
 源代码中的“三字母词”，在编译阶段会被替换为“对应的字符”。对于以“?”开头的字符序列，如果不能与那9个匹配，编译器将保持原状；一旦匹配，编译器就会做替换。但是现在的编译器默认不开启了，gcc要加`-ansi`或者`-trigraphs`。
 
-### 双字符（digraph）
+双字符（digraph）：与三字符不同的是，它不会替换双引号中的字符。
 
-与三字符不同的是，它不会替换双引号中的字符。
-
-泛型选择（C11）
----------------
+## 泛型选择（C11）
 
 * _Generic ( x, int:0, double:1, default: 2 )
 * x不会被求值，只判断类型，返回的值为匹配的标签后的值
@@ -163,12 +155,16 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 )(X)
 ```
 
-静态断言
---------
+## 静态断言
 
-* _Static_assert()可以在编译期检查表达式，如果为假则终止编译并打印错误信息。
+_Static_assert()可以在编译期检查表达式，如果为假则终止编译并打印错误信息。
 
 ```c
 #include <limits.h>
 _Static_assert(CHAR_BIT == 16, "16-bit char falsesly assumed");
 ```
+
+## 参考
+
+* 《C和指针》
+* 《C Primer Plus》

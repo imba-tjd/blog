@@ -2,10 +2,7 @@
 title: 程序集
 ---
 
-> 文章内容来自于《Illustrated C# 2012 (4th Edition)》
-
-程序集结构
-----------
+## 程序集结构
 
 ### 清单
 
@@ -26,8 +23,7 @@ title: 程序集
 
 * 可选。包括图形和语言资源
 
-模块
-----
+## 模块
 
 * 程序集代码文件称为模块
 * 对于有多个模块的程序集，一个文件是主模块（primary module），其他的是次要模块（secondary modules）
@@ -35,8 +31,7 @@ title: 程序集
 * 次要模块的文件名以扩展名.netmodule结尾
 * 多文件程序被视为一个单一模块。它们一起部署并一起定版
 
-程序集标识符
-------------
+## 程序集标识符
 
 程序集的标识符有4个组成部分，它们一起唯一标识了该程序集：
 
@@ -47,6 +42,10 @@ title: 程序集
 
 完全限定名称：由简单名、版本、文化和表示为16字节公钥凭据的公钥组成的列表文本
 
-ToRead：https://www.red-gate.com/simple-talk/dotnet/.net-framework/partitioning-your-code-base-through-.net-assemblies-and-visual-studio-projects/
+## 参考
 
+* 《Illustrated C# 2012 (4th Edition)》
 
+### TODO
+
+* https://www.red-gate.com/simple-talk/dotnet/.net-framework/partitioning-your-code-base-through-.net-assemblies-and-visual-studio-projects/

@@ -2,11 +2,7 @@
 title: 枚举器和迭代器
 ---
 
-> 《Illustrated C# 2012 (4th Edition)》
-> 《C# in depth》
-
-迭代器语法
-----------
+## 迭代器语法
 
 * foreach的循环变量是一个**只读**的局部变量
 * 多次调用GetEnumerator应产生不同的迭代器，所以必须让一个和实现了IEnumerable平行的类实现IEnumerator，调用时new一个
@@ -25,8 +21,7 @@ title: 枚举器和迭代器
 * 如果想返回空，可以用yield break或者Enumerable.Empty
 * 如果接受一个IEnumerable，又仍想返回一层的IEnumerable：如果已经用了yield，只能foreach消费传入的再yield return；要不就返回两层的，再在外面包一层SelectMany；如果没有，可以用Concat/Append，如果是在开头添加，可以从Empty接上
 
-IEnumerator\<T\>接口 : IEnumerator , IDisposable
-------------------------------------------------
+## IEnumerator\<T\>接口 : IEnumerator , IDisposable
 
 ### T Current
 
@@ -52,8 +47,7 @@ IEnumerator\<T\>接口 : IEnumerator , IDisposable
 
 * 实现IDisposable接口
 
-IEnumerable\<T\>接口 : IEnumerable
-----------------------------------
+## IEnumerable\<T\>接口 : IEnumerable
 
 ### IEnumerator\<T\> GetEnumerator()
 
@@ -67,10 +61,7 @@ IEnumerable\<T\>接口 : IEnumerable
 
 * 因为没有索引，使用此方法的复杂度可能是o(n)
 
-* * * * *
-
-迭代器块
---------
+## 迭代器块
 
 * 有一个或多个yield语句
 * 方法主体、访问器主体、运算符主体中的任意一种都可以是迭代器块
@@ -78,8 +69,7 @@ IEnumerable\<T\>接口 : IEnumerable
 * yield break语句指定咋序列中没有其它项
 * 根据迭代器块的返回类型，你可以让迭代器块产生枚举器或可枚举类型
 
-迭代器模式
-----------
+## 迭代器模式
 
 * 实现返回枚举器的迭代器时，必须通过实现GetEnumerator来让类可枚举
 * 实现返回可枚举类型的迭代器时，需要实现返回IEnumerable\<T\>接口的方法，调用迭代器方法来使用由迭代器返回的可枚举类
@@ -88,8 +78,7 @@ IEnumerable\<T\>接口 : IEnumerable
 * 可以将迭代器（返回IEnumerator\<T\>）作为属性，GetEnumerator方法根据判断返回指定的迭代器
 * 在编译器生成的枚举器中，Reset方法没有实现
 
-随机获取序列内容
-----------------
+## 随机获取序列内容
 
 * 在不知道序列中有多少元素的情况下，经过一次遍历就获取序列中随机一个元素，并且获取到每个元素的概率相等（为1/n）
 * 伪代码见《杂项算法》
@@ -130,4 +119,7 @@ public static T RandomElement<T>(this IEnumerable<T> source, Random random)
 }
 ```
 
+## 参考
 
+* 《Illustrated C# 2012 (4th Edition)》
+* 《C# in depth》
