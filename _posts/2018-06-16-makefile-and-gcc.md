@@ -100,4 +100,9 @@ prog3 : prog3.o sort.o utils.o
 ## 参考
 
 * https://blog.csdn.net/haoel/article/details/2886
-* 未读：https://zhuanlan.zhihu.com/p/78091632 https://www.zhihu.com/question/58949190
+
+### TODO
+
+* https://zhuanlan.zhihu.com/p/78091632
+* CMake：https://www.zhihu.com/question/58949190
+* https://zhuanlan.zhihu.com/p/100964932

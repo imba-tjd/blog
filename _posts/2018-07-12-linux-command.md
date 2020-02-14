@@ -135,9 +135,9 @@ title: Linux命令
 ## curl
 
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
-* 支持多种协议，默认限时内容；-I仅下载Header，-i也显示Header
-* -o或者\>写入文件，-O使用网站提供的名字
-* -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开
+* 支持多种协议，默认限时内容；-I仅显示Header，-i顺便显示Header
+* -o或者>写入文件，-O使用网站提供的名字
+* -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开指定
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
 * -#显示进度条，在-O或者重定向输出时默认会有
 * -x使用proxy
@@ -145,12 +145,12 @@ title: Linux命令
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
-* -d 'para1=val1&para2=val2'使用POST方式请求
+* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；val如果以@开头会被认为从文件中读取一行一个，可用`--data-raw`覆盖；`--data-urlencode`会帮你做一次URL编码；-F的类型是`multipart/form-data`
 * -T使用PUT方式上传文件，-X手动使用其它HTTP请求
 * -k忽略证书错误
 * url里用中括号加数字范围可以批量下载
 * --http2允许用HTTP/2，如果服务器不支持仍可用1.1，需--version中有模块
-* 访问httpbin/get可以看到服务器收到的请求信息
+* 访问httpbin.org/get可以看到服务器收到的请求信息
 * 如果头中有`accept-encoding: gzip`，必须加`--compress`参数，否则获得的是二进制结果。但win下不支持后者
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 
