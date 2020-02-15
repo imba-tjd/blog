@@ -23,6 +23,7 @@ title: Git/GitHub笔记
 * 删除远端分支：git push origin --delete [patch]或git push origin :patch
 * 把分支推送到远端并设定联系： git push -u origin patch
 * 把当前内容建立为一个没有历史的分支：git checkout --orphan new；但注意原来commit了的内容会自动stage，注意gitignore
+* git checkout -：切换到上一个分支
 
 ### 合并分支
 
@@ -33,6 +34,7 @@ title: Git/GitHub笔记
 * 注意快速前进是切换到落后的分支，git merge/rebase 先进的分支；两者一样是因为rebase没有要复制的，只利用它移动当前到指定之后；可用 git merge -：the '-' is shorthand for the previous branch
 * git的rebase和GitHub的rebaes不同：都是在目标分支上再现，但git会移动当前分支到目标分支前面，而目标分支不动；GitHub则是目标分支移动，当前分支不变，相当于rebase后ff master且又把“当前”分支切换回原来的
 * 如果要继续在子分支上开发，最好选择merge，这样才能有公共的父结点；否则下一次合并的时候会再把之前的比较一遍，一旦master有提交，就会产生冲突。另一种方法是squash前把master merge进dev，这一步可能产生冲突，是正常现象，否则合并到master本来也会冲突；这样就会产生一个公共结点，再把dev squash进master；如果担心污染dev此处也可以用squash
+* 删除已经合并到 master 的分支：`git branch --merged master | grep -v '^\*\|  master' | xargs -n 1 git branch -d`
 
 ### 冲突
 
@@ -55,7 +57,7 @@ title: Git/GitHub笔记
 * git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后用rebase --autosquash可以自动合并到一个提交里
-* git checkout -- filename：此命令会使用HEAD中的最新内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响
+* git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件
 * git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
 * git checkout --merge br：相当于stash, checkout, stash pop
 
@@ -73,6 +75,8 @@ title: Git/GitHub笔记
 * --global http.postBuffer 524288000：有人说能加速传输，有人说无效
 * --get-all remote.origin.url：获取对应section的值，效果与--list中看到的一样。主要是有的无法被设置，只能用这个看
 * feature.manyFiles/experimental true：启用实验性功能
+* core.fileMode false：不再将权限变化视为改动
+* --unset：删除设置
 
 ### 查看diff信息的工具
 
@@ -86,16 +90,16 @@ title: Git/GitHub笔记
 ## 记录
 
 * git blame [filename]：查看文件每一行是由谁在哪次commit中修改的, 按q退出，-w忽略空格变更
-* git show [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；可以查看tag
+* git show [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；不加参数就是看上一次提交的
 * git log --stat：查看提交信息及更新的文件
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git archive --format tar --output /path/to/file.tar master：将master以tar格式打包到指定文件
-* git diff --check：检查行尾有没有多余的空白
+* git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
 * cat .git/HEAD：显示HEAD的指向
-* git tag [tagname] [hash/-d]；git push --tags：推送所有标签；删除本地标签后再删除远端标签：git push origin :refs/tags/v0.9
+* git tag [tagname] [hash] 新建tag，-n显示tag及commit信息，-d删除；git push --tags：推送所有标签；删除远端标签：git push origin :refs/tags/v0.9
 * git reflog：查看所有记录，包括reset的
 * git log branch1...branch2：显示branch2比branch1多了哪些提交
-* git whatchanged xxx：查看某文件的修改历史
+* git whatchanged xxx --since='2 weeks ago'：查看某文件的修改历史
 * [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)：`git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`；加--all修改所有的分支，prune empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败；如果文件路径里有空格，把外层改成双引号，路径用单引号
 * 彻底重命名且不会丢失历史：`git filter-branch -f --tree-filter 'git mv -k 原文件名 新文件名' --prune-empty HEAD`；-k忽略文件不存在时报错失败；会修改本分支所有提交；https://stackoverflow.com/questions/3142419 给了一个用index-filter的示例；如果要移动到之前不存在的文件夹中，命令要加`mkdir -p xxx;`
 * git clone --depth=1指的不是只clone根文件夹，而是不clone之前的记录，当前提交还是完整的
@@ -103,7 +107,7 @@ title: Git/GitHub笔记
 * git diff master [patch]：比较当前分支/patch与master/目标分支的差别。可以重定向到.patch中，用git apply恢复
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
 * git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录
-* git bundle create repo.bundle HEAD master可以把当前仓库整个打包成一个二进制文件，之后怎么用还没看懂，好像直接当作仓库fetch
+* git bundle create repo.bundle HEAD/master可以把当前分支（可同时指定多个分支）整个打包成一个二进制文件，之后路径可以直接当作仓库fetch和clone
 * 现在好像出了个替代filter-branch的工具：https://github.com/newren/git-filter-repo
 
 ## Pull&Push
@@ -120,12 +124,15 @@ title: Git/GitHub笔记
 * bash的感叹号有特殊作用，如果commit message里要用，可以用单引号包裹
 * git check-ignore -v xxx：如果配置了.gitignore，提交不了特定的文件，可以用此命令查看对应规则；或者可以add -f
 * git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now：手动清理它们
-* git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin）
+* git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin），-X只清除ignore的
 * src refspec master does not match any：没有任何commit就push
 * git bisect：以二分的方式找需要的记录，[https://www.worldhello.net/2016/02/29/git-bisect-on-git.html](https://www.worldhello.net/2016/02/29/git-bisect-on-git.html)
 * 在文件夹中添加一个.gitkeep可以上传空文件夹；没有内容的提交：--allow-empty，没有信息的提交：--allow-empty-message
 * 列出所有项目中忽略的文件：git ls-files --others --ignored --exclude-standard
 * git rebase --rebase-merges/-r、rebase --preserve-merges/-p：没看懂
+* git help -g：显示一些内置的教程，git help -a：显示所有的git命令
+* git update-ref -d HEAD：把所有的改动都放回工作区并清空所有的commit
+* git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支
 
 ## Syncing Fork
 
@@ -137,12 +144,13 @@ title: Git/GitHub笔记
 ## git stash
 
 * 用于在有 uncommitted changes 的情况下切换branch，并把改动应用到新的branch上
-* git config rebase.autoStash true：每次pull的时候会自动stash当前本地的改动，不用手动stash，并在pull之后stash pop本地更改
+* git config rebase.autoStash true：每次pull的时候会自动stash当前本地的改动，不用手动stash，并在pull之后stash pop本地更改；不知对普通的rebase是否有效？普通的有--autostash这个参数
 
 ```bash
-git stash
+git stash # -u会保存untracked的文件
 git checkout [branchname]
 git stash pop
+git checkout stash@{n} -- file-path # 从stash中拿出某一个文件
 
 git stash list
 git stash clear
@@ -234,9 +242,7 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 
 ## .gitignore
 
-* https://www.cnblogs.com/kevingrace/p/5690241.html （有错误）
-* https://pdf-lib.org/Home/Details/407 （有错误）
-* https://git-scm.com/docs/gitignore#_pattern_format
+* git status --ignored：显示忽略的文件
 
 * 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录 （但其实是下一条的特例）
 * 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以**/开头 ）；如果有，则隐式在最前面加斜杠，此时以**/开头会全局匹配
@@ -336,3 +342,7 @@ collapsable content
 * https://www.cnblogs.com/kidsitcn/p/4513297.html\
 * https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000\
 * https://medium.com/therobinkim/git-add-everything-but-whitespace-changes-deec3dce39f
+* https://www.cnblogs.com/kevingrace/p/5690241.html （有错误）
+* https://pdf-lib.org/Home/Details/407 （有错误）
+* https://git-scm.com/doc
+* https://github.com/521xueweihan/git-tips

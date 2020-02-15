@@ -195,7 +195,7 @@ title: Linux命令
 * -p显示使用端口的进程和uid；默认会把常用端口号解析成服务名，-n阻止这种解析
 * -s显示summary，-e显示额外信息，-o显示keepalive时间信息
 * filter过滤连接状态：`ss state/exclude all/connected/各种TCP状态`，help里有
-* expression过滤ip和端口：`ss src = :22`，也可用`sport = :22`或`sport 22`，而`src xxx`就只指IP了；Peer地址用dst，端口用dport；可以用and和or连接多个条件，则需要再在外面加个单引号；IP可以用`192.168.0/24`这种形式；运算符可用==、=、!=、ge、le、gt、lt
+* expression过滤ip和端口：`ss src :22`，冒号前填IP，Peer地址用dst，其它一些过时记法略；可以用and和or连接多个条件，则需要再在外面加个单引号；IP可以用`192.168.0/24`这种形式；运算符可用==、=、!=、ge、le、gt、lt
 * Local Address指的就是本机，但它既可以是Listen的，也可以是发出的；Perr Address就是“另一端”
 * 监听地址为*的就是双栈，`[::]`就只是V6
 
