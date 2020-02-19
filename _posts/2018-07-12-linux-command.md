@@ -64,7 +64,8 @@ title: Linux命令
 * cat > file：接下来输入内容，ctrl+d结束；可以快速地创建一个有内容的文件
 * less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 * fc：在editor中编辑上一条输入的命令，并在退出时执行
-* factor：求一个数的所有因数；
+* factor：求一个数的所有因数
+* logrotate：切割日志的程序
 
 ## tar
 
@@ -231,6 +232,8 @@ find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐�
 ## systemctl
 
 * systemctl start（当前启动一次）、enable（开机自启）、disable（禁止自启）、status、restart；查看所有已启动的服务 systemctl list -units --type=service
+* systemctl show --property=Environment docker
+* systemctl daemon-reload
 
 ## nmap
 

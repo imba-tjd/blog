@@ -35,6 +35,7 @@ title: Linux软件
 * nmap
 * neofetch：显示一些基本信息，不过需要安装较多依赖。linuxlogo可替代一小部分
 * iotop
+* sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
 
 ### Debian阿里源
 
