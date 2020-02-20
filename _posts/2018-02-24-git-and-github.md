@@ -161,7 +161,7 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 
 ## Submodule
 
-* git clone --recursive可以自动拉取子模块，否则用git submodule update --init --recursive；--recursive用于子模块也用了submodule
+* git clone --recursive --shallow-submodules可以自动拉取子模块；否则用git submodule update --init --recursive --depth=1，其中后者的--recursive用于子模块也用了submodule
 * git submodule add [-b 目标分支] url [文件夹]：主动添加
 * git submodule update --recursive：相当于cd子模块然后checkout，要加--remote才相当于fetch+checkout
 * git submodule foreach [--recursive]：因为update和clone已经有了recursive，没必要用这个，只有自己想对所有子模块用别的命令时才用
@@ -171,7 +171,7 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 
 ### Remarks
 
-* git pull --recurse-submodulesz只会顺便fetch子模块，不会pull/checkout
+* git pull --recurse-submodules只会顺便fetch子模块，不会pull/checkout
 * git config status.submodulesummary 1：git status时显示子模块的信息
 * 修改了子模块但只push了主模块，其他人会遇到问题。git push --recurse-submodules=on-demand可以一并推送子模块，或者用check只警告
 * submodule的meta信息储存在`.gitmodule`中
@@ -182,6 +182,7 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 * 实际内容保存在父仓库的.git里，子模块的.git只有一个指针。所以删除子模块的文件夹也没事
 * 不支持菱形依赖，会出问题：https://stackoverflow.com/questions/1419498；url写成自己时递归更新会无限循环
 * 当切换回原来的某个提交时，必须update一下submodule，否则仍是新的
+* recursive和recurse-submodules应该是同一个命令，但是现在文档中只有后者
 
 ### 比较
 
