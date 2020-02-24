@@ -57,7 +57,7 @@ title: Git/GitHub笔记
 * git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后用rebase --autosquash可以自动合并到一个提交里
-* git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件
+* git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件；另有git restore做相似的事
 * git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
 * git checkout --merge br：相当于stash, checkout, stash pop
 
@@ -65,7 +65,7 @@ title: Git/GitHub笔记
 
 * global的设置在~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；-e打开文本编辑器进行操作
 * color.ui true：彩色的 git 输出；但默认为auto，不需要更改
-* --global credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里
+* --global credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里；如果安装了GitGUI则默认为manager，Win下可设为wincred，则会用控制面板的账户里的Credential Manager
 * --global user.email、--global user.name
 * gc.pruneexpire "30 days"：不在branch上的30天后清理；gc.auto 0：关闭gc
 * core.quotePath false：当路径出现中文时，不会进行转义，即能显示中文
@@ -91,7 +91,7 @@ title: Git/GitHub笔记
 
 * git blame [filename]：查看文件每一行是由谁在哪次commit中修改的, 按q退出，-w忽略空格变更
 * git show [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；不加参数就是看上一次提交的
-* git log --stat：查看提交信息及更新的文件
+* git log --stat：查看提交信息及更新的文件，--shortstat只显示变化了的文件数量和行号
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git archive --format tar --output /path/to/file.tar master：将master以tar格式打包到指定文件
 * git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
@@ -122,7 +122,6 @@ title: Git/GitHub笔记
 
 * git checkout HEAD~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD~3^2
 * bash的感叹号有特殊作用，如果commit message里要用，可以用单引号包裹
-* git check-ignore -v xxx：如果配置了.gitignore，提交不了特定的文件，可以用此命令查看对应规则；或者可以add -f
 * git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now：手动清理它们
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin），-X只清除ignore的
 * src refspec master does not match any：没有任何commit就push
@@ -244,7 +243,7 @@ git stash save "work in progress for foo feature" # 为当前未提交改动加�
 ## .gitignore
 
 * git status --ignored：显示忽略的文件
-
+* git check-ignore -v file：如果提交不了特定的文件，可以用此命令查看文件匹配到了哪个规则；或者可以add -f
 * 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录 （但其实是下一条的特例）
 * 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以**/开头 ）；如果有，则隐式在最前面加斜杠，此时以**/开头会全局匹配
 * 星号匹配多个字符（会一直匹配到斜杠才结束），问号匹配单个字符，用方括号表示单个字符匹配列表；以斜杠结尾表示要匹配的是目录（以及里面的），但注意会全局匹配

@@ -17,6 +17,7 @@ title: Firefox和Chrome
 * media.videocontrols.picture-in-picture.enabled视频的画中画图标，除了它还要改xxx.video-toggle.enabled才能生效
 * network.captive-portal-service.enabled检测网络是否需要登录
 * network.http.http3.enabled：开启quic
+* security.enterprise_roots.enabled：使用系统证书列表
 
 #### 页面翻译
 
