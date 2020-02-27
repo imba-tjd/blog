@@ -7,6 +7,11 @@ title: Firefox和Chrome
 * 正在进行的实验：about:studies
 * Flash Player去沙箱版：https://bbs.kafan.cn/thread-1839722-1-1.html
 
+### 下载
+
+* 历史版本：https://ftp.mozilla.org/pub/firefox/releases/
+* 最新版本：https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=zh-CN
+
 ### about:config
 
 * 关闭最后一个标签页不关闭浏览器：browser.tabs.closeWindowWithLastTab
@@ -49,9 +54,9 @@ title: Firefox和Chrome
 
 ### 更改语言
 
-1.  https://support.mozilla.org/zh-CN/kb/使用语言包改变Firefox界面语言
-2.  https://addons.mozilla.org/zh-CN/firefox/language-tools/
-3.  about:config：右键，新建，字符串。`intl.locale.requested: en-US`
+1. https://support.mozilla.org/zh-CN/kb/使用语言包改变Firefox界面语言
+2. https://addons.mozilla.org/zh-CN/firefox/language-tools/
+3. about:config：右键，新建，字符串。`intl.locale.requested: en-US`
 
 ### 编辑右键菜单
 
@@ -63,7 +68,6 @@ title: Firefox和Chrome
 * Chrome Store Foxified：让火狐运行Chrome的扩展
 * Grammarly for Firefox：拼写检查
 * History Master：统计历史访问的网页的数据
-* Zoom Page WE：缩放网页
 * 云盘万能钥匙
 
 ### 主题

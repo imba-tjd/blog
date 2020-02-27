@@ -65,7 +65,7 @@ title: Git/GitHub笔记
 
 * global的设置在~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；-e打开文本编辑器进行操作
 * color.ui true：彩色的 git 输出；但默认为auto，不需要更改
-* --global credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里；如果安装了GitGUI则默认为manager，Win下可设为wincred，则会用控制面板的账户里的Credential Manager
+* --global credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里；如果安装了GitGUI则默认为manager，要求输入账户密码时是打开一个网页，Win下可设为wincred，这俩都会储存到控制面板的账户里的Credential Manager中，后者可用git credential-wincred管理
 * --global user.email、--global user.name
 * gc.pruneexpire "30 days"：不在branch上的30天后清理；gc.auto 0：关闭gc
 * core.quotePath false：当路径出现中文时，不会进行转义，即能显示中文
@@ -93,6 +93,7 @@ title: Git/GitHub笔记
 * git show [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；不加参数就是看上一次提交的
 * git log --stat：查看提交信息及更新的文件，--shortstat只显示变化了的文件数量和行号
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
+* git shortlog -sn：显示各个作者的提交次数
 * git archive --format tar --output /path/to/file.tar master：将master以tar格式打包到指定文件
 * git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
 * cat .git/HEAD：显示HEAD的指向

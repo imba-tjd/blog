@@ -82,6 +82,10 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-security main restricted 
 * mirrors.163.com
 * mirrors.huaweicloud.com
 
+### 问题
+
+* `N: Download is performed unsandboxed as root as file '/root/xxx.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)`：https://askubuntu.com/questions/908800 但是好像可以安装成功
+
 ## PIP
 
 ### 安装和升级
@@ -139,7 +143,6 @@ trusted-host = mirrors.aliyun.com
 ## Ruby
 
 * gem install lolcat：彩虹颜色的管道输出
-* gem install travis
 
 ### 不在包管理器中的软件
 
@@ -148,6 +151,8 @@ trusted-host = mirrors.aliyun.com
 * [deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)：安装后可安装微信QQ
 * VSC 32bit：https://go.microsoft.com/fwlink/?LinkID=760680 官方最后的版本是1.35.1
 * [uGet](https://ugetdm.com/)：下载工具，开源但不在GitHub上
+* [hfish](https://hfish.io/)：各种蜜罐
+* https://github.com/chaitin/xray ：扫描常见的Web安全问题，不开源
 
 ## 其他
 
@@ -161,7 +166,6 @@ trusted-host = mirrors.aliyun.com
 * 网站目录：/var/www/html/
 * 操作服务：service apache2/httpd/apachectl start/stop/restart
 * 检查配置文件有没有语法错误：apachectl -t或apache2/httpd -t，但它们好像不同
-* 配置https：https://mp.weixin.qq.com/s/Tw4UzX73Q7MSw3GJXnpN8A
 
 ### 虚拟主机
 
@@ -218,10 +222,14 @@ trusted-host = mirrors.aliyun.com
 * 卸载：sudo perl  /usr/bin/vmware-uninstall-tools.pl
 * 收缩硬盘大小：sudo vmware-toolbox-cmd disk shrink /
 
-## LXDE
+## MEGAcmd
 
-* 改变DPI：https://iamjagjeetubhi.wordpress.com/2017/07/01/change-dpi-in-lxde/
+* https://mega.nz/linux/MEGAsync/Debian_10.0/amd64/megacmd-Debian_10.0_amd64.deb
 
 ## 参考
 
 * https://zhuanlan.zhihu.com/p/101601709
+
+### TODO
+
+* rclone: https://zhuanlan.zhihu.com/p/104480400

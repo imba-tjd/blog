@@ -183,6 +183,7 @@ System.Diagnostics.Process类
 ### 执行CMD命令
 
 * 以管理员权限运行程序：Verb="runas"；但UseShellExecute必须为true
+* 如果Path中存在同名程序须小心，发生过CMD指定的是System32下的但Process.Start执行的是在后面自定义的
 
 ```
 // 效果和执行了一个无回显的batch脚本一样，不会显示命令，只会有输出

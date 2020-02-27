@@ -42,7 +42,6 @@ title: Linux命令
 * which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件；type可以区分内置还是外置命令
 * xclip：复制到剪切板上，不自带
 * head -10：显示前10行信息
-* nohup：`nohup ./test &`能在exit后继续任务，默认所有信息输出到$HOME/nohup.out中；不自带
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * sha1sum/md5sum -c xxx.sha1：自动验证对应的文件是否符合；不加-c是验证，未指定文件时从stdin读入
 * ln：参数意义与cp相同，-P硬链接（默认？），-s软连接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软连接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
@@ -54,7 +53,6 @@ title: Linux命令
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
-* scp -rpC src dest（user@HostorIP:/path/filename ./），r为递归，p为保留日期等，C为压缩,-P指定端口；src可有多个文件；win下的好像无法识别中文路径；-3可以（通过本机）在两个服务器之间传文件
 * ps auxf：显示所有进程，且显示父子进程关系，但这样就不完全按时间排序了，想要后者就去掉f。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子进程关系，不会有pid；在`procps`包中
 * cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软连接，可以追踪到源文件；cp -a：相当于-dpR
 * iconv -f gbk -t utf-8 source-file -o target-file
@@ -67,7 +65,9 @@ title: Linux命令
 * logrotate：切割日志的程序
 * nroff -man manpage.1 | more：显示man格式的.1文件
 
-## tar
+## 压缩/解压
+
+### tar
 
 * 压缩：tar czf jpg.tar.gz *.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
 * 解压：tar xf abc.tar.gz（x为解压缩；类型现在都可以自动识别了；最后可跟路径来只解压指定的部分文件）
@@ -91,14 +91,15 @@ title: Linux命令
 
 ## find
 
-* -type指定文件类型，f为普通文件，l为链接文件（f不包含这一项），d为文件夹
 * `find path -name '*.txt' -exec wc -l {}\;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件；也可以使用|xargs
+* -type指定文件类型，f为普通文件，l为链接文件（f不包含这一项），d为文件夹
 * -not -path：排除目录；默认会搜索隐藏目录，但这个参数好像不能递归排除；另外还存在一个prune参数作用好像也是排除
 * -size +1m：大于1M的文件
 * -mtime -1：一天之内修改的；atime是访问时间，ctime是创建时间
 * -print0：与xargs -0匹配使用
 * -delete：直接删除找到的文件
 * -maxdepth：最大搜索深度
+* 进入当前目录下所有子文件夹分别执行命令：`find . -maxdepth 1 -type d ! \( -name ".*" -o -name "System Volume Information" -o -name '$RECYCLE.BIN' \) -exec ./script.sh {} \;`
 
 ## awk
 
@@ -133,29 +134,7 @@ title: Linux命令
 * `ls *.jpg | xargs -n1 -I cp {} /data/images`：复制所有图片文件到 /data/images 目录下。-I指定一个替换字符串，默认为{}，这个字符串在xargs扩展时会被替换掉，每一个参数命令都会被执行一次
 * 无法用`... | xargs cd`，因为后者会变成/bin/cd，但只用bash的内置cd命令才能改变当前目录；可用`cd $(...)`
 
-## curl
-
-* 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
-* 支持多种协议，默认显示body；-I仅显示Header（但用的是HEAD方法），-i顺便显示Header，`-D –`不限方法只显示头
-* -o或者>写入文件，-O使用网站提供的名字
-* -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开指定
-* -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
-* -#显示进度条，在-O或者重定向输出时默认会有
-* -x使用proxy（正代）
-* -C断点续传，但不清楚效果如何
-* -e/--referer提供referer
-* -s安静模式，不显示进度条；-sS安静模式下仍显示错误
-* -L跟随30x跳转
-* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；val如果以@开头会被认为从文件中读取一行一个，可用`--data-raw`覆盖；`--data-urlencode`会帮你做一次URL编码；-F的类型是`multipart/form-data`
-* -T使用PUT方式上传文件，-X手动使用其它HTTP请求
-* -k忽略证书错误
-* url里用中括号加数字范围可以批量下载
-* --http2允许用HTTP/2，如果服务器不支持仍可用1.1，需--version中有模块
-* 访问httpbin.org/get可以看到服务器收到的请求信息
-* 如果头中有`accept-encoding: gzip`，必须加`--compress`参数，否则获得的是二进制结果。但win下不支持后者
-* 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
-
-### dig
+## dig
 
 * sudo apt install dnsutils
 * `dig @dns.googlehosts.org www.baidu.com`
@@ -200,22 +179,65 @@ title: Linux命令
 * Local Address指的就是本机，但它既可以是Listen的，也可以是发出的；Perr Address就是“另一端”
 * 监听地址为*的就是双栈，`[::]`就只是V6
 
-## rsync
+## 传输文件
 
-* rsync from to，其中远端用user@host:/path，from是文件，to是目标文件夹；-r复制整个文件夹
-* -avPH：a保留文件所有属性且递归，v详细模式，P断点续传，H保留硬链接
+## curl
+
+* 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
+* 支持多种协议，默认显示body；-I仅显示Header（但用的是HEAD方法），-i顺便显示Header，`-D –`不限方法只显示头
+* -o或者>写入文件，-O使用网站提供的名字
+* -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开指定
+* -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
+* -#显示进度条，在-O或者重定向输出时默认会有
+* -x使用proxy（正代）
+* -C从指定Range继续下载，但必须指定起始点，无法傻瓜式使用
+* -e/--referer提供referer
+* -s安静模式，不显示进度条；-sS安静模式下仍显示错误
+* -L跟随30x跳转
+* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；val如果以@开头会被认为从文件中读取一行一个，可用`--data-raw`覆盖；`--data-urlencode`会帮你做一次URL编码；-F的类型是`multipart/form-data`
+* -T使用PUT方式上传文件，-X手动使用其它HTTP请求
+* -k忽略证书错误
+* url里用中括号加数字范围可以批量下载
+* --http2允许用HTTP/2，如果服务器不支持仍可用1.1，需--version中有模块
+* 访问httpbin.org/get可以看到服务器收到的请求信息
+* 如果头中有`accept-encoding: gzip`，必须加`--compress`参数，否则获得的是二进制结果。但win下不支持后者
+* 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
+
+### scp
+
+* scp -rpC src dest
+* user@Host或IP:/path/filename ./
+* r为递归，p为保留日期等，C为压缩
+* -P指定端口
+* src可有多个文件
+* win下的好像无法识别中文路径
+* -3可以（通过本机）在两个服务器之间传文件
+
+### rsync
+
+* rsync -avrPH from to：a保留文件所有属性且递归，v详细模式，r递归复制文件夹，P断点续传，H保留硬链接；地址和scp类似，如果用两个冒号用的就是rsync协议
 * -u只更新变化了的，-z启用压缩，-n是dry run，--delete删除to中所有不在from中的文件
-* -e 'ssh -p 22'可以通过ssh传输
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
 * https://zhuanlan.zhihu.com/p/40022680
 * https://zhuanlan.zhihu.com/p/85087767
 * https://zhuanlan.zhihu.com/p/100531052
+* 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
+
+### aria2
+
+* -c断点续传
+* -s、-x设置线程
+* -d下载目录
+* -i从文件中读取url，-j同时下载的任务数
+* -D在后台运行，https://aria2c.com/ 就是本机的控制台
+* 不支持UPnP，不支持从命令行指定代理
 
 ## sed
 
 ```
 sed -i "15i Contents" Lab.txt # 在文件的第15行插入指定内容
 find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐藏文件夹
+sed -i 's/aaa/bbb' file.txt # 替换文本
 ```
 
 ## 持续运行
@@ -225,7 +247,7 @@ find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐�
 * bg：让ctrl+z挂起的程序在后台运行
 * jobs：显示后台挂起的任务
 * 输命令时在最后加个&会默认在后台运行，一般会用`>log.txt 2>&1 &`不让输出到屏幕上；如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样
-* 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；但这样的程序无法用fg恢复；默认会自动把输出重定向到nohup.out中
+* 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；~~但这样的程序无法用fg恢复~~好像可以；默认会自动把输出重定向到$HOME/nohup.out中
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
