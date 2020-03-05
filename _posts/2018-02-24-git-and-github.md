@@ -35,6 +35,7 @@ title: Git/GitHub笔记
 * git的rebase和GitHub的rebaes不同：都是在目标分支上再现，但git会移动当前分支到目标分支前面，而目标分支不动；GitHub则是目标分支移动，当前分支不变，相当于rebase后ff master且又把“当前”分支切换回原来的
 * 如果要继续在子分支上开发，最好选择merge，这样才能有公共的父结点；否则下一次合并的时候会再把之前的比较一遍，一旦master有提交，就会产生冲突。另一种方法是squash前把master merge进dev，这一步可能产生冲突，是正常现象，否则合并到master本来也会冲突；这样就会产生一个公共结点，再把dev squash进master；如果担心污染dev此处也可以用squash
 * 删除已经合并到 master 的分支：`git branch --merged master | grep -v '^\*\|  master' | xargs -n 1 git branch -d`
+* git push --force-with-lease：更安全的rebase后的force push，当本地的远端分支不是最新时拒绝推送，防止覆盖其他人推送了的
 
 ### 冲突
 
@@ -72,7 +73,7 @@ title: Git/GitHub笔记
 * core.ignorecase false：默认情况下，已经push到远端的文件夹，在本地只修改文件名大小写是不会被检测的；但启用后仅仅只是会push一个另一个大小写的文件过去？可以考虑在Linux端改名，Win端直接删除文件，然后pull
 * --global core.editor "code --wait"：编辑信息时要使用的编辑器；不过普通WSL下会有问题，要Remote扩展才行
 * --global https.https://github.com.proxy socks5://127.0.0.1:1080：这样可以只访问github时代理。但对ssh无效，ssh要修改`~/.ssh/config`
-* --global http.postBuffer 524288000：有人说能加速传输，有人说无效
+* --global http.postBuffer 10485760：每块数据的接收大小，默认不超过1M，此为10M，有人说能加速传输，有人说无效
 * --get-all remote.origin.url：获取对应section的值，效果与--list中看到的一样。主要是有的无法被设置，只能用这个看
 * feature.manyFiles/experimental true：启用实验性功能
 * core.fileMode false：不再将权限变化视为改动
@@ -147,7 +148,7 @@ title: Git/GitHub笔记
 * git config rebase.autoStash true：每次pull的时候会自动stash当前本地的改动，不用手动stash，并在pull之后stash pop本地更改；不知对普通的rebase是否有效？普通的有--autostash这个参数
 
 ```bash
-git stash # -u会保存untracked的文件
+git stash
 git checkout [branchname]
 git stash pop
 git checkout stash@{n} -- file-path # 从stash中拿出某一个文件
@@ -157,6 +158,9 @@ git stash clear
 git show stash@{0} # 查看stash缓存区顶部的改动
 git stash apply stash@{1} # 将版本号为stash@{1}的改动应用（不会删除）到当前branch
 git stash save "work in progress for foo feature" # 为当前未提交改动加一个注释，并保存到stash
+
+git stash -u # 也保存保存untracked的文件，不要用-a，会把ignore的也保存
+git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此命令建分支，之后好像要discard一下再pop再checkout --merge
 ```
 
 ## Submodule

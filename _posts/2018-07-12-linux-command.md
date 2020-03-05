@@ -145,9 +145,9 @@ title: Linux命令
 * +dnssec
 * +cmd：默认开启，会显示dig的版本
 * -p 5353：指定端口
-* AAAA：查询ipv6的记录（有可能返回一个网址，原因不明，大概是不支持吧）；A：ipv4的记录；MX：邮件服务器记录；NS：该域名由哪个dns服务器负责解析；CNAME：查询别名；-x：查询PTR记录，只能这样，前面的方法不适用
+* AAAA：查询ipv6的记录；A：ipv4的记录；MX：邮件服务器记录；NS：该域名由哪个dns服务器负责解析；CNAME：查询别名；-x：查询PTR记录，只能用此参数，前面的方法不适用
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
-* ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示与DNS服务器响应超时；这两者ANSWER字段为0；成功是是NOERROR，ANSWER字段为2
+* ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；这两者ANSWER字段为0；成功是是NOERROR，ANSWER字段为2/3；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
 * 另外还有kdig（knot-utils）和host命令
 
 ## crontab
@@ -257,6 +257,7 @@ sed -i 's/aaa/bbb' file.txt # 替换文本
 * systemctl start（当前启动一次）、enable（开机自启）、disable（禁止自启）、status、restart；查看所有已启动的服务 systemctl list -units --type=service
 * systemctl show --property=Environment docker
 * systemctl daemon-reload
+* journalctl：管理日志
 
 ## nmap
 

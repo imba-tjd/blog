@@ -23,6 +23,10 @@ title: Firefox和Chrome
 * network.captive-portal-service.enabled检测网络是否需要登录
 * network.http.http3.enabled：开启quic
 * security.enterprise_roots.enabled：使用系统证书列表
+* browser.urlbar.trimURLs：地址栏隐藏http
+* xpinstall.signatures.required：允许安装未签名扩展
+* extensions.pocket.enabled false：禁用pocket扩展
+* security.tls.version.min：1为TLS1.0
 
 #### 页面翻译
 
@@ -33,8 +37,8 @@ title: Firefox和Chrome
 ### DNS over HTTPS
 
 * network.trr.mode：3为强制，2为允许fallback
-* network.trr.uri：https://1.1.1.1/dns-query 或 https://mozilla.cloudflare-dns.com/dns-query
-* network.trr.bootstrapAddress：1.1.1.1
+* network.trr.uri：https://1.1.1.1/dns-query 或 https://mozilla.cloudflare-dns.com/dns-query 或 https://rubyfish.cn/dns-query
+* network.trr.bootstrapAddress：1.1.1.1 避免上一条被劫持
 * network.security.esni.enabled：true开启esni
 * ttr的reference：https://bagder.github.io/TRRprefs/
 

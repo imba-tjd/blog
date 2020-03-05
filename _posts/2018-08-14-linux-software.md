@@ -43,12 +43,12 @@ title: Linux软件
 # src是获取源代码时用的，不必要
 # 如果只是从测试源中安装某一个软件，可用apt -t testing install xxx
 deb https://mirrors.aliyun.com/debian/ stretch main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian/ stretch main non-free contrib
 deb https://mirrors.aliyun.com/debian-security stretch/updates main
-# deb-src https://mirrors.aliyun.com/debian-security stretch/updates main
 deb https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
 deb https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
+# deb-src https://mirrors.aliyun.com/debian/ stretch main non-free contrib
+# deb-src https://mirrors.aliyun.com/debian-security stretch/updates main
+# deb-src https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
 # deb-src https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
 
 # testing
@@ -60,17 +60,17 @@ deb https://mirrors.aliyun.com/debian-security testing-security main contrib non
 
 ### Ubuntu
 
-发行版命名，现在最新版是eoan，测试版是focal。可以看出是根据首字母来的。
+发行版命名，测试版是focal。可以看出是根据首字母来的。
 
 ```
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-updates main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-updates main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-backports main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-backports main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-security main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ disco-security main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-security main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-security main restricted universe multiverse
 ```
 
 ### 其它源

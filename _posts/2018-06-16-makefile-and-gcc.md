@@ -9,7 +9,7 @@ title: Makefile和gcc
 ```makefile
 include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通配符和变量
 
-# 变量定义
+# 变量定义，可以在命令行中用key="val"重写
 objects = main.o kbd.o command.o display.o \ # 用反斜杠换行，教程错了= =
     insert.o search.o files.o utils.o
 objects2 := $(wildcard *.o) # 使用wildcard关键字会进行扩展；如果直接用*.o，那就是普通的*.o，（效果应该是在command中当作shell命令会生效，但makefile自动推导无效）
@@ -20,7 +20,7 @@ obj = $(patsubst %.c ,%.o ,$(src)) # 用于从src目录中找到所有.c 结尾�
     cd subdir && make # 进入子文件夹make；父makefile定义的变量手动用export命令可以传递到子makefile中，但SHELL和MAKEFLAGS变量会自动传递
 
 # 显式规则
-edit : $(objects) # 第一条为最终目标；使用变量用$()
+edit : $(objects) # 如果没有指定目标就用第一个目标；使用变量用$()
     cc -o edit $(objects) # 此处的edit为程序名字
 
 # 隐式规则，自动推导：.o会自动把.c加入依赖
@@ -43,6 +43,14 @@ clean : cleandiff # 伪目标也可以有依赖
     -rm edit $(objects) # 减号表示出现错误也继续执行
 cleandiff :
     rm *.diff
+
+ifeq (, $(shell which curl))
+    $(error "No curl in $$PATH, please install")
+endif
+
+EMPTY:=
+SPACE:=$(EMPTY) $(EMPTY)
+COMMA:=$(EMPTY),$(EMPTY)
 ```
 
 ### 文件搜寻
@@ -104,6 +112,10 @@ prog3 : prog3.o sort.o utils.o
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
 
+## Clang
+
+* 安装：https://apt.llvm.org/
+
 ## 参考
 
 * https://blog.csdn.net/haoel/article/details/2886
@@ -113,3 +125,4 @@ prog3 : prog3.o sort.o utils.o
 * https://zhuanlan.zhihu.com/p/78091632
 * CMake：https://www.zhihu.com/question/58949190
 * https://zhuanlan.zhihu.com/p/100964932
+* https://www.ruanyifeng.com/blog/2015/02/make.html

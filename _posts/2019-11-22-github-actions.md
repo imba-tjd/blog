@@ -5,13 +5,34 @@ tags:
     - CI
 ---
 
-## Python环境
+## Event
+
+### push
+
+因为push触发的CI里面如果又push了，不会循环触发；不知其它事件中push会不会触发；或者也许只是不触发自己这个workflow，其它有可能会触发。
+
+### cron
+
+从左到右依次是分、时、日、月、星期。`0 0 * * *`就是每天8点（UTC0点）；星期天是0。
+
+## upload-artifact
+
+* path为要打包的文件，含义是Linux下的文件，即也可以指定文件夹，但只能有一个，星号是无效的；两者都会自动用zip打包一遍
+* name是Actions中的artifact中可下载的文件名，不应以zip结尾否则会出现后缀
+
+## 环境
+
+* 软件环境：https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
+* 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
+
+
+### Python环境
 
 * 自带python 2.7和3.6，pip9，但需要pip3 install wheel。而pip升级会失败：ImportError: cannot import name main
 * 安装不需要加--user，好像是用了虚拟环境，但安装包又不是在当前目录下，不懂
 * 需要PATH=$PATH:~/.local/bin，注意不同step应该是不共享的。但也可以直接用python3 -m来调用
 
-### 自带的包
+#### 自带的包
 
 ```
 asn1crypto (0.24.0)
@@ -65,6 +86,8 @@ WALinuxAgent (2.2.40)
 zope.interface (4.3.2)
 ```
 
-## TODO
+### /etc/docker/daemon.json
 
-* 需要学一下如何保留artifacts
+```json
+{ "cgroup-parent": "/actions_job" }
+```
