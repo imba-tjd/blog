@@ -36,6 +36,7 @@ title: Linux软件
 * neofetch：显示一些基本信息，不过需要安装较多依赖。linuxlogo可替代一小部分
 * iotop
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
+* virt-what：查看VPS使用了哪种虚拟化技术，如kvm
 
 ### Debian阿里源
 
@@ -97,6 +98,7 @@ python3 -m pip install --upgrade pip setuptools wheel
 pip3 list [--outdated/-o]
 pip3 install <package_name> [--upgrade/-U] [--pre] [--user]
 pip3 install <local.whl/tar.gz> -or- -e <dir(/*.whl)> -or- setup.py install
+pip3 install git+https://github.com/user/repo.git
 pip3 show <package_name>
 pip3 uninstall
 
@@ -225,6 +227,13 @@ trusted-host = mirrors.aliyun.com
 ## MEGAcmd
 
 * https://mega.nz/linux/MEGAsync/Debian_10.0/amd64/megacmd-Debian_10.0_amd64.deb
+* mega-login、mega-put
+
+## rclone
+
+* curl https://rclone.org/install.sh | sudo bash
+* rclone config, n, 22(onedrive)
+* (mkdir;) rclone mount onedrive: /www/wwwroot/your_ip/onedrive --allow-other --allow-non-empty --vfs-cache-mode writes &
 
 ## 参考
 

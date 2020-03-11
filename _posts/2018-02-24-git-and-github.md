@@ -331,6 +331,17 @@ collapsable content
 * hub release create --copy -F release-notes.txt v2.3.0
 * 还有一些操作issue和pr的功能，包括浏览（可指定过滤条件）、创建（可assign）、close、merge；宣传说所有原本的git命令都可用，hub只是做了扩充，可以直接设为git的alias
 
+## readme渲染顺序
+
+* readme.md -> readme -> readme.txt
+* index、index.md、index.html是没用的
+
+## Gist
+
+* readme.md会在打开后自动排到第一，但不影响gist名
+* 以`.`开头会排到前面
+* 大写字母开头会排在小写字母的前面；但有一次例外：gist名仍用的是大写开头的，而点开后却是小写开头的排在前面，也许是点开后的排序是先字母再大小写？
+
 ## 其它问题
 
 ### fatal: index file corrupt

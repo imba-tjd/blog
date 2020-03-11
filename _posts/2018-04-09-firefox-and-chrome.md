@@ -5,19 +5,21 @@ title: Firefox和Chrome
 ## Firefox
 
 * 正在进行的实验：about:studies
+* 网络状况：about:networking
 * Flash Player去沙箱版：https://bbs.kafan.cn/thread-1839722-1-1.html
 
 ### 下载
 
 * 历史版本：https://ftp.mozilla.org/pub/firefox/releases/
 * 最新版本：https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=zh-CN
+* https://download-installer.cdn.mozilla.net/pub/firefox/releases/74.0/win64/zh-CN/Firefox%20Setup%2074.0.exe （Firefox Setup 74.0.exe）
 
 ### about:config
 
 * 关闭最后一个标签页不关闭浏览器：browser.tabs.closeWindowWithLastTab
 * 新标签打开书签和链接：browser.tabs.loadBookmarksInTabs
-* 使用MacType渲染（已经失效，cairo在69移除了）：gfx.content.azure.backends: gfx.content.azure.backends;direct2d1.1,cairo,skia；gfx.direct2d.disabled: true
-* network.prefetch有一些预读的选项，但是可能有隐私问题
+* 使用MacType渲染（已经失效，cairo在69移除了）：gfx.content.azure.backends ...
+* 搜prefetch有一些预读的选项，但是可能有隐私问题
 * browser.cache.disk.enable可以设置是否在硬盘上缓存数据，默认最大大小可能有1G。在about:cache可以看到
 * media.videocontrols.picture-in-picture.enabled视频的画中画图标，除了它还要改xxx.video-toggle.enabled才能生效
 * network.captive-portal-service.enabled检测网络是否需要登录
@@ -26,7 +28,9 @@ title: Firefox和Chrome
 * browser.urlbar.trimURLs：地址栏隐藏http
 * xpinstall.signatures.required：允许安装未签名扩展
 * extensions.pocket.enabled false：禁用pocket扩展
-* security.tls.version.min：1为TLS1.0
+* security.tls.version.min 3：1为TLS1.0
+* network.IDN_show_punycode true：中文域名时显示真正的域名
+* network.http.rcwn.enabled：是否启用raced竞速请求。当FF检测到磁盘较慢时，会无视缓存直接发网络请求，理论上会使用先成功的，另一个就取消掉，实际好像不是这样
 
 #### 页面翻译
 
@@ -40,7 +44,7 @@ title: Firefox和Chrome
 * network.trr.uri：https://1.1.1.1/dns-query 或 https://mozilla.cloudflare-dns.com/dns-query 或 https://rubyfish.cn/dns-query
 * network.trr.bootstrapAddress：1.1.1.1 避免上一条被劫持
 * network.security.esni.enabled：true开启esni
-* ttr的reference：https://bagder.github.io/TRRprefs/
+* ttr的reference：https://bagder.github.io/TRRprefs/ https://wiki.mozilla.org/Trusted_Recursive_Resolver
 
 ### 图标
 

@@ -20,6 +20,21 @@ tags:
 * path为要打包的文件，含义是Linux下的文件，即也可以指定文件夹，但只能有一个，星号是无效的；两者都会自动用zip打包一遍
 * name是Actions中的artifact中可下载的文件名，不应以zip结尾否则会出现后缀
 
+## Docker
+
+```
+# 直接在容器中运行
+jobs:
+  my_job:
+    #runs-on仍要
+    container: golang # 若要详细配置，参见 workflow-syntax-for-github-actions#jobsjob_idcontainer
+
+# 快速从hub拉取和使用容器
+uses: docker://golang
+with:
+  args: go version
+```
+
 ## 环境
 
 * 软件环境：https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md

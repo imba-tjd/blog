@@ -142,12 +142,13 @@ title: Linux命令
 * +short：只显示ip（但可能有多个）
 * +trace：显示解析过程。其实是自己主动迭代解析
 * +additional：显示glue records
-* +dnssec
+* +dnssec：返回RRSIG记录，不清楚是否会进行校验
 * +cmd：默认开启，会显示dig的版本
+* +subnet=your_ip/24：EDNS，9.11之后默认开启；但DNSPod程序员表示他们只支持/32，不满足会就把请求丢弃，防止随机IP的攻击，此时可加+nocookie/+noedns不发送EDNS请求
 * -p 5353：指定端口
 * AAAA：查询ipv6的记录；A：ipv4的记录；MX：邮件服务器记录；NS：该域名由哪个dns服务器负责解析；CNAME：查询别名；-x：查询PTR记录，只能用此参数，前面的方法不适用
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
-* ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；这两者ANSWER字段为0；成功是是NOERROR，ANSWER字段为2/3；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
+* ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
 * 另外还有kdig（knot-utils）和host命令
 
 ## crontab
