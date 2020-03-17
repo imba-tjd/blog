@@ -57,7 +57,7 @@ title: Git/GitHub笔记
 * 如果reset的不是当前分支，则会进入分离模式
 * git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
-* git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后用rebase --autosquash可以自动合并到一个提交里
+* git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后用rebase -i --autosquash会自动把fixup的放到合适的位置
 * git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件；另有git restore做相似的事
 * git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
 * git checkout --merge br：相当于stash, checkout, stash pop

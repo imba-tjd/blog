@@ -221,6 +221,16 @@ _options = IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentVa
 }
 ```
 
+#### 手动读取配置
+
+```c#
+using Microsoft.Extensions.Configuration;
+var config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables()
+    .Build();
+```
+
 ### 多环境（environment）
 
 * 默认会读取ASPNETCORE_ENVIRONMENT环境变量，默认有Development、Staging和Production；如果不设就是Production
@@ -441,6 +451,7 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * https://docs.microsoft.com/zh-cn/aspnet/core/mvc/controllers/routing
 * 不区分大小写
 * 可以是某个cshtml文件，也可以是那个文件夹下的Index.cshtml
+* action的Async后缀现在无需在url中添加
 
 ### MVC
 

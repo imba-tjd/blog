@@ -31,6 +31,8 @@ title: Firefox和Chrome
 * security.tls.version.min 3：1为TLS1.0
 * network.IDN_show_punycode true：中文域名时显示真正的域名
 * network.http.rcwn.enabled：是否启用raced竞速请求。当FF检测到磁盘较慢时，会无视缓存直接发网络请求，理论上会使用先成功的，另一个就取消掉，实际好像不是这样
+* devtools.selfxss.count：在console中粘贴时会提示“欺诈警告：粘贴您不了解的东西时请务必小心...如果仍想粘贴，请在下方输入allow pasting（不必按回车键）以允许粘贴”。此项可提高阈值，默认是0
+* network.http.max-persistent-connections-per-server
 
 #### 页面翻译
 
@@ -70,6 +72,8 @@ title: Firefox和Chrome
 
 * https://www.reddit.com/r/firefox/comments/7lsqn2/is_it_possible_to_remove_some_options_from_right/
 * https://www.reddit.com/r/firefox/comments/7dvtw0/guide_how_to_edit_your_context_menu/
+* https://github.com/stonecrusher/simpleMenuWizard
+* https://www.youtube.com/watch?v=J0NDzs9PsIg
 
 ### 扩展（Add-ons）
 
@@ -81,6 +85,7 @@ title: Firefox和Chrome
 ### 主题
 
 * Quantum：https://addons.mozilla.org/zh-CN/firefox/addon/quantum-launch/
+* Rainbow Blur：https://addons.mozilla.org/zh-CN/firefox/addon/rainbow-blur-1
 
 ### 其他
 
