@@ -253,12 +253,14 @@ sed -i 's/aaa/bbb' file.txt # 替换文本
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
 
-## systemctl
+## systemd
 
 * systemctl start（当前启动一次）、enable（开机自启）、disable（禁止自启）、status、restart；查看所有已启动的服务 systemctl list -units --type=service
 * systemctl show --property=Environment docker
 * systemctl daemon-reload
 * journalctl：管理日志
+* syslog 被 systemd-journal 取代，crond 也被 systemd 的 timer 单元取代，udev 也准备集成到 systemd 中来，未来甚至还可能取代 /etc/fstab
+* https://wiki.archlinux.org/index.php/Systemd_(简体中文)
 
 ## nmap
 

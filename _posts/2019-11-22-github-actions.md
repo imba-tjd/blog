@@ -40,7 +40,6 @@ with:
 * 软件环境：https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
 * 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
 
-
 ### Python环境
 
 * 自带python 2.7和3.6，pip9，但需要pip3 install wheel。而pip升级会失败：ImportError: cannot import name main

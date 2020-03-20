@@ -7,6 +7,7 @@ title: Firefox和Chrome
 * 正在进行的实验：about:studies
 * 网络状况：about:networking
 * Flash Player去沙箱版：https://bbs.kafan.cn/thread-1839722-1-1.html
+* 搜索的高亮只会显示1000个
 
 ### 下载
 
@@ -20,7 +21,7 @@ title: Firefox和Chrome
 * 新标签打开书签和链接：browser.tabs.loadBookmarksInTabs
 * 使用MacType渲染（已经失效，cairo在69移除了）：gfx.content.azure.backends ...
 * 搜prefetch有一些预读的选项，但是可能有隐私问题
-* browser.cache.disk.enable可以设置是否在硬盘上缓存数据，默认最大大小可能有1G。在about:cache可以看到
+* browser.cache.disk.enable可以设置是否在硬盘上缓存数据，大小受browser.cache.disk.smart_size.enabled自动控制，大概1G
 * media.videocontrols.picture-in-picture.enabled视频的画中画图标，除了它还要改xxx.video-toggle.enabled才能生效
 * network.captive-portal-service.enabled检测网络是否需要登录
 * network.http.http3.enabled：开启quic
@@ -32,7 +33,14 @@ title: Firefox和Chrome
 * network.IDN_show_punycode true：中文域名时显示真正的域名
 * network.http.rcwn.enabled：是否启用raced竞速请求。当FF检测到磁盘较慢时，会无视缓存直接发网络请求，理论上会使用先成功的，另一个就取消掉，实际好像不是这样
 * devtools.selfxss.count：在console中粘贴时会提示“欺诈警告：粘贴您不了解的东西时请务必小心...如果仍想粘贴，请在下方输入allow pasting（不必按回车键）以允许粘贴”。此项可提高阈值，默认是0
-* network.http.max-persistent-connections-per-server
+* network.http.max-persistent-connections-per-server：连接同一域名的最大连接数，默认6；另有per-proxy默认32
+* network.http.accept-encoding：去掉deflate的压缩
+* ui.key.menuAccessKey：是否允许按alt打开菜单栏
+* security.dialog_enable_delay：下载框变为可点击的时间，默认1000毫秒
+* network.dns.disableIPv6
+* security.fileuri.strict_origin_policy：file协议的URI只允许读取同一目录下的文件，默认开启
+* accessibility.typeaheadfind.manual：快速查找，按`/`和`'`时出现，后者仅链接，默认开启
+* privacy.resistFingerprinting：抵抗数字指纹，不过开启后可能产生问题，默认关闭
 
 #### 页面翻译
 
