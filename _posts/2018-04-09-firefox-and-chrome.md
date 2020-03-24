@@ -101,6 +101,8 @@ title: Firefox和Chrome
 
 ## Chrome
 
+* http://static.centbrowser.cn/installer_64/
+
 ### about:flags
 
 * https://bbs.kafan.cn/thread-2133336-1-1.html

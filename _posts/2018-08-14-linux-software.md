@@ -242,3 +242,4 @@ trusted-host = mirrors.aliyun.com
 ### TODO
 
 * rclone: https://zhuanlan.zhihu.com/p/104480400
+* unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html

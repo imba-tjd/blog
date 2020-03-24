@@ -149,6 +149,7 @@ title: Linux命令
 * AAAA：查询ipv6的记录；A：ipv4的记录；MX：邮件服务器记录；NS：该域名由哪个dns服务器负责解析；CNAME：查询别名；-x：查询PTR记录，只能用此参数，前面的方法不适用
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
 * ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
+* 查询EDNS状态：`dig edns-client-sub.net -t TXT @8.8.8.8`
 * 另外还有kdig（knot-utils）和host命令
 
 ## crontab
@@ -165,6 +166,8 @@ title: Linux命令
 ## iproute2
 
 替代net-tools(ifconfig, arp, route, netstat)。
+https://www.cnblogs.com/sparkdev/p/9253409.html
+https://www.cnblogs.com/sparkdev/p/9262825.html
 
 * ip
 
@@ -235,10 +238,14 @@ title: Linux命令
 
 ## sed
 
+* -i为直接修改文件内容
+* -e指定后一个参数为sed的指令，当需要一次性指定多个时有用
+
 ```
-sed -i "15i Contents" Lab.txt # 在文件的第15行插入指定内容
 find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐藏文件夹
-sed -i 's/aaa/bbb' file.txt # 替换文本
+'6i Contents' # 在文件的第6行插入指定内容
+'s/aaa/bbb/' # 替换文本
+sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8行是删除2-5行前的第8行，而不是变化后的
 ```
 
 ## 持续运行
@@ -247,6 +254,7 @@ sed -i 's/aaa/bbb' file.txt # 替换文本
 * fg：把ctrl+z挂起的程序恢复到前台
 * bg：让ctrl+z挂起的程序在后台运行
 * jobs：显示后台挂起的任务
+* 使用`%1`指定目标任务，可以用kill杀掉
 * 输命令时在最后加个&会默认在后台运行，一般会用`>log.txt 2>&1 &`不让输出到屏幕上；如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样
 * 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；~~但这样的程序无法用fg恢复~~好像可以；默认会自动把输出重定向到$HOME/nohup.out中
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
@@ -255,12 +263,22 @@ sed -i 's/aaa/bbb' file.txt # 替换文本
 
 ## systemd
 
-* systemctl start（当前启动一次）、enable（开机自启）、disable（禁止自启）、status、restart；查看所有已启动的服务 systemctl list -units --type=service
+/lib/systemd/system/
+
+### systemctl
+
+* systemctl start（当前启动一次）、stop、enable（开机自启）、disable（禁止自启）、status、restart、try-restart（已启动才重启否则不做操作）、reload-or-restart、reload-or-try-restart、mask（禁止自动和手动启动）、unmask name.service
+* 查看已激活的服务：systemctl list-units --type=service；加-a显示所有的；查看所有服务的自启状态：systemctl list-unit-files -t service
 * systemctl show --property=Environment docker
 * systemctl daemon-reload
-* journalctl：管理日志
-* syslog 被 systemd-journal 取代，crond 也被 systemd 的 timer 单元取代，udev 也准备集成到 systemd 中来，未来甚至还可能取代 /etc/fstab
-* https://wiki.archlinux.org/index.php/Systemd_(简体中文)
+* systemctl hibernate（休眠）、hybrid-sleep（交互式休眠）、rescue（进入单用户救援状态）
+* chkservice：交互式管理服务的程序 https://zhuanlan.zhihu.com/p/35264613
+
+### 其它
+
+* systemd-analyze：查看启动耗时；blame指令：查看每个服务的启动耗时；critical-chain [name.service]指令：显示瀑布状的启动过程流
+* journalctl：管理日志，取代syslog
+* crond 也被 systemd 的 timer 单元取代
 
 ## nmap
 
@@ -293,3 +311,4 @@ https://einverne.github.io/categories.html#每天学习一个命令
 
 * https://www.cnblogs.com/manong--/p/8012324.html
 * https://blog.csdn.net/aspirationflow/article/details/7694274
+* https://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html

@@ -5,6 +5,7 @@ title: PowerShell
 > https://www.jb51.net/article/115518.htm
 > https://mva.microsoft.com/zh-cn/training-courses/powershell-18405
 > https://www.pstips.net：看到 [Powershell错误处理](https://www.pstips.net/powershell-online-tutorials) 了
+> https://www.cnblogs.com/sparkdev/tag/PowerShell/
 
 语法
 ====

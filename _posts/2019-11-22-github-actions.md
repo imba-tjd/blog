@@ -35,10 +35,23 @@ with:
   args: go version
 ```
 
+## 设置值
+
+```
+- name: get version
+  id: get_version
+  run: echo "::set-output name=version_tag::${GITHUB_REF/refs\/tags\//}"
+- name: release
+  env:
+    TAG: ${{ steps.get_version.outputs.version_tag }}
+```
+
 ## 环境
 
 * 软件环境：https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
 * 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
+* 直接使用apt必须加sudo，但在容器里就必须不用
+* clang默认就是9
 
 ### Python环境
 
