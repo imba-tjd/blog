@@ -194,7 +194,7 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
 * -#显示进度条，在-O或者重定向输出时默认会有
 * -x使用proxy（正代）
-* -C从指定Range继续下载，但必须指定起始点，无法傻瓜式使用
+* -C从指定Range继续下载；好像`-C -`可以自动断点续传
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
@@ -300,7 +300,7 @@ tmux（https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux
 
 killall、pkill、kill -9
 
-nftables：https://zhuanlan.zhihu.com/p/88981486
+nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395
 
 https://www.oschina.net/translate/useful-linux-commands-for-newbies
 
