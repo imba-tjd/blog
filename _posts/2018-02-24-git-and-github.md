@@ -222,12 +222,13 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 1. gpg2 --list-key *邮件地址*
 2. git config user.signingkey ...
 3. 需要用的时候必须git commit -S
+4. TODO：https://zhuanlan.zhihu.com/p/34318369
 
-### [SSH](https://help.github.com/en/articles/connecting-to-github-with-ssh)
+### SSH
 
-1. ssh-keygen -o -t rsa -b 4096 -C "email@example.com"
-2. cat ~/.ssh/id_rsa.pub | clip
-3. Add your public SSH key to your GitLab account
+1. ssh-keygen -t ed25519 -C "email@example.com"
+2. cat ~/.ssh/id_rsa.pub | clip （Win自带）
+3. 把密钥添加到GitHub账户里去
 4. ssh -T git@gitlab.com
 
 ## Oh My Zsh Alias
@@ -307,7 +308,7 @@ collapsable content
 
 * https://zhuanlan.zhihu.com/p/56759711 Github协议详解，详细又易懂
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
-* CC：https://www.zhihu.com/question/265416787
+* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode
 * 选择开源协议：https://choosealicense.com/
 
 ## bare和mirror
@@ -362,3 +363,4 @@ collapsable content
 * https://pdf-lib.org/Home/Details/407 （有错误）
 * https://git-scm.com/doc
 * https://github.com/521xueweihan/git-tips
+* https://help.github.com/en/articles/connecting-to-github-with-ssh

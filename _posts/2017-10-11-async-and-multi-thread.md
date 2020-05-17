@@ -55,7 +55,7 @@ int value = await Task.Run(() => Task.Run(() => 4)); // Task<TResult> Func
 ### 调用异步方法
 
 * 在非异步方法里同步调用异步方法，需要声明Task或`Task<T>`实例保存异步的结果，异步方法进行到await语句时返回调用方法。使用t.Wait()、t.WaitAll、t.WaitAny同步地等待任务
-* 在非异步方法中异步调用异步方法，可用GetAwaiter().GetResult()。但感觉和Wait差不多，只是不会抛AggregateException而已，还是会阻塞
+* 在非异步方法中异步调用异步方法，可用GetAwaiter().GetResult()。但感觉和Wait/Result差不多，只是不会抛AggregateException而已，还是会阻塞
 * 以上两种方法在有同步上下文时都会造成死锁
 * 在异步方法里调用异步方法，需要在调用的方法前加await关键字。可以直接声明T保存`Task<T>`的结果。使用await Task.WhenAll和await Task.WhenAny异步等待多个任务
 

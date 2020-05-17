@@ -42,7 +42,7 @@ title: Linux软件
 
 ```
 # src是获取源代码时用的，不必要
-# 如果只是从测试源中安装某一个软件，可用apt -t testing install xxx
+# 如果只是从测试源中安装某一个软件，可用apt -t testing install xxx；好像backports默认就是只有这样才能装的
 deb https://mirrors.aliyun.com/debian/ stretch main non-free contrib
 deb https://mirrors.aliyun.com/debian-security stretch/updates main
 deb https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
@@ -129,7 +129,6 @@ trusted-host = mirrors.aliyun.com
 * 程序安装位置，用pip show能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
 * 安装pip本身和一些库：python3-dev python3-venv python3-pip，Linux下安装后的名称只会是pip3
 * 删除python2：apt purge python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln
-* pip升级：python3 -m pip install --upgrade pip setuptools wheel
 * 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip
 
 * thefuck
@@ -161,6 +160,7 @@ trusted-host = mirrors.aliyun.com
 * /usr/games/fortune
 * cowsay
 * gnome-tweak
+* 桌面版debian记得删除`libreoffice*`和`thunderbird`
 
 ## Apache
 

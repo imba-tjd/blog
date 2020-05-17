@@ -20,7 +20,7 @@ title: Linux命令
 * stat：查看文件的属性；file：以自然语言描述文件是什么，但debian不自带
 * source/.：解析配置文件
 * setleds：设置键盘指示灯
-* top：显示进程内存/cpu占用信息，会自动更新；htop：多彩的界面，不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
+* top：显示进程内存/cpu占用信息，会自动更新；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
 * screen：窗口管理器的命令行界面版本
 * uname -a：查看内核版本
 * chroot：改变根目录
@@ -64,6 +64,7 @@ title: Linux命令
 * factor：求一个数的所有因数
 * logrotate：切割日志的程序
 * nroff -man manpage.1 | more：显示man格式的.1文件
+* mktemp：在/tmp下创建一个空的临时文件，输出该文件路径，因此一般用法为FILE=$(mktemp) ...
 
 ## 压缩/解压
 
@@ -216,15 +217,14 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 * src可有多个文件
 * win下的好像无法识别中文路径
 * -3可以（通过本机）在两个服务器之间传文件
+* src如果以`/`结尾，就是传输文件夹里的内容，不是传输一个文件夹；如果不以斜杠结尾再加`-r`就能传输一个文件夹
 
 ### rsync
 
-* rsync -avrPH from to：a保留文件所有属性且递归，v详细模式，r递归复制文件夹，P断点续传，H保留硬链接；地址和scp类似，如果用两个冒号用的就是rsync协议
-* -u只更新变化了的，-z启用压缩，-n是dry run，--delete删除to中所有不在from中的文件
+* rsync -avzP src dest：a保留文件所有属性且递归，z启用压缩，P断点续传且显示每个文件的进度，v详细模式但在P下只会再多显示一点总结信息
+* -H保留硬链接，-u只更新变化了的（文件存在于dest且mtime更新），-n是dry run，--delete删除dest中所有不在src中的文件，-c用校验和而不是时间和大小判断是否不同会大量消耗资源，-vvvv显示debug级别的信息
+* 设置--inplace和--append后好像是增量同步；有限速功能避免把服务器带宽占满（scp也有）；Host::/path用的是rsync协议，运行daemon时可以类似ftp提供文件出去，可以设置只读和IP黑白名单；不提供dest等价于运行ll，此时-h才有用；-R的作用：`-rR /var/./log/nginx /tmp`将会创建/tmp/log/nginx；-S发送稀疏文件时使用
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
-* https://zhuanlan.zhihu.com/p/40022680
-* https://zhuanlan.zhihu.com/p/85087767
-* https://zhuanlan.zhihu.com/p/100531052
 * 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
 
 ### aria2
