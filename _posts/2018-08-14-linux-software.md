@@ -7,6 +7,7 @@ title: Linux软件
 * 使用`grep " install " /var/log/apt/history.log`可查看最近安装的软件，**不包含因为依赖装上的**
 * 清理已删除的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
 * 可以使用apt install ./xxx.deb直接安装本地的deb包
+* 查看更新记录：`cat /var/log/apt/history.log`，而`/var/lib/apt/periodic`中什么也没有
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
 * apt-transport-https、~~ca-certificates~~：使得APT支持https？后者装curl的时候会自动装上
@@ -121,6 +122,7 @@ https://www.lfd.uci.edu/~gohlke/pythonlibs/
 [global]
 #timeout = 6000
 index-url = https://mirrors.aliyun.com/pypi/simple/
+# https://pypi.doubanio.com/simple/ https://mirrors.163.com/pypi/simple/ https://pypi.tuna.tsinghua.edu.cn/simple/
 [install]
 trusted-host = mirrors.aliyun.com
 ```

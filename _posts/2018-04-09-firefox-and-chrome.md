@@ -6,7 +6,6 @@ title: Firefox和Chrome
 
 * 正在进行的实验：about:studies
 * 网络状况：about:networking
-* Flash Player去沙箱版：https://bbs.kafan.cn/thread-1839722-1-1.html
 * 搜索的高亮只会显示1000个
 
 ### 下载
@@ -41,6 +40,7 @@ title: Firefox和Chrome
 * security.fileuri.strict_origin_policy：file协议的URI只允许读取同一目录下的文件，默认开启
 * accessibility.typeaheadfind.manual：快速查找，按`/`和`'`时出现，后者仅链接，默认开启
 * privacy.resistFingerprinting：抵抗数字指纹，不过开启后可能产生问题，默认关闭
+* browser.backspace_action：设为2则退格键不会导致网页后退
 
 #### 页面翻译
 

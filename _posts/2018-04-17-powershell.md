@@ -7,6 +7,10 @@ title: PowerShell
 > https://www.pstips.net：看到 [Powershell错误处理](https://www.pstips.net/powershell-online-tutorials) 了
 > https://www.cnblogs.com/sparkdev/tag/PowerShell/
 
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 语法
 ====
 
