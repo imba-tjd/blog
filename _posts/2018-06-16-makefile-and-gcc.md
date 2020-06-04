@@ -128,3 +128,4 @@ prog3 : prog3.o sort.o utils.o
 * CMake：https://www.zhihu.com/question/58949190
 * https://zhuanlan.zhihu.com/p/100964932
 * https://www.ruanyifeng.com/blog/2015/02/make.html
+* https://github.com/seisman/how-to-write-makefile

@@ -39,7 +39,7 @@ title: Linux命令
 * tail -f：跟踪指定文件，如果有变化立即显示，删除后停止；与less -F相同
 * tasksel：在Debian中快速安装软件
 * cat \<\<EOF\>out.txt：输入以后继续输入文字，当最后一行输入EOF文本的时候结束输入，用-EOF可以忽略空白字符
-* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件；type可以区分内置还是外置命令
+* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件；type可以区分内置还是外置命令，-a可以显示包含alias在内的命令查找顺序
 * xclip：复制到剪切板上，不自带
 * head -10：显示前10行信息
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
@@ -296,7 +296,7 @@ sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8�
 
 ## TODO
 
-tmux（https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt）、supervisor(python)、PM2 (for node.js)
+tmux（https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt https://zhuanlan.zhihu.com/p/27915505）、supervisor(python)、PM2 (for node.js)
 
 killall、pkill、kill -9
 
