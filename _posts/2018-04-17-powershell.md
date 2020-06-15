@@ -6,6 +6,7 @@ title: PowerShell
 > https://mva.microsoft.com/zh-cn/training-courses/powershell-18405
 > https://www.pstips.net：看到 [Powershell错误处理](https://www.pstips.net/powershell-online-tutorials) 了
 > https://www.cnblogs.com/sparkdev/tag/PowerShell/
+> TODO: https://yuedu.baidu.com/ebook/d7b1a1767dd184254b35eefdc8d376eeafaa174e https://zhuanlan.zhihu.com/p/145043422
 
 ```
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser

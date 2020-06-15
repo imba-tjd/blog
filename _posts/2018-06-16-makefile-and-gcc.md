@@ -114,6 +114,12 @@ prog3 : prog3.o sort.o utils.o
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
 
+### 超级静态的编译
+
+```
+-static-libgcc -static-libstdc++ -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
+```
+
 ## Clang
 
 * 安装：https://apt.llvm.org/

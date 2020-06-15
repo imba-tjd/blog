@@ -5,6 +5,47 @@ tags:
     - CI
 ---
 
+## Workflow
+
+`.github/workflow/main.yml`
+
+```yaml
+name: CI
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2 # 官方文档很完善了
+
+    - name: 每一步都可以有名称
+      run: |
+        echo Hello World!;
+      env:
+        key: val
+
+    - uses: ./action-a # 这个点是本仓库，而不是workflow文件夹
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: nginx # artifact中可下载的对象的文件名，无需以zip后缀结尾，否则会有双重后缀
+        path: /sbin/nginx # 要打包的文件/文件夹的绝对或相对路径，支持通配；当作Linux意义下的文件，不保留父路径，只有自己的文件名
+        # 上传同一文件名的对象到同一name会自动覆盖，上传不同文件名的对象到同一name会添加到压缩包中；此处的“文件名”指的是path里不含路径的文件名
+
+
+  docker: # 直接在容器中运行整个job
+    runs-on: ubuntu-latest # 不可省
+    container: golang # 详细配置见 workflow-syntax-for-github-actions#jobsjob_idcontainer
+
+    uses: docker://golang # 快速从hub拉取和使用容器
+    with:
+      args: go version
+
+if: success()/falure()/caceled() # 官方文档用${{...}}，这个是upload-artifact的实例，不清楚哪个对
+```
+
 ## Event
 
 ### push
@@ -15,51 +56,58 @@ tags:
 
 从左到右依次是分、时、日、月、星期。`0 0 * * *`就是每天8点（UTC0点）；星期天是0。
 
-## upload-artifact
+## [在YAML中的变量](https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions)
 
-* path为要打包的文件，含义是Linux下的文件，即也可以指定文件夹，但只能有一个，星号是无效的；两者都会自动用zip打包一遍
-* name是Actions中的artifact中可下载的文件名，不应以zip结尾否则会出现后缀
-
-## Docker
-
-```
-# 直接在容器中运行
-jobs:
-  my_job:
-    #runs-on仍要
-    container: golang # 若要详细配置，参见 workflow-syntax-for-github-actions#jobsjob_idcontainer
-
-# 快速从hub拉取和使用容器
-uses: docker://golang
-with:
-  args: go version
-```
-
-## 设置值
-
-```
+```yaml
 - name: get version
   id: get_version
   run: echo "::set-output name=version_tag::${GITHUB_REF/refs\/tags\//}"
 - name: release
   env:
     TAG: ${{ steps.get_version.outputs.version_tag }}
+
+${{ env.name }}
+${{ github.workspace }}
+```
+
+## 创建Actions
+
+有两种方式：Docker和JS。对于前者，创建一个Dockerfile，运行entrypoint.sh即可。
+
+`action.yml`定义元数据：
+
+```yaml
+name: "Hello Actions"
+description: "Greet someone"
+author: "octocat@github.com"
+
+inputs:
+  MY_NAME: # 在映像中用$INPUT_MY_NAME获取
+    description: "Who to greet"
+    required: true
+    default: "World"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+
+branding:
+  icon: "mic"
+  color: "purple"
 ```
 
 ## 环境
 
 * 软件环境：https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
-* 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
+* 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
 * 直接使用apt必须加sudo，但在容器里就必须不用
 * clang默认就是9
 
 ### Python环境
 
 * 自带python 2.7和3.6，pip9，但需要pip3 install wheel。而pip升级会失败：ImportError: cannot import name main
-* 安装不需要加--user，和Win不一样
 * 需要PATH=$PATH:~/.local/bin，注意不同step应该是不共享的。但也可以直接用python3 -m来调用
-
-#### 自带的包
+* actions/setup-python不支持安装beta版
 
 ```
 asn1crypto (0.24.0)

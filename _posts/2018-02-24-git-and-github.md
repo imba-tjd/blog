@@ -24,6 +24,7 @@ title: Git/GitHub笔记
 * 把分支推送到远端并设定联系： git push -u origin patch
 * 把当前内容建立为一个没有历史的分支：git checkout --orphan new；但注意原来commit了的内容会自动stage，注意gitignore
 * git checkout -：切换到上一个分支
+* 现在可用git switch [-c]替代git checkout [-b]
 
 ### 合并分支
 
@@ -58,7 +59,7 @@ title: Git/GitHub笔记
 * git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后用rebase -i --autosquash会自动把fixup的放到合适的位置
-* git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件；另有git restore做相似的事
+* git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件；现在此功能被git restore替代
 * git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
 * git checkout --merge br：相当于stash, checkout, stash pop
 
@@ -99,7 +100,7 @@ title: Git/GitHub笔记
 * git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
 * cat .git/HEAD：显示HEAD的指向
 * git tag [tagname] [hash] 新建tag，-n显示tag及commit信息，-d删除；git push --tags：推送所有标签；删除远端标签：git push origin :refs/tags/v0.9
-* git reflog：查看所有记录，包括reset的
+* git reflog：查看本地所有变动过的记录，包括不在分支上的；注意clone下来的用此命令只能看到一条clone的记录，远端删除后再clone无法用它恢复；
 * git log branch1...branch2：显示branch2比branch1多了哪些提交
 * git whatchanged xxx --since='2 weeks ago'：查看某文件的修改历史
 * [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)：`git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`；加--all修改所有的分支，prune empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败；如果文件路径里有空格，把外层改成双引号，路径用单引号
@@ -302,7 +303,15 @@ collapsable content
 * https://help.github.com/en/articles/about-code-owners
 * 把`CODEOWNERS`文件放到`/`、 `.github/` 下即可启用，仅对存在此文件的分支的PR有效
 * 文件匹配+空格+@用户；从后往前匹配，所以单独一个*要放到最前
-* *.js匹配所有js；开头不加/则匹配所有的；末尾为/*不会递归生效，为/才会
+* `*.js`匹配所有js；开头不加/则匹配所有的；末尾为/*不会递归生效，为/才会
+
+### 特殊链接
+
+```
+直接从PR获得文本diff：https://patch-diff.githubusercontent.com/raw/<user>/<repo>/pull/<id>.diff
+以tar.gz下载源代码：https://github.com/<user>/<repo>/tarball/master
+下载最新版release，但文件名需固定；如果是访问页面就去掉downlaod：https://github.com/<user>/<repo>/releases/download/latest/<filename>
+```
 
 ## License
 
@@ -310,6 +319,7 @@ collapsable content
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
 * CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode
 * 选择开源协议：https://choosealicense.com/
+* 所有协议：https://opensource.org/licenses/category
 
 ## bare和mirror
 
@@ -319,6 +329,7 @@ collapsable content
 
 ## [hub命令行工具](https://github.com/github/hub)
 
+* 设计上可以直接设为git的alias，原本的git命令都可用，hub只是做了扩充
 * sudo apt install hub; hub version
 * 第一次使用会提示输入用户名和密码，可设置`GITHUB_USER`和`GITHUB_PASSWORD`避免交互，会创建OAuthToken放在`~/.config/hub`；也可用`GITHUB_TOKEN`，这种不会写入config，但可能就每次都要设置（与Actions结合比较方便）
 * 好像会默认使用https因为有个issue说它可以用gcm ；config中设置`hub.protocol ssh`可指定协议为ssh
@@ -330,7 +341,11 @@ collapsable content
 * hub gist create --copy build.log：自动把文件变成gist
 * hub ci-status --verbose
 * hub release create --copy -F release-notes.txt v2.3.0
-* 还有一些操作issue和pr的功能，包括浏览（可指定过滤条件）、创建（可assign）、close、merge；宣传说所有原本的git命令都可用，hub只是做了扩充，可以直接设为git的alias
+* 还有一些操作issue和pr的功能，包括浏览（可指定过滤条件）、创建（可assign）、close、merge
+
+## [gh](https://github.com/cli/cli)
+
+* 重写的不兼容git的cli工具，还没有正式release，以后再学
 
 ## readme渲染顺序
 
