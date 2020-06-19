@@ -5,9 +5,15 @@ title: Linux软件
 ## APT
 
 * 使用`grep " install " /var/log/apt/history.log`可查看最近安装的软件，**不包含因为依赖装上的**
-* 清理已删除的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
+* 清理已删除但保留配置的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
 * 可以使用apt install ./xxx.deb直接安装本地的deb包
 * 查看更新记录：`cat /var/log/apt/history.log`，而`/var/lib/apt/periodic`中什么也没有
+* apt list -i只能用dpkg -l替代，前者无法直接输出到`code -`里
+* apt-cache rdepends -i：查询反向依赖
+* apt-mark hold/unhold <pkgname>：锁定/解锁版本，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
+
+### 软件列表
+
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
 * apt-transport-https、~~ca-certificates~~：使得APT支持https？后者装curl的时候会自动装上
@@ -38,6 +44,7 @@ title: Linux软件
 * iotop
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
 * virt-what：查看VPS使用了哪种虚拟化技术，如kvm
+* ncdu：带有进度条的du
 
 ### Debian阿里源
 
@@ -90,35 +97,38 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted 
 
 ## PIP
 
-### 安装和升级
+* 安装pip本身和一些库：python3-dev python3-venv python3-pip python-pip-whl python3-setuptools python3-wheel，Linux下安装后的名称只会是pip3
+* 删除python2：apt autoremove python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln
+* 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\Python\Python38\Scripts；%LocalAppData%\Programs\Python\Python39\DLLs\Scripts
+* 依赖安装位置，用pip show能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
+* 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip；现在可以使用pip cache purge清除wheel，但是还是有http缓存
+* 许多包也能从apt获得，以`python3-`加包名获得；若用pip卸载时提示：`Not uninstalling xxx at /usr/lib/python3/dist-packages, outside environment /usr`，这表明此包是用apt装的
 
 ```bash
-python3 -m ensurepip --default-pip
-python3 -m pip install --upgrade pip setuptools wheel
+python3 -m ensurepip --upgrade --default-pip # 一般最终用户不需要调用它，除非安装python时没有装pip
+python3 -m pip install -U pip setuptools wheel
 
 pip3 list [--outdated/-o]
-pip3 install <package_name> [--upgrade/-U] [--pre] [--user]
+pip3 install <package_name> [--upgrade/-U] [--pre预览版] [--user]
 pip3 install <local.whl/tar.gz> -or- -e <dir(/*.whl)> -or- setup.py install
-pip3 install git+https://github.com/user/repo.git
+pip3 install git+https://github.com/user/repo.git@branch
 pip3 show <package_name>
-pip3 uninstall
+pip3 uninstall：不会卸载依赖，可用pip-autoremove代替
+pip3 check：能显示出某个模块的依赖冲突和缺失
 
-# 更新所有：
-import pip
-from subprocess import call
-for dist in pip.get_installed_distributions():
-    call("pip install --upgrade " + dist.project_name, shell=True)
+# 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager解决，或直接--force-reinstall
+# 更新所有包（自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）：pipupgrade --latest；或pip install -U `pip list -o|awk 'NR>2 {print $1}'`；或python -c "import pkg_resources, subprocess; subprocess.call('pip install --upgrade ' + ' '.join(dist.project_name for dist in pkg_resources.working_set), shell=True)"
+#for dist in pkg_resources.working_set:
+#    print("pip install --upgrade " + dist.project_name)
+#    subprocess.call("pip install --upgrade " + dist.project_name, shell=True)
 
-# error: Microsoft Visual C++ 14.0 is required.
-https://www.lfd.uci.edu/~gohlke/pythonlibs/
-
-# conda也可以管理，不过也许和pip有兼容性问题
+pipdeptree [-p package1,p2]：显示依赖哪些包，还有check的效果；-r：显示某个包是被那些依赖的
 ```
 
-#### 国内源
+### 国内源
 
 ```conf
-# %APPDATA%\pip\pip.ini；~/.config/pip/pip.conf；-i
+# %APPDATA%\pip\pip.ini；~/.config/pip/pip.conf；pip -i；pip config set global.index-url xxx
 [global]
 #timeout = 6000
 index-url = https://mirrors.aliyun.com/pypi/simple/
@@ -127,11 +137,16 @@ index-url = https://mirrors.aliyun.com/pypi/simple/
 trusted-host = mirrors.aliyun.com
 ```
 
-* 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\Python\Python38\Scripts。Linux用PATH=$PATH:...添加，但好像全局的是默认添加的
-* 程序安装位置，用pip show能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
-* 安装pip本身和一些库：python3-dev python3-venv python3-pip，Linux下安装后的名称只会是pip3
-* 删除python2：apt purge python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln
-* 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip
+### pipx
+
+* 是用来安装全局的命令行工具的，对标apt和brew，会分别把每个工具放在虚拟空间中防止依赖冲突
+* pipx install [--system-site-packages -f]
+* pipx ensurepath：自动往PATH中添加`~/.local/bin`；pipx completions：安装自动完成
+* run命令只运行不安装，下载的缓存持续几天，支持直接用链接的.py文件；如果命令行和包名不同，用`--spec`
+* list、upgrade、upgrade-all（对每个包用only-if-needed策略运行upgrade）、uninstall、uninstall-all、reinstall-all（更新python版本后使用）
+* inject pkg dep：往指定包的虚拟环境里装包；runpip pkg pip_commands：在指定包的虚拟环境里运行pip
+
+### 软件列表
 
 * thefuck
 * mssql-cli
@@ -142,6 +157,8 @@ trusted-host = mirrors.aliyun.com
 * [bleachbit](https://github.com/bleachbit/bleachbit)：清理垃圾的
 * ps_mem：显示各个进程的内存占用情况
 * Glances：监控所有系统信息（类似于vmstat）
+* userpath：添加和验证PATH的程序，也能作为库使用
+* fierce：扫描域名，基本上是取附近IP的反查PTR
 
 ## Ruby
 
@@ -162,7 +179,7 @@ trusted-host = mirrors.aliyun.com
 * /usr/games/fortune
 * cowsay
 * gnome-tweak
-* 桌面版debian记得删除`libreoffice*`和`thunderbird`
+* 桌面版debian删除不用的程序：apt autoremove libreoffice* thunderbird smplayer smtube (不知有无mpv和vlc*和mplayer，有可能是smtube的依赖)
 
 ## Apache
 
@@ -173,7 +190,7 @@ trusted-host = mirrors.aliyun.com
 
 ### 虚拟主机
 
-1. Apache1需要去掉`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和adf`Include conf/extra/httpd-vhosts.conf`前的井号。Apache2不是这样。把sites-available下的文件软连接到sites-enable下即可启用，mods同理。ssl默认是不启用的。
+1. Apache1需要去掉`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和`Include conf/extra/httpd-vhosts.conf`前的井号。Apache2不是这样。把sites-available下的文件软连接到sites-enable下即可启用，mods同理。ssl默认是不启用的。
 2. Apache1修改conf/extra/httpd-vhosts.conf，Apache2直接改sites-available里的文件。
 3. 修改虚拟主机文件
 
@@ -204,7 +221,6 @@ trusted-host = mirrors.aliyun.com
 * 关于黑白名单（allow和deny）：http://www.nowamagic.net/academy/detail/1225512
 * deny 与allow之间没有空格只有一个逗号隔开
 * 如何设置只允许域名访问，不允许直接ip访问？
-* 需要用户名和密码认证才能访问？
 
 ## VMware Tools
 
@@ -244,4 +260,4 @@ trusted-host = mirrors.aliyun.com
 ### TODO
 
 * rclone: https://zhuanlan.zhihu.com/p/104480400
-* unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html
+* unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691
