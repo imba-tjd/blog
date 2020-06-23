@@ -4,7 +4,7 @@ minimal_mistakes_skin: aqua
 # GitHub默认启用且不能禁用: coffeescript, default-layout, gist, github-metadata, optional-front-matter, paginate, readme-index, titles-from-headings, relative-links
 plugins:
   - jekyll-include-cache
-#  - jekyll-feed
+  - jekyll-feed
 #  - jekyll-sitemap
 #  - jekyll-feed
 #  - jemoji
