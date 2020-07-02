@@ -1,6 +1,6 @@
 ignore_theme_config: true # 4.0+的jekyll，如果有key没有覆盖，会合并主题的config。因为自定义的内容很多，故关闭
-# remote_theme: mmistakes/minimal-mistakes
-theme: minimal-mistakes-jekyll
+remote_theme: mmistakes/minimal-mistakes
+# theme: minimal-mistakes-jekyll
 minimal_mistakes_skin: aqua
 
 # GitHub Pages默认启用了一些且无法禁用；本地安装主题会自动安装依赖插件，但远程主题必须手动设置，但Pages有白名单
