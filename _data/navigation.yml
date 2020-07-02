@@ -1,0 +1,6 @@
+# 每一项还可以有children
+main: # 默认；要换别的可在FM中加sidebar: nav: xxx
+- title: 分类
+  url: /categories
+- title: 关于
+  url: /about
