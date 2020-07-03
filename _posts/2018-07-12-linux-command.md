@@ -89,6 +89,7 @@ title: Linux命令
 * -p写到stdout中
 * tldr的文档是错的
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
+* 对于分卷压缩包，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
 
 ## find
 
@@ -186,8 +187,11 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 
 ## 传输文件
 
-## curl
+aria2、axel、httpie放到软件的文章里去了。
 
+### curl
+
+* 安装时会装上openssl
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 * 支持多种协议，默认显示body；-I仅显示Header（但用的是HEAD方法），-i顺便显示Header，`-D –`不限方法只显示头
 * -o或者>写入文件，-O使用网站提供的名字
@@ -199,7 +203,7 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
-* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；val如果以@开头会被认为从文件中读取一行一个，可用`--data-raw`覆盖；`--data-urlencode`会帮你做一次URL编码；-F的类型是`multipart/form-data`
+* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；val如果以@开头会被认为从文件中读取一行一个，可用`--data-raw`覆盖；`--data-urlencode`会帮你做一次URL编码，像值中有空格时可用；-F的类型是`multipart/form-data`
 * -T使用PUT方式上传文件，-X手动使用其它HTTP请求
 * -k忽略证书错误
 * url里用中括号加数字范围可以批量下载
@@ -226,15 +230,7 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 * 设置--inplace和--append后好像是增量同步；有限速功能避免把服务器带宽占满（scp也有）；Host::/path用的是rsync协议，运行daemon时可以类似ftp提供文件出去，可以设置只读和IP黑白名单；不提供dest等价于运行ll，此时-h才有用；-R的作用：`-rR /var/./log/nginx /tmp`将会创建/tmp/log/nginx；-S发送稀疏文件时使用
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
 * 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
-
-### aria2
-
-* -c断点续传
-* -s、-x设置线程
-* -d下载目录
-* -i从文件中读取url，-j同时下载的任务数
-* -D在后台运行，https://aria2c.com/ 就是本机的控制台
-* 不支持UPnP，不支持从命令行指定代理
+* TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps
 
 ## sed
 

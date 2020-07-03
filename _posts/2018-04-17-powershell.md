@@ -8,22 +8,33 @@ title: PowerShell
 > https://www.cnblogs.com/sparkdev/tag/PowerShell/
 > TODO: https://yuedu.baidu.com/ebook/d7b1a1767dd184254b35eefdc8d376eeafaa174e https://zhuanlan.zhihu.com/p/145043422
 
-```
+## 基本环境和安装模块
+
+* 可选安装PowerShellGet，但pwsh自带非常新的版本
+* 如果不用`-Scope AllUsers`，默认会装到`$home\Documents\PowerShell\`，好处是不需要管理员权限
+* `-Force`可避免从不信任的源安装的交互式警告
+* `-AllowPrerelease`和指定最小版本的参数不允许一次装多个
+* Get-Module显示已安装的模块，Update-Module更新所有或指定模块，Remove-Module与Import-Module相反，不是用来从硬盘上删除包的
+* 这样配置下来每次启动要花700多到900多ms
+
+```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Install-Module PSReadLine -AllowPrerelease -Scope AllUsers -Force -Proxy http://127.0.0.1:1080
+Install-Module posh-git,oh-my-posh -Scope AllUsers -Force -Proxy http://127.0.0.1:1080
+
+code $Profile # 在用户的Document/PowerShell中，一旦产生，再在地址栏里输powershell就会打开该我的文档里的文件夹，真的难以理解
+Import-Module oh-my-posh # 自动导入posh-git
+Set-Theme AgnosterPlus
 ```
 
-语法
-====
-
-变量
-----
+## 变量
 
 * 变量：$变量名=值；因为是动态类型，下面的类型也可以这样复制给变量；声明但未赋值的变量的值等于（-eq）$null；直接使用$变量名就可以显示其值，无需用echo；如果需要用特殊字符做变量名，如$和"，需要用大括号括起来；支持连续赋值；一次性多个赋值或交换两个变量：`$value1,$value2=$value2,$value1`；访问未声明的变量或数组越界不会报错，而是返回null，无输出
 * 在$前加[类型]可申明强类型变量，除了常见的类型以外，还支持：datetime、guid、nullable、psobject、regex、scriptblock、switch、timespan、type、XML；可以使用`(Get-Variable var).Attributes.Clear()`把强类型转换为弱类型；使用-is可以判断类型
 * 声明变量还可以用New-Variable *name* -Value ...，name无需$，-Option可指定readonly和constant，前者被赋值后不可修改但仍可被删除且可被-Force赋值；同作用域内在多次声明同一个变量会报错
 * 验证变量或虚拟驱动器是否存在：Test-Path + 驱动器名和冒号/variable:*变量名*；使用del variable:*变量名*或Remove-Variable(rv)可清除变量，注意不能用del $变量名，因为这样会删除变量的内容指向的东西
 * 可以对变量进行一些限制，如不为空、范围等，详见：https://www.pstips.net/powershell-variable-management-behind-the-scenes.html
-* 数组([array])：声明用@(元素1, ...)，或者直接用逗号；多行的数据实际上是数组；索引从零开始，但可为负，比如最后一个元素可用使用-1访问；访问用$*name*[]，括号内用逗号表达式可一次获取多个元素，也可为序列，则`$books[($books.Count)..0]`即可倒序输出；元素类型可不同，如果要强类型，在$*变量名*前面加`[int[]]`；附加元素用+=，但实际上是重新生成；是引用类型，需要副本时用Clone方法
+* 数组([array])：声明用@(元素1, ...)，或用**逗号**；多行的数据实际上是数组；索引从零开始，但可为负，比如最后一个元素可用使用-1访问；访问用`$*name*[]`，括号内用逗号表达式可一次获取多个元素，也可为序列，则`$books[($books.Count)..0]`即可倒序输出；元素类型可不同，如果要强类型，在`$变量名`前面加`[int[]]`；附加元素用+=，但实际上是重新生成；是引用类型，需要副本时用Clone方法
 * 哈希表([hashtable])：@{键=值; ...}，访问用方括号或点加键；值可直接用逗号表达式来声明数组；删除元素用Remove方法
 * 强制类型转换用方括号，对于数字是四舍五入，比如[int] 1.7为2；定义函数的返回值或指定类型的变量时也用方括号
 * 创建对象：New-Object 类名 参数；也可以用.net的方式
@@ -40,8 +51,8 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 * $pid当前ps进程的pid
 * $home用户目录
 * $host显示ps的基本信息
-* $?显示上一次命令是否成功，为布尔类型，$LastExitCode为上一次命令返回的数字值
-* $$：上一次执行的代码的最后一个参数字符串，$^：第一个参数字符串
+* $?显示上一次命令是否成功，为布尔类型；$LastExitCode为上一次命令返回的数字值
+* $$：上一次执行的代码的最后一个参数字符串；$^：第一个参数字符串
 * $MyInvocation：具有有关当前命令的信息，如脚本的路径和文件名$myinvocation.mycommand.path或函数的名称$myinvocation.mycommand.name
 * $Profile显示配置文件路径
 * $PSHome：PS的安装路径
@@ -224,7 +235,7 @@ CMDLET
 管道
 ----
 
-* ForEach-Object(foreach和%)：1..3 | % { echo $_ }；可指定-Begin、-Process、-End，或直接用三个大括号代替，$ForEach表示索引
+* ForEach-Object(foreach和%)：1..3 | % { echo $_ }；可指定-Begin、-Process、-End，或直接用三个大括号代替，$ForEach表示索引；7之后支持-Parallel
 * Where-Object(where和?)：'You', 'Me' | ? { $_ -match 'u' }
 * Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl *；可指定-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
 * Sort-Object(sort)：-Descending降序；如果某个对象不具有所指定的属性之一，则 cmdlet 会将该对象的属性值解释为 NULL，并将其放置在排序顺序的末尾；如果要多字段排序需要传哈希表对象

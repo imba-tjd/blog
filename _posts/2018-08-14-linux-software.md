@@ -1,5 +1,6 @@
 ---
 title: Linux软件
+category: linux
 ---
 
 ## APT
@@ -9,15 +10,14 @@ title: Linux软件
 * 可以使用apt install ./xxx.deb直接安装本地的deb包
 * 查看更新记录：`cat /var/log/apt/history.log`，而`/var/lib/apt/periodic`中什么也没有
 * apt list -i只能用dpkg -l替代，前者无法直接输出到`code -`里
-* apt-cache rdepends -i：查询反向依赖
+* apt-cache rdepends -i：查询反向依赖；-i理论上是只显示已安装的，但实际好像有些未安装的也显示了？
 * apt-mark hold/unhold <pkgname>：锁定/解锁版本，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
+* 使用前最好安装一下gnupg2（apt-key需要）、apt-transport-https、ca-certificates
 
 ### 软件列表
 
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
-* apt-transport-https、~~ca-certificates~~：使得APT支持https？后者装curl的时候会自动装上
-* curl：还会顺带装openssl
 * software-properties-common：含有add-apt-repository
 * autoremove python(2)以后会被删除的包：sudo
 * mtr： traceroute + ping
@@ -101,8 +101,9 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted 
 * 删除python2：apt autoremove python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln
 * 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\Python\Python38\Scripts；%LocalAppData%\Programs\Python\Python39\DLLs\Scripts
 * 依赖安装位置，用pip show能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
-* 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip；现在可以使用pip cache purge清除wheel，但是还是有http缓存
+* 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip；现在可用pip cache purge清除wheel，但是还是有http缓存；可用pip cache dir显示缓存位置
 * 许多包也能从apt获得，以`python3-`加包名获得；若用pip卸载时提示：`Not uninstalling xxx at /usr/lib/python3/dist-packages, outside environment /usr`，这表明此包是用apt装的
+* 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager全部更新，或直接--force-reinstall
 
 ```bash
 python3 -m ensurepip --upgrade --default-pip # 一般最终用户不需要调用它，除非安装python时没有装pip
@@ -110,19 +111,21 @@ python3 -m pip install -U pip setuptools wheel
 
 pip3 list [--outdated/-o]
 pip3 install <package_name> [--upgrade/-U] [--pre预览版] [--user]
-pip3 install <local.whl/tar.gz> -or- -e <dir(/*.whl)> -or- setup.py install
+pip3 install local.whl/tar.gz -or- 包名 -f <含有whl的文件夹> -or- setup.py install
 pip3 install git+https://github.com/user/repo.git@branch
 pip3 show <package_name>
 pip3 uninstall：不会卸载依赖，可用pip-autoremove代替
 pip3 check：能显示出某个模块的依赖冲突和缺失
 
-# 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager解决，或直接--force-reinstall
-# 更新所有包（自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）：pipupgrade --latest；或pip install -U `pip list -o|awk 'NR>2 {print $1}'`；或python -c "import pkg_resources, subprocess; subprocess.call('pip install --upgrade ' + ' '.join(dist.project_name for dist in pkg_resources.working_set), shell=True)"
-#for dist in pkg_resources.working_set:
+# 更新所有包（能自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）
+pipupgrade --latest --yes --or-- -ly # 好像在win下有各种各样的问题；千万不要装成pip-upgrade了
+# 或pip3 install -U `pip3 list -o | awk 'NR>2 {print $1}'`
+# 或import pkg_resources, subprocess; subprocess.call('pip install --upgrade ' + ' '.join(dist.project_name for dist in pkg_resources.working_set), shell=True)
+# 或for dist in pkg_resources.working_set:
 #    print("pip install --upgrade " + dist.project_name)
 #    subprocess.call("pip install --upgrade " + dist.project_name, shell=True)
 
-pipdeptree [-p package1,p2]：显示依赖哪些包，还有check的效果；-r：显示某个包是被那些依赖的
+deptree [-p package1,p2]：显示依赖哪些包，也有check的效果；-r：显示某个包是被那些依赖的；自己依赖lxml
 ```
 
 ### 国内源
@@ -150,7 +153,6 @@ trusted-host = mirrors.aliyun.com
 
 * thefuck
 * mssql-cli
-* [httpie](https://httpie.org/)：专注于http协议的curl的替代品；中文翻译文档：https://keelii.com/2018/09/03/HTTPie/
 * qrcode：装好后用管道把东西传给它。貌似命令行也可用（只要字体支持）
 * `sublist3r.py -d example.com -e Baidu,Yahoo,Google,Bing,Ask,Netcraft,Virustotal,SSL`：搜寻子域名
 * [trash-cli](https://github.com/andreafrancia/trash-cli)：把文件移动到`.Trash`中
@@ -162,9 +164,15 @@ trusted-host = mirrors.aliyun.com
 
 ## Ruby
 
+```bash
+apt install ruby-dev # 千万不要安装gem这个包
+gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
+gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc和g++
+```
+
 * gem install lolcat：彩虹颜色的管道输出
 
-### 不在包管理器中的软件
+## 不在包管理器中的软件
 
 * [chafa](https://github.com/hpjansson/chafa)：在终端中显示图像，支持gif，不过是像素化显示的
 * [browsh](https://github.com/browsh-org/browsh)：基于文本的运行于终端的浏览器，图片是像素化显示的
@@ -173,6 +181,7 @@ trusted-host = mirrors.aliyun.com
 * [uGet](https://ugetdm.com/)：下载工具，开源但不在GitHub上
 * [hfish](https://hfish.io/)：各种蜜罐
 * https://github.com/chaitin/xray ：扫描常见的Web安全问题，不开源
+* [Teleconsole](https://www.teleconsole.com/)：分享当前Shell，也能支持端口转发
 
 ## 其他
 
@@ -222,6 +231,19 @@ trusted-host = mirrors.aliyun.com
 * deny 与allow之间没有空格只有一个逗号隔开
 * 如何设置只允许域名访问，不允许直接ip访问？
 
+### .htaccess
+
+```
+<Files ~ "^.(htaccess|htpasswd)$">
+deny from all
+</Files>
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^(www\.ttps:/)(:80)? [NC]
+RewriteRule ^(.*) https://$1 [R=301,L]
+Redirect permanent /123 https://target
+order deny,allow
+```
+
 ## VMware Tools
 
 ### 安装
@@ -252,6 +274,67 @@ trusted-host = mirrors.aliyun.com
 * curl https://rclone.org/install.sh | sudo bash
 * rclone config, n, 22(onedrive)
 * (mkdir;) rclone mount onedrive: /www/wwwroot/your_ip/onedrive --allow-other --allow-non-empty --vfs-cache-mode writes &
+
+## axel多线程下载
+
+* -n指定线程数，默认4
+* -o指定输出文件名，如果目标已经存在，会检查是否存在.st状态文件，如果存在就断点续传，不存在就报错
+* 在不指定-o时会自动选择文件名，自动断点续传；如果存在同名文件会自动添加.0后缀，不会覆盖，-c指定此种情况时跳过
+* -q静默模式
+* 支持环境变量设置代理，支持设置UA和其它头
+* 可同时指定多个url，但不是同时下载多个文件；只会依次使用，连接失败时才换下一个，只要有一个下载成功就结束
+
+## [aria2](https://aria2.github.io/manual/en/html/aria2c.html)
+
+* 支持BT和磁力，不支持ed2k，不支持HTTP2，不支持UPnP。感觉唯一的用处就是离线下载，或者放在路由器上
+* UI：https://github.com/ziahamza/webui-aria2 https://github.com/mayswind/AriaNg https://aria2c.com/
+* 命令行：-o 保存的文件名，相对路径为相对dir；--all-proxy=xxx设置代理，无简写方式
+* 开启RPC：--enable-rpc，默认监听双栈localhost:6800
+
+```conf
+# 注释支持单行，但不支持行尾，此处为笔记就不管了
+# 配置文件放到~/.config/aria2/aria2.conf中
+# 其他人的配置：https://github.com/P3TERX/aria2.conf http://aria2c.com/usage.html
+daemon=true # Win下无效，WSL有效
+enable-rpc=true
+#rpc-allow-origin-all=true # 设置Access-Control-Allow-Origin:*，用于跨域
+
+dir=xxx # 下载目录，命令行中用-d
+log=xxx
+log-level=notice # 默认debug
+console-log-level=warn # 默认notice
+max-connection-per-server=4 # 默认1；命令行中用-x4
+#continue=true # 用于没有状态文件时的断点续传，例如其它程序下了一半；有状态文件时是自动的
+input-file=xxx/aria2.session # 原本是用于从文件中读取多个下载链接
+save-session=xxx/aria2.session # 任务记录
+save-session-interval=60
+force-save=true # 好像是保留已完成的任务，用于做种
+bt-enable-lpd=true
+bt-tracker=xxx,xxx
+```
+
+## [httpie](https://httpie.org/)
+
+* 专注于http协议的curl的替代品，安装后有http和https两个命令，还支持`http+unix://`
+* 网卡的时候无法响应Ctrl+C
+* 内置的json高亮，但会导致必须完全接收响应才进行输出，-S关闭缓冲但仍能按单行高亮；重定向时默认关高亮
+* 默认请求gzip，默认`User-Agent: HTTPie/<version>`，使用`User-Agent:`清除默认头，使用`Host:`添加空值的头
+* 默认同时显示响应的header和body，相当于--print hb，H和B代表请求的；单独的-h或-b是--print h或b的缩写，不要用-hb；-h不会使用HEAD协议，但在接收完头之后就会关闭；-v相当于--all --print=bHBh
+* -a username:password设置basic验证
+* -F跟随跳转，默认最多30次重定向；--all显示中间响应，--history-print h只显示中间响应的响应头
+* --proxy=http:http://[user:pass@]127.0.0.1:1080；https的开头必须指定`https:`，但目标可以是http；目标不直接支持socks
+* --session=./session.json明文保存和使用cookie等信息；如果不含斜杠，只有名字和“后缀”，就会保存到一个特定的httpie/sessions目录下；另有只读会话
+* --verify=no跳过TLS验证，--ssl=tls1.3指定版本，默认是SSL v2.3？没看懂，好像说是会自动协商用最高级的
+* -d下载模式（隐含-F），会往终端里打印头但把body保存到文件中，且会显示用时和大小，手动指定文件名同时用-o；单独用-o也是只保存body，但不会显示头；-c断点续传；可连起来用-dco加文件名；别直接用重定向，PS上有bug
+* --check-status如果请求失败，在命令行中返回错误代码；--ignore-stdin在非交互式shell如脚本中使用比较好
+* --timeout超时时间，默认为0即无限
+
+```
+http :8080 # 相当于http://localhost:8080；单独的冒号为80
+http POST httpbin.org/post X-API-Token:123 name=John field=@file.txt # 方便地设置头和data，且类型默认为json，-f设为form
+http google.com search=='HTTPie logo' 'Cookie:sessionid=foo;another-cookie=bar' # 两个等号是查询字符串，空格会自动转义
+http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可重定向输入
+```
 
 ## 参考
 

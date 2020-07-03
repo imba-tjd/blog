@@ -9,7 +9,7 @@ title: 第三方 Python 库
 ### requirements.txt
 
 ```bash
-pip freeze > requirements.txt # 一定要在venv中运行否则会把全局的写进去
+pip freeze > requirements.txt # 需在venv中运行否则会把全局的写进去；类似于pip list --format=freeze，只是verb不同，freeze参数少
 pip install -r requirements.txt
 
 SomeProject==1.4
@@ -298,7 +298,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 但对于输入时href中正常的&，输出时也会变为实体而出错，官方的理由是这样能最大程度保证输出的是有效的HTML。用formatter=None可以避免但是其它地方又不会转换了。
 ```
 
-## PyInstaller
+## [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/usage.html)
 
 * pyinstaller opts file.py/file.spec
 * -F：打包成单一的exe；默认-D创建dir，结果在dist文件夹中；build文件夹记录了构建过程，warn-xxx.txt记录了出错内容
@@ -312,6 +312,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 好像如果upx可用就会自动使用，Linux程序还可用-s(strip)
 * 控制import的内容能减少大小
 * 如果有共同的依赖，有方法合并，但好像有点复杂，且文档未更新
+* TODO: https://zhuanlan.zhihu.com/p/40716095
 
 ## 参考
 
@@ -342,11 +343,14 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * gzip
 * bokeh
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
-* Nuitka：https://zhuanlan.zhihu.com/p/133303836 https://zhuanlan.zhihu.com/p/31721250 性能有提高，跨平台差；好像不能单文件
-* fastapi：https://fastapi.tiangolo.com/
+* Nuitka：https://zhuanlan.zhihu.com/p/31721250 https://zhuanlan.zhihu.com/c_1245860717607686144 性能有提高，跨平台差；好像不能单文件
+* fastapi：https://fastapi.tiangolo.com/ https://zhuanlan.zhihu.com/p/136621431
 * https://typer.tiangolo.com/ https://github.com/pallets/click/ 用于解析命令行参数
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
 * pyright
 * plotly、plotly/dash
 * httpx
 * https://github.com/grantjenks/python-diskcache
+* https://github.com/Delgan/loguru 日志
+* https://github.com/cool-RR/PySnooper 调试
+* 

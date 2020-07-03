@@ -223,7 +223,7 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 1. gpg2 --list-key *邮件地址*
 2. git config user.signingkey ...
 3. 需要用的时候必须git commit -S
-4. TODO：https://zhuanlan.zhihu.com/p/34318369
+4. TODO：https://zhuanlan.zhihu.com/p/34318369 https://zhuanlan.zhihu.com/p/76861431
 
 ### SSH
 
