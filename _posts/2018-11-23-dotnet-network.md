@@ -8,10 +8,10 @@ title: ".NET网络编程"
 
 * 构造函数可以直接用无参的，也可以接受HttpClientHandler
 * BaseAddress：获取或设置基地址， 使用URN时会拼接上
-* DefaultRequestHeaders：返回一个HttpRequestHeaders对象，具体见下面
-* Timeout：接受TimeSpan，默认100秒，DNS查询15秒，需要无限可用System.Threading.Timeout.InfiniteTimeSpan
+* DefaultRequestHeaders：返回一个HttpRequestHeaders对象，具体见下面；无法用初始化器初始化因为它只是一个引用，无法set
+* Timeout：接受TimeSpan，默认100秒，DNS查询15秒，需要无限可用System.Threading.Timeout.InfiniteTimeSpan；超时时是在获取结果时抛TaskCanceledException
 * GetByteArrayAsync、GetStreamAsync、GetStringAsync：只接受Uri对象或字符串，编码不清楚
-* PostAsync、PutAsync、PatchAsync、SendAsync、DeleteAsync、 GetAsync ：发送对应的请求，都支持取消；其中前三者需要HttpContent，Send就是自定义其它所有请求，需要HttpRequestMessage；返回都是`Task<HttpResponseMessage>`
+* PostAsync、PutAsync、PatchAsync、SendAsync、DeleteAsync、GetAsync：发送对应的请求，都支持取消；其中前三者需要HttpContent，Send就是自定义其它所有请求，需要HttpRequestMessage；返回都是`Task<HttpResponseMessage>`
 * `System.Net.ServicePointManager.DefaultConnectionLimit`限制最大并发数，默认是两个
 
 ### HttpClientHandler
@@ -27,17 +27,20 @@ title: ".NET网络编程"
 
 ### HttpContent
 
-* 虽然回应信息也具有Content属性，但此处只记录作为Post的参数发送出去的信息
-* 本身的构造函数是protected的，实际主要用ByteArrayContent的子类StringContent，或用StreamContent
-* 具有Headers属性，可以除开client的头单独设置；提交表单等需要设置ContentType
+* 既是响应信息，也作为请求的body
+* 请求时实际一般用new StringContent/StreamContent，因为它本身的构造函数是protected的
+* 响应时一般用ReadAsStringAsync或ReadAsByteArrayAsync，内容大于80KB时最好用ReadAsStreamAsync或CopyToAsync
 
-### FormUrlEncodedContent
+#### FormUrlEncodedContent
 
-```
+提交表单，不知道是否会自动设置ContentType。
+
+```c#
 var content = new FormUrlEncodedContent(new[] {
     new KeyValuePair<string, string>("email", "xxxx"),
     new KeyValuePair<string, string>("password", "xxxx"),
 });
+content.Headers.
 var result = await client.PostAsync("https://www.xxxx.com/login", content);
 ```
 
@@ -46,8 +49,6 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 * StatusCode、IsSuccessStatusCode、EnsureSuccessStatusCode()
 * Content.ReadAsStringAsync()
 * RequestMessage获取导致此响应消息的请求消息，如果发生过跳转就会与最初的不同；可以获取Method和RequestUri等
-* Headers获取Date、Server（哪种http软件）、Content-Length、Expires、Cache-Control、Connection: Keep-Alive、Content-Type
-* Version
 
 ### HttpRequestHeaders
 
@@ -59,16 +60,13 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 
 ## 给网址进行编码
 
-> https://stackoverflow.com/questions/4396598/whats-the-difference-between-escapeuristring-and-escapedatastring
-> https://www.cnblogs.com/dudu/archive/2011/02/25/asp_net_UrlEncode.html
-
-* System.Net.WebUtility与System.Web.HttpUtility类似，但后者在.Net Core上是在Web命名空间里唯一的一个类了
-* Uri.EscapeUriString**适合把url中的中文编码掉**；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错； 只支持utf8，没有UnEscapeUriString方法
-* HttpUtility.UrlPathEncode：不要使用此方法，已弃用
-* WebUtility.UrlEncode：与Uri.EscapeDataString相比会编码波浪号；HttpUtility.UrlEncode可以指定编码方式
+* **最合适的方法**是先分别把键值对用Uri.EscapeDataString编码再手动合并起来，，保留以下符号：`!'()*-._~0-9a-zA-Z`，会把`://`编码掉；解码用Uri.UnescapeDataString
+* Uri.EscapeUriString适合把**URL**中的中文编码掉；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错；只支持编码成utf8的转义，没有UnEscapeUriString方法
+* System.Net.WebUtility与System.Web.HttpUtility类似，但后者在.Net Core上是在Web命名空间里唯一的一个类了；HttpUtility.UrlEncode可以指定编码方式，WebUtility.UrlEncode：与Uri.EscapeDataString相比会编码波浪号
 * 曾经空格会被编码成加号，后来弃用了；但表单的提交不符合最新标准，仍用加号，许多实现也支持把加号解码成空格
-* **最完美的方法**是先分别把键值对用Uri.EscapeDataString编码再手动合并起来，之后用Uri.UnescapeDataString解码；保留以下符号：`!'()*-._~0-9a-zA-Z`，会把`://`编码掉
 * WebUtility.HtmlEncode：此方法用于把Html特殊字符转换成Html实体，比如大于小于符号，与url编码无关
+* HttpUtility.UrlPathEncode：不要使用此方法，已弃用
+* 几种编码方式的结果对比：https://stackoverflow.com/a/11236038/9606292；Uri的两个方法的对比：https://stackoverflow.com/questions/4396598；
 
 ## 安全性
 
@@ -122,7 +120,7 @@ static class TLS {
 
 * https://github.com/wangqiang3311/HttpRequestDemo
 
-## 发送HEAD
+### 只获取响应头
 
 ```c#
 // 一旦获取消息头即可完成相关的请求操作，在获取源的大小或者验证的源的可用性时很好用
@@ -201,3 +199,4 @@ response.Close();
 
 * https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/concepts/async/
 * https://zhuanlan.zhihu.com/p/89106847
+* https://www.cnblogs.com/dudu/archive/2011/02/25/asp_net_UrlEncode.html

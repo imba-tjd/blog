@@ -13,7 +13,9 @@ title: ".NET Core和MSBuild"
 [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)的PropertyGroup
 ----------------------------------------------------------------------------------
 
-```
+* 从2015的格式迁移到新格式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/；https://github.com/hvanbakel/CsprojToVs2017
+
+```xml
 <StartupObject>Namespace.Class // 指定入口
 //<OutputType>Exe // 生成EXE；3.0前还必需指定RID，现在默认FDE不需要它了；WinExe为窗体程序
 <TargetFramework>netcoreapp3.0</TargetFramework> // 分号指定多目标
@@ -130,12 +132,12 @@ MSBuild
 
 * `/property:xxx=yyy`或/p：重写属性值
 * `/target:xxx;yyy`或/t：生成这些目标
-* `/maxcpucount[:n]`或/m：指定要使用的cpu个数，不加为1，加了但不指定n就是最大
+* `/maxcpucount[:n]`或/m：指定要使用的cpu个数并行生成，不加为1，加了但不指定n就是最大
 * `/consoleloggerparameters:ShowTimestamp`或/clp：每条命令前显示时间；还有一些其它的选项
 * `/fileLogger[n]`：输出到msbuild[n].log文件中
 * `/warnaserror[:code[;code2]]`：将警告视为错误
 * `/restore`或/r：先执行名为Restore的目标
-* `/verbosity`或/v：q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]
+* `/verbosity`或/v：q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]，一般指定-m
 
 ### 元素
 

@@ -24,7 +24,7 @@ title: Git/GitHub笔记
 * 把分支推送到远端并设定联系： git push -u origin patch
 * 把当前内容建立为一个没有历史的分支：git checkout --orphan new；但注意原来commit了的内容会自动stage，注意gitignore
 * git checkout -：切换到上一个分支
-* 现在可用git switch [-c]替代git checkout [-b]
+* 现在可用git switch [-c]替代git checkout [-b]，但switch无法进入分离模式
 
 ### 合并分支
 
@@ -58,7 +58,7 @@ title: Git/GitHub笔记
 * 如果reset的不是当前分支，则会进入分离模式
 * git revert pushed：在**当前分支**上创建一个撤销pushed分支最后一次更改的更改
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
-* git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后用rebase -i --autosquash会自动把fixup的放到合适的位置
+* git commit --fixup hash：把stage了的自动写提交信息作为指定hash的修正，之后rebase -i会自动把fixup的放到合适的位置
 * git checkout [hash] -- filename：此命令会使用HEAD中的最新内容/指定commit中的内容替换掉你的工作目录中的文件，已添加到暂存区的改动以及新文件都不会受到影响；可先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用hash^即可找回文件；现在此功能被git restore替代
 * git reset --hard upstream/master：这个命令好像会重新释放一遍指定分支，可能会很耗费资源
 * git checkout --merge br：相当于stash, checkout, stash pop
@@ -135,6 +135,8 @@ title: Git/GitHub笔记
 * git help -g：显示一些内置的教程，git help -a：显示所有的git命令
 * git update-ref -d HEAD：把所有的改动都放回工作区并清空所有的commit
 * git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支
+* git worktree
+* git rebase --autosquash不知道有什么用
 
 ## Syncing Fork
 
@@ -254,11 +256,12 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * 同一仓库可以在不同文件夹下有不同的.gitignore文件，所有的“全局”只会在同级和子目录生效，无法对父目录起作用；以斜杠开头也表示.gitignore文件所在的目录 （但其实是下一条的特例）
 * 当pattern中间不含有斜杠（非路径）时，匹配是全局的（相当于 以**/开头 ）；如果有，则隐式在最前面加斜杠，此时以**/开头会全局匹配
 * 星号匹配多个字符（会一直匹配到斜杠才结束），问号匹配单个字符，用方括号表示单个字符匹配列表；以斜杠结尾表示要匹配的是目录（以及里面的），但注意会全局匹配
-* .*会匹配以点开头的（不管后面有多少个点），*.*则只不会匹配无后缀的
+* `.*`会匹配以点开头的（不管后面有多少个点），`*.*`则只不会匹配无后缀的
 * 当**在中间时，可以匹配那一部分有或没有的路径，理论上可以匹配多层，但实际有不行的
 * 注释用井号，匹配井号用转义，其他的类似
-* 使用于被版本控制的情形，用户自己单独定义可以用$GIT_DIR/info/exclude和core.excludesFile
+* 个人单独定义自己的可以用$GIT_DIR/info/exclude和core.excludesFile
 * 如果仓库原本没有此文件，则可以不提交就忽略自己；如果原本有，则不能不提交就忽略自己
+* VSC的搜索会忽略它匹配到的
 
 ### 不忽略 （即要包含）
 

@@ -21,6 +21,7 @@ jobs:
     - uses: actions/checkout@v2 # 官方文档很完善了
 
     - name: 每一步都可以有名称
+      # shell: base # Win默认是PS
       run: |
         echo Hello World!;
       env:
@@ -102,6 +103,7 @@ branding:
 * 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
 * 直接使用apt必须加sudo，但在容器里就必须不用
 * clang默认就是9
+* win自带nuget，但不自带msbuild的可执行文件，要用microsoft/setup-msbuild；dotnet msbuild好像不能用于fx的
 
 ### Python环境
 

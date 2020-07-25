@@ -1,8 +1,8 @@
 ---
 title: ASP.NET Core
+category: dotnet
 tags:
     - C#
-    - .NET
     - ASP.NET
 ---
 
@@ -12,9 +12,8 @@ tags:
 
 ```bash
 dotnet new webapp [--no-https]
-dotnet dev-certs https --clean
 dotnet tool install --global dotnet-dev-certs
-dotnet dev-certs https --trust # Linux下不可用，只会自动生成，无法安装，可以直接用Nginx反代；只会有localhost的证书，改成别的SNI会连接失败
+dotnet dev-certs https --clean/--trust # Linux下不可用，只会自动生成，无法安装，可以直接用Nginx反代；只会有localhost的证书，改成别的SNI会连接失败
 ```
 
 ### Startup类
@@ -27,17 +26,9 @@ dotnet dev-certs https --trust # Linux下不可用，只会自动生成，无法
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
     // 异常/错误处理
     if (env.IsDevelopment()) {
-        // When the app runs in the Development environment:
-        //   Use the Developer Exception Page to report app runtime errors.
-        //   Use the Database Error Page to report database runtime errors.
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
     } else {
-        // When the app doesn't run in the Development environment:
-        //   Enable the Exception Handler Middleware to catch exceptions
-        //     thrown in the following middlewares.
-        //   Use the HTTP Strict Transport Security Protocol (HSTS)
-        //     Middleware.
         app.UseExceptionHandler("/Error");
         app.UseHsts();
     }
@@ -50,12 +41,10 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
     // Return static files and end the pipeline.
     // 使用时用波形符指向web根目录（默认为wwwroot）
     app.UseStaticFiles(); // 无参的就是设置web根目录，可多次调用有参重载设置别的
-    //一般要加OnPrepareResponse= ctx=>
-        ctx.Context.Response.Headers.Append("Cache-Control", ...)
+    // 一般要加OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", ...)
     // 另外还有DirectoryBrowser目录浏览的中间件和FileServer中间件
 
-    // Conform to EU General Data. Protection Regulation (GDPR) regulations.
-    app.UseCookiePolicy();
+    app.UseCookiePolicy(); // 添加符合欧洲的GDPR条例
 
     app.UseRouting();
     app.UseCors();
@@ -116,7 +105,7 @@ public class XXXMiddleware {
 public void ConfigureServices(IServiceCollection services) {
     services.AddRazorPages();
     services.AddControllersWithView()//MVC;UseMvc()和UseRouter() Deprecated了
-// 即时编译：在上面两者**紧接着**用.AddRazorRuntimeCompilation()，还需要添加Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包；但它只适用于View；另一种方式是用dotnet watch run跑
+// 即时编译：在上面两者**紧接着**用.AddRazorRuntimeCompilation()，要先添加Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包；但它只适用于View；另一种方式是用dotnet watch run跑
     services.AddController()[.AddXmlSerializerFormatters()]; // WebAPI
 
     services.AddResponseCompression();
@@ -172,10 +161,10 @@ config.GetChildren(); // 返回IEnumerable<IConfigurationSection>
 config.GetSection("...").Exists();
 ```
 
-#### appsettings.json选项
+#### appsettings.json
 
 * key不区分大小写，不同配置提供相同的key，后者会覆盖前者
-* 修改后会立即生效（如果支持动态加载，像绑端口就不行）
+* 修改后会立即生效（前提是支持动态加载，像绑端口就不行）
 * 可以有注释和末尾的逗号
 * 可以在dotnet run的时候用--key=value传进去
 
@@ -268,7 +257,7 @@ public class TodoController : ControllerBase {
 // 未看：https://www.youtube.com/watch?v=oXNslgIXIbQ
 ```
 
-## 主机
+## 主机和Main
 
 * 现在应使用Host静态类的方法，不要用WebHost类
 * Run()实际上用了RunAsync().GetAwaiter().GetResult();所以它跟直接await RunAsync()是差不多的。会阻止调用线程，直到关闭主机
