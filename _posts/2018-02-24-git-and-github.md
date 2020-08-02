@@ -79,6 +79,7 @@ title: Git/GitHub笔记
 * feature.manyFiles/experimental true：启用实验性功能
 * core.fileMode false：不再将权限变化视为改动
 * --unset：删除设置
+* pull.rebase true：相当于pull自动-r
 
 ### 查看diff信息的工具
 
@@ -148,7 +149,7 @@ title: Git/GitHub笔记
 ## git stash
 
 * 用于在有 uncommitted changes 的情况下切换branch，并把改动应用到新的branch上
-* git config rebase.autoStash true：每次pull的时候会自动stash当前本地的改动，不用手动stash，并在pull之后stash pop本地更改；不知对普通的rebase是否有效？普通的有--autostash这个参数
+* git config rebase.autoStash true：rebase或pull -r时，如果本地有未提交的内容，自动stash，rebase完后自动pop；否则如果关闭会拒绝执行rebase。可用--autostash单次开启
 
 ```bash
 git stash

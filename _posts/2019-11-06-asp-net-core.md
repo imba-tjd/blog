@@ -499,6 +499,8 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * UseCors
 * Redis：https://www.bilibili.com/video/av41724451
 * .NET 微服务：适用于容器化 .NET 应用程序的体系结构（书，2.2）：https://docs.microsoft.com/zh-cn/dotnet/architecture/microservices/
+* https://zhuanlan.zhihu.com/p/46894251
+* https://zhuanlan.zhihu.com/p/127415186
 
 ## 参考
 

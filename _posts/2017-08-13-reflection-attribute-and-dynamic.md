@@ -1,5 +1,6 @@
 ---
 title: 反射、特性和动态类型
+category: dotnet
 ---
 
 ## 反射
@@ -352,6 +353,7 @@ Console.WriteLine(expando.Second);
 * 32位系统4字节长，64位8字节，因此可用作储存指针的数据
 * 等价于Handle或者void*，是一些Marshal类方法的返回类型
 * ToPointer方法就可以转换成void*
+* System.Runtime.InteropServices.SafeHandle包装了它，使用它可避免实现析构函数；不过它本身是抽象类，Microsoft.Win32.SafeHandles提供了一些实现
 
 ## P/Invoke
 

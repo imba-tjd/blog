@@ -1,35 +1,32 @@
 ---
-title: ".NET Core和MSBuild"
+title: .NET Core和MSBuild
+category: dotnet
 ---
 
-安装
-----
-
+## 安装
 * Linux上的运行时：https://docs.microsoft.com/zh-cn/dotnet/core/install/runtime?pivots=os-linux，全都要先做准备工作；Windows上的SDK：https://dotnet.microsoft.com/download；也有自动安装脚本，且支持在没有root权限的情况下安装
 * Linux全部不支持x86
 * DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1：环境变量，跳过第一次使用的欢迎信息
 * docker映像：https://hub.docker.com/_/microsoft-dotnet-core/
 
-[CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)的PropertyGroup
-----------------------------------------------------------------------------------
+## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)的PropertyGroup
 
 * 从2015的格式迁移到新格式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/；https://github.com/hvanbakel/CsprojToVs2017
 
 ```xml
 <StartupObject>Namespace.Class // 指定入口
 //<OutputType>Exe // 生成EXE；3.0前还必需指定RID，现在默认FDE不需要它了；WinExe为窗体程序
-<TargetFramework>netcoreapp3.0</TargetFramework> // 分号指定多目标
-<RuntimeIdentifier>... // RID
+<TargetFramework>netcoreapp3.0;net5.0;net472</TargetFramework>
+<RuntimeIdentifier>... // RID：win[10][-x64][-aot]；https://docs.microsoft.com/zh-cn/dotnet/core/rid-catalog
 <PublishSingleFile>true // 单文件发布，但比较大，100多M？
 <PublishTrimmed>true // 裁剪体积，但就不要用反射了
 <PublishReadyToRun>true // AOT模式，必须指定RID，可与Trimmed一起用
-<LangVersion>latest // C#版本
+<LangVersion>latest/preview // C#版本
 <AllowUnsafeBlocks>true
 <Configuration>Debug</Configuration>
 <AssemblyName>MSBuildSample</AssemblyName>
 <OutputPath>Bin/ // 最好加目录分隔符
 <OS>Windows_NT
-<IsPackable> // 与dotnet pack有关
 <CheckForOverflowUnderflow>true //全局溢出时抛异常
 <NoWarn>NU1602,NU1604</NoWarn>
 <Nullable>enable
@@ -50,24 +47,20 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 所有默认排除项可用$(DefaultItemExcludes)引用。
 ```
 
-### [Runtime IDentifier(RID)](https://docs.microsoft.com/zh-cn/dotnet/core/rid-catalog)
-
-* win-x86、win-x64、win10-x64；linux-x64、osx-x64；win-x64-corert
-
-dotnet CLI
-----------
+## dotnet CLI
 
 无论是全写还是缩写，都使用空格分隔开关和值。
 
 * dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的
-* 未读：dotnet watch、dotnet user-secrets
+* dotnet watch run：任何文件修改后就重新编译一遍，ASP比较有效
+* 未读：dotnet user-secrets
 
 ### dotnet build、clean、publish共有
 
 * --configuration/c {Debug|Release}
-* --framework/f \<FRAMEWORK\>
-* --output \<OUTPUT_DIRECTORY\>/-o：指定存放目录，默认是./bin/Dubug/netcoreapp2.2
-* --runtime \<RUNTIME_IDENTIFIER\>/-r
+* --framework/f fw
+* --output/-o dir：指定存放目录，默认是./bin/Debug/netcoreapp2.2
+* --runtime/-r rid
 * --no-restore：强制不自动还原
 
 ### dotnet publish
@@ -86,23 +79,14 @@ dotnet CLI
 * dotnet list reference、dotnet remove reference
 * dotnet add package Newtonsoft.Json [--version 1.0.0]、dotnet remove package
 
-### 其他
-
-* dotnet nuget locals --clear all：清除所有本地缓存目录的文件
-* 暂时还没有dotnet update和list package，Feature Request在：https://github.com/NuGet/Home/issues/4103，可能的脚本解决办法：https://gist.github.com/JonCanning/a083e80c53eb68fac32fe1bfe8e63c48
-* ~~要添加DotNetCliToolReference现在只能手动编辑csproj，Feature Request在：https://github.com/NuGet/Home/issues/4901~~ 此条目被deprecated了
-
-全局工具
---------
+### 全局工具
 
 * 安装：dotnet tool install -g *PackageName* --add-source ./
 * 列出、卸载、升级：dotnet tool list、dotnet tool uninstall、dotnet tool update
-* 自己创建/打包：dotnet pack、https://docs.microsoft.com/zh-cn/dotnet/core/tools/global-tools-how-to-create
-* 有名的可用的：https://github.com/natemcmaster/dotnet-tools
-* dotnet watch
+* 自己创建：https://docs.microsoft.com/zh-cn/dotnet/core/tools/global-tools-how-to-create
+* 收集：https://github.com/natemcmaster/dotnet-tools
 
-Docker
-------
+## Docker
 
 * Linux的latest是debian10，Win是nanoserver-1909
 
@@ -112,7 +96,7 @@ dotnet new webapi --no-https
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS build
 WORKDIR /src
 COPY *.csproj . # 或用 *.sln，但好像csproj的文件夹没法通配复制啊
-RUN dotnet restore # 教程如此，说是as distinct layers
+RUN dotnet restore
 COPY . .
 RUN dotnet publish -c release -o /app
 
@@ -125,8 +109,7 @@ docker build -t myapp
 docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ```
 
-MSBuild
--------
+## MSBuild
 
 ### 命令行参数
 
@@ -183,16 +166,42 @@ MSBuild
 
 <Target Name="Compile" DependsOnTarget="Resources" >
     <Csc Sources="@(CSFile)"
-          TargetType="library"
-          Resources="@(CompiledResources)"
-          EmitDebugInformation="$(includeDebugInformation)"
-          References="@(Reference)"
-          DebugType="$(debuggingType)" >
-        <Output TaskParameter="OutputAssembly"
-                  ItemName="FinalAssemblyName" />
+            TargetType="library"
+            Resources="@(CompiledResources)"
+            EmitDebugInformation="$(includeDebugInformation)"
+            References="@(Reference)"
+            DebugType="$(debuggingType)" >
+            <Output TaskParameter="OutputAssembly"
+                ItemName="FinalAssemblyName" />
     </Csc>
     <Message Text="The output file is @(FinalAssemblyName)"/>
 </Target>
 ```
 
+## nuget
 
+* 需要在csproj中创建一些元数据，具体条目见csproj的新增内容文章
+* dotnet pack打包
+* 进入.nupkg，dotnet nuget push name.nupkg -k API_Key -s https://api.nuget.org/v3/index.json
+* 上传后不能删，即使没有任何包依赖也不行
+* 403错误可能是和别人的包重名了
+* dotnet nuget locals --clear all：清除所有本地缓存目录的文件
+* 暂时还没有dotnet update和list package，Feature Request在：https://github.com/NuGet/Home/issues/4103，可能的脚本解决办法：https://gist.github.com/JonCanning/a083e80c53eb68fac32fe1bfe8e63c48
+* https://www.myget.org/gallery 也有一些，且不是nuget.org的镜像，且没有免费版
+* 缓存：%LocalAppData%\NuGet\v3-cache
+
+### [nuget.config](https://docs.microsoft.com/zh-cn/nuget/reference/nuget-config-file)
+
+```xml
+<configuration>
+    <packageSources>
+        <!-- <clear /> --> // 清除全局设置
+        <add key="dotnet-core" value="https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" />
+        <!-- <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" /> -->
+    </packageSources>
+</configuration>
+```
+
+## 参考
+
+* https://zhuanlan.zhihu.com/p/35979897
