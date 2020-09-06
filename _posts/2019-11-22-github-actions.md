@@ -21,7 +21,7 @@ jobs:
     - uses: actions/checkout@v2 # 官方文档很完善了
 
     - name: 每一步都可以有名称
-      # shell: base # Win默认是PS
+      # shell: cmd # Win默认就是pwsh，且是最新稳定版
       run: |
         echo Hello World!;
       env:
@@ -32,8 +32,8 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: nginx # artifact中可下载的对象的文件名，无需以zip后缀结尾，否则会有双重后缀
-        path: /sbin/nginx # 要打包的文件/文件夹的绝对或相对路径，支持通配；当作Linux意义下的文件，不保留父路径，只有自己的文件名
-        # 上传同一文件名的对象到同一name会自动覆盖，上传不同文件名的对象到同一name会添加到压缩包中；此处的“文件名”指的是path里不含路径的文件名
+        path: /sbin/nginx # 要打包的文件/文件夹的绝对或相对路径，可用|指定多个路径；单个路径只保留basename，多个保留最短公共前缀；支持通配，此时保留通配及之后的路径
+        # 对于同一name，若两个文件的basename相同则会覆盖，不同则会都添加进压缩包中
 
 
   docker: # 直接在容器中运行整个job

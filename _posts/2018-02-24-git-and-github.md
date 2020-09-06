@@ -370,16 +370,14 @@ collapsable content
 
 ## 参考
 
-* https://rogerdudler.github.io/git-guide/index.zh.html\
-* http://www.boydwang.com/2014/01/git-notes/\
-* https://www.lugir.com/git-basic.html\
-* https://rogerdudler.github.io/git-guide/index.zh.html\
-* https://learngitbranching.js.org/\
-* https://www.cnblogs.com/kidsitcn/p/4513297.html\
-* https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000\
+* https://rogerdudler.github.io/git-guide/index.zh.html
+* http://www.boydwang.com/2014/01/git-notes/
+* https://www.lugir.com/git-basic.html
+* https://learngitbranching.js.org/
+* https://www.cnblogs.com/kidsitcn/p/4513297.html
+* https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000
 * https://medium.com/therobinkim/git-add-everything-but-whitespace-changes-deec3dce39f
 * https://www.cnblogs.com/kevingrace/p/5690241.html （有错误）
-* https://pdf-lib.org/Home/Details/407 （有错误）
 * https://git-scm.com/doc
 * https://github.com/521xueweihan/git-tips
 * https://help.github.com/en/articles/connecting-to-github-with-ssh
