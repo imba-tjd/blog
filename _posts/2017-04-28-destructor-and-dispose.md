@@ -34,7 +34,7 @@ category: dotnet
 * 资源释放后，再引用实例方法会引发ObjectDisposedException
 * 如果只在类的内部使用实现了Dispose方法的对象，则不用实现析构函数，只在释放托管资源的部分调用对应对象的Dispose就行，如sql连接
 * 应只进行清理工作，不要把this又添加到别的地方去，否则会“复活”
-* C#8引入了System.IAsyncDisposable，在里面调用`await DisposeAsyncCore();`和`Dispose(false);`
+* C#8引入了IAsyncDisposable，实现时调用`await DisposeAsyncCore();`和`Dispose(false);`，在前者中继续异步Dispose具体的对象且用`ConfigureAwait(false)`
 * 按照我的理解，正确实现了IDisposable的类就变成托管对象了
 
 ```c#
@@ -55,14 +55,14 @@ class BaseClass : IDisposable {
             return;
 
         if (disposing) {
-            // 释放托管对象，用于及时释放内存
-            // 包括把占用大量内存或使用短缺资源的托管对象设为null
-            // 以及由该类自己创建的的对象，调用?.Dispose()
+            // 释放由该类自己创建的的托管对象，调用?.Dispose()，用于及时释放内存
         }
 
         // 释放非托管对象
         CloseHandle(handle); // 需PInvoke，见代码段末尾
         handle = IntPtr.Zero;
+
+        // 把占用大量内存或使用短缺资源的托管对象设为null，如MemoryStream，这使得它们更容易变得不可达
 
         disposed = true;
     }

@@ -107,6 +107,8 @@ title: Firefox和Chrome
 
 * https://bbs.kafan.cn/thread-2133336-1-1.html
 * Password import
+* Experimental JavaScript
+* Future V8 VM features
 
 #### [overlay scrollbar](https://www.zhihu.com/question/64630817/answer/223528093)
 

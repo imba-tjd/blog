@@ -50,7 +50,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps --system-site-packag
 * python命令行运行：既可以运行文件，也可以运行目录，对于目录就是运行`__main__.py`；会把目标中的`__name__`设为`'__main__'`
 * python命令行加不加-m的区别：不加-m会把目标所在的文件夹加到`sys.path`中，然后直接执行目标；加-m会把当前工作目录加到`sys.path`中，对于目录会先执行`__init__.py`再执行`__main__.py`，对于文件不能加.py后缀；`runpy.py`在其中起到了作用，不要自己创建该名字的文件
 * 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的。所以模块本身是天然的单例实现
-* 包的目录下必须要有`__init__.py`文件，内容可以为空，如果没有就不是包？
+* 包的目录下必须要有`__init__.py`文件，内容可以为空，如果没有就不是包？最好存在`__all__`
 
 ```python
 __title__
@@ -353,4 +353,4 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * https://github.com/grantjenks/python-diskcache
 * https://github.com/Delgan/loguru 日志
 * https://github.com/cool-RR/PySnooper 调试
-* 
+* pymysql

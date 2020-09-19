@@ -462,4 +462,6 @@ unistd.h
 * 不是标准库的，而是posix函数库
 * sleep(int seconds)
 
+## TODO
 
+asprintf：非标准库，好像也不是posix，是GNU的

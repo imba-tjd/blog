@@ -4,7 +4,7 @@ title: Git/GitHub笔记
 
 ## OverView
 
-* git init/git clone username@host:/path/to/repository
+* git init/git clone git@github.com:user/repo [本地目标文件夹/.]
 * git pull [--rebase] [upstream master] = git fetch + git merge（到当前分支）；rebase会先stash当前更改，更新后再pop
 * git add -A（所有修改）/.或*（包括修改和新建，不包括删除）/-u（更新，包括修改和删除，不包括新建）
 * git status；加-uno会不检测未stage的文件，大大加快执行速度
@@ -36,7 +36,6 @@ title: Git/GitHub笔记
 * git的rebase和GitHub的rebaes不同：都是在目标分支上再现，但git会移动当前分支到目标分支前面，而目标分支不动；GitHub则是目标分支移动，当前分支不变，相当于rebase后ff master且又把“当前”分支切换回原来的
 * 如果要继续在子分支上开发，最好选择merge，这样才能有公共的父结点；否则下一次合并的时候会再把之前的比较一遍，一旦master有提交，就会产生冲突。另一种方法是squash前把master merge进dev，这一步可能产生冲突，是正常现象，否则合并到master本来也会冲突；这样就会产生一个公共结点，再把dev squash进master；如果担心污染dev此处也可以用squash
 * 删除已经合并到 master 的分支：`git branch --merged master | grep -v '^\*\|  master' | xargs -n 1 git branch -d`
-* git push --force-with-lease：更安全的rebase后的force push，当本地的远端分支不是最新时拒绝推送，防止覆盖其他人推送了的
 
 ### 冲突
 
@@ -114,19 +113,19 @@ title: Git/GitHub笔记
 * git bundle create repo.bundle HEAD/master可以把当前分支（可同时指定多个分支）整个打包成一个二进制文件，之后路径可以直接当作仓库fetch和clone
 * 现在好像出了个替代filter-branch的工具：https://github.com/newren/git-filter-repo
 
-## Pull&Push
+## Pull,Push,Fetch
 
 * 远端分支（o/master）其实是真·远端在本地的镜像，fetch后就是更新的它
-* git push [-u] [-f]：u如果分支与多个远端关联或者没有任何关联，可以用这个设定默认push的主机，等于--set-upstream；f可以强制push，无视远端先于本地和其他冲突，如果不加会被拒绝，只 pull
-* git push origin \<source\>:\<destination\>：冒号前是源分支（本地分支，其实是refspec），后是目标分支（远端分支的名字，无需前缀，否则会作为名字的一部分），如果两者不同或者远端不存在那个名字的分支，可以不省略目标分支，把未跟踪的分支push过去，但是不会解决冲突
-* git pull也可以指定主机、source（远端分支）、destination（本地分支）。效果是fetch source，把source合并到destination里（如果无法快速前进会被拒绝），再merge（或指定rebase） destination进当前分支（或HEAD）；所以destination不能是HEAD、merge不会改变destination的指针（此时跟source一致），但会改变当前分支
-* git fetch/pull origin :branchname：在HEAD处创建本地分支
+* git push [-u/--set-upstream] [-f]：u设定关联（默认push）的远端；f可以强制push，无视远端先于本地和其他冲突，如果不加会被拒绝；--force-with-lease是更安全的rebase后的force push，当本地的远端分支不是最新时不推送，防止覆盖其他人推送了的
+* git push origin source:destination：冒号前是源分支（本地分支，其实是refspec），后是目标分支（远端分支的名字，无需前缀，否则会作为名字的一部分），如果两者不同或者远端不存在那个名字的分支，可以不省略目标分支，把未跟踪的分支push过去，但是不会解决冲突
+* git pull也可以指定主机、source（远端分支）、destination（本地分支）。效果是fetch source，把source合并到destination里（如果无法快速前进会被拒绝），再merge（或--rebase） destination进当前分支（或HEAD）；所以destination不能是HEAD、merge不会改变destination的指针（此时跟source一致），但会改变当前分支
+* fetch默认会取回origin的所有分支，--all取回的是所有远端；如果指定的分支（包括remote）未关联到本地，不会自动创建分支，只会放到FETCH_HEAD里，需用:localbranch指定目标
 
 ## 其它git命令
 
 * git checkout HEAD~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD~3^2
 * bash的感叹号有特殊作用，如果commit message里要用，可以用单引号包裹
-* git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now：手动清理它们
+* git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now/：手动清理它们
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin），-X只清除ignore的
 * src refspec master does not match any：没有任何commit就push
 * git bisect：以二分的方式找需要的记录，[https://www.worldhello.net/2016/02/29/git-bisect-on-git.html](https://www.worldhello.net/2016/02/29/git-bisect-on-git.html)

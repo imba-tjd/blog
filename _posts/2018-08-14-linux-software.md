@@ -118,7 +118,8 @@ pip3 uninstall：不会卸载依赖，可用pip-autoremove代替
 pip3 check：能显示出某个模块的依赖冲突和缺失
 
 # 更新所有包（能自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）
-pipupgrade --latest --yes --or-- -ly # 好像在win下有各种各样的问题；千万不要装成pip-upgrade了
+pip freeze | % {pip install -U $_.split("=")[0]}
+# pipupgrade --latest --yes --or-- -ly # 在win下有各种各样的问题，还可能被报毒；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用
 # 或pip3 install -U `pip3 list -o | awk 'NR>2 {print $1}'`
 # 或import pkg_resources, subprocess; subprocess.call('pip install --upgrade ' + ' '.join(dist.project_name for dist in pkg_resources.working_set), shell=True)
 # 或for dist in pkg_resources.working_set:
