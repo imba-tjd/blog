@@ -2,21 +2,23 @@
 title: 第三方 Python 库
 ---
 
-## 环境
+## 环境和打包
 
 预编译的Win下的包：https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 ### requirements.txt
 
+* pipreqs能从import产生本文件，替代freeze；pip-tools能从setup或一个.in产生本文件并能同步版本更新；pigar支持notebook；基本上只有需要锁定依赖时才用
+
 ```bash
 pip freeze > requirements.txt # 需在venv中运行否则会把全局的写进去；类似于pip list --format=freeze，只是verb不同，freeze参数少
 pip install -r requirements.txt
 
+--index https://xxx
 SomeProject==1.4
 SomeProject>=1,<2 # 逗号为且；在CLI中运行需加引号否则大于号会被认为是重定向
 SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2”
-
-# 另外还有pipreqs、pigar、pip-tools几个程序也是用来管理依赖的
+-e . # 相当于pip install -e .
 ```
 
 ### venv
@@ -27,39 +29,165 @@ SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2�
 
 ```bash
 python3 -m venv .venv
-. .venv/bin/activate
-deactivate
-```
 
-快捷方式：
-
-```bash
 alias activate=". .venv/bin/activate"
 
-if not exist .venv python -m venv .venv --upgrade-deps --system-site-packages
+if not exist .venv python -m venv .venv --upgrade-deps
 .venv\Scripts\activate.bat
 
-if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps --system-site-packages}
+if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 & .venv\Scripts\activate.ps1
 ```
 
-### 模块
+### 包和模块
 
 * 一个.py文件就是一个模块，模块名`__name__`按目录组织，用点分隔，import时无需也不能加.py后缀
-* import运行：对于`a/b/c.py`，`import a.b.c`会依次运行a和b目录下的`__init__.py`，再运行`c.py`；但如果import的直接是目录，只会执行`__init__.py`，不会执行`__main__.py`
-* python命令行运行：既可以运行文件，也可以运行目录，对于目录就是运行`__main__.py`；会把目标中的`__name__`设为`'__main__'`
-* python命令行加不加-m的区别：不加-m会把目标所在的文件夹加到`sys.path`中，然后直接执行目标；加-m会把当前工作目录加到`sys.path`中，对于目录会先执行`__init__.py`再执行`__main__.py`，对于文件不能加.py后缀；`runpy.py`在其中起到了作用，不要自己创建该名字的文件
-* 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的。所以模块本身是天然的单例实现
-* 包的目录下必须要有`__init__.py`文件，内容可以为空，如果没有就不是包？最好存在`__all__`
+* 一个含有`__init__.py`的目录就是包，import该目录时相当于导入该目录下的`__init__.py`，它的`__name__`等于目录路径对应的模块名
+* 对于`x/y/z.py`，`import x.y.z`会依次运行`x/__init__.py`和`x/y/__init__.py`，再运行`c.py`，且只能通过`x.y.z.xx`访问z中的东西（包括z里import的），x的init中声明的变量和import的东西都被限制在x的空间中无法访问（除非z里import了x的）；`import x`且无法用`x.y`和`x.y.z`访问y和z，除非x的init里import了
+* 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的，所以模块本身是天然的单例实现
+* python命令行也可运行目录，目标为那**一个**`__main__.py`；运行目标时会把`__name__`变量设为`'__main__'`
+* 不用-m会把目标所在的文件夹加到sys.path中，然后按路径直接执行目标，目标就是顶级模块；用-m会把cwd加到sys.path中，按模块名先一层层执行`__init__.py`再执行目标，会先编译成.pyc，会把`__package__`设为模块名的前一部分，cwd是顶级模块；该sys.path与环境变量的path无关，对于环境变量修改PYTHONPATH可更改搜索地点
+* 不要自己创建名为`runpy.py`的文件，因为系统存在runpy这个包
+* VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
+* 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
+* `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx
 
 ```python
-__title__
-__author__ = xxx
-if __name__=='__main__': # 只有直接运行才会成立，import时不成立
-    ...
+# 绝对import，以sys.path中的目录开始搜索
+import x # 引用顶级目录的x/__init__.py，若不存在再找顶级目录的x.py，再找库模块x；以下将前两者简称x模块
+import x.y # 在x文件夹中找y模块，仍会调用x/__init__.py
+from x import y # 在x模块中找y对象，若导入*则只可能是这种，若不存在再在x文件夹中找y模块，此时仍会调用x/__init__.py
+
+# 相对import，以当前模块的__package__作为起始位置；顶级模块无法使用，会报ImportError
+from . import x # 引用同级目录的__init__.py中的x对象，或同级目录的x模块；不存在import .x
+from .x import y # 引用同级目录的x模块中的y对象，或x文件夹中的y模块
+from ..x import y # 引用上级目录的x模块中的y对象，或上级目录的x文件夹中的y模块
+import ..x # 引用上级目录的x模块
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+```
+
+### setuptools
+
+* 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
+* pip的包名与模块无关
+* python3 setup.py --help-commands；生成whl用bdist_wheel，需先装好wheel，生成过程在build文件夹里，生成的东西在dist文件夹里；install自动生成egg并安装模块，也会自动安装依赖但不会走pip自定义的源，实际上用的是easy_install；build_ext --inplace能生成c扩展，可用--compiler指定编译器；bdist_wininst；bdist --help-formats
+* twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
+* pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软连接，当然setup自己除外；setup develop [--uninstall]效果类似一样但后者不会删入口点exe
+* pip wheel . 可以在pwd生成wheel，还是需要setup.py；注意不是python -m wheel
+* pip download --only-binary :all: --dest . xxx 下载whl
+* 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
+* 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
+
+```python
+# __init__.py；必须有此文件才能自动发现
+from impl import fun # 从实现中公开函数
+__version__ = '0.0.1' # 默认0.0.0
+__all__ = ('fun') # 在被import *时如果存在此字段，只会导入它指定的
+
+# __main__.py
+from . import xxx
+def _main():
+    xxx()
+if __name__ == '__main__': # 理论上运行它本身时永远等于，但保不齐被别人import
+    _main()
+
+# setup.py
+import setuptools
+setuptools.setup( # 也可无参调用，参数能覆盖cfg，写错没有警告
+    name = 'xxx',
+    packages=find_packages(),
+    entry_points={"console_scripts": ["foo = foo.__main__:main"],},
+)
+
+# setup.cfg：https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html
+[metadata]
+name = some_name
+version = attr: mypkg.__version__
+author = xxx
+author_email = xxx
+description = Some description
+long_description = file: README # long_description_content_type = text/markdown
+keywords = one, two # 逗号对应列表，换行应该也是
+license = MIT # license_file = LICENSE 3rdparty/*.txt （多个需换行）
+url = xxx
+platform = any
+classifiers = # https://pypi.org/pypi?%3Aaction=list_classifiers
+    Development Status :: 5 - Production/Stable # 3 - Alpha
+    Intended Audience :: Developers
+    License :: OSI Approved :: MIT License
+    Operating System :: OS Independent
+    Programming Language :: Python :: 3
+    Topic :: Internet :: WWW/HTTP
+project_urls =
+    Bug Tracker = https://github.com/user/repo/issues
+    Changelog = https://github.com/user/repo/blob/master/CHANGELOG.md
+
+[options]
+packages = find: # 自动搜索存在__init__.py的文件夹；还有一种find_namespace:；package_dir可进行目录映射
+install_requires =
+    requests;python_version<'3.4' # https://www.python.org/dev/peps/pep-0508/
+    pywin32 >= 1.0;platform_system=='Windows'
+python_requires = >=2.7, !=3.0.*
+include_package_data = True # 好像是自动添加那些在包中且没有被gitignore的文件，又好像会解析MANIFEST.in；还可指定exclude_package_data
+py_modules =
+    module # 对应与cfg同级的module.py
+scripts =
+    bin/script
+    scripts/script
+zip_safe = False # 不启用时作为源码安装，方便调试，兼容性好；启用时作为.egg压缩包安装，性能好；对wheel无任何影响
+# setup_requires可以加一个wheel；test_suite = tests；tests_require废弃了
+
+[options.entry_points]
+console_scripts = # 还支持gui_scripts；如果某一项需要额外的依赖，用方括号声明名字并在extras里写内容
+    myexe = proj.__main__:_main # 若用proj:_main，得到的是init中的对象，而不是__main__.py的
+
+[options.extras_require] # pip安装时或entry_points用中括号才会装上
+tests = tox; pytest # 不明白为什么列表变成分号了但是就是这样，也可分行写
+
+[options.packages.find]
+where = src
+include = pkg*
+exclude = tests
+
+[options.package_data] # 不清楚是否独立于include_package_data；还有个data_files能把文件安装到指定位置
+* = *.txt, *.rst
+hello = *.msg
+
+[bdist_wheel] # 对应verb的开关
+universal = True # 能在py2和3上不做任何改变就运行且无C扩展才能开，命名上是py2.py3-none-any
+
+# pyproject.toml
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+https://www.python.org/dev/peps/pep-0518/
+https://github.com/takluyver/flit
+https://www.python.org/dev/peps/pep-0621/
+版本支持upper bound限定，不会修改最左边的非0数字：^0.1.11能更新到0.1.19但不会到0.2.0
+
+# ~/.pypirc；chmod 600
+[distutils]
+index-servers =
+    pypi
+    pypitest
+
+[pypi]
+username:
+password:
+
+[pypitest]
+repository: https://test.pypi.org/legacy/
+username:
+password:
 ```
 
 ## Scrapy
+
+TO READ：我的一个gist
 
 ### CLI
 
@@ -196,7 +324,7 @@ process.start()
 
 ### Parsel
 
-* 在cssselect和lxml上构建的库
+* 在cssselect和lxml上构建的库；pyquery也是这两这上构建的。但是cssselect和Parsel都是scrapy开发的
 * get()以后就变为普通的字符串了
 * getall()永远返回列表
 * css提供::text取文本，返回值仍为Selector；不会取到子元素的，理论上用` *::text`可获取，但实际失败了，最好用xpath的string()
@@ -230,38 +358,56 @@ se.css('a').xpath('xxx').re(r'xxx').get()/.getall()
 
 ## Requests
 
-```python
-import requests
+* urllib.request.urlopen不提供复用，http.client更加底层，两者都无法实际使用
+* urllib3是第三方库；只能下到bytes，要自己手动解码`r.data.decode('utf-8')`，不默认发gzip但能自动解码，长连接用urllib3.PoolManager()
+* httpx的api差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
+* requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
 
-# Session，能连接复用（urllib3提供连接池）以及保留cookie；即使使用了会话，方法级别的参数也不会保留
+### Session
+
+* 能连接复用以及保留cookie
+* 即使使用了会话，方法级别的参数也不会保留
+
+```python
 s = requests.session() # 其实最好用with，这样发生了异常也能关闭
 s.request = functools.partial(s.request, timeout=3) # 连接超时时间，可为小数，默认无穷大，不加会一直等；直接赋值只影响connect超时时间，可传递元组，第二个参数控制下载超时；Session级别的只能这样设置，是故意的
 allow_redirects=True; max_redirects=30 # 前者默认为True（head除外），会自动跟踪3xx因此结果直接是200；后者是默认值
 verify=True #【默】，也可设为CA文件的路径，默认用Mozilla的；cert参数是客户端验证的证书
-proxies={"http": "http://10.10.1.10:1080", "https": "http://10.10.1.10:1080"} # 也支持环境变量HTTP_PROXY，支持Basic Auth;不直接支持socks
+proxies={"http": "http://10.10.1.10:1080", "https": "http://10.10.1.10:1080"} # 默认会检测环境变量HTTP_PROXY，不直接支持socks
 headers={'User-Agent':'python-requests/2.23.0','Accept-Encoding':'gzip','Connection':'keep-alive'}.update({'Referer': referer}) #【基本默】普通dict，大小写不敏感
 auth=('user', 'pass') # Authorization头，如果不放到session里，重定向时会自动去掉
-cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但好像也可以按dict的方式使用。另有requests.utils.add_dict_to_cookiejar(cj, cookie_dict)、cookiejar_from_dict、dict_from_cookiejar几个函数，曾经我测试起来必须用它们才行，不能直接update
+cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict。另有requests.utils.add_dict_to_cookiejar(cj, cookie_dict)、cookiejar_from_dict、dict_from_cookiejar几个函数；有可能第一次能用dict，之后就要用它们了，不能直接update
+```
 
-# url必须要有scheme；必须每次写完整url，要不就用requests_toolbelt提供的BaseUrlSession
-# get的params会自动变成查询参数，且值为None的不会附加上去，值为list的会自动与k展开
-# post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，也因后者故最好不要传字符串形式的json给data，可以先loads一下；传字符串给data不会有额外变化，就是设置body；传字符串给json无意义；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
+### 请求和响应
+
+* url必须要有scheme；必须每次写完整url，要不就用requests_toolbelt提供的BaseUrlSession
+* get的params会自动变成查询参数，且值为None的不会附加上去，值为list的会自动与k展开
+* post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，也因后者故最好不要传字符串形式的json给data，可以先loads一下
+* 传字符串给data不会有额外变化，就是设置body；传字符串给json无意义；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
+* 只有当Content-Type包含text且不存在charset时，根据RFC此时默认字符集必须是ISO-8859-1，其它时候会进行猜测
+
+```python
 r: Response = s.get(url,params={k:v})、post(url,data/json = {k:v}/str)、put/delete/head/options
-# Response：
-r.status_code（200，== requests.codes.ok）、raise_for_status()、json()（即使解码成功也不一定意味着请求成功，因为有时服务器会在失败时也返回json）、text（根据encoding解码的HTTP内容字符串）、url、encoding（可赋值，一般赋r.apparent_encoding或'utf-8'）、content（HTTP内容二进制，但会自动解码gzip，适用于图片等）、history（记录重定向响应列表）、headers（此时为响应头部，但仍可用r.request.headers访问请求头部）
-# 只有当Content-Type包含text且不存在charset时，根据RFC此时默认字符集必须是ISO-8859-1；其它时候会进行猜测
+r.raise_for_status(), r.status_code # 200，== requests.codes.ok
+r.json() # 即使解码成功也不一定意味着请求成功，因为有时服务器会在失败时也返回json
+r.text # 根据encoding解码的HTTP内容字符串
+r.encoding # 可赋值，一般赋r.apparent_encoding或'utf-8'
+r.content # HTTP内容二进制，但会自动解码gzip，适用于图片等
+r.url, r.history # 后者为重定向响应列表
+r.headers # 字典，此时为响应头部，仍可用r.request.headers访问请求头部
 
-# 保存二进制文件的推荐方式，已gzip解码
+# 保存二进制文件的推荐方式，会自动gzip解码
 with open(filename, 'wb') as fd:
     for chunk in r.iter_content(chunk_size):
         fd.write(chunk)
 
-# 缓存，默认是保存在内存中的dict；还支持redis：
+# 缓存，默认是保存在内存中的dict，还支持redis；另有requests-cache库星数更高但不是requests官方推荐的
 from cachecontrol import CacheControl
 cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachecontrol.caches.FileCache('.webcache')
-# 一些建议：params最好sorted一下；缓存的响应永远不要流式处理
+# 一些建议：params最好sorted一下、缓存的响应永远不要流式处理
 
-# stream=True，则get返回时只有Header被下载下来了，可以进行一些处理，直到访问content才会下载响应体；还可以使用raw属性，是urllib3里的原始响应，未gzip解码
+# stream=True，则get返回时只有Header被下载下来了，可以进行一些处理，直到访问content才会下载响应体；还可以使用raw属性，是urllib3里的原始响应，未gzip解码？
 with requests.get(url, stream=True) as r:
     if r.encoding is None: r.encoding = 'utf-8'
     for line in r.iter_lines(decode_unicode=True): # 迭代流式API
@@ -274,7 +420,7 @@ with requests.get(url, stream=True) as r:
 
 ## Beautiful Soup
 
-* 支持不同的HTML Parser，其中html5lib最接近真实网页，是纯Python，相对慢；lxml（其实是lxml.html）容错性性中游，速度最快；自带的html.parser容错性差
+* 支持不同的HTML Parser，其中html5lib最接近真实网页，是纯Python，相对慢；lxml（其实是lxml.html）容错性性中游，速度最快；自带的html.parser容错性差；另外还有一个html5-parser，基于c更快但star只有11，不考虑
 * HTML分为四种对象：bs4.BeautifulSoup（文档）、bs4.element.Tag（标签）、bs4.element.NavigableString（文本）、bs4.element.Comment（注释）；XML还有其他对象
 * 有的属性是多值属性，如class，bs会自动处理成list（xml不做处理）。但像id中即使有空格，也只会直接返回字符串
 * 支持修改，许多东西可以直接赋值和`del`删除；还有一些其它的用于修改树的方法，暂时不学
@@ -312,7 +458,130 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 好像如果upx可用就会自动使用，Linux程序还可用-s(strip)
 * 控制import的内容能减少大小
 * 如果有共同的依赖，有方法合并，但好像有点复杂，且文档未更新
-* TODO: https://zhuanlan.zhihu.com/p/40716095
+* TODO: https://zhuanlan.zhihu.com/p/40716095 https://mp.weixin.qq.com/s/rL84_hBqH4CX-SmUXnjKAQ
+* 好像有个PyOxidizer是相同功能，但是需要装Rust且开发非常早期
+
+## python-fire
+
+* 功能简单，几乎就是链式调用，类似于把空格变成点。能把函数、类中的函数、模块中的函数（实际上都是对象）变成cli工具
+* 选项参数名字中的横杠和下划线等价
+* 支持`*args`或`**kwargs`
+* 分隔符`-`显式告知之后的为子命令而非参数，例如`- upper`可以把结果变为大写
+* `python -m fire xxx`可以对目标模块做任何改变而使用
+* BUG：对于对象，--help/-h无法显示verb，必须要用`- -h`才行
+
+```python
+import fire
+def hi(name='world'): return 'hello'+name
+fire.Fire(hello) # python cli.py world或--name=world
+
+class Calculator: # 支持继承
+    def __init__(self,offset=1): self.o=offset # 构造函数中的变为Flag；可访问属性o
+    def add(self,a,b): return a+b
+    def multi(self,a,b): return a*b
+fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
+```
+
+## ipython
+
+* `In[]`和`Out[]`记录了每一次的输入和输出，关键是可以用中括号获取它们；最后三次输出保存在`_`,`__`,`___`中，输入保存在`_i`中
+* 退出用的是Ctrl+D，python在Win下用的是Ctrl+Z；支持Ctrl+r的与bash类似的历史搜索
+* 传递参数给文件或模块要用`--`，否则会被认为是传给ipython自己；而python不对`--`特别对待
+* 用pipx装的时候记得加`--system-site-packages`，且不要在里面的pip更新系统包
+* 交互式输出对象默认使用pprint，可以用%pprint关闭；在语句后加上分号会不显示交互式输出结果（不显示Out）
+* `from IPython import embed`，运行到`embed()`时会进入IPython环境，但只能手动交互，并不是之后的代码就由IPython自动执行了，也不会读取设置，好处是修改了全局变量等退出到原有Python环境中时能保留；start_ipython()是普通的启动IPython的方法，会读取设置
+* `from IPython.display import display`，之后用display()替代print()，能输出富文本
+* 自动括号和引号：`/fun 1 -> fun(1)`，`/fun 1,2 -> fun(1,2)`；`,fun a b` -> `fun('a','b')`；`;fun a b` -> `fun('a b')`
+* 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode可以改变这一行为但不懂怎么用
+* exit()的行为和python不一致
+
+### [魔法命令](https://ipython.readthedocs.io/en/latest/interactive/magics.html)
+
+* 单个%是行魔法，回车就执行，默认开启了%automagic，无歧义时不加%也行；两个%%是cell魔法，会提示`...`允许多行输入，无法省略百分号
+* 命令的结果可以赋值给Python变量，此时无法省略%；命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`
+* quickref：显示所有魔法命令的简要参考；lsmagic：显示所有支持的魔法命令；?加魔法命令：显示指定命令的参考
+* run test.py：运行脚本，-i可以继承当前会话的变量，-d启动调试，-t计时，-p或prun启动Profiler，-m调用模块（参数仍要--）
+* debug：在刚刚出现过异常后使用，能进入ipdb检视刚才的异常栈；当然也可以一开始就用，设置断点；支持%%，接下来输入代码就可以debug
+* edit：启动编辑器来输入交互式代码，关闭后会传到cli里；VSC会自动加一个\n，没啥好办法
+* store：持久化储存变量，store -r恢复
+* hist：查看历史命令，-n加上序号，-g pattern用grep搜索
+* timeit：统计语句运行的时间，会多次运行取平均值；有%%
+* xdel：删除变量并试图清除在其对象上的一切引用
+* who：显示当前所有变量，可指定要显示的类型；whos信息更丰富
+* pip：可以直接运行pip
+* macro name n1-n2 n3：把n1到n2及n3这几行代码命名为name的宏，之后输name即可，但那时就不显示具体输入内容了，可用store储存，用edit编辑
+* pastebin：自动把东西上传到GitHub的gist里并返回链接
+* alias：显示预定义的shell命令，也可设置自己的，不过直接设置不能持久化；rehashx：把path里的可执行文件都导入alias中，使用时就不用加叹号了
+* pycat：语法高亮地显示文件
+* bookmark、pwd、pushd、popd、dhist：与路径有关的一些操作
+* env：显示环境变量
+* !ls执行shell命令，但Win下默认是CMD，且编码为gbk；!!：没看懂和一个的区别
+* ?加命令：内省，会显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
+* ?加带有`*`的对象：显示匹配到的对象名；其实是psearch命令
+* save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出放进输入中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
+* %%HTML、%%js、%%latex、%%markdown：将cell渲染成HTML输出；%%js运行JS
+* autoreload 2：需要load_ext加载。import模块后修改源文件能自动变化
+
+### 配置
+
+* ipython profile create [profilename]：创建`~/.ipython/profile_default/ipython_config.py`
+* 在`profile_default/startup/`中的.py或.ipy会自动执行，命名可以`10-xxx.py`这样含有优先级
+* config加不含c.的设置项可以动态读取和设置值
+* 使用`import os; os.environ['comspec']='powershell.exe'`更改`!`的shell；或者创建自己的魔法命令，从`-c -`读取
+
+```python
+c.TerminalInteractiveShell.confirm_exit = False
+c.TerminalInteractiveShell.editor = 'code -w'
+
+# 未更改的设置
+c.InteractiveShell.autocall = 0 # 启动自动括号，设为1时是智能模式，2是完全模式
+c.InteractiveShell.logstart = False # 启用后会保存会话，下次就会恢复；但默认是overwrite模式？
+c.InteractiveShell.pdb = False # 控制是否出现异常时自动进入ipdb，可用%pdb开关
+c.InteractiveShellApp.exec_files/.exec_lines/.extensions = [] # IPython启动时要执行的文件/代码/IPython扩展（load_ext）
+c.StoreMagics.autorestore = False # 开启后store能自动持久化
+```
+
+## pdb
+
+* VSC调试用的并不是pdb，故先不学了
+* python -m ipdb
+* 输入单个问号能显示功能命令
+* Debugging a broken unit test: pytest ... --pdbcls=IPython.terminal.debugger:TerminalPdb --pdb
+* breakpoint()：进入pdb，是原版python就有的功能，相当于`pdb.set_trace()`？
+* 命令教程：https://zhuanlan.zhihu.com/p/37218789 https://zhuanlan.zhihu.com/p/43846098
+* 还有个pdb++(pdbpp)项目
+
+## jupyter
+
+* jupyter lab为新开发的UI，故先不学notebook了
+* pip install jupyter; jupyter notebook --no-browser --allow-root
+* 在反代之后需要配置`NotebookApp.allow_remote_access`或`c.NotebookApp.allow_origin`，否则会报`Blocking Cross Origin API request`或`Blocking request with non-local 'Host'`；`/api/kernels/`和`/terminals/`需要配websocket，各种配置中都设置了`Host`
+* 会往`%AppData%\jupyter`里写东西，但在商店的Python里会装到沙盘里
+* https://www.zhihu.com/search?type=content&q=jupyter https://www.zhihu.com/question/59392251
+* Docker映像文档：https://jupyter-docker-stacks.readthedocs.io/
+* 输出富文本：https://nbviewer.jupyter.org/github/ipython/ipython/blob/master/examples/IPython%20Kernel/Rich%20Output.ipynb
+
+### 配置
+
+* jupyter notebook --generate-config 在 .jupyter/jupyter_notebook_config.py 下生成默认配置
+* c.NotebookApp.notebook_dir：指定启动目录
+* c.NotebookApp.open_browser = False
+* c.NotebookApp.ip = '*'
+* c.NotebookApp.port = 8888
+
+## Conda
+
+* conda是一款软件管理软件，相当于windows里面的应用商店。miniconda和anaconda中都包含了conda。miniconda只包含了conda、python、和一些必备的软件工具；anaconda包含了数据科学和机器学习要用到的很多软件
+* pip只用来安装python的whl和源码，后者有时需要编译器，有的需要操作系统的包管理器安装依赖
+* conda用来安装conda package二进制包，大部分是python的，但也支持了不少非python语言的依赖项如mkl、cuda这种c/c++写的包；有些包只能用conda，比如rdkit；但包的总数远少于PyPI
+* conda自己可以用来创建虚拟环境，可以很轻松地管理多个版本的python
+* conda比pip更加严格，conda会检查当前环境下所有包之间的依赖关系
+* conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+* conda create -n venv python=3.8; conda info -e; conda activate venv; conda remove -n venv --all
+
+## 杂项
+
+* colorama：控制台的前、背景色
 
 ## 参考
 
@@ -326,31 +595,32 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * https://zhuanlan.zhihu.com/p/21976757
 * https://zhuanlan.zhihu.com/p/21976757
 * https://requests.readthedocs.io/zh_CN
+* https://github.com/HelloGitHub-Team/Article/blob/master/contents/Python/cmdline
 
 ## TODO
 
-* PyTest；自带的叫testsuit
-* PySnooper：用于调试
-* PyNaCl
-* Numpy scipy https://zhuanlan.zhihu.com/p/30011154 https://mp.weixin.qq.com/s?__biz=MzIxMjM4MjkwMw==&mid=2247483920&idx=1&sn=96b11616cf48c83f54ac76c6687a20af https://cs231n.github.io/python-numpy-tutorial/
-* Seaborn 数据可视化
-* Pandas https://zhuanlan.zhihu.com/c_1142118980302032896 https://mp.weixin.qq.com/s?__biz=MzIxMjM4MjkwMw==&mid=2247483970&idx=1&sn=8028f7582597e0023f0fa02f84db57f1
+* PyTest
+* PySnooper snoop：用于调试
+* PyNaCl https://github.com/pyca/cryptography
+* Seaborn bokeh 数据可视化
 * 哪些 Python 库让你相见恨晚:https://www.zhihu.com/question/24590883
 * https://github.com/dbader/schedule，据说自带的很不好用
-* colorama：彩色输出
-* https://github.com/docopt/docopt：命令行选项创建工具，也有C#端；https://github.com/pallets/click/ 另一个工具；https://github.com/chriskiehl/Gooey：把命令行程序变成GUI
+* 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
 * https://github.com/harelba/q：Run SQL directly on CSV or TSV files
-* gzip
-* bokeh
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * Nuitka：https://zhuanlan.zhihu.com/p/31721250 https://zhuanlan.zhihu.com/c_1245860717607686144 性能有提高，跨平台差；好像不能单文件
 * fastapi：https://fastapi.tiangolo.com/ https://zhuanlan.zhihu.com/p/136621431
-* https://typer.tiangolo.com/ https://github.com/pallets/click/ 用于解析命令行参数
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
-* pyright
-* plotly、plotly/dash
-* httpx
+* plotly.py、plotly/dash
 * https://github.com/grantjenks/python-diskcache
 * https://github.com/Delgan/loguru 日志
 * https://github.com/cool-RR/PySnooper 调试
-* pymysql
+* pymysql peewee https://github.com/pudo/dataset https://github.com/PyMySQL/mysqlclient-python https://pypi.org/project/mysql-connector-python/ https://github.com/encode/orm https://github.com/sdispater/orator
+* https://github.com/mitmproxy/mitmproxy
+* https://jobbole.github.io/awesome-python-cn/
+* https://github.com/gevent/gevent
+* 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
+* https://github.com/serge-sans-paille/pythran https://github.com/numba/numba
+* https://github.com/mahmoud/boltons
+* https://github.com/rthalley/dnspython
+* https://github.com/scrapinghub/splash 具有HTTP API的轻型浏览器js渲染引擎
