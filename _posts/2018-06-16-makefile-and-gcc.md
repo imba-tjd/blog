@@ -135,3 +135,5 @@ prog3 : prog3.o sort.o utils.o
 * https://zhuanlan.zhihu.com/p/100964932
 * https://www.ruanyifeng.com/blog/2015/02/make.html
 * https://github.com/seisman/how-to-write-makefile
+* https://nullprogram.com/blog/2017/08/20/
+* https://reactos.org/wiki/Building_MINGW-w64

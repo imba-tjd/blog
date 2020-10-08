@@ -24,7 +24,7 @@ category: linux
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
 * netcat
 * ag/rg：比grep、ack更快地递归搜索文件内容；https://einverne.github.io/post/2019/09/ripgrep-recursively-searches-directories-using-regex-pattern.html
-* jq：json文件处理以及格式化显示，支持高亮；json_pp是perl自带
+* jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
 * axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
@@ -100,7 +100,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted 
 * 安装pip本身和一些库：python3-dev python3-venv python3-pip python-pip-whl python3-setuptools python3-wheel，Linux下安装后的名称只会是pip3
 * 删除python2：apt autoremove python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln
 * 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\Python\Python38\Scripts；%LocalAppData%\Programs\Python\Python39\DLLs\Scripts
-* 依赖安装位置，用pip show能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
+* 依赖安装位置，用pip show xxx或者python -m site能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
 * 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip；现在可用pip cache purge清除wheel，但是还是有http缓存；可用pip cache dir显示缓存位置
 * 许多包也能从apt获得，以`python3-`加包名获得；若用pip卸载时提示：`Not uninstalling xxx at /usr/lib/python3/dist-packages, outside environment /usr`，这表明此包是用apt装的
 * 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager全部更新，或直接--force-reinstall
@@ -112,14 +112,14 @@ python3 -m pip install -U pip setuptools wheel
 pip3 list [--outdated/-o]
 pip3 install <package_name> [--upgrade/-U] [--pre预览版] [--user]
 pip3 install local.whl/tar.gz -or- 包名 -f <含有whl的文件夹> -or- setup.py install
-pip3 install git+https://github.com/user/repo.git@branch
+pip3 install git+https://github.com/user/repo.git@branch # 也可用ssh://，会下到所有历史且pip维护者拒绝加depth，可改用下zip代替，下不到submodule
 pip3 show <package_name>
 pip3 uninstall：不会卸载依赖，可用pip-autoremove代替
 pip3 check：能显示出某个模块的依赖冲突和缺失
 
 # 更新所有包（能自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）
 pip freeze | % {pip install -U $_.split("=")[0]}
-# pipupgrade --latest --yes --or-- -ly # 在win下有各种各样的问题，还可能被报毒；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用
+# pipupgrade -ly 在win下有各种各样的问题；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用，pip-review不积极开发了，pip-upgrader好像还能用
 # 或pip3 install -U `pip3 list -o | awk 'NR>2 {print $1}'`
 # 或import pkg_resources, subprocess; subprocess.call('pip install --upgrade ' + ' '.join(dist.project_name for dist in pkg_resources.working_set), shell=True)
 # 或for dist in pkg_resources.working_set:
@@ -161,7 +161,7 @@ trusted-host = mirrors.aliyun.com
 * ps_mem：显示各个进程的内存占用情况
 * Glances：监控所有系统信息（类似于vmstat）
 * userpath：添加和验证PATH的程序，也能作为库使用
-* fierce：扫描域名，基本上是取附近IP的反查PTR
+* fierce：扫描域名，基本上是取附近IP的反查PTR；aiodnsbrute爆破查找域名
 
 ## Ruby
 
@@ -329,6 +329,7 @@ bt-tracker=xxx,xxx
 * -d下载模式（隐含-F），会往终端里打印头但把body保存到文件中，且会显示用时和大小，手动指定文件名同时用-o；单独用-o也是只保存body，但不会显示头；-c断点续传；可连起来用-dco加文件名；别直接用重定向，PS上有bug
 * --check-status如果请求失败，在命令行中返回错误代码；--ignore-stdin在非交互式shell如脚本中使用比较好
 * --timeout超时时间，默认为0即无限
+* http-prompt为交互式的请求器
 
 ```
 http :8080 # 相当于http://localhost:8080；单独的冒号为80
@@ -345,3 +346,6 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可�
 
 * rclone: https://zhuanlan.zhihu.com/p/104480400
 * unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691
+* zstd
+* https://github.com/iovisor/bcc
+* https://github.com/robertdavidgraham/masscan

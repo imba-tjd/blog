@@ -214,7 +214,7 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 ### 设置.gitattributes
 
 * 自动转换：* text=auto
-* 整个仓库固定CRLF/LF：* text=crlf/lf；指定文件：*.txt eol=crlf
+* 整个仓库固定CRLF/LF：* text=crlf/lf；指定文件：*.bat eol=crlf
 * 不进行自动转换：*.txt binary
 * 修改后可用`git add --renormalize .`改变已有文件的换行；使用前需要把当前文件都提交
 
@@ -320,7 +320,7 @@ collapsable content
 
 * https://zhuanlan.zhihu.com/p/56759711 Github协议详解，详细又易懂
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
-* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode
+* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（包括不允许翻译），NC是不用于商业目的
 * 选择开源协议：https://choosealicense.com/
 * 所有协议：https://opensource.org/licenses/category
 
@@ -329,6 +329,7 @@ collapsable content
 * git init --bare xxx.git：用作同步中心，不包含工作区，可以**接受**push，不能使用平常的git命令；命名按照习惯以.git结尾，实际上下下来的就是.git文件夹
 * git clone --mirror：隐含bare；普通的clone会把origin作为直接上游，会有跟踪远端的本地分支，没有origin的上游信息；bare直接是本地分支，没有跟踪分支，也没有origin的上游；mirror则有origin的上游，运行git remote update会覆盖所有的refs，与删掉再clone一致
 * 不通过fork创建重复的仓库：https://help.github.com/cn/github/creating-cloning-and-archiving-repositories/duplicating-a-repository
+* TODO: https://zhuanlan.zhihu.com/p/258961962
 
 ## [hub命令行工具](https://github.com/github/hub)
 
@@ -348,7 +349,16 @@ collapsable content
 
 ## [gh](https://github.com/cli/cli)
 
-* 重写的不兼容git的cli工具，还没有正式release，以后再学
+* gh auth login; eval "$(gh completion -s bash)"; gh config set editor "code --wait"
+* cat cool.txt | gh gist create; gist list; gist view; gist edit
+* gh issue view -w
+* gh pr checkout xxx
+* gh release create v1.2.3 '/path/to/asset.zip#My display label' -F changelog.md
+* gh release download --pattern '*.deb' -R user/repo; list; view
+* gh repo clone user/repo -- --depth=1
+* gh repo create --private
+* gh repo view user/repo -w -b dev
+* gh repo fork：无参时必须在本地repo中调用，用于fork之前clone到本地的非自己repo并自动把当前origin改成upstream；如果带user/repo参数，那就相当于fork并clone
 
 ## readme渲染顺序
 
@@ -380,3 +390,8 @@ collapsable content
 * https://git-scm.com/doc
 * https://github.com/521xueweihan/git-tips
 * https://help.github.com/en/articles/connecting-to-github-with-ssh
+
+### TODO
+
+* git log https://zhuanlan.zhihu.com/p/259380550
+* git lfs https://zhuanlan.zhihu.com/p/146683392

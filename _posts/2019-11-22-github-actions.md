@@ -5,13 +5,27 @@ tags:
     - CI
 ---
 
+https://github.github.io/actions-cheat-sheet/actions-cheat-sheet.pdf
+
 ## Workflow
 
 `.github/workflow/main.yml`
 
 ```yaml
 name: CI
-on: push
+# on: push
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - _site/**
+      - .github/workflows/deploy.yml
+  schedule:
+  - cron: "0 0 * * *"
+
+env:
+  k: v
 
 jobs:
   build:

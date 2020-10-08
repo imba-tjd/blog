@@ -17,7 +17,7 @@ uː too/two loose blue group food soup
 aː hard fast car ask bath father start；其中a是手写体ɑ，不是印刷体
 ɒ  lot odd top not wash cough
 ɔː law war saw/sore door four north bought thought
-ə  about common memory standard butter easily family supply analysis them hundred；a cup of(/kʌpə/) tea - cuppa, a piece of(/pi:sə/) cake；又叫做schwa中央元音，只出现在轻读音节中
+ə  about common memory standard butter easily family supply analysis them hundred banana infomation carefully；a cup of(/kʌpə/) tea - cuppa, a piece of(/pi:sə/) cake；又叫做schwa中央元音，只出现在轻读音节中
 ɜː her girl learn bird nurse refer alert pearl word urgent；类似于“饿”
 e  dress head bed let many；KK中写作ɛ
 æ  trap stamp back lap apple
@@ -31,7 +31,7 @@ aɪ eye price high try time；其中a是印刷体
 əʊ boat show know open hope post；KK中写作o，DJ给美音注音用oʊ
 eə fair pair hair care square
 aʊ how now fowl(家禽) allow mouth；其中a是印刷体
-eɪ make face day break plane/plain rain；KK中写作e
+eɪ make face day break plane/plain rain danger；KK中写作e
 
 ## 元音辨析
 
@@ -79,7 +79,7 @@ r right wrong sorry arrange; 出现在元音后不发音：car card bored hear h
 l 如果后面有元音，与普通话“了”的声母差不多，称作light L：lack valley；如果没有或者在末尾，舌尖不离开上牙齿，声带振动，称作dark L：bell world pal pill mile milk cold，注意girl和all中的l要发音到位；对比：leaf - feel, let - tell, loaf - foal, loot - tool, light - bill；不发音L：calm palm salmon colonel folk；英音和美音的音节划分可能不同：million value
 ts secrets facts bats；和拼音中的c类似
 dz besides words beds kids；拼音中的z的浊音版本
-tr tree truth try street
+tr tree truth try；不送气：street strange
 dr dry drink drew dream
 
 ## 辅音辨析
@@ -117,7 +117,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
   * 融合：/s+j=ʃ/:bless you, issue; /z+j=ʒ/:as you, azure(æʒə); /t+j=tʃ/:meet you, mutual; /d+j=dʒ/:did/would you, educate；英音口语中还有/sdʒuːdnt/
   * 辅音延长（相同辅音只发一次）：life force, fish shop, black coffee bad dog, good day, with this；但fish stick, wasn't there不算
 * 异化
-  * /s/+/t,k,p/会变成对应的不送气音：steam, stand, stick, sky, school, spring, special
+  * /s/+/t,k,p,tr/会变成对应的不送气音：steam, stand, stick, sky, school, spring, special, mistake
   * 美音的r化：car, four；不过如果有两个r时第一个不变：surprise, particular, governor
 * 加音，词尾元音+词首元音
   * /w/: do it, who is, too often, go on
@@ -159,10 +159,22 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * months，实际上读/ts/；clothes，实际上读/z/和close一样；pizza/piːtsə/，其中的t变为停顿
 * February：音标确实是/februəri/，但是听上去却有/j/的音；或者说现在的人一般不读它第一个r
 * machine - mechanical
+* interesting：第一个e就跟没有一样
 
 ## 同词异义异音
 
 * lead：动词/liːd/带领，名词/led/铅
+
+## ough的发音
+
+* thought bought: /ɔː/
+* though: /əʊ/
+* through: /uː/
+* thorough borough: /ə/
+* rough enough tough slough(v.): /ʌf/
+* cough trough: /ɒf/
+* bough plough slough(n.): /aʊ/
+* "通假字"：hiccup=hiccough, hock=hough, loch=lough
 
 ## 参考
 

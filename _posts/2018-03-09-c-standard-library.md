@@ -464,4 +464,6 @@ unistd.h
 
 ## TODO
 
-asprintf：非标准库，好像也不是posix，是GNU的
+* asprintf：非标准库，好像也不是posix，是GNU的
+* https://github.com/nothings/stb https://github.com/srdja/Collections-C https://github.com/faragon/libsrt https://github.com/P-p-H-d/mlib https://github.com/troydhanson/uthash
+* libuv

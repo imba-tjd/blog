@@ -147,7 +147,7 @@ category: windows
 
 * ForEach-Object(foreach和%)：`1..3 | % { echo $_ }`；可指定-Begin、-Process、-End，或直接用三个大括号代替，$ForEach表示索引，7之后支持-Parallel；第二种用法是不加大括号而跟字符串，代表取那一项成员
 * Where-Object(where和?)：'You', 'Me' | ? { $_ -match 'u' }
-* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl *；可指定-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
+* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl *；也可用于选择一定数量范围：-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
 * Sort-Object(sort)：-Descending降序；如果某个对象不具有所指定的属性之一，则 cmdlet 会将该对象的属性值解释为 NULL，并将其放置在排序顺序的末尾；如果要多字段排序需要传哈希表对象
 * Tee-Object(tee)：保存并显示管道输入的内容，会先创建文件再运行前面的命令；-Variable 变量名（不用加$）可以把结果保存到变量里
 * Group-Object：进行分组，依据可为表达式；分组后有Count属性用于排序，Name属性为key，Group属性为内容
@@ -243,3 +243,5 @@ Profile文件
 * https://www.cnblogs.com/sparkdev/tag/PowerShell/
 * TODO: https://yuedu.baidu.com/ebook/d7b1a1767dd184254b35eefdc8d376eeafaa174e https://zhuanlan.zhihu.com/p/145043422
 * https://stackoverflow.com/questions/47274532/difference-between-and
+
+ISE无法识别utf8
