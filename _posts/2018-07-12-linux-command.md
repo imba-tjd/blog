@@ -8,6 +8,7 @@ title: Linux命令
 * https://man.linuxde.net/
 * https://www.runoob.com/linux/linux-command-manual.html
 * https://tldr.ostera.io/
+* https://github.com/chubin/cheat.sh
 
 ## 简单笔记
 
@@ -191,26 +192,29 @@ aria2、axel、httpie放到软件的文章里去了。
 
 ### curl
 
-* 安装时会装上openssl
-* 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
-* 支持多种协议，默认显示body；-I仅显示Header（但用的是HEAD方法），-i顺便显示Header，`-D –`不限方法只显示头
-* -o或者>写入文件，-O使用网站提供的名字
+* 安装时会装上openssl；支持http2、ftp等多种协议；一次可请求多个URL且会复用，某些选项要多次指定，--next可把接下来的选项都指定为下一个URL的
+* 默认显示body，-I用HEAD请求，-i顺便显示Header，`-D –`不限方法只显示头，-X手动指定HTTP请求类型
+* -o或者>写入文件，-O使用网站提供的名字；多URL时要多次指定，或者后者可改用--remote-name-all
 * -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开指定
-* -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
-* -#显示进度条，在-O或者重定向输出时默认会有
 * -x使用proxy（正代）
-* -C从指定Range继续下载；好像`-C -`可以自动断点续传
+* `-C -`断点续传
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
-* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；val如果以@开头会被认为从文件中读取一行一个，可用`--data-raw`覆盖；`--data-urlencode`会帮你做一次URL编码，像值中有空格时可用；-F的类型是`multipart/form-data`
-* -T使用PUT方式上传文件，-X手动使用其它HTTP请求
+* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；`-d @file`是从文件中读取，一行一个；`--data-raw @file`不会识别成文件，就是真正的`@`；`--data-urlencode`会帮你做一次URL编码，像值中有空格时可用；-F的类型是`multipart/form-data`
 * -k忽略证书错误
-* url里用中括号加数字范围可以批量下载
-* --http2允许用HTTP/2，如果服务器不支持仍可用1.1，需--version中有模块
+* --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
+* -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
+* url通配：`[1-10]`、`[01-10]`、`[1-10:2]`、`[a-z]`、`{asdf,zxcv}`，-g禁用这一行为；在-o的文件名中可用`#1`对应通配变量
+* -K opt.txt：从文件中读取命令行选项，一行一个可不带横杠，井号注释，也想指定url必须用`url`；默认会寻找`~/.curlrc`，Win下是~及exe所在目录下的`_curlrc`
+* -#显示进度条，在-O或者重定向输出时默认会有
+* -J：与-O同时使用时会从Content-Disposition中读取文件名，小心覆盖，不会url解码
+* -m指定超时时间，15--speed-limit 1000指定15秒内至少传输1000字节
+* -ssl：自动升级到https，如果无法建立仍用http
+* --libcurl xxx.c：生成对应的c语言代码
 * 访问httpbin.org/get可以看到服务器收到的请求信息
-* 如果头中有`accept-encoding: gzip`，必须加`--compress`参数，否则获得的是二进制结果。但win下不支持后者
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
+* 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 
 ### scp
 
@@ -290,21 +294,17 @@ sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8�
 * 指定后面的项目会把前面的也都进行一遍；扫描方式可以同时使用多个，如果什么都不加应该就是SYN，也有一种说法是会用四种方式
 * 规避技巧：-S伪造源IP，--spoof-mac伪造mac，--data-length随机填充数据到指定长度，--badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙
 
-## TODO
-
-tmux（https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt https://zhuanlan.zhihu.com/p/27915505）、supervisor(python)、PM2 (for node.js)
-
-killall、pkill、kill -9
-
-nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395
-
-https://www.oschina.net/translate/useful-linux-commands-for-newbies
-
-https://einverne.github.io/categories.html#每天学习一个命令
-
-
 ## 参考
 
 * https://www.cnblogs.com/manong--/p/8012324.html
 * https://blog.csdn.net/aspirationflow/article/details/7694274
 * https://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
+
+### TODO
+
+* tmux（https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt https://zhuanlan.zhihu.com/p/27915505）、supervisor(python)、PM2 (for node.js)
+* killall、pkill、kill -9
+* nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395
+* https://www.oschina.net/translate/useful-linux-commands-for-newbies
+* https://einverne.github.io/categories.html#每天学习一个命令
+* https://github.com/trimstray/the-book-of-secret-knowledge

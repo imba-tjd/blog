@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v2 # 官方文档很完善了
 
     - name: 每一步都可以有名称
-      # shell: cmd # Win默认就是pwsh，且是最新稳定版
+      shell: bash # Win默认就是pwsh，且是最新稳定版；注意容器中一般为sh
       run: |
         echo Hello World!;
       env:
@@ -113,17 +113,17 @@ branding:
 
 ## 环境
 
-* 软件环境：https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
+* 软件环境：https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md ubuntu-latest是1804，要手动指定20.04才行，离谱；gcc是9.3，clang是10
 * 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
 * 直接使用apt必须加sudo，但在容器里就必须不用
-* clang默认就是9
 * win自带nuget，但不自带msbuild的可执行文件，要用microsoft/setup-msbuild；dotnet msbuild好像不能用于fx的
+* 命令找不到时的报错：`/__w/_temp/xxx.sh: 7: /__w/_temp/xxx.sh: pushd: not found`
+* 不要自己装golang-go，会报`compile: version 'xxx' does not match go tool version 'xxx'`
 
 ### Python环境
 
 * 自带python 2.7和3.6，pip9，但需要pip3 install wheel。而pip升级会失败：ImportError: cannot import name main
 * 需要PATH=$PATH:~/.local/bin，注意不同step应该是不共享的。但也可以直接用python3 -m来调用
-* actions/setup-python不支持安装beta版
 
 ```
 asn1crypto (0.24.0)

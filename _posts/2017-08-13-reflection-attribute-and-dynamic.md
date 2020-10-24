@@ -7,7 +7,7 @@ category: dotnet
 
 * 有关程序及其类型的数据被称为元数据，它们保存在程序的程序集中
 * 程序在运行时，可以查看其他程序集或其本身的元数据，这种行为叫做反射
-* 使用GetType方法和typeof运算符来获取Type对象
+* 使用GetType方法和typeof运算符来获取Type对象；Core上要再用.GetTypeInfo()
 
 ### System.Type类的部分成员
 

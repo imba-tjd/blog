@@ -187,7 +187,7 @@ cnn.GetAll<Student>();
 
 * [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重
 * SSDT：https://www.youtube.com/watch?v=ijDcHGxyqE4
-* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长
+* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但好像已经比前者更好了
 * Linq to SQL：已经不维护了，且只支持SQL Server
 
 ## ADO.NET

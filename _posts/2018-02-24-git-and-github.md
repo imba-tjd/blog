@@ -318,11 +318,12 @@ collapsable content
 
 ## License
 
-* https://zhuanlan.zhihu.com/p/56759711 Github协议详解，详细又易懂
+* http://www.bewindoweb.com/224.html Github协议详解
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
 * CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（包括不允许翻译），NC是不用于商业目的
 * 选择开源协议：https://choosealicense.com/
 * 所有协议：https://opensource.org/licenses/category
+* https://www.gnu.org/licenses/gpl-faq.html
 
 ## bare和mirror
 
@@ -349,14 +350,15 @@ collapsable content
 
 ## [gh](https://github.com/cli/cli)
 
+* 大部分命令默认都是交互式的
 * gh auth login; eval "$(gh completion -s bash)"; gh config set editor "code --wait"
 * cat cool.txt | gh gist create; gist list; gist view; gist edit
 * gh issue view -w
 * gh pr checkout xxx
 * gh release create v1.2.3 '/path/to/asset.zip#My display label' -F changelog.md
 * gh release download --pattern '*.deb' -R user/repo; list; view
-* gh repo clone user/repo -- --depth=1
-* gh repo create --private
+* gh repo clone user/repo -- --depth=1（但会自动fetch全部的upstream）
+* gh repo create：在有.git的情况下自动创建网页版仓库并添加remote，但不会自动push
 * gh repo view user/repo -w -b dev
 * gh repo fork：无参时必须在本地repo中调用，用于fork之前clone到本地的非自己repo并自动把当前origin改成upstream；如果带user/repo参数，那就相当于fork并clone
 

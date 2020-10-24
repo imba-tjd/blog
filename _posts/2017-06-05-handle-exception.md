@@ -18,6 +18,8 @@ title: 异常处理
 
 如果异常发生时不在try块内或该try语句没有匹配的catch子句，CLR将搜索调用栈，寻找带匹配的catch子句的封装try语句。如果找到，回到调用栈的顶端，沿着调用栈，执行任何封装的try语句的finally子句，并从栈中弹出每个栈帧。然后执行匹配的catch子句，如果有finally子句，执行。然后在try语句之后继续执行。
 
+finally中不能有return。
+
 Best Practice
 -------------
 

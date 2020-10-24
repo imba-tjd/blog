@@ -24,7 +24,7 @@ category: linux
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
 * netcat
 * ag/rg：比grep、ack更快地递归搜索文件内容；https://einverne.github.io/post/2019/09/ripgrep-recursively-searches-directories-using-regex-pattern.html
-* jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；json_pp是perl自带
+* jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；还有个yq是py的；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
 * axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
@@ -106,7 +106,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted 
 * 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager全部更新，或直接--force-reinstall
 
 ```bash
-python3 -m ensurepip --upgrade --default-pip # 一般最终用户不需要调用它，除非安装python时没有装pip
+python3 -m ensurepip --upgrade --default-pip # 一般用不到，除非安装python时没有装pip
 python3 -m pip install -U pip setuptools wheel
 
 pip3 list [--outdated/-o]
@@ -119,12 +119,8 @@ pip3 check：能显示出某个模块的依赖冲突和缺失
 
 # 更新所有包（能自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）
 pip freeze | % {pip install -U $_.split("=")[0]}
-# pipupgrade -ly 在win下有各种各样的问题；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用，pip-review不积极开发了，pip-upgrader好像还能用
 # 或pip3 install -U `pip3 list -o | awk 'NR>2 {print $1}'`
-# 或import pkg_resources, subprocess; subprocess.call('pip install --upgrade ' + ' '.join(dist.project_name for dist in pkg_resources.working_set), shell=True)
-# 或for dist in pkg_resources.working_set:
-#    print("pip install --upgrade " + dist.project_name)
-#    subprocess.call("pip install --upgrade " + dist.project_name, shell=True)
+# pipupgrade -ly 在win下有各种各样的问题；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用，pip-review不积极开发了，pip-upgrader好像还能用
 
 deptree [-p package1,p2]：显示依赖哪些包，也有check的效果；-r：显示某个包是被那些依赖的；自己依赖lxml
 ```
@@ -349,3 +345,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可�
 * zstd
 * https://github.com/iovisor/bcc
 * https://github.com/robertdavidgraham/masscan
+* airflow 任务调度
