@@ -43,14 +43,14 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 
 * 一个.py文件就是一个模块，模块名`__name__`按目录组织，用点分隔，import时无需也不能加.py后缀
 * 一个含有`__init__.py`的目录就是包，import该目录时相当于导入该目录下的`__init__.py`，它的`__name__`等于目录路径对应的模块名
-* 对于`x/y/z.py`，`import x.y.z`会依次运行`x/__init__.py`和`x/y/__init__.py`，再运行`c.py`，且只能通过`x.y.z.xx`访问z中的东西（包括z里import的），x的init中声明的变量和import的东西都被限制在x的空间中无法访问（除非z里import了x的）；`import x`且无法用`x.y`和`x.y.z`访问y和z，除非x的init里import了
+* 对于`x/y/z.py`，`import x.y.z`会依次运行`x/__init__.py`和`x/y/__init__.py`，再运行`c.py`，且只能通过`x.y.z.xx`访问z中的东西（包括z里import的），x的init中声明的变量和import的东西都被限制在x的空间中无法访问（除非z里import了x的）；`import x`无法用`x.y`和`x.y.z`访问y和z，除非x的init里import了
 * 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的，所以模块本身是天然的单例实现
 * python命令行也可运行目录，目标为那**一个**`__main__.py`；运行目标时会把`__name__`变量设为`'__main__'`
 * 不用-m会把目标所在的文件夹加到sys.path中，然后按路径直接执行目标，目标就是顶级模块；用-m会把cwd加到sys.path中，按模块名先一层层执行`__init__.py`再执行目标，会先编译成.pyc，会把`__package__`设为模块名的前一部分，cwd是顶级模块；该sys.path与环境变量的path无关，对于环境变量修改PYTHONPATH可更改搜索地点
 * 不要自己创建名为`runpy.py`的文件，因为系统存在runpy这个包
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
 * 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
-* `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx
+* `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
 
 ```python
 # 绝对import，以sys.path中的目录开始搜索
@@ -81,6 +81,8 @@ except ImportError:
 * pip download --only-binary :all: --dest . xxx 下载whl
 * 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
 * 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
+* MANIFEST.in额外控制sdist的内容，默认包含和不包含：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
+* 使用包内数据：importlib.resources.files("mypkg")/"data/data.csv" https://importlib-resources.readthedocs.io/en/latest/using.html；单个py_modules无法使用
 
 ```python
 # __init__.py；必须有此文件才能自动发现
@@ -95,23 +97,26 @@ def _main():
 if __name__ == '__main__': # 理论上运行它本身时永远等于，但保不齐被别人import
     _main()
 
-# setup.py
+# setup.py：https://packaging.python.org/guides/distributing-packages-using-setuptools/
 import setuptools
 setuptools.setup( # 也可无参调用，参数能覆盖cfg，写错没有警告
     name = 'xxx',
-    packages=find_packages(),
-    entry_points={"console_scripts": ["foo = foo.__main__:main"],},
+    packages=['mypkg'], # 也可用find_packages()自动搜索存在__init__.py的文件夹
+    package_dir={'mypkg': 'src/mypkg'}, # 如果位置不对可以手动映射，key也可以是''则用最后一部分作为包名
+    package_data={'mypkg': ['data/*.dat']}, # 即src/mypkg/data/*.dat，key必须是包名或''即任意包，*.dat只会包含mypkg同级目录下的，或者用*/*.dat
+    py_modules=['test'], # 对应与setup.py同级的module.py，对于sub.test也可用且不会flat；或用[x.stem for x in Path().glob('*.py')]动态获取
+    entry_points={"console_scripts": ["foo = foo.__main__:_main"],},
 )
 
 # setup.cfg：https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html
 [metadata]
-name = some_name
+name = xxx
 version = attr: mypkg.__version__
 author = xxx
 author_email = xxx
-description = Some description
+description = xxx
 long_description = file: README # long_description_content_type = text/markdown
-keywords = one, two # 逗号对应列表，换行应该也是
+keywords = one, two
 license = MIT # license_file = LICENSE 3rdparty/*.txt （多个需换行）
 url = xxx
 platform = any
@@ -127,14 +132,12 @@ project_urls =
     Changelog = https://github.com/user/repo/blob/master/CHANGELOG.md
 
 [options]
-packages = find: # 自动搜索存在__init__.py的文件夹；还有一种find_namespace:；package_dir可进行目录映射
+packages = find: # 还有一种find_namespace:
 install_requires =
     requests;python_version<'3.4' # https://www.python.org/dev/peps/pep-0508/
     pywin32 >= 1.0;platform_system=='Windows'
 python_requires = >=2.7, !=3.0.*
-include_package_data = True # 好像是自动添加那些在包中且没有被gitignore的文件，又好像会解析MANIFEST.in；还可指定exclude_package_data
-py_modules =
-    module # 对应与cfg同级的module.py
+include_package_data = True # 将MANIFEST.in的内容打包进bdist，还可指定exclude_package_data优先去除bdist的内容
 scripts =
     bin/script
     scripts/script
@@ -153,7 +156,7 @@ where = src
 include = pkg*
 exclude = tests
 
-[options.package_data] # 不清楚是否独立于include_package_data；还有个data_files能把文件安装到指定位置
+[options.package_data] # 不要与include_package_data共用；还有个data_files能把文件安装到指定位置，但should be相对路径，相对于sys.prefix
 * = *.txt, *.rst
 hello = *.msg
 
@@ -362,6 +365,7 @@ se.css('a').xpath('xxx').re(r'xxx').get()/.getall()
 * urllib3是第三方库；只能下到bytes，要自己手动解码`r.data.decode('utf-8')`，不默认发gzip但能自动解码，长连接用urllib3.PoolManager()
 * httpx的api差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
 * requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
+* httplib2：和urllib差不多级别的API，活跃度不高，可用于Py2
 
 ### Session
 
@@ -458,7 +462,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 好像如果upx可用就会自动使用，Linux程序还可用-s(strip)
 * 控制import的内容能减少大小
 * 如果有共同的依赖，有方法合并，但好像有点复杂，且文档未更新
-* TODO: https://zhuanlan.zhihu.com/p/40716095 https://mp.weixin.qq.com/s/rL84_hBqH4CX-SmUXnjKAQ
+* TODO: https://zhuanlan.zhihu.com/p/40716095 https://mp.weixin.qq.com/s/rL84_hBqH4CX-SmUXnjKAQ https://www.zhihu.com/question/281858271
 * 好像有个PyOxidizer是相同功能，但是需要装Rust且开发非常早期
 
 ## python-fire
@@ -489,23 +493,25 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * 传递参数给文件或模块要用`--`，否则会被认为是传给ipython自己；而python不对`--`特别对待
 * 用pipx装的时候记得加`--system-site-packages`，且不要在里面的pip更新系统包
 * 交互式输出对象默认使用pprint，可以用%pprint关闭；在语句后加上分号会不显示交互式输出结果（不显示Out）
-* `from IPython import embed`，运行到`embed()`时会进入IPython环境，但只能手动交互，并不是之后的代码就由IPython自动执行了，也不会读取设置，好处是修改了全局变量等退出到原有Python环境中时能保留；start_ipython()是普通的启动IPython的方法，会读取设置
-* `from IPython.display import display`，之后用display()替代print()，能输出富文本
+* 普通代码中用`IPython.embed()`进入IPython环境，但只能手动交互，并不是之后的代码就由IPython自动执行了，也不会读取设置，好处是修改了全局变量等退出到原有Python环境中时能保留；start_ipython()是普通的启动IPython的方法，会读取设置
+* `from IPython.display import display`能输出html、jpeg、js、md、json
 * 自动括号和引号：`/fun 1 -> fun(1)`，`/fun 1,2 -> fun(1,2)`；`,fun a b` -> `fun('a','b')`；`;fun a b` -> `fun('a b')`
 * 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode可以改变这一行为但不懂怎么用
 * exit()的行为和python不一致
+* `get_ipython()`不为None就是在ipython中
+* TODO: https://github.com/ipython/ipython-in-depth
 
 ### [魔法命令](https://ipython.readthedocs.io/en/latest/interactive/magics.html)
 
 * 单个%是行魔法，回车就执行，默认开启了%automagic，无歧义时不加%也行；两个%%是cell魔法，会提示`...`允许多行输入，无法省略百分号
 * 命令的结果可以赋值给Python变量，此时无法省略%；命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`
 * quickref：显示所有魔法命令的简要参考；lsmagic：显示所有支持的魔法命令；?加魔法命令：显示指定命令的参考
-* run test.py：运行脚本，-i可以继承当前会话的变量，-d启动调试，-t计时，-p或prun启动Profiler，-m调用模块（参数仍要--）
+* run test.py：运行脚本，-i可以继承当前会话的变量，-d启动调试，-t计时，-p或%prun启动Profiler，-m调用模块（参数仍要--）
 * debug：在刚刚出现过异常后使用，能进入ipdb检视刚才的异常栈；当然也可以一开始就用，设置断点；支持%%，接下来输入代码就可以debug
 * edit：启动编辑器来输入交互式代码，关闭后会传到cli里；VSC会自动加一个\n，没啥好办法
 * store：持久化储存变量，store -r恢复
 * hist：查看历史命令，-n加上序号，-g pattern用grep搜索
-* timeit：统计语句运行的时间，会多次运行取平均值；有%%
+* timeit：统计语句运行的时间，会多次运行取平均值或手动指定-n；有%%；单次运行是time
 * xdel：删除变量并试图清除在其对象上的一切引用
 * who：显示当前所有变量，可指定要显示的类型；whos信息更丰富
 * pip：可以直接运行pip
@@ -521,6 +527,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出放进输入中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
 * %%HTML、%%js、%%latex、%%markdown：将cell渲染成HTML输出；%%js运行JS
 * autoreload 2：需要load_ext加载。import模块后修改源文件能自动变化
+* matplotlib inline
 
 ### 配置
 
@@ -553,13 +560,13 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## jupyter
 
-* jupyter lab为新开发的UI，故先不学notebook了
 * pip install jupyter; jupyter notebook --no-browser --allow-root
 * 在反代之后需要配置`NotebookApp.allow_remote_access`或`c.NotebookApp.allow_origin`，否则会报`Blocking Cross Origin API request`或`Blocking request with non-local 'Host'`；`/api/kernels/`和`/terminals/`需要配websocket，各种配置中都设置了`Host`
 * 会往`%AppData%\jupyter`里写东西，但在商店的Python里会装到沙盘里
 * https://www.zhihu.com/search?type=content&q=jupyter https://www.zhihu.com/question/59392251
 * Docker映像文档：https://jupyter-docker-stacks.readthedocs.io/
 * 输出富文本：https://nbviewer.jupyter.org/github/ipython/ipython/blob/master/examples/IPython%20Kernel/Rich%20Output.ipynb
+* TODO: https://www.dataquest.io/blog/jupyter-notebook-tips-tricks-shortcuts/
 
 ### 配置
 
@@ -568,6 +575,13 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * c.NotebookApp.open_browser = False
 * c.NotebookApp.ip = '*'
 * c.NotebookApp.port = 8888
+
+### 快捷键
+
+* a在上方添加代码块，b在下方，dd是删除
+* shift enter运行当前代码块并移动到下一块
+* j上移聚焦代码块，k下移
+* enter编辑当前块，esc返回一般模式
 
 ## Conda
 
@@ -579,9 +593,81 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
 * conda create -n venv python=3.8; conda info -e; conda activate venv; conda remove -n venv --all
 
+## [FastAPI](https://fastapi.tiangolo.com/)
+
+* pip install fastapi uvicorn[standard]
+* uvicorn main:app --host 127.0.0.1 --port 8000 --reload；对应main.py的app对象
+* /docs和/redoc能查看api文档，还能进行测试
+* 如果路径中需要出现后缀，如`/test.txt`，路径需要声明成`{file_path:path}`
+* bool查询参数会自动转换，b=1或者b=True或b=yes都可以
+
+```python
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/", summary='xxx', description='xxx')
+async def read_root():
+    return {"Hello": "World"}
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: Optional[str] = None): # 自动检测非路径参数；如果不加默认值就必须有
+    return {"item_id": item_id, "q": q}
+
+# 查询参数校验；如果不想设默认值但又为必要参数，设为...；还可设置title和description；Path对应路径参数校验，Body对应请求体
+q: str = Query('default', min_length=3, max_length=50, regex="^fixedquery$") # 数值可设定gt和lt
+
+from pydantic import BaseModel,Field
+class Item(BaseModel):
+    name: str
+    price: float = Field(..., gt=0)
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item): # 支持Enum
+    return {"item_name": item.name, "item_id": item_id}
+```
+
+## MySQL
+
+* pymysql：纯Py，当用gevent或者PyPy时可以用
+* mysql-connector-python：纯Py，Oracle官方实现，性能貌似比pymysql还要差
+* mysqlclient-python：带有C扩展，性能最好
+
+## ORM
+
+* peewee
+* https://github.com/pudo/dataset：基于sqlalchemy
+* https://github.com/encode/orm：基于SQLAlchemy core的查询和databases的异步
+
+## PySnooper
+
+* 每一行代码的执行
+* 变量的声明和赋值
+* 返回值
+* 持续时间
+
+```python
+@pysnooper.snoop(normalize=True)
+def f(): ...
+# 在函数中的某一部分上使用：with pysnooper.snoop():
+
+# 参数：
+snoop('/my/log/file.log', prefix='ZZZ ')
+watch=('foo.bar') # 查看非本地变量的值；watch_explode展开字典的内容
+depth=2 # 调用其它函数的跟踪深度，默认为1
+```
+
 ## 杂项
 
 * colorama：控制台的前、背景色
+* icecream：用来代替print输出调试信息的，比如无参调用会显示被调用时所在文件和行号，有参调用会显示参数内容和返回值，并再返回那个返回值，用disable()可关掉所有输出，install()可使得无需import也能用
+* beeprint：格式化打印dict
+* tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
+* python-dotenv：从`.env`中读取并设置环境变量
+* PyYAML：一定要用safe_load；或者用strictyaml
+* lazy_import：np = lazy_import.lazy_module("numpy")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的numpy也是lazy的
+* chardet：自动检测编码
+* watchdog：用于监测文件变化
+* celery：分布式任务队列 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列
+* attrs：dataclasses的增强版
 
 ## 参考
 
@@ -599,28 +685,32 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## TODO
 
-* PyTest
-* PySnooper snoop：用于调试
+* PyTest https://realpython.com/learning-paths/test-your-python-apps/
 * PyNaCl https://github.com/pyca/cryptography
-* Seaborn bokeh 数据可视化
-* 哪些 Python 库让你相见恨晚:https://www.zhihu.com/question/24590883
+* Seaborn bokeh plotly.py plotly/dash 数据可视化
 * https://github.com/dbader/schedule，据说自带的很不好用
 * 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
-* https://github.com/harelba/q：Run SQL directly on CSV or TSV files
+* https://github.com/harelba/q：Run SQL directly on CSV or TSV files；csvkit
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * Nuitka：https://zhuanlan.zhihu.com/p/31721250 https://zhuanlan.zhihu.com/c_1245860717607686144 性能有提高，跨平台差；好像不能单文件
-* fastapi：https://fastapi.tiangolo.com/ https://zhuanlan.zhihu.com/p/136621431
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
-* plotly.py、plotly/dash
 * https://github.com/grantjenks/python-diskcache
 * https://github.com/Delgan/loguru 日志
-* https://github.com/cool-RR/PySnooper 调试
-* pymysql peewee https://github.com/pudo/dataset https://github.com/PyMySQL/mysqlclient-python https://pypi.org/project/mysql-connector-python/ https://github.com/encode/orm https://github.com/sdispater/orator
 * https://github.com/mitmproxy/mitmproxy
-* https://jobbole.github.io/awesome-python-cn/
 * https://github.com/gevent/gevent
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
 * https://github.com/serge-sans-paille/pythran https://github.com/numba/numba
-* https://github.com/mahmoud/boltons
+* https://github.com/mahmoud/boltons 纯Py utils大集合，不过社区贡献并不太多
 * https://github.com/rthalley/dnspython
 * https://github.com/scrapinghub/splash 具有HTTP API的轻型浏览器js渲染引擎
+* https://github.com/zopefoundation/ZODB 虽然star数少，但提交数很多，支持事务
+* 函数式编程：https://github.com/Suor/funcy
+* 与外部程序交互：https://github.com/pexpect/pexpect https://github.com/amoffat/sh https://sarge.readthedocs.io/en/latest/
+* 解析url：https://github.com/gruns/furl
+* https://gitlab.com/mike01/pypacker socket库
+* https://github.com/prkumar/uplink 把REST API变成class
+* https://github.com/marshmallow-code/marshmallow
+* 自动重试：https://github.com/jd/tenacity
+* https://github.com/hugapi/hug 类似于Google-Fire的WebAPI版本
+* profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
+* GUI：PySimpleGUI kivy
