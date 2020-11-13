@@ -68,7 +68,7 @@ if (Path.DirectorySeparatorChar == '/')    return "/" + codeBase;return codeBase
 判断Windows10
 -------------
 
-如果不做任何操作，win8.1和win10的Environment.OSVersion.ToString得到的是`Microsoft Windows NT 6.2.9200.0`，貌似是因为VerifyVersionInfo这个API被弃用了；非Windows应该仍是有用的
+如果不做任何操作，win8.1和win10的Environment.OSVersion.ToString得到的是`Microsoft Windows NT 6.2.9200.0`，貌似是因为VerifyVersionInfo这个API被弃用了；非Windows应该仍是有用的。在.net5中返回正确的值了。
 
 第一种解决办法是添加一个manifest，去掉兼容性中Windows10的id的注释
 

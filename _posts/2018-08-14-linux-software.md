@@ -118,11 +118,11 @@ pip3 uninstall：不会卸载依赖，可用pip-autoremove代替
 pip3 check：能显示出某个模块的依赖冲突和缺失
 
 # 更新所有包（能自动修复依赖缺失，但因为pip自己的问题，可能产生依赖冲突）
-pip freeze | % {pip install -U $_.split("=")[0]}
+pip list -o --format=freeze | % {pip install -U $_.split("=")[0]}
 # 或pip3 install -U `pip3 list -o | awk 'NR>2 {print $1}'`
 # pipupgrade -ly 在win下有各种各样的问题；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用，pip-review不积极开发了，pip-upgrader好像还能用
 
-deptree [-p package1,p2]：显示依赖哪些包，也有check的效果；-r：显示某个包是被那些依赖的；自己依赖lxml
+pipdeptree [-p package1,p2]：显示依赖哪些包，也有check的效果；-r：显示某个包是被那些依赖的
 ```
 
 ### 国内源
@@ -346,3 +346,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可�
 * https://github.com/iovisor/bcc
 * https://github.com/robertdavidgraham/masscan
 * airflow 任务调度
+* pyload 离线下载

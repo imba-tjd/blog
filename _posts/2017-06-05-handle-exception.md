@@ -36,6 +36,7 @@ Best Practice
 * 避免catch中在引发新的异常，比如记录日志的时候出现IO异常
 * 7.0后，throw变为表达式，可以使用null ?? throw new Exception()这样的语句了
 * 不要catch总的Exception类然后switch(e.TargetSite.Name)等可能发生变化的东西
+* 如果catch后只是做记录，想继续网上抛要用`throw`而不是`throw e`，后者是重新引发异常，导致调用栈丢失
 
 异常的强保证
 ------------

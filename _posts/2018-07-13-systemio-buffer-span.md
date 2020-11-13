@@ -75,7 +75,7 @@ System.IO
 * Directory.GetFiles/EnumerateFiles：如果path是相对路径，返回的也是；DirectoryInfo的见FileInfo.ToString
 * CreateDirectory(string path).ToString()的返回值与path相同，如果只写文件夹名不写完整路径，返回的也只有文件夹名，当然创建文件夹会成功
 * ToString：如果用的是构造函数，返回原始的路径；如果是GetDirectory创建的，返回基本名
-* Directory.Get/SetCurrentDirectory与Environment.CurrentDirectory效果一样
+* Directory.Get/SetCurrentDirectory与Environment.CurrentDirectory效果一样；AppContext.BaseDirectory是程序集所在目录
 
 ### Path
 

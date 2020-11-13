@@ -9,7 +9,7 @@ category: windows
 * bool运算用-and、-or，但好像-not可用!代替；也支持当作0和1进行运算，对应关系和C一样；pwsh7支持&&，但它是用来分别执行两边的命令的，而不是当作一个表达式（例如`$true && $false`跟用-and不一样）；pwsh7支持三元运算符
 * 比较大小用`-eq`、`-nq`、`-lt`等；其中有的东西既不为真也不为假，-eq那俩bool类型都返回False；这些运算符也可对序列使用，达到过滤的效果
 * 获得类型：`.GetType()`，判断类型：`$arr -is [array]`，类型转换：`[int]2.5`或`2.5 -as [int]`
-* 数组([array]，其实是`object[]`)：声明用`@(元素1, ...)`，或直接用`元素1, ...`，改用强类型可用`[int[]]`；访问用中括号，索引从零开始，可为负，括号内也可是序列，则可一次取多个元素；长度固定，附加元素必须用+=，实际上是重新生成，直接给超出索引的地方赋值会报错；是引用类型，需要副本时用Clone()；对不可取索引的对象取[0]不会报错，仍返回它自己；生成数字序列：a..b，但好像无法指定间隔；可声明为`[System.Collections.ArrayList]`以获得更多特性；-contains返回bool，反过来用-in，两个数组可以相加
+* 数组([array]，其实是`object[]`)：声明用`@(元素1, ...)`，或直接用`元素1, ...`，改用强类型可用`[int[]]`；访问用中括号，索引从零开始，可为负，括号内也可是序列，则可一次取多个元素；长度固定，附加元素必须用+=，实际上是重新生成，直接给超出索引的地方赋值会报错；是引用类型，需要副本时用Clone()；对不可取索引的对象取[0]不会报错，仍返回它自己；生成数字序列：a..b，但好像无法指定间隔；可声明为`[System.Collections.ArrayList]`以获得更多特性；-contains返回bool，反过来用-in；也支持-eq等运算符，相当于filter，但必须数组对象在第一个，否则就与整个数组对象逻辑运算了；两个数组可以相加
 * 字典(其实是Hashtable)：`@{键=值; ...}`。声明时键不用加引号，访问用方括号或`.键`，不区分大小写；删除用Remove()，获取所有的键和值分别用.Keys和.Values
 * 转义用反引号。在正则中无需二次反斜杠转义了
 * 可以进行容量计算：1kb+1kb，但结果为int的字节数
@@ -146,8 +146,8 @@ category: windows
 ### 管道
 
 * ForEach-Object(foreach和%)：`1..3 | % { echo $_ }`；可指定-Begin、-Process、-End，或直接用三个大括号代替，$ForEach表示索引，7之后支持-Parallel；第二种用法是不加大括号而跟字符串，代表取那一项成员
-* Where-Object(where和?)：'You', 'Me' | ? { $_ -match 'u' }
-* Select-Object(select)：选择属性（投影），支持通配符，单用星号相当于fl *；也可用于选择一定数量范围：-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
+* Where-Object(where和?)：'You', 'Me' | ? { $_ -match 'u' }（投影）
+* Select-Object(select)：选择多个属性（投影），支持通配符，单用星号相当于fl *；也可用于选择一定数量范围：-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
 * Sort-Object(sort)：-Descending降序；如果某个对象不具有所指定的属性之一，则 cmdlet 会将该对象的属性值解释为 NULL，并将其放置在排序顺序的末尾；如果要多字段排序需要传哈希表对象
 * Tee-Object(tee)：保存并显示管道输入的内容，会先创建文件再运行前面的命令；-Variable 变量名（不用加$）可以把结果保存到变量里
 * Group-Object：进行分组，依据可为表达式；分组后有Count属性用于排序，Name属性为key，Group属性为内容
@@ -167,7 +167,7 @@ category: windows
 * Format-Table(ft): 将输出的格式设置为表，适合用于显示键值对，后可跟KeyName和对每一项的计算（比如/1KB）；-Autosize(auto) -Wrap：强制显示所有内容，如果不用，过长的字符串会显示...，这是因为PS是流模式，下一条命令的长度未知；如果要手动指定宽度和对齐方式等，每个键需要传一个哈希表给Property属性：`@{expression="KeyName"; width=40;label="Header"; alignment="center"}`；有一个-GroupBy参数可以在保持表格的情况下分组
 * Format-Wide: 将对象的格式设置为只能显示每个对象的一个属性的宽表，样式类似于bash默认的ls
 * 从用户处读取字符串输入：Read-Host
-* ConvertTo-Json
+* ConvertTo-Json（默认-Depth为2）、ConvertFrom-Json
 
 ### 输出
 

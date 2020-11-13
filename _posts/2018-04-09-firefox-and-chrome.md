@@ -41,6 +41,9 @@ title: Firefox和Chrome
 * accessibility.typeaheadfind.manual：快速查找，按`/`和`'`时出现，后者仅链接，默认开启
 * privacy.resistFingerprinting：抵抗数字指纹，不过开启后可能产生问题，默认关闭
 * browser.backspace_action：设为2则退格键不会导致网页后退
+* javascript.options.warp true
+* browser.startup.homepage.abouthome_cache.enabled
+* dom.webgpu.enabled true
 
 #### 页面翻译
 

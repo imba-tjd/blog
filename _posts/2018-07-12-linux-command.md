@@ -212,6 +212,7 @@ aria2、axel、httpie放到软件的文章里去了。
 * -m指定超时时间，15--speed-limit 1000指定15秒内至少传输1000字节
 * -ssl：自动升级到https，如果无法建立仍用http
 * --libcurl xxx.c：生成对应的c语言代码
+* --cert-status：检查OCSP
 * 访问httpbin.org/get可以看到服务器收到的请求信息
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58

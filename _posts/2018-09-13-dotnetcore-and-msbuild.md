@@ -4,39 +4,66 @@ category: dotnet
 ---
 
 ## 安装
-* Linux上的运行时：https://docs.microsoft.com/zh-cn/dotnet/core/install/runtime?pivots=os-linux，全都要先做准备工作；Windows上的SDK：https://dotnet.microsoft.com/download；也有自动安装脚本，且支持在没有root权限的情况下安装
-* Linux全部不支持x86
-* DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1：环境变量，跳过第一次使用的欢迎信息
-* docker映像：https://hub.docker.com/_/microsoft-dotnet-core/
 
-## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)的PropertyGroup
+* Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian；还有自动安装脚本且支持在无root权限安装
+* Windows：https://dot.net
+* docker映像：https://hub.docker.com/_/microsoft-dotnet
+
+## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
 * 从2015的格式迁移到新格式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/；https://github.com/hvanbakel/CsprojToVs2017
+* crossgen2只支持自包含
+* CoreRT按prerequisites说的要VC
+* dotnet msbuild /pp | code -：查看完整生成的csproj
 
 ```xml
-<StartupObject>Namespace.Class // 指定入口
-//<OutputType>Exe // 生成EXE；3.0前还必需指定RID，现在默认FDE不需要它了；WinExe为窗体程序
-<TargetFramework>netcoreapp3.0;net5.0;net472</TargetFramework>
-<RuntimeIdentifier>... // RID：win[10][-x64][-aot]；https://docs.microsoft.com/zh-cn/dotnet/core/rid-catalog
-<PublishSingleFile>true // 单文件发布，但比较大，100多M？
-<PublishTrimmed>true // 裁剪体积，但就不要用反射了
-<PublishReadyToRun>true // AOT模式，必须指定RID，可与Trimmed一起用
-<LangVersion>latest/preview // C#版本
-<AllowUnsafeBlocks>true
-<Configuration>Debug</Configuration>
-<AssemblyName>MSBuildSample</AssemblyName>
-<OutputPath>Bin/ // 最好加目录分隔符
-<OS>Windows_NT
-<CheckForOverflowUnderflow>true //全局溢出时抛异常
-<NoWarn>NU1602,NU1604</NoWarn>
-<Nullable>enable
-<WarningsAsErrors>$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618</WarningsAsErrors> //把几个nullable的视为error
-<ApplicationIcon>favicon.ico
-未看：GenerateAssemblyInfo、AssemblyName、RootNamespace、ApplicationManifest、DefineConstants
-还存在一个全球化固定模式，可以减少Linux下安装包的体积：github.com/dotnet/corefx/blob/master/Documentation/architecture/globalization-invariant-mode.md
+<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>：
+StartupObject：Namespace.Class # 存在多个Main时指定入口
+OutputType：Exe # 默认Library
+TargetFramework：net5.0
+RuntimeIdentifier：win-x64 # https://docs.microsoft.com/zh-cn/dotnet/core/rid-catalog
+
+PublishSingleFile：true # 5.0不再是简单地zip，对于自包含最好加上IncludeNativeLibrariesForSelfExtract=true
+PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到，可SuppressTrimAnalysisWarnings：false开启警告
+TrimMode：link # 默认按程序集裁剪，此项可按成员裁剪，粒度更细
+PublishReadyToRun：true # AOT，必须指定RID，可与Trimmed一起用；提高启动速度，减少JIT数量，但代码质量不如JIT，不过会自动分层编译
+InvariantGlobalization：true # 减少Linux下自包含的体积
+DebugType：none # 默认portable，VS模板默认pdbonly
+Prefer32Bit：默认false，但VS模板默认true
+
+LangVersion：latest/preview
+AllowUnsafeBlocks：true
+AssemblyName：MSBuildSample # 还有个RootNamespace
+OutputPath：Bin/ # 最好加上目录分隔符
+CheckForOverflowUnderflow：true # 溢出时抛异常
+Nullable：enable
+NoWarn：NU1602,NU1604
+WarningsAsErrors：$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618 # 几个nullable的视为error
+GenerateAssemblyInfo：默认为true，自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明
+DefineConstants：未看
 
 WPF：
-<OutputType>WinExe；<UseWPF>true
+OutputType：WinExe # 存在下一条时，设为Exe也可，会被自动替换
+UseWPF：true # 还有UseWindowsForms
+TargetFramework：net5.0-windows
+ApplicationIcon：favicon.ico
+ApplicationManifest：app.manifest
+
+<ItemGroup>
+  <Content Include="lib\**">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+  <Resource Include="logo.ico" />
+
+  <PackageReference Include="Newtonsoft.Json" Version="12.*" />
+  <ProjectReference Include="..\xxx\xxx.csproj" />
+</ItemGroup>
+
+<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Exec Command="echo Output written to $(OutDir)" /> # 默认CWD是Temp
+</Target>
 ```
 
 ### 默认编译项
@@ -49,39 +76,25 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 
 ## dotnet CLI
 
-无论是全写还是缩写，都使用空格分隔开关和值。
-
+* dotnet add/remove package Newtonsoft.Json；dotnet list package --outdated
+* dotnet add app/app.csproj reference **/*.csproj；dotnet list/remove reference
+* dotnet sln todo.sln add **/*.csproj；dotnet sln remove
 * dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的
 * dotnet watch run：任何文件修改后就重新编译一遍，ASP比较有效
+* --roll-forward LatestMajor：使用最新runtime跑老应用。例如某个tools没更新，可指定DOTNET_ROLL_FORWARD来运行
 * 未读：dotnet user-secrets
 
-### dotnet build、clean、publish共有
+## 部署及选项
 
-* --configuration/c {Debug|Release}
-* --framework/f fw
-* --output/-o dir：指定存放目录，默认是./bin/Debug/netcoreapp2.2
+* --configuration/c Release：默认Debug
+* --output/-o dir：指定存放目录，默认是./bin/Debug/net5.0
 * --runtime/-r rid
-* --no-restore：强制不自动还原
-
-### dotnet publish
-
-* SCD独立部署：dotnet publish -c Release -r win-x64；带运行时，体积大
-* FDD和FDE：不自带runtime。区别是前者必须用dotnet xxx.dll才能运行程序，后者自带.exe（当前平台的程序），但实际程序仍是dll。3.0默认后者。
-* --self-contained：一同发布运行时。如果指定了RID，就默认加上了这个参数，否则必须用`--self-contained false`手动关闭
-* /p:PublishSingleFile=true：打包为单文件
-* 不清楚FDE中的dll是否是跨平台的
-
-### dotnet sln、reference、package
-
-* dotnet sln todo.sln add **/*.csproj
-* dotnet sln remove
-* dotnet add app/app.csproj reference **/*.csproj
-* dotnet list reference、dotnet remove reference
-* dotnet add package Newtonsoft.Json [--version 1.0.0]、dotnet remove package
+* SCD独立部署(自包含)带运行时体积大，必须指定rid且一旦指定就默认加了--self-contained
+* FDD和FDE依赖框架的部署，两者区别是前者必须用dotnet xxx.dll，3.0默认后者能生成.exe但实际程序仍是dll；要么不指定rid，要么指定rid且加--self-contained=false
 
 ### 全局工具
 
-* 安装：dotnet tool install -g *PackageName* --add-source ./
+* 安装：dotnet tool install -g PackageName --add-source ./
 * 列出、卸载、升级：dotnet tool list、dotnet tool uninstall、dotnet tool update
 * 自己创建：https://docs.microsoft.com/zh-cn/dotnet/core/tools/global-tools-how-to-create
 * 收集：https://github.com/natemcmaster/dotnet-tools
@@ -118,7 +131,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * `/maxcpucount[:n]`或/m：指定要使用的cpu个数并行生成，不加为1，加了但不指定n就是最大
 * `/consoleloggerparameters:ShowTimestamp`或/clp：每条命令前显示时间；还有一些其它的选项
 * `/fileLogger[n]`：输出到msbuild[n].log文件中
-* `/warnaserror[:code[;code2]]`：将警告视为错误
+* `/warnaserror[:code;code2]`：将(某些)警告视为错误
 * `/restore`或/r：先执行名为Restore的目标
 * `/verbosity`或/v：q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]，一般指定-m
 
@@ -145,6 +158,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 字符串里如果含有[特殊字符](https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-special-characters)，使用反斜杠是无法转义的，要写%+16进制
 * 获取注册表值：`$(registry:Hive\MyKey\MySubKey@Value)`，去掉@Value可获取子键默认值
 * $()中也可以使用类型PS与.NET交互的语法，字符串要用反引号
+* OutDir与TargetDir的区别是后者是相对路径；会自动根据rid进行变化但不会根据publish进行变化
 
 ```
 <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

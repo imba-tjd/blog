@@ -44,7 +44,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * 一个.py文件就是一个模块，模块名`__name__`按目录组织，用点分隔，import时无需也不能加.py后缀
 * 一个含有`__init__.py`的目录就是包，import该目录时相当于导入该目录下的`__init__.py`，它的`__name__`等于目录路径对应的模块名
 * 对于`x/y/z.py`，`import x.y.z`会依次运行`x/__init__.py`和`x/y/__init__.py`，再运行`c.py`，且只能通过`x.y.z.xx`访问z中的东西（包括z里import的），x的init中声明的变量和import的东西都被限制在x的空间中无法访问（除非z里import了x的）；`import x`无法用`x.y`和`x.y.z`访问y和z，除非x的init里import了
-* 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的，所以模块本身是天然的单例实现
+* 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的，所以模块本身是天然的单例实现。一个函数如果绑定了对应模块内的全局变量，当在别的地方`import *`后修改那个全局变量，函数仍然使用的是原来的变量，与class类似
 * python命令行也可运行目录，目标为那**一个**`__main__.py`；运行目标时会把`__name__`变量设为`'__main__'`
 * 不用-m会把目标所在的文件夹加到sys.path中，然后按路径直接执行目标，目标就是顶级模块；用-m会把cwd加到sys.path中，按模块名先一层层执行`__init__.py`再执行目标，会先编译成.pyc，会把`__package__`设为模块名的前一部分，cwd是顶级模块；该sys.path与环境变量的path无关，对于环境变量修改PYTHONPATH可更改搜索地点
 * 不要自己创建名为`runpy.py`的文件，因为系统存在runpy这个包
@@ -88,13 +88,13 @@ except ImportError:
 # __init__.py；必须有此文件才能自动发现
 from impl import fun # 从实现中公开函数
 __version__ = '0.0.1' # 默认0.0.0
-__all__ = ('fun') # 在被import *时如果存在此字段，只会导入它指定的
+__all__ = ('fun',) # 在被import *时如果存在此字段，只会导入它指定的，help也只能看到这些
 
 # __main__.py
 from . import xxx
-def _main():
+def _main(): # 即使不存在__all__也不会被import *
     xxx()
-if __name__ == '__main__': # 理论上运行它本身时永远等于，但保不齐被别人import
+if __name__ == '__main__': # 理论上本文件就是设计成直接运行的，但保不齐被别人import
     _main()
 
 # setup.py：https://packaging.python.org/guides/distributing-packages-using-setuptools/
@@ -145,7 +145,7 @@ zip_safe = False # 不启用时作为源码安装，方便调试，兼容性好�
 # setup_requires可以加一个wheel；test_suite = tests；tests_require废弃了
 
 [options.entry_points]
-console_scripts = # 还支持gui_scripts；如果某一项需要额外的依赖，用方括号声明名字并在extras里写内容
+console_scripts = # 还支持gui_scripts，关闭父console还能运行；如果某一项需要额外的依赖，用方括号声明名字并在extras里写内容
     myexe = proj.__main__:_main # 若用proj:_main，得到的是init中的对象，而不是__main__.py的
 
 [options.extras_require] # pip安装时或entry_points用中括号才会装上
@@ -361,16 +361,22 @@ se.css('a').xpath('xxx').re(r'xxx').get()/.getall()
 
 ## Requests
 
+### 其它库
+
 * urllib.request.urlopen不提供复用，http.client更加底层，两者都无法实际使用
-* urllib3是第三方库；只能下到bytes，要自己手动解码`r.data.decode('utf-8')`，不默认发gzip但能自动解码，长连接用urllib3.PoolManager()
+* urllib3是第三方库，线程安全；urllib3.PoolManager().request('GET',url)，只能下到bytes，要自己手动解码`r.data.decode('u8')`，不默认发gzip但能自动解码
 * httpx的api差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
 * requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
-* httplib2：和urllib差不多级别的API，活跃度不高，可用于Py2
+* httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
+* faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
+* h11：底层库，和http.client同级别
+* python-trio/hip：urllib3的fork，添加了异步，开发很早期，没有使用的价值
 
 ### Session
 
 * 能连接复用以及保留cookie
 * 即使使用了会话，方法级别的参数也不会保留
+* 非线程安全的，toolbelt提供了简单的多线程
 
 ```python
 s = requests.session() # 其实最好用with，这样发生了异常也能关闭
@@ -593,10 +599,10 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
 * conda create -n venv python=3.8; conda info -e; conda activate venv; conda remove -n venv --all
 
-## [FastAPI](https://fastapi.tiangolo.com/)
+## Web Server
 
-* pip install fastapi uvicorn[standard]
-* uvicorn main:app --host 127.0.0.1 --port 8000 --reload；对应main.py的app对象
+### FastAPI
+
 * /docs和/redoc能查看api文档，还能进行测试
 * 如果路径中需要出现后缀，如`/test.txt`，路径需要声明成`{file_path:path}`
 * bool查询参数会自动转换，b=1或者b=True或b=yes都可以
@@ -621,8 +627,71 @@ class Item(BaseModel):
     name: str
     price: float = Field(..., gt=0)
 @app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item): # 支持Enum
+def update_item(item_id: int, item: Item): # 自动把非路径参数从body中提取；支持Enum
     return {"item_name": item.name, "item_id": item_id}
+```
+
+### Starlette
+
+* taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖很多
+* StaticFiles依赖aiofiles故不记录
+
+```python
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse,HTMLResponse,JSONResponse
+from starlette.routing import Route, Mount
+
+def homepage(_): ...
+def user(request: Request):
+    username = request.path_params['username']
+    return PlainTextResponse('Hello, %s!' % username)
+
+routes = [
+    Route('/', homepage, methods=['GET']), # 默认只接受GET，实际如果路由存在永远可用HEAD
+    Route('/user/{username:str}', user), # 默认str，还可指定int,float,path
+    Mount('/users', routes=[ # 指定共有前缀的路由
+        Route('/', users),
+        Route('/{username}', user),
+    ])
+]
+
+app = Starlette(debug=True, routes=routes) # 开启debug客户端也会收到traceback，否则客户端只有Internal Server Error
+app.state.ADMIN_EMAIL = 'xxx' # 全局状态，访问用request.app
+```
+
+### Uvicorn
+
+* pip install uvicorn[standard]：最小需要click和h11，标准版会装上基于Cython的uvloop和watchdog
+* uvicorn --host 127.0.0.1 --port 8000 main:app；【默】对应main.py的app对象，--reload最小版为轮询
+* --uds指定unix socket；--workers多线程
+* 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips *信任所有
+* scope中有scheme、method、path、headers
+
+```python
+async def app(scope, receive, send):
+    while more_body:
+        message = await receive()
+        body += message.get('body', b'')
+        more_body = message.get('more_body', False)
+    await send({
+        'type': 'http.response.start',
+        'status': 200,
+        'headers': [
+            [b'content-type', b'text/plain'],
+        ],
+    })
+    await send({
+        'type': 'http.response.body',
+        'body': b'Hello, world!',
+    })
+if __name__ == "__main__": # 从脚本运行
+    uvicorn.run("main:app")
+
+async def app(scope, receive, send): # 使用Starlette简单封装uvicorn请求
+    request = Request(scope, receive)
+    response = Response(content, media_type='text/plain')
+    await response(scope, receive, send)
 ```
 
 ## MySQL
@@ -636,6 +705,7 @@ def update_item(item_id: int, item: Item): # 支持Enum
 * peewee
 * https://github.com/pudo/dataset：基于sqlalchemy
 * https://github.com/encode/orm：基于SQLAlchemy core的查询和databases的异步
+* tortoise-orm
 
 ## PySnooper
 
@@ -664,10 +734,12 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * python-dotenv：从`.env`中读取并设置环境变量
 * PyYAML：一定要用safe_load；或者用strictyaml
 * lazy_import：np = lazy_import.lazy_module("numpy")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的numpy也是lazy的
-* chardet：自动检测编码
+* chardet：猜测编码
 * watchdog：用于监测文件变化
-* celery：分布式任务队列 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列
-* attrs：dataclasses的增强版
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq
+* attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
+* r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
+* lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
 
 ## 参考
 
@@ -709,8 +781,11 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * 解析url：https://github.com/gruns/furl
 * https://gitlab.com/mike01/pypacker socket库
 * https://github.com/prkumar/uplink 把REST API变成class
-* https://github.com/marshmallow-code/marshmallow
+* https://github.com/marshmallow-code/marshmallow jsonpickle json和类之间的序列化
 * 自动重试：https://github.com/jd/tenacity
 * https://github.com/hugapi/hug 类似于Google-Fire的WebAPI版本
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
 * GUI：PySimpleGUI kivy
+* 和C++交互：pybind11
+* streamlit：从程序生成网页，不过主要是为机器学习设计的
+* Redocly/redoc、swagger、openapi
