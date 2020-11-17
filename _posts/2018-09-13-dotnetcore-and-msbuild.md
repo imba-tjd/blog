@@ -22,7 +22,7 @@ category: dotnet
 <PropertyGroup>：
 StartupObject：Namespace.Class # 存在多个Main时指定入口
 OutputType：Exe # 默认Library
-TargetFramework：net5.0
+TargetFramework：net5.0 # 指定多个加s和分号
 RuntimeIdentifier：win-x64 # https://docs.microsoft.com/zh-cn/dotnet/core/rid-catalog
 
 PublishSingleFile：true # 5.0不再是简单地zip，对于自包含最好加上IncludeNativeLibrariesForSelfExtract=true

@@ -112,6 +112,7 @@ title: Firefox和Chrome
 * Password import
 * Experimental JavaScript
 * Future V8 VM features
+* sharing-qr-code-generator
 
 #### [overlay scrollbar](https://www.zhihu.com/question/64630817/answer/223528093)
 

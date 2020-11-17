@@ -233,7 +233,7 @@ class A {
 * 最佳做法：private static readonly object obj = new object();，加上readonly可以确保不被修改
 * lock会对expression做装箱操作，然后进行比较。不要lock值类型，因为装箱后必然不同；不要lock字符串字面量，因为它在CLI中是唯一对象，其他的可能会使用
 * 不要对public类使用lock(this)，因为可能被修改；而且这样也只对类里的对象有效，不会对不同类实例有效
-* Monitor的好处是可以用TryEnter，Lock的底层是用Monitor实现的
+* Lock的底层是用Monitor实现的，大概类似于TryEnter再在finally里Exit
 * 退出时应该会保证修改都同步到内存里去了。不过不会保证lock内部的有序性
 
 ### [Interlocked](https://docs.microsoft.com/zh-cn/dotnet/standard/threading/interlocked-operations)
@@ -258,14 +258,13 @@ try {
 
 ### Mutex
 
-> http://www.cnblogs.com/guozhiming2003/archive/2008/09/16/1291953.html
->
-> Monitor类和Lock的用法差不多，这两个都是锁定数据或是锁定被调用的函数。而Mutex则多用于锁定多线程间的同步调用。简单的说，Monitor和Lock多用于锁定被调用端，而Mutex则多用锁定调用端。
-> Mutex只能互斥线程间的调用，但是不能互斥本线程的重复调用。
+* Lock是锁定数据或被调用的函数，用于锁定被调用端。Mutex则多用于锁定多线程间的同步调用，锁定调用端
+* Mutex只能互斥线程间的调用，但是不能互斥本线程的重复调用
+* mut.WaitOne()、mut.ReleaseMutex()
 
 ### 其他锁
 
-* ReaderWriterLockSlim可提供读取器/编写器锁，允许多个线程同时读取资源
+* ReaderWriterLockSlim可提供读取器/编写器锁，允许多个线程同时读取资源。AcquireWriterLock、AcquireReaderLock、ReleaseWriterLock
 
 ### 标签锁？
 
