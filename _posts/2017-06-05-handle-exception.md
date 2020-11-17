@@ -2,19 +2,7 @@
 title: 异常处理
 ---
 
-异常类
-------
-
-|属性|类型|描述|
-|:---|:---|:---|
-|Message|string|含有解释异常原因的消息|
-|StackTrace|string|含有描述异常发生在何处的信息|
-|InnerException|Exception|如果当前异常是由另一个异常引起的，这个属性包含前一个异常的引用|
-|HelpLink|string|这个属性可以被应用程序定义的异常设置，为异常原因信息提供URN或URL|
-|Source|string|如果没有被应用程序定义的异常设定，那么这个属性含有异常所在的程序集的名称|
-
-执行流程
---------
+StackOverflowException无法被catch。
 
 如果异常发生时不在try块内或该try语句没有匹配的catch子句，CLR将搜索调用栈，寻找带匹配的catch子句的封装try语句。如果找到，回到调用栈的顶端，沿着调用栈，执行任何封装的try语句的finally子句，并从栈中弹出每个栈帧。然后执行匹配的catch子句，如果有finally子句，执行。然后在try语句之后继续执行。
 
@@ -55,15 +43,7 @@ Best Practice
 * 合理利用when的副作用：因为是顺序判断的，可以写一个永远返回false的函数，里面只做log，添加到所有catch之前；或者可以改变输出文字的颜色，向控制台输出信息
 * 还可以产生只非在debug时catch，否则不catch的效果，一遍排查故障：!System.Diagnostics.Debugger.IsAttached
 
-Assert
-------
+## System.Diagnostics.Debug/Trace
 
-assert关键字本意上是为测试调试程序时使用的，但如果不小心用assert来控制了程序的业务流程，那在测试调试结束后去掉assert关键字就意味着修改了程序的正常的逻辑。
-
-如果代码书写完全正确，但因外界环境或者用户操作仍然可能发生的事件，则不适合用断言。可以使用异常，或者条件判断处理。
-
-C#的Assert只在System.Diagnostics里有，且控制台应用无效。
-
-C++的异常：https://www.zhihu.com/question/22889420
-
-
+* Trace.Listeners是一个静态列表，程序运行后自动产生一个DefaultTraceListener，可取出来指定LogFileName，之后Trace.Print()既可以记录日志了
+* Debug.Assert不会导致程序结束。WinForm下会产生对话框，可直接点ignore，可使用listener.AssertUiEnabled=False关掉
