@@ -505,6 +505,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode可以改变这一行为但不懂怎么用
 * exit()的行为和python不一致
 * `get_ipython()`不为None就是在ipython中
+* ctrl+space不是自动完成，而是进入选择模式，受emacs的影响
 * TODO: https://github.com/ipython/ipython-in-depth
 
 ### [魔法命令](https://ipython.readthedocs.io/en/latest/interactive/magics.html)
@@ -789,3 +790,4 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * 和C++交互：pybind11
 * streamlit：从程序生成网页，不过主要是为机器学习设计的
 * Redocly/redoc、swagger、openapi
+* https://github.com/jek/blinker 功能简单的非分布式信号（事件）库

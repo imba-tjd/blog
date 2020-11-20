@@ -44,6 +44,7 @@ title: Firefox和Chrome
 * javascript.options.warp true
 * browser.startup.homepage.abouthome_cache.enabled
 * dom.webgpu.enabled true
+* network.trr.exclude-etc-hosts 默认为true，即DoH时忽略hosts
 
 #### 页面翻译
 

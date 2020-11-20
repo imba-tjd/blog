@@ -138,3 +138,4 @@ prog3 : prog3.o sort.o utils.o
 * https://nullprogram.com/blog/2017/08/20/
 * https://reactos.org/wiki/Building_MINGW-w64
 * -Wno-excessive-errors
+* https://zhuanlan.zhihu.com/p/296191493

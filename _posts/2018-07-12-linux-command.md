@@ -201,7 +201,7 @@ aria2、axel、httpie放到软件的文章里去了。
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
-* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；`-d @file`是从文件中读取，一行一个；`--data-raw @file`不会识别成文件，就是真正的`@`；`--data-urlencode`会帮你做一次URL编码，像值中有空格时可用；-F的类型是`multipart/form-data`
+* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；`-d @file`是从文件中读取，一行一个；`--data-raw @file`避免识别成文件，就是真正的`@`；`--data-urlencode`自动对值做一次URL编码，像有空格时可用，但key没有编码，如果想要，再在key前面加一个等号；-F的类型是`multipart/form-data`
 * -k忽略证书错误
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md

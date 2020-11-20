@@ -32,6 +32,7 @@ PublishReadyToRun：true # AOT，必须指定RID，可与Trimmed一起用；提�
 InvariantGlobalization：true # 减少Linux下自包含的体积
 DebugType：none # 默认portable，VS模板默认pdbonly
 Prefer32Bit：默认false，但VS模板默认true
+PublishReadyToRunUseCrossgen2：true # 目前只能用于自包含的
 
 LangVersion：latest/preview
 AllowUnsafeBlocks：true

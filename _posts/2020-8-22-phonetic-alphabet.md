@@ -160,6 +160,8 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * February：音标确实是/februəri/，但是听上去却有/j/的音；或者说现在的人一般不读它第一个r
 * machine - mechanical
 * interesting：第一个e就跟没有一样
+* receipt：p不发音
+* suite：/swiːt/
 
 ## 同词异义异音
 
