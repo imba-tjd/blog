@@ -395,14 +395,14 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * get的params会自动变成查询参数，且值为None的不会附加上去，值为list的会自动与k展开
 * post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，也因后者故最好不要传字符串形式的json给data，可以先loads一下
 * 传字符串给data不会有额外变化，就是设置body；传字符串给json无意义；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
-* 只有当Content-Type包含text且不存在charset时，根据RFC此时默认字符集必须是ISO-8859-1，其它时候会进行猜测
+* RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1
 
 ```python
 r: Response = s.get(url,params={k:v})、post(url,data/json = {k:v}/str)、put/delete/head/options
 r.raise_for_status(), r.status_code # 200，== requests.codes.ok
 r.json() # 即使解码成功也不一定意味着请求成功，因为有时服务器会在失败时也返回json
 r.text # 根据encoding解码的HTTP内容字符串
-r.encoding # 可赋值，一般赋r.apparent_encoding或'utf-8'
+r.encoding # 可赋值，一般在它等于'ISO-8859-1'时赋r.apparent_encoding
 r.content # HTTP内容二进制，但会自动解码gzip，适用于图片等
 r.url, r.history # 后者为重定向响应列表
 r.headers # 字典，此时为响应头部，仍可用r.request.headers访问请求头部
@@ -777,7 +777,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * https://github.com/rthalley/dnspython
 * https://github.com/scrapinghub/splash 具有HTTP API的轻型浏览器js渲染引擎
 * https://github.com/zopefoundation/ZODB 虽然star数少，但提交数很多，支持事务
-* 函数式编程：https://github.com/Suor/funcy
+* 函数式编程：https://github.com/Suor/funcy https://github.com/JulienPalard/Pipe
 * 与外部程序交互：https://github.com/pexpect/pexpect https://github.com/amoffat/sh https://sarge.readthedocs.io/en/latest/
 * 解析url：https://github.com/gruns/furl
 * https://gitlab.com/mike01/pypacker socket库

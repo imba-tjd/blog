@@ -221,6 +221,3 @@ InitializeSingleSource(G,s){
 ------
 
 * 把尾递归改成递推：https://zhuanlan.zhihu.com/p/36587160
-* 写尾递归函数有什么规律或技巧吗？：https://www.zhihu.com/question/52305783
-
-

@@ -16,11 +16,10 @@ title: Firefox和Chrome
 
 ### about:config
 
-* 关闭最后一个标签页不关闭浏览器：browser.tabs.closeWindowWithLastTab
-* 新标签打开书签和链接：browser.tabs.loadBookmarksInTabs
-* 使用MacType渲染（已经失效，cairo在69移除了）：gfx.content.azure.backends ...
+* browser.tabs.closeWindowWithLastTab 关闭最后一个标签页不关闭浏览器
+* browser.tabs.loadBookmarksInTabs 书签用新标签打开
 * 搜prefetch有一些预读的选项，但是可能有隐私问题
-* browser.cache.disk.enable可以设置是否在硬盘上缓存数据，大小受browser.cache.disk.smart_size.enabled自动控制，大概1G
+* browser.cache.disk.enable是否在硬盘上缓存数据，大小受browser.cache.disk.smart_size.enabled自动控制，大概1G
 * media.videocontrols.picture-in-picture.enabled视频的画中画图标，除了它还要改xxx.video-toggle.enabled才能生效
 * network.captive-portal-service.enabled检测网络是否需要登录
 * network.http.http3.enabled：开启quic
@@ -45,6 +44,7 @@ title: Firefox和Chrome
 * browser.startup.homepage.abouthome_cache.enabled
 * dom.webgpu.enabled true
 * network.trr.exclude-etc-hosts 默认为true，即DoH时忽略hosts
+* network.preload：允许`link rel="preload"`
 
 #### 页面翻译
 

@@ -264,4 +264,22 @@ function doSomething(a) {
 }
 ```
 
+## 一种避免goto的方法
 
+```
+A:
+    f1()
+B:
+    if c1 goto A
+    f2()
+    if c2 goto B
+end
+
+# 改成
+f1() # 手动重复一次，c1就变为入口条件了
+do {
+    while c1
+        f1()
+    f2()
+} while c2
+```
