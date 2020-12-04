@@ -155,15 +155,6 @@ LIMRG(ON) // 最终变为#pragma STDC CX_LIMITED_RANGE ON？
 )(X)
 ```
 
-## 静态断言
-
-_Static_assert()可以在编译期检查表达式，如果为假则终止编译并打印错误信息。
-
-```c
-#include <limits.h>
-_Static_assert(CHAR_BIT == 16, "16-bit char falsesly assumed");
-```
-
 ## 参考
 
 * 《C和指针》
