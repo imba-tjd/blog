@@ -101,7 +101,7 @@ TODO: https://zhidao.baidu.com/question/17712149.html
 * tm_sec：秒数，范围为0-60，允许”闰秒”
 * tm_min：0-59
 * tm_hour：0-23
-* tm_mday：当月的日期
+* tm_mday：当月的日期，从1开始
 * tm_mon：0-11
 * tm_year：1900之后的年数。所以要加上1900才是真正的年数
 * tm_wday：星期，0为星期天，6为星期六

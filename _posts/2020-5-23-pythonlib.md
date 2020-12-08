@@ -395,7 +395,7 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * get的params会自动变成查询参数，且值为None的不会附加上去，值为list的会自动与k展开
 * post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，也因后者故最好不要传字符串形式的json给data，可以先loads一下
 * 传字符串给data不会有额外变化，就是设置body；传字符串给json无意义；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
-* RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1
+* RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
 
 ```python
 r: Response = s.get(url,params={k:v})、post(url,data/json = {k:v}/str)、put/delete/head/options

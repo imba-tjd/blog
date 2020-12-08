@@ -163,12 +163,18 @@ static void Main()
 * 转换运算符必须是源类型或目标类型的成员
 * 如果转换会丢失数据或抛出异常，要写成显式转换，不要写成隐式的
 * 无法直接重载逻辑条件运算符&&和||，需要重载常规逻辑运算符&和|还有关键字true和false达到这个效果；后者仅用于判断短路，返回bool；前者就是&&和||运算时的结果，只是不会有短路效应；与位操作无关，返回的是原类型
+* 优先创造目标类型的构造函数，除非目标类型的代码不受控制
 
 ```
-public static implicit（或explicit） operator TargetType ( SourceType Identifier )
-{
+// 类型转换；注意operator是关键字
+public static implicit/explicit operator TargetType(SourceType identifier) {
     //Some Code
     return ObjectOfTargetType;
+}
+
+// 运算符重载；其中x是要重载的
+public static TargetType operator x(SourceType operand){
+    return operand x operand;
 }
 ```
 
