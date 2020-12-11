@@ -86,30 +86,20 @@ public static void Print(string message);
 * 这些特性只能用于方法中的可选参数，无法用于动态类型。
 
 ```c#
-using System;
 using System.Runtime.CompilerServices;
 
-namespace CSharpConsoleTest
-{
-    class Program
-    {
-        static void MyTrace(string message,
-            [CallerFilePath] string fileName = "",
-            [CallerLineNumber] int lineNumber = 0,
-            [CallerMemberName] string callingMember = "")
-        {
-            Console.WriteLine($"Message:       {message}");
-            Console.WriteLine($"FileName:      {fileName}");
-            Console.WriteLine($"Line:          {lineNumber}");
-            Console.WriteLine($"Called From:   {callingMember}");
-        }
-
-        static void Main()
-        {
-            MyTrace("test");
-            Console.ReadKey();
-        }
+class Program {
+    static void MyTrace(string message,
+        [CallerFilePath] string fileName = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string callingMember = "") {
+        Console.WriteLine($"Message:       {message}");
+        Console.WriteLine($"FileName:      {fileName}");
+        Console.WriteLine($"Line:          {lineNumber}");
+        Console.WriteLine($"Called From:   {callingMember}");
     }
+
+    static void Main() { MyTrace("test"); }
 }
 ```
 
@@ -159,20 +149,8 @@ public sealed class MyAttributeAttribute:System.Attribute{...}
 
 ```c#
 [assembly:InternalVisibleTo("...")]
-[assembly:InternalVisibleTo("..."), PublicKey="..."]
 ```
 
-其中PublicKey可由`sn -Tp xxx.dll`得到，且需要Key而不是Key token。
-
-### 其他预定义特性
-
-|特性|意义|
-|:---|:---|
-|CLSCompliant|声明可公开的成员应该被编译器检测是否符合CLS。兼容的程序集可以被任何.NET兼容的语言使用|
-|Serializable|声明结构可以被序列化|
-|NonSerialized|声明结构不能被序列化|
-|DLLImport|声明是非托管代码实现的|
-|WebMethod|声明方法应该被作为XML Web服务的一部分暴露|
 
 ## 自定义特性
 
@@ -229,46 +207,6 @@ public static T DynamicSum<T>(this IEnumerable<T> source) {
 }
 ```
 
-## IronPython
-
-### 使用脚本
-
-```
-ScriptEngine engine = Python.CreateEngine();
-engine.Execute("print 'hello, world'");
-engine.ExecuteFile("HelloWorld.py");
-```
-
-### 使用变量
-
-```c#
-string python = @"
-text = 'hello'
-output = input + 1
-";
-ScriptEngine engine = Python.CreateEngine();
-ScriptScope scope = engine.CreateScope();
-scope.SetVariable("input", 10);
-engine.Execute(python, scope);
-Console.WriteLine(scope.GetVariable("text"));
-Console.WriteLine(scope.GetVariable("input"));
-Console.WriteLine(scope.GetVariable("output"));
-```
-
-### 使用函数
-
-```c#
-string python = @"
-def sayHello(user):
-    print 'Hello %(name)s' % {'name' : user}
-";
-ScriptEngine engine = Python.CreateEngine();
-ScriptScope scope = engine.CreateScope();
-engine.Execute(python, scope);
-dynamic function = scope.GetVariable("sayHello");
-function("Jon");
-```
-
 ### 最佳可访问类型
 
 ```c#
@@ -283,9 +221,6 @@ static void Main() {
 ```
 
 ## DLR
-
-* 调用点、接收器、绑定器
-* 多级缓存
 
 ### 实现动态行为
 
@@ -320,22 +255,15 @@ Console.WriteLine(expando.Second);
 
 #### Try...方法
 
-* TryBinaryOperation：二元运算，如x + y
-* TryConvert：转换，如(Target)x
 * TryCreateInstance：创建对象表达式，C#中没有等价的操作
-* TryDeleteIndex：移除索引的操作，C#中没有等价的操作
-* TryDeleteMember：移除属性的操作，C#中没有等价的操作
+* TryDeleteIndex：移除索引，C#中没有等价的操作
+* TryDeleteMember：移除属性，C#中没有等价的操作
 * TryGetIndex：获取索引器中的项，如x[10]
 * TryGetMember：获取属性的值，如x.Property
 * TryInvoke：视为函数（委托）调用，如x(10)
 * TryInvokeMember：成员调用，如x.Method(10)
 * TrySetIndex：设置索引器中的项，如x[10] = 20
 * TrySetMember：设置属性，如x.Property = 10
-* TryUnaryOperation：一元运算，如!x或-x
-
-### IDynamicMetaObjectProvider
-
-* 太复杂，看不懂
 
 ## Marshal
 
