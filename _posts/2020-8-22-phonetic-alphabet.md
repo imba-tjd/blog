@@ -110,7 +110,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * 狭义连读，词尾辅音+词首元音：look at it, name is, can I help you, good idea, fall in love, not at all, in a instant, all of it, 9068(/nai no sik seit/)
 * 同化
   * 逆行同化，前面的音受后面音影响
-    * 无声除阻：不完全爆破，爆破音+辅音，把嘴巴闭上就能发：look back, that job, good night, not now, forget me, bat man；失去爆破，词尾爆破音+词首爆破音：big cake, take care, what do, grandma, red coat, it can
+    * 无声除阻：不完全爆破，爆破音+辅音，把嘴巴闭上就能发：look back, that job, good night, not now, forget me, bat man, grandma；失去爆破，词尾爆破音+词首爆破音：big cake, take care, what do, red coat, it can
     * 浊音+清音->清音+清音：have to(/haf/), of course(/f/)
     * 鼻音双唇化：in person(/ɪm/), impolite(拼写都发生了变化，本来表否定是in的)
   * 顺行同化，后面的音受前面音影响。主要是复数的结尾s，见s的发音规律
@@ -158,7 +158,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * Chicago：/ʃ/，和chef一样，不是/tʃ/
 * months，实际上读/ts/；clothes，实际上读/z/和close一样；pizza/piːtsə/，其中的t变为停顿
 * February：音标确实是/februəri/，但是听上去却有/j/的音；或者说现在的人一般不读它第一个r
-* machine - mechanical
+* machine - mechanical - mechanism
 * interesting：第一个e就跟没有一样
 * receipt：p不发音
 * suite：/swiːt/

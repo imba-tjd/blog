@@ -140,7 +140,7 @@ trusted-host = mirrors.aliyun.com
 ### pipx
 
 * 是用来安装全局的命令行工具的，对标apt和brew，会分别把每个工具放在虚拟空间中防止依赖冲突
-* pipx install [--system-site-packages -f]
+* pipx install [--system-site-packages -f]；Python版本更新后要-f装
 * pipx ensurepath：自动往PATH中添加`~/.local/bin`；pipx completions：安装自动完成
 * run命令只运行不安装，下载的缓存持续几天，支持直接用链接的.py文件；如果命令行和包名不同，用`--spec`
 * list、upgrade、upgrade-all（对每个包用only-if-needed策略运行upgrade）、uninstall、uninstall-all、reinstall-all（更新python版本后使用）
