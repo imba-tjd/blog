@@ -728,7 +728,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## 杂项
 
-* colorama：控制台的前、背景色
+* colorama：控制台的前、背景色；rich：自动染色和格式化
 * icecream：用来代替print输出调试信息的，比如无参调用会显示被调用时所在文件和行号，有参调用会显示参数内容和返回值，并再返回那个返回值，用disable()可关掉所有输出，install()可使得无需import也能用
 * beeprint：格式化打印dict
 * tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
@@ -741,6 +741,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
+* pretty_errors：精简stacktrace，可全局安装
 
 ## 参考
 
@@ -786,7 +787,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * 自动重试：https://github.com/jd/tenacity
 * https://github.com/hugapi/hug 类似于Google-Fire的WebAPI版本
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
-* GUI：PySimpleGUI kivy
+* GUI：PySimpleGUI kivy DearPyGui
 * 和C++交互：pybind11
 * streamlit：从程序生成网页，不过主要是为机器学习设计的
 * Redocly/redoc、swagger、openapi

@@ -36,6 +36,7 @@ category: dotnet
 * 应只进行清理工作，不要把this又添加到别的地方去，否则会“复活”
 * C#8引入了IAsyncDisposable，实现时调用`await DisposeAsyncCore();`和`Dispose(false);`，在前者中继续异步Dispose具体的对象且用`ConfigureAwait(false)`
 * 按照我的理解，正确实现了IDisposable的类就变成托管对象了
+* 语义上，Dispose后就不能再使用了。如果是close，也许还可以设计成能重新open
 
 ```c#
 using System;

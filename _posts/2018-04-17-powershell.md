@@ -243,5 +243,7 @@ Profile文件
 * https://www.cnblogs.com/sparkdev/tag/PowerShell/
 * TODO: https://yuedu.baidu.com/ebook/d7b1a1767dd184254b35eefdc8d376eeafaa174e https://zhuanlan.zhihu.com/p/145043422
 * https://stackoverflow.com/questions/47274532/difference-between-and
+* https://leanpub.com/thebigbookofpowershellgotchas/read
+* https://powershell.org/forums/forum/windows-powershell-qa/
 
 ISE无法识别utf8

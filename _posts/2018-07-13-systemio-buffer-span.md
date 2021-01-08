@@ -23,6 +23,7 @@ System.IO
 * 默认自动检测BOM，TextReader在第一次读取后才可用CurrentEncoding指示当前编码，或者用构造函数接受一个Encoding类的实例的重载指定编码方式；如果强制不自动检测，则为UTF8-BOM，读和写都是
 * StreamWriter默认是覆盖写，如果文件已有，不会创建新文件
 * BinaryReader/Writer构造函数接受Stream，之后Write接受许多重载，而读取使用许多以Read为前缀的方法
+* 理论设计上读写器能处理任意Stream，但不拥有Stream；实际中StreamWriter是Stream的Owner
 
 ### 流
 
@@ -34,6 +35,7 @@ System.IO
 * 读写都需要手动指定byte数组、开始的位置、数据长度，比较底层
 * 写入的时候长度可用byte数组的长度，读取时byte数组的长度可用流的长度
 * 是二进制流，在这个层面无法确定编码，要读写器包装后指定；或者自己写入GetPreamble的内容和读取后用指定的编码解码
+* MemoryStream不需要Dispose，但其它流基本上都要，为了通用，Stream就继承了IDispose
 
 #### FileStream
 

@@ -27,6 +27,7 @@ category: dotnet
 * Task的状态：t.Status、t.IsFault、IsCompleted(包括成功、取消和失败)、IsCompletedSuccessfully
 * 同步等待/在同步方法中调用异步方法：t.Result、t.Wait()、t.GetAwaiter().GetResult()、t.WaitAll()、t.WaitAny()、Thread.Sleep()；其中GetAwaiter()不会抛AggregateException而已，在WPF中都可能死锁
 * 异步等待：await、await Task.WhenAll()、await Task.WhenAny()、await Task.Delay()、await Task.Yield()离开当前的消息队列，回到队列末尾
+* 不要调用它的Dispose，4.5后做了大更改
 
 ### Task.Run的重载
 

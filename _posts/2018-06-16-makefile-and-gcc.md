@@ -123,6 +123,7 @@ prog3 : prog3.o sort.o utils.o
 ## Clang
 
 * 安装：https://apt.llvm.org/
+* Win: https://github.com/mstorsjo/llvm-mingw
 
 ## 参考
 
