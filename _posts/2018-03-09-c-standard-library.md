@@ -6,15 +6,16 @@ stdio.h
 -------
 
 * FOPEN_MAX：最多能同时打开这么多个文件
-* FILENAME_MAX：略
+* FILENAME_MAX：最长文件名
 * 已经从流读取了数据，则在写之前要调用其中一个定位函数；已经写入了数据，在读取之前要用fflush或定位函数
-* freopen用于重新打开流，它会先尝试关闭流。可以改变读写方式，可以改变标准流
-* fclose会刷新缓冲区。它也有可能失败，比如流是NULL
+* freopen：会先尝试关闭流。可以改变读写方式，可以改变标准流
+* fclose：会刷新缓冲区。它也有可能失败，比如流是NULL
 * fgetc和fputc是真正的函数，getc、putc、getchar、putchar都是宏；非标准有getch无回显无缓冲输入，getche有回显无缓冲输入
 * int ungetc( char character, FILE* stream )：把一个字符返回到流中。每个流都允许至少一个字符被退回。退入流和写入流不同，如果用了定位函数，退回的字符会丢失
 * sscanf和sprintf可以从字符串读取信息或把信息转换为字符串。sprintf没有指定缓冲区大小
 * 其他人的笔记：http://www.cnblogs.com/likebeta/archive/2012/06/16/2551780.html
 * EXIT_FAILURE
+* 不用回车从终端读取字符：kbhit是非阻塞式的，但是是非标准的。conio.h中，getche是回显无缓冲的输入，getch是无回显无缓冲的输入。unix可用ioctl指定输入类型再用getchar（属于unix库）
 
 fflush(NULL)刷新所有输出流
 
@@ -272,6 +273,4 @@ wtypes.h和WCHAR是Windows的头文件。
 ## TODO
 
 * asprintf：非标准库，好像也不是posix，是GNU的
-* https://github.com/nothings/stb https://github.com/srdja/Collections-C https://github.com/faragon/libsrt https://github.com/P-p-H-d/mlib https://github.com/troydhanson/uthash https://github.com/antirez/sds
-* libuv
 * itoa：非标准库，可以把数字转换成字符串，可指定进制
