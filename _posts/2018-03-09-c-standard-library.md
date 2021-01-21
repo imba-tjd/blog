@@ -87,9 +87,9 @@ time.h
 
 TODO: https://zhidao.baidu.com/question/17712149.html
 
-* clock_t clock( void )：返回从程序开始执行起处理器所消耗的时间（不是经过的时间），除以CLOCKS_PER_SEC以后就得出消耗的秒数。如果无法表示，返回-1
-* time_t time( time_t* return_value )：如果参数不为NULL，也会储存在这个指针里。如果无法表示（2038年时会溢出？），返回-1。标准未规定time_t的编码方式，常见的为1970年1月1日0点0分0秒
-* char* ctime( const time_t* time_value )：输出固定格式的时间Sun Jul 4 04:02:48 1976\n\0。下一次调用时，这个字符串会被覆盖。ctime实际上可能以asctime( localtime( time_value ) )实现
+* clock_t clock()：返回从程序开始执行起处理器所消耗的时间（不是经过的时间），除以CLOCKS_PER_SEC以后就得出消耗的秒数，目前用%ld打印。如果无法表示，返回-1
+* time_t time()：现在可不使用参数。如果无法表示（2038年时会溢出？），返回-1。标准未规定time_t的实现方式，一般起点为1970年1月1日0点0分0秒
+* char* ctime(const time_t*)：输出固定格式的时间Sun Jul 4 04:02:48 1976\n\0。下一次调用时，这个字符串会被覆盖。ctime实际上可能以asctime( localtime( time_value ) )实现
 * double difftime( time_t time1, time_t time12 )：计算time1 - time2，结果为秒
 * struct tm* gmtime( const time_t* time_value )：把时间值转换为UTC，以前被叫做GMT
 * struct tm* localtime( const time_t* time_value )：把时间值转换为当地时间
@@ -108,27 +108,6 @@ TODO: https://zhidao.baidu.com/question/17712149.html
 * tm_wday：星期，0为星期天，6为星期六
 * tm_yday：天数，0-365
 * tm_isdat：夏令时标识
-
-非本地跳转setjmp.h
-------------------
-
-* int setjmp(jmp_buf state)：没有使用过的时候调用它永远返回0
-* void longjmp(jump_buf state, int value)：跳转到最开始setjmp(state)的位置，并且让setjmp(state)以后每次调用都返回value值
-* 顶层函数返回后再调用longjmp很可能会失败
-
-```c
-static jmp_buf restart;
-
-int mian(void)
-{
-    int value;
-    value = setjmp(restart);
-    switch(setjmp(restart)){
-    default:严重错误
-    case 1:小错误
-    case 0:正常的处理过程。如果中间发生错误，使用longjmp}
-}
-```
 
 string.h
 --------
