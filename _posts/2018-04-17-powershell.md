@@ -139,7 +139,7 @@ category: windows
 ### meta
 
 * Get-Location(pwd)：（以表格形式）显示当前路径；Get-Location | select -ExpandProperty Path的输出就和pwd一样了，或者先赋给变量，再用属性
-* Get-Command(gcm)：显示匹配的cmdlet，模式可加`*`。另外无参数调用比用纯`*`的结果少；Show-Command：显示一个gui窗口来填参数
+* Get-Command(gcm)：显示匹配的cmdlet，模式可加`*`，-ParameterType加类型可查询以指定类型为参数的cmdlet。另外无参数调用比用纯`*`的结果少；Show-Command：显示一个gui窗口来填参数
 * Get-History、Invoke-History *id*
 * Update-Help
 
@@ -147,7 +147,7 @@ category: windows
 
 * ForEach-Object(foreach和%)：`1..3 | % { echo $_ }`；可指定-Begin、-Process、-End，或直接用三个大括号代替，$ForEach表示索引，7之后支持-Parallel；第二种用法是不加大括号而跟字符串，代表取那一项成员
 * Where-Object(where和?)：'You', 'Me' | ? { $_ -match 'u' }（投影）
-* Select-Object(select)：选择多个属性（投影），支持通配符，单用星号相当于fl *；也可用于选择一定数量范围：-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
+* Select-Object(select)：选择多个属性（列），支持通配符；也可用于选择一定数量范围：-First(f)、-Last、-Skip、-SkipLast、-Index、-Unique、-Property（不加时默认用的这个）、-ExpandProperty（只显示属性的值，不显示属性名）；自定义列：@{Name=...;Expression={$_...}}
 * Sort-Object(sort)：-Descending降序；如果某个对象不具有所指定的属性之一，则 cmdlet 会将该对象的属性值解释为 NULL，并将其放置在排序顺序的末尾；如果要多字段排序需要传哈希表对象
 * Tee-Object(tee)：保存并显示管道输入的内容，会先创建文件再运行前面的命令；-Variable 变量名（不用加$）可以把结果保存到变量里
 * Group-Object：进行分组，依据可为表达式；分组后有Count属性用于排序，Name属性为key，Group属性为内容
@@ -245,5 +245,6 @@ Profile文件
 * https://stackoverflow.com/questions/47274532/difference-between-and
 * https://leanpub.com/thebigbookofpowershellgotchas/read
 * https://powershell.org/forums/forum/windows-powershell-qa/
+* 粘贴数据时有bug，无法粘贴`1・`等，但可以单独粘贴那个点，注意不是`·`，好像键盘无法直接打出
 
 ISE无法识别utf8

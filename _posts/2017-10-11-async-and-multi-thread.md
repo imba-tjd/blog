@@ -271,7 +271,7 @@ try {
 
 * MethodImplAttribute用于方法，SynchronizationAttribute用于类
 * 命名空间位于：System.Runtime.Remoting.Contexts
-* [MethodImplAttribute(MethodImplOptions.Synchronized)]标签应用到实例方法，相当于对当前实例加锁lock(this)；[MethodImplAttribute(MethodImplOptions.Synchronized)]标签应用到静态方法，相当于当前类型加锁，相当于 lock (typeof(Account))
+* [MethodImplAttribute(MethodImplOptions.Synchronized)]标签应用到实例方法，相当于对当前实例加锁lock(this)；应用到静态方法，相当于当前类型加锁，相当于 lock (typeof(Account))
 * [Synchronization(SynchronizationAttribute.REQUIRED, true)]，类需要继承ContextBoundObject
 
 ## 参考

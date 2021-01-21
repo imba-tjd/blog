@@ -55,8 +55,8 @@ string ObjToStr() {
 * property
 * type 用于类型
 * return 用于方法的返回值或get访问器的返回值，不能省略
-* assembly 用于当前程序集
-* module 用于当前模块
+* assembly
+* module
 
 ## 预定义保留的特性
 
@@ -66,7 +66,7 @@ string ObjToStr() {
 
 ```c#
 [Obsolete("Message")]
-[Obsolete("Message"), true] // bool类型的第二个参数指定目标被标记为错误
+[Obsolete("Message"), true] // 标记为错误
 ```
 
 ### Conditional特性
@@ -103,9 +103,9 @@ class Program {
 }
 ```
 
-### DebuggerStepThrough特性
+### System.Diagnostics.DebuggerStepThrough特性
 
-调试器在执行目标代码时不会进入内部调试。位于System.Diagnostics命名空间。可用于类、结构、构造函数、方法或访问器。
+调试器在执行目标代码时不会进入内部调试
 
 ### AttributeUsage特性
 
@@ -220,12 +220,11 @@ static void Main() {
 }
 ```
 
-## DLR
+## DLR(System.Dynamic)
 
-### 实现动态行为
-
-* 位于System.Dynamic下
-* 可用于DOM树
+```c#
+T AddChecked<T>(T left, T right) => Dynamic.OpAddChecked(left, right);
+```
 
 ### ExpandoObject
 

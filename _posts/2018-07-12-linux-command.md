@@ -54,7 +54,7 @@ title: Linux命令
 * base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
-* ps auxf：显示所有进程，且显示父子进程关系，但这样就不完全按时间排序了，想要后者就去掉f。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子进程关系，不会有pid；在`procps`包中
+* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
 * cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软连接，可以追踪到源文件；cp -a：相当于-dpR
 * iconv -f gbk -t utf-8 source-file -o target-file
 * eval
@@ -235,7 +235,7 @@ aria2、axel、httpie放到软件的文章里去了。
 * 设置--inplace和--append后好像是增量同步；有限速功能避免把服务器带宽占满（scp也有）；Host::/path用的是rsync协议，运行daemon时可以类似ftp提供文件出去，可以设置只读和IP黑白名单；不提供dest等价于运行ll，此时-h才有用；-R的作用：`-rR /var/./log/nginx /tmp`将会创建/tmp/log/nginx；-S发送稀疏文件时使用
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
 * 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
-* TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps
+* TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps https://zhuanlan.zhihu.com/p/331838860
 
 ## sed
 
