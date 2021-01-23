@@ -151,7 +151,6 @@ public sealed class MyAttributeAttribute:System.Attribute{...}
 [assembly:InternalVisibleTo("...")]
 ```
 
-
 ## 自定义特性
 
 * 继承自System.Attribute的类即可
@@ -191,33 +190,6 @@ private static bool AddConditionallyImpl<T>(IList<T> list, T item) {
 
 public static bool AddConditionally(dynamic list, dynamic item) =>
     AddConditionallyImpl(list, item);
-```
-
-### 弥补泛型操作符不足
-
-* 不要声明成IEnumerable\<dynamic\>，因为协变性无法用于值类型
-
-```c#
-public static T DynamicSum<T>(this IEnumerable<T> source) {
-    dynamic total = default(T);
-    foreach (T element in source)
-        total = (T) (total + element); // 如果不强制转换，运算时会进行提升；如果T为byte，返回时就会异常
-
-    return total;
-}
-```
-
-### 最佳可访问类型
-
-```c#
-static void Execute(dynamic x, string y) => Console.WriteLine("dynamic string");
-static void Execute(dynamic x, object y) => Console.WriteLine("dynamic object");
-static void Main() {
-    object text = "text";
-    dynamic d = 10;
-    Execute(d, text); // dynamic object
-    Execute(d, (dynamic)text); // dynamic string
-}
 ```
 
 ## DLR(System.Dynamic)
