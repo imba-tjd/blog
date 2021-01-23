@@ -82,33 +82,6 @@ stdlib.h
 * char* getenv(const char* name)：在环境变量里查找name，如果找到，返回路径，否则返回NULL
 * 标准并未定义putenv函数
 
-time.h
-------
-
-TODO: https://zhidao.baidu.com/question/17712149.html
-
-* clock_t clock()：返回从程序开始执行起处理器所消耗的时间（不是经过的时间），除以CLOCKS_PER_SEC以后就得出消耗的秒数，目前用%ld打印。如果无法表示，返回-1
-* time_t time()：现在可不使用参数。如果无法表示（2038年时会溢出？），返回-1。标准未规定time_t的实现方式，一般起点为1970年1月1日0点0分0秒
-* char* ctime(const time_t*)：输出固定格式的时间Sun Jul 4 04:02:48 1976\n\0。下一次调用时，这个字符串会被覆盖。ctime实际上可能以asctime( localtime( time_value ) )实现
-* double difftime( time_t time1, time_t time12 )：计算time1 - time2，结果为秒
-* struct tm* gmtime( const time_t* time_value )：把时间值转换为UTC，以前被叫做GMT
-* struct tm* localtime( const time_t* time_value )：把时间值转换为当地时间
-* char* asctime( const struct tm* tm_ptr )：输出固定格式的时间，参见上面的ctime，注意参数区别
-* size_t strftime( char* string, size_t maxsize, const char* format, const struct tm* tm_ptr )：把时间格式化成字符串，使用了和printf类似的原理，具体替换码略。如果maxsize不够大，函数返回-1且字符串内容未定义
-* time_t mktime( struct tm* tm_ptr )：把tm转换为time_t，tm_wday和tm_yday会被忽略，其他字段的值的范围也无需原来的限制。转换之后tm会进行规格化，各字段的值转化到通常范围内。可以用于判断某个特定的日期属于星期几
-
-### tm结构
-
-* tm_sec：秒数，范围为0-60，允许”闰秒”
-* tm_min：0-59
-* tm_hour：0-23
-* tm_mday：当月的日期，从1开始
-* tm_mon：0-11
-* tm_year：1900之后的年数。所以要加上1900才是真正的年数
-* tm_wday：星期，0为星期天，6为星期六
-* tm_yday：天数，0-365
-* tm_isdat：夏令时标识
-
 string.h
 --------
 
@@ -190,13 +163,6 @@ putchar("0123456789ABCDEF"[value%16]);
 * 也要避免`p = realloc(p,2048);`这种写法，本来分配内存失败后原来的数据还是存在的，这样写就找不到了
 * 如果realloc第一个参数为NULL，它的行为就和malloc一样
 * free的参数只能是NULL或从malloc、calloc、realloc返回的指针，不能是指针+-后的结果，因为分配了多少内存是记录在某个偏移的地方的。
-
-输出错误信息errno.h
--------------------
-
-* errno：当标准库函数发生错误时，会在一个外部整型变量errno中保存错误代码
-* char* strerror( int error_number )：根据错误值返回预设的错误信息（位于\<string.h\>）
-* void perror( const char* messsage)：先输出自定义信息，再输出strerror的信息；相当于printf("%s %s", message, strerror(errno))（位于 \<stdio.h\>）
 
 可移植类型：stdint.h和inttypes.h
 --------------------------------
