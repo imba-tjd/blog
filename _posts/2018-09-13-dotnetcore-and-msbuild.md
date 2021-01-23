@@ -77,7 +77,7 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 
 ## dotnet CLI
 
-* dotnet add/remove package Newtonsoft.Json；dotnet list package --outdated
+* dotnet add/remove package xxx；dotnet list package --outdated
 * dotnet add app/app.csproj reference **/*.csproj；dotnet list/remove reference
 * dotnet sln todo.sln add **/*.csproj；dotnet sln remove
 * dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的
@@ -201,7 +201,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 上传后不能删，即使没有任何包依赖也不行
 * 403错误可能是和别人的包重名了
 * dotnet nuget locals --clear all：清除所有本地缓存目录的文件
-* 暂时还没有dotnet update和list package，Feature Request在：https://github.com/NuGet/Home/issues/4103，可能的脚本解决办法：https://gist.github.com/JonCanning/a083e80c53eb68fac32fe1bfe8e63c48
+* 暂时还没有dotnet update，Feature Request在：https://github.com/NuGet/Home/issues/4103，可能的脚本解决办法：https://gist.github.com/JonCanning/a083e80c53eb68fac32fe1bfe8e63c48
 * https://www.myget.org/gallery 也有一些，且不是nuget.org的镜像，且没有免费版
 * 缓存：%LocalAppData%\NuGet\v3-cache
 

@@ -5,17 +5,14 @@ category: dotnet
 
 ## Async/Await
 
-* 引用System.Threading.Task命名空间
-* 方法头中包含async修饰符，方法体内包含一个或多个await表达式，表示可以异步完成的任务，会自动生成隐式的自动机；但接口的声明中不需要async修饰
-* 按照约定，异步方法的名称应以Async为后缀
-* 异步方法的参数不能为out或ref参数
-* 如果工作为IO绑定，使用await和普通的异步函数，不要使用并行库；如果是CPU绑定，使用await Task.Run(()=>Fun())；前者不一定会开新线程
+* 接口的函数声明不需要async修饰
+* 参数不能为out或ref参数
+* IO绑定用await和普通的异步函数，不要使用并行库，不会开新线程；CPU绑定使用await Task.Run(()=>Fun())，需要长时间运行时用TaskFactory.StartNew的一个重载
 * 最好不要把async和LINQ结合，因为后者会延迟执行，可能会阻塞；可用ToList去掉lazy特性
 * ~~不能在catch和finally块~~ C#6可以了、非异步匿名函数、lock语句块或不安全代码中使用
 * 不要在一个表达式中直接多次使用await，如`r=await F1()*await F2()`，这样无法并行任务，因为C#规定先对左边求值再对右边求值
-* 如果需要对参数进行验证，需要编写一个同步的方法验证参数，再return调用异步（async）方法 （可以用匿名函数），这样可以非lazy处理
+* 如果需要对参数进行验证，需要编写一个同步的方法验证参数，再return调用异步方法 （可以用匿名函数），这样可以非lazy处理
 * 异步Main：不存在async void Main；VS无法正常识别async Task Main
-* TaskFactory.StartNew的一个重载允许线程长时间运行，其他时候使用Task.Run就好
 * await 异步IO不会创建新线程，await new Task才会，await普通的async方法，完成后WPF等会恢复到之前的线程上，Console不会
 * 构造函数不能用async，一定要调用异步函数最好只调用async void的
 
@@ -31,7 +28,7 @@ category: dotnet
 
 ### Task.Run的重载
 
-几种普通的重载就略了，这里有两种特殊的，看起来返回值不是自己，而是参数里的Task。
+几种普通的重载略，这里有两种特殊的，看起来返回值不是自己，而是参数里的Task。
 
 ```c#
 Task t = Task.Run(() => Task.Run(() => Console.WriteLine(3))); // Task Task.Run(Func<Task> fun);
@@ -165,6 +162,10 @@ private void btnDoStuff_Click() {
     btnDoStuff.IsEnabled = true;
 }
 ```
+
+### 同步转异步
+
+* 可用委托的BeginInvoke加上TaskFactory.FromAsync
 
 ## 线程池
 

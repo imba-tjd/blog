@@ -307,3 +307,7 @@ TODO。用于类与类之间的映射，或者数据库模型与实体之间的�
 * 浙江省高等学校精品在线开放课程共享平台——Web应用程序设计（.NET）
 * [How to connect C# to SQL (the easy way)](https://www.youtube.com/watch?v=Et2khGnrIqc)
 * https://zhuanlan.zhihu.com/p/36608131
+
+### TODO
+
+* https://www.entityframeworktutorial.net/

@@ -722,7 +722,7 @@ def f(): ...
 
 # 参数：
 snoop('/my/log/file.log', prefix='ZZZ ')
-watch=('foo.bar') # 查看非本地变量的值；watch_explode展开字典的内容
+watch=('foo.bar') # 查看非局部变量的值；watch_explode展开字典的内容
 depth=2 # 调用其它函数的跟踪深度，默认为1
 ```
 

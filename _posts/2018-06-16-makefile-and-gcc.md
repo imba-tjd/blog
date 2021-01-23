@@ -108,7 +108,7 @@ prog3 : prog3.o sort.o utils.o
 
 * Linux下，.a是静态库，由多个.o组成，编译时当作.o用就是；.so是动态库，需要-L指定路径库名，当前目录用-L.，再-l库名，其中l和库名没有空格，L可有可无；L是只写库名而不写完整路径用的，否则可以不用；-l:库名.a可以手动指定不以lib开头的库
 * Windows下，.lib是静态库，.dll是动态库；但与so相比，dll可不包含符号，此时符号在.lib中，即同一个后缀两个不同的作用
-* 先用`gcc -c`生成.o，生成.a用`ar -crv dest.a src1.o ...`，生成.so用`-shared -fPIC`
+* 先用`gcc -c`生成.o，生成.a用`ar -crv dest.a src1.o ...`，生成.so用`-shared -fPIC`；fpic产生的代码更小更快但在某些平台有限制一般不用
 * ldd命令能查看程序所依赖的共享库
 * `-Wl,-rpath=/...` 可以指定**运行时**要搜索的动态库目录
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
