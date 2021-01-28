@@ -113,7 +113,7 @@ branding:
 
 ## 环境
 
-* 软件环境：https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md ubuntu-latest是1804，要手动指定20.04才行，离谱；gcc是9.3，clang是10
+* 软件环境：https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md gcc是9.3，clang是10
 * 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
 * 直接使用apt必须加sudo，但在容器里就必须不用
 * win自带nuget，但不自带msbuild的可执行文件，要用microsoft/setup-msbuild；dotnet msbuild好像不能用于fx的
@@ -122,8 +122,9 @@ branding:
 
 ### Python环境
 
-* 自带python 2.7和3.6，pip9，但需要pip3 install wheel。而pip升级会失败：ImportError: cannot import name main
-* 需要PATH=$PATH:~/.local/bin，注意不同step应该是不共享的。但也可以直接用python3 -m来调用
+* 默认3.8但有3.9和2.7
+* 需要pip3 install wheel；曾经有不要给pip升级的经验
+* 需要PATH=$PATH:~/.local/bin，注意不同step应该是不共享的。或者可以试试python3 -m
 
 ```
 asn1crypto (0.24.0)

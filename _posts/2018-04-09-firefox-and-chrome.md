@@ -42,6 +42,7 @@ title: Firefox和Chrome
 * browser.backspace_action：设为2则退格键不会导致网页后退
 * javascript.options.warp true
 * browser.startup.homepage.abouthome_cache.enabled
+* browser.startup.preXulSkeletonUI 好像86默认开启
 * dom.webgpu.enabled true
 * network.trr.exclude-etc-hosts 默认为true，即DoH时忽略hosts
 * network.preload：允许`link rel="preload"`

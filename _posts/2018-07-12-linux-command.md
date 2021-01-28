@@ -160,7 +160,9 @@ title: Linux命令
 * crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}`
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
-* systemctl list-timers
+* systemctl list-timers（systemd-timer）
+* https://crontab.guru/
+* https://zhuanlan.zhihu.com/p/58719487
 
 每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
 
@@ -220,7 +222,7 @@ aria2、axel、httpie放到软件的文章里去了。
 ### scp
 
 * scp -rpC src dest
-* user@Host或IP:/path/filename ./
+* user@host_or_ip:/path/filename ./
 * r为递归，p为保留日期等，C为压缩
 * -P指定端口
 * src可有多个文件
@@ -309,15 +311,28 @@ sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8�
 * -i：下载列表时跳过出错的；-w强制不覆盖文件
 * `urlopen error EOF occurred in violation of protocol`：可以试试用http和`--prefer-insecure`(仅u2b)，但实际仍会出现；还可试试`--external-downloader curl`但不清楚ps的编码会不会有问题，反正速度肯定是降低了的，而且好像视频还不生效？只有音频生效
 
+## tmux
+
+* 新建会话：tmux new -s <sessio_name>
+* ctrl b + c：新窗口，ctrl b + p：切换到上一个窗口，ctrl b + n：下一个窗口；ctrl b + s：列出并切换窗口
+* ctrl b + %：竖分屏，ctrl b + "：横分屏，ctrl b + 方向键：切换panel
+* https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt
+* https://zhuanlan.zhihu.com/p/27915505
+* https://github.com/gpakosz/.tmux
+* https://github.com/tmux-python/tmuxp
+* https://pityonline.gitbooks.io/tmux-productive-mouse-free-development_zh/content/index.html
+* https://louiszhai.github.io/2017/09/30/tmux/
+
 ## 参考
 
 * https://www.cnblogs.com/manong--/p/8012324.html
 * https://blog.csdn.net/aspirationflow/article/details/7694274
 * https://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
+* https://zhuanlan.zhihu.com/p/43687973
 
 ### TODO
 
-* tmux（https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt https://zhuanlan.zhihu.com/p/27915505）、supervisor(python)、PM2 (for node.js)
+* supervisor(python)、PM2 (for node.js)
 * killall、pkill、kill -9
 * nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395
 * https://www.oschina.net/translate/useful-linux-commands-for-newbies

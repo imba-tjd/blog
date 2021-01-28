@@ -40,7 +40,7 @@ category: windows
 
 ### 预定义变量
 
-* $home用户目录
+* $home用户目录；VSC不支持~
 * $host：基本信息 $pid：当前进程的pid $PSHome：安装路径
 * `$?`上一次命令是否成功，bool类型；`$LastExitCode`上一次命令返回的数字值
 * `$$`：上一次执行的代码的最后一个参数字符串；`$^`：第一个参数字符串

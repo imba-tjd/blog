@@ -51,14 +51,14 @@ category: linux
 ```
 # src是获取源代码时用的，不必要
 # 如果只是从测试源中安装某一个软件，可用apt -t testing install xxx；好像backports默认就是只有这样才能装的
-deb https://mirrors.aliyun.com/debian/ stretch main non-free contrib
-deb https://mirrors.aliyun.com/debian-security stretch/updates main
-deb https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
-deb https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian/ stretch main non-free contrib
+deb https://mirrors.aliyun.com/debian bullseye main non-free contrib
+deb https://mirrors.aliyun.com/debian-security bullseye-security main non-free contrib
+deb https://mirrors.aliyun.com/debian bullseye-updates main non-free contrib
+deb https://mirrors.aliyun.com/debian bullseye-backports main non-free contrib
+# deb-src https://mirrors.aliyun.com/debian stretch main non-free contrib
 # deb-src https://mirrors.aliyun.com/debian-security stretch/updates main
-# deb-src https://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib
+# deb-src https://mirrors.aliyun.com/debian stretch-updates main non-free contrib
+# deb-src https://mirrors.aliyun.com/debian stretch-backports main non-free contrib
 
 # testing
 deb https://mirrors.aliyun.com/debian testing main contrib non-free
