@@ -48,7 +48,7 @@ category: windows
 
 ### 虚拟驱动器
 
-`ls 驱动器名加冒号`可打印内部的值，注意无需加`$`。key可用dos通配符。只有使用里面的变量内容的时候才用`$`，如`$env:path`。使用Get-PSDrive可看到所有的驱动器，Get-Volume只看实际的卷。如果key中也含有变量，需用Set-Item。
+`ls 驱动器名加冒号`可打印内部的值，创建用New-Item(ni)，删除用ri/del/rm，注意此时无需加`$`。key可用dos通配符。只有使用里面的变量内容的时候才用`$`，如`$env:path`。使用Get-PSDrive可看到所有的驱动器，Get-Volume只看实际的卷。如果key中也含有变量，需用Set-Item。
 
 * env：环境变量，其中修改path要用+=且记得加分号。永久修改需要用`[environment]::SetEnvironmentvariable`。
 * alias：所有的别名。仅仅打印，要执行用&
@@ -106,10 +106,8 @@ category: windows
 
 ## 别名
 
-* Get-Alias(alias)：根据别名查找原名；反过来用-Definition加原名
-* Set-Alias设置别名，需要指定-Name和-Value，或者new-item -path alias:xx -value xxx
-* 删除别名：del alias:*别名*
-* 导出和导入别名：Export-Alias alias.ps1、Import-Alias [-Force] alias.ps1
+* Get-Alias(alias)：根据别名查找原名；反过来用-Definition加原名来查找别名
+* Set-Alias myalias cmd-let
 
 其他
 ----
@@ -245,6 +243,6 @@ Profile文件
 * https://stackoverflow.com/questions/47274532/difference-between-and
 * https://leanpub.com/thebigbookofpowershellgotchas/read
 * https://powershell.org/forums/forum/windows-powershell-qa/
-* 粘贴数据时有bug，无法粘贴`1・`等，但可以单独粘贴那个点，注意不是`·`，好像键盘无法直接打出
+* 粘贴数据时有bug，无法粘贴`1・`等，但可以单独粘贴那个点，或点前没内容也可以，注意不是`·`，好像键盘无法直接打出；又发现在Windows Terminal中无法用右键粘贴中文冒号分号等`1：`，但ctrl v可以
 
 ISE无法识别utf8

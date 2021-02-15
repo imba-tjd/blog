@@ -263,8 +263,12 @@ order deny,allow
 
 ## MEGAcmd
 
-* https://mega.nz/linux/MEGAsync/Debian_10.0/amd64/megacmd-Debian_10.0_amd64.deb
-* mega-login、mega-put
+* dpkg -i https://mega.nz/linux/MEGAsync/Debian_10.0/amd64/megacmd-Debian_10.0_amd64.deb
+* 支持交互式命令mega-cmd以及一大堆脚本式命令mega-*，都会自动启动mega-cmd-server；login登录，会话信息保存在home中；默认不开启HTTPS，用https on开启
+* get下载且可直接从分享链接下载，put上传，quit退出交互式shell
+* 类shell命令：pwd，cd，ls，find，du/df -h，rm；lcd和lpdw为交互式时的local路径
+* help列出所有命令，--help和-vvv略；sync本地和云端同步，backup本地定时备份到云端且可保存历史版本，webdav支持文件夹或stream文件，whoami -l显示所有的会话
+* Windows版不会自动添加PATH，且经过测试创建软链接无法使用，可以添加PS的alias，$env:LOCALAPPDATA\MEGAcmd\MEGAcmdShell.exe，不需要用脚本式的bat
 
 ## rclone
 
