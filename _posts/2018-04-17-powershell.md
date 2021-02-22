@@ -107,7 +107,7 @@ category: windows
 ## 别名
 
 * Get-Alias(alias)：根据别名查找原名；反过来用-Definition加原名来查找别名
-* Set-Alias myalias cmd-let
+* Set-Alias myalias cmd-let/func：无法像bash那样自动对参数链式展开
 
 其他
 ----

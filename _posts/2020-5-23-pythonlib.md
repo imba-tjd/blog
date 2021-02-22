@@ -74,7 +74,7 @@ except ImportError:
 
 * 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
 * pip的包名与模块无关
-* python3 setup.py --help-commands；生成whl用bdist_wheel，需先装好wheel，生成过程在build文件夹里，生成的东西在dist文件夹里；install自动生成egg并安装模块，也会自动安装依赖但不会走pip自定义的源，实际上用的是easy_install；build_ext --inplace能生成c扩展，可用--compiler指定编译器；bdist_wininst；bdist --help-formats
+* python3 setup.py --help-commands；生成whl用bdist_wheel，需先装好wheel，生成过程在build文件夹里，生成的东西在dist文件夹里；install自动生成egg并安装模块，也会自动安装依赖但不会走pip自定义的源，实际上用的是easy_install；build_ext --inplace能生成c扩展，可用--compiler指定编译器；bdist --help-formats
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
 * pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软连接，当然setup自己除外；setup develop [--uninstall]效果类似一样但后者不会删入口点exe
 * pip wheel . 可以在pwd生成wheel，还是需要setup.py；注意不是python -m wheel
@@ -170,6 +170,7 @@ build-backend = "setuptools.build_meta"
 https://www.python.org/dev/peps/pep-0518/
 https://github.com/takluyver/flit
 https://www.python.org/dev/peps/pep-0621/
+https://pypa-build.readthedocs.io/en/latest/
 版本支持upper bound限定，不会修改最左边的非0数字：^0.1.11能更新到0.1.19但不会到0.2.0
 
 # ~/.pypirc；chmod 600

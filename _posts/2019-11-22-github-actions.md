@@ -21,6 +21,8 @@ on:
     paths:
       - _site/**
       - .github/workflows/deploy.yml
+    paths-ignore:
+      - '**.md'
   schedule:
   - cron: "0 0 * * *"
 
@@ -40,6 +42,7 @@ jobs:
         echo Hello World!;
       env:
         key: val
+      continue-on-error: true # 仅本步有效且最后仍为失败
 
     - uses: ./action-a # 这个点是本仓库，而不是workflow文件夹
 
@@ -87,29 +90,8 @@ ${{ github.workspace }}
 
 ## 创建Actions
 
-有两种方式：Docker和JS。对于前者，创建一个Dockerfile，运行entrypoint.sh即可。
-
-`action.yml`定义元数据：
-
-```yaml
-name: "Hello Actions"
-description: "Greet someone"
-author: "octocat@github.com"
-
-inputs:
-  MY_NAME: # 在映像中用$INPUT_MY_NAME获取
-    description: "Who to greet"
-    required: true
-    default: "World"
-
-runs:
-  using: "docker"
-  image: "Dockerfile"
-
-branding:
-  icon: "mic"
-  color: "purple"
-```
+* `action.yml`定义元数据
+* 输入的变量在环境中用$INPUT_MY_NAME获取
 
 ## 环境
 
@@ -183,3 +165,7 @@ zope.interface (4.3.2)
 ```json
 { "cgroup-parent": "/actions_job" }
 ```
+
+## 收集
+
+* fregante/setup-git-user

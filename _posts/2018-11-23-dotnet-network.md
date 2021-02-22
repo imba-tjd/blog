@@ -56,7 +56,7 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 
 * 本身位于System.Net.Http.Headers命名空间中，但是一般用`HttpClient.DefaultRequestHeaders`获取，回复用`response.Headers`；是引用类型，修改它就好，不需要也不能再赋值回来；或者每次请求也可以单独使用它
 * 用于设置HTTP请求头
-* 修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`
+* 修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`，默认不存在
 * ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" }
 * TryGetValues可以获取它的值
 
@@ -147,39 +147,30 @@ HttpClient一般用单例模式/复用，不要用using，否则会耗尽socket�
 
 FindServicePoint的参数只会考虑scheme、host和port
 
-## 过时的技术
+Ping：new System.Net.NetworkInformation.Ping().SendPingAsync(host, 5); p.Status = IPStatus.Success
 
-有的无法用于UWP。
+## 过时的技术
 
 ### HttpWebRequest
 
+* 默认没有UserAgent，Timeout为100秒
+* 更改并发数：req.ServicePoint.ConnectionLimit
+
 ```c#
-// 可直接用HttpClient.GetByteArrayAsync替代
-byte[] GetURLContents(string url)
-{
-    var content = new MemoryStream();
-    var webReq = (HttpWebRequest)WebRequest.Create(url); // 或用as
+var req = HttpWebRequest.CreateHttp(ADDR);
+using var response = request.GetResponse(); // 有对应的Async方法
+using var receiveStream = response.GetResponseStream(); // 另一种用法是CopyTo(Async)到内存流
+using var reader = new System.IO.StreamReader(receiveStream);
+string content = reader.ReadToEnd();
 
-    // 也可转为HttpWebResponse
-    using (WebResponse response = webReq.GetResponse()) // 有对应的Async方法
-    using (Stream responseStream = response.GetResponseStream()) // 或用StreamReader.ReadToEnd
-        responseStream.CopyTo(content); // 有对应的Async方法
-
-    return content.ToArray();
-}
-
-var request = HttpWebRequest.CreateHttp(ADDR);
-string content;
-using (var response = request.GetResponse())
-using (var receiveStream = response.GetResponseStream())
-    content = new System.IO.StreamReader(receiveStream).ReadToEnd();
+// POST
+req.Method = "POST";
+request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+request.ContentLength = data.Length;
+using var s = req.GetRequestStream();
+s.Write(data, 0, data.Length);
 ```
 
-* Req可设置UserAgent和Timeout
-* 更改并发数：Req.ServicePoint.ConnectionLimit = int.MaxValue;
-* 使用POST：request.Method = "POST";、request.ContentType、request.ContentLength = data.Length;、using request.GetRequestStream().Write(data, 0, data.Length);
-* 表单：ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-* TLS：request.Credentials = CredentialCache.DefaultCredentials;
 
 ### WebClient
 
