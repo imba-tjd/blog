@@ -635,37 +635,57 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 
 ### Starlette
 
+* 也支持`@app.route`，但官网没这么写
+* 不以`/`结尾的路由会自动重定向
 * taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖很多
-* StaticFiles依赖aiofiles故不记录
+* Route还可以设置name，之后可用request或app.url_for获取那个名字的url
+* 使用类：继承starlette.endpoints.HTTPEndpoint，定义get等方法
+* 自带一些中间件：gzip、httpsredirect
+* Config封装了.env的读取
+* TODO：https://github.com/Redocly/redoc https://github.com/swagger-api/swagger-ui https://www.starlette.io/schemas/
 
 ```python
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import PlainTextResponse,HTMLResponse,JSONResponse
+from starlette.responses import PlainTextResponse,HTMLResponse,JSONResponse,RedirectResponse,FileResponse
 from starlette.routing import Route, Mount
+from starlette.staticfiles import StaticFiles # 此项及FileResponse需要装aiofiles
 
 def homepage(_): ...
 def user(request: Request):
-    username = request.path_params['username']
-    return PlainTextResponse('Hello, %s!' % username)
+    username = request.path_params['username'] # query_params, cookies, body()是bytes, json(), form()['filename'].read()
+    return PlainTextResponse('Hello, %s!' % username) # headers, set_cookie()
 
 routes = [
     Route('/', homepage, methods=['GET']), # 默认只接受GET，实际如果路由存在永远可用HEAD
-    Route('/user/{username:str}', user), # 默认str，还可指定int,float,path
-    Mount('/users', routes=[ # 指定共有前缀的路由
+    Route('/user/{username:str}', user), # 默认str(以.和/分隔)，还可指定int,float,path(剩余的所有部分)
+    Mount('/users', routes=[ # 指定共有前缀的路由，可在子模块中定义好routes=Router(...)再import进来
         Route('/', users),
         Route('/{username}', user),
-    ])
+    ]),
+    Mount('/static', StaticFiles(directory='static', html=True)), # 也可单独使用赋给app
 ]
 
-app = Starlette(debug=True, routes=routes) # 开启debug客户端也会收到traceback，否则客户端只有Internal Server Error
-app.state.ADMIN_EMAIL = 'xxx' # 全局状态，访问用request.app
+app = Starlette(debug=True, routes=routes) # 开启debug客户端也会收到traceback，否则客户端只有Internal Server Error；还可注册on_startup事件，以及设置exception_handlers指定发生错误时的路由
+app.state.ADMIN_EMAIL = 'xxx' # 全局状态，请求中访问用request.app；另外单个请求的状态还可以用request.state
+
+# 测试：之后主动调用此函数，会自动启动app
+from starlette.testclient import TestClient
+def test_homepage():
+    with TestClient(app) as client: # 就是requests.Session
+        response = client.get("/")
+        assert response.status_code == 200
+
+# 手动模拟FileResponse，必须先全部读完再包装成file-like obj，且不具有ETag和Content-Length且不会自动猜测media_type
+def myfile(_):
+    with open('test.txt', 'rb') as f:
+        return StreamingResponse(io.BytesIO(f.read()))
 ```
 
 ### Uvicorn
 
 * pip install uvicorn[standard]：最小需要click和h11，标准版会装上基于Cython的uvloop和watchdog
-* uvicorn --host 127.0.0.1 --port 8000 main:app；【默】对应main.py的app对象，--reload最小版为轮询
+* uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询
 * --uds指定unix socket；--workers多线程
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips *信任所有
 * scope中有scheme、method、path、headers
@@ -687,8 +707,9 @@ async def app(scope, receive, send):
         'type': 'http.response.body',
         'body': b'Hello, world!',
     })
+
 if __name__ == "__main__": # 从脚本运行
-    uvicorn.run("main:app")
+    uvicorn.run("main:app",reload=True)
 
 async def app(scope, receive, send): # 使用Starlette简单封装uvicorn请求
     request = Request(scope, receive)
@@ -696,18 +717,24 @@ async def app(scope, receive, send): # 使用Starlette简单封装uvicorn请求
     await response(scope, receive, send)
 ```
 
-## MySQL
+## ORM和数据库
+
+* peewee
+* https://github.com/pudo/dataset：基于sqlalchemy
+* SQLAlchemy：等2.0
+* https://github.com/marshmallow-code/marshmallow 能把类序列化成json，但标记类型要用该库提供的
+* jsonpickle：把任意类序列化成json
+* GINO：目前只支持pg
+* https://github.com/encode/orm：基于SQLAlchemy core的查询、databases的异步、typesystem的类型验证，但很不活跃
+* ponyorm、tortoise-orm
+* tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
+* edgedb：自创DML的关系型数据库，但好像是基于pg的
+
+### MySQL
 
 * pymysql：纯Py，当用gevent或者PyPy时可以用
 * mysql-connector-python：纯Py，Oracle官方实现，性能貌似比pymysql还要差
 * mysqlclient-python：带有C扩展，性能最好
-
-## ORM
-
-* peewee
-* https://github.com/pudo/dataset：基于sqlalchemy
-* https://github.com/encode/orm：基于SQLAlchemy core的查询和databases的异步
-* tortoise-orm
 
 ## PySnooper
 
@@ -732,7 +759,6 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * colorama：控制台的前、背景色；rich：自动染色和格式化
 * icecream：用来代替print输出调试信息的，比如无参调用会显示被调用时所在文件和行号，有参调用会显示参数内容和返回值，并再返回那个返回值，用disable()可关掉所有输出，install()可使得无需import也能用
 * beeprint：格式化打印dict
-* tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
 * python-dotenv：从`.env`中读取并设置环境变量
 * PyYAML：一定要用safe_load；或者用strictyaml
 * lazy_import：np = lazy_import.lazy_module("numpy")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的numpy也是lazy的
@@ -743,6 +769,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
 * pretty_errors：精简stacktrace，可全局安装
+* abersheeran/a2wsgi：ASGI于WSGI的app互转
 
 ## 参考
 
@@ -784,12 +811,10 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * 解析url：https://github.com/gruns/furl
 * https://gitlab.com/mike01/pypacker socket库
 * https://github.com/prkumar/uplink 把REST API变成class
-* https://github.com/marshmallow-code/marshmallow jsonpickle json和类之间的序列化
 * 自动重试：https://github.com/jd/tenacity
-* https://github.com/hugapi/hug 类似于Google-Fire的WebAPI版本
+* https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
 * GUI：PySimpleGUI kivy DearPyGui
 * 和C++交互：pybind11
 * streamlit：从程序生成网页，不过主要是为机器学习设计的
-* Redocly/redoc、swagger、openapi
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库

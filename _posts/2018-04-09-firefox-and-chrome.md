@@ -7,6 +7,7 @@ title: Firefox和Chrome
 * 正在进行的实验：about:studies
 * 网络状况：about:networking
 * 搜索的高亮只会显示1000个
+* 地址栏搜索选择非默认搜索引擎时按住shift可直接进行搜索而不触发联想
 
 ### 下载
 
@@ -46,6 +47,7 @@ title: Firefox和Chrome
 * dom.webgpu.enabled true
 * network.trr.exclude-etc-hosts 默认为true，即DoH时忽略hosts
 * network.preload：允许`link rel="preload"`
+* browser.urlbar.suggest.engines：false
 
 #### 页面翻译
 

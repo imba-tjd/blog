@@ -169,3 +169,5 @@ zope.interface (4.3.2)
 ## 收集
 
 * fregante/setup-git-user
+* mxschmitt/action-tmate
+* nektos/act
