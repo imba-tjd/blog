@@ -51,11 +51,6 @@ DriveInfo[] di = DriveInfo.GetDrives();
 
 * Environment.SetEnvironmentVariable(string name, string path, EnvironmentVariableTarget target)
 
-XDocument 和XmlDocument
------------------------
-
-> http://www.cnblogs.com/HQFZ/p/4788428.html
-
 处理路径中的斜杠和反斜杠
 ------------------------
 
@@ -68,48 +63,24 @@ if (Path.DirectorySeparatorChar == '/')    return "/" + codeBase;return codeBase
 判断Windows10
 -------------
 
-如果不做任何操作，win8.1和win10的Environment.OSVersion.ToString得到的是`Microsoft Windows NT 6.2.9200.0`，貌似是因为VerifyVersionInfo这个API被弃用了；非Windows应该仍是有用的。在.net5中返回正确的值了。
+如果不做任何操作，Environment.OSVersion.ToString()为`Microsoft Windows NT 6.2.9200.0`，在.NET5中返回正确的值了，如`Microsoft Windows NT 10.0.19043.0`。非Windows应该一直可以用。
 
-第一种解决办法是添加一个manifest，去掉兼容性中Windows10的id的注释
+第一种解决办法是添加一个manifest，去掉兼容性中Windows10的id的注释。
 
-第二种办法是搜索注册表，但注意在非Windows上不可用：
+第二种办法搜索注册表，仅限Win：`(string)Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion")?.GetValue("ProductName")`->`Windows 10 Pro for Workstations`
 
-```
-using Microsoft.Win32;
-static bool IsWindows10()
-{
-    var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+第三种办法，使用win32库的VersionHelpers.h
 
-    string productName = (string)reg.GetValue("ProductName");
+检测其他Win版本：https://stackoverflow.com/questions/2819934/detect-windows-version-in-net
 
-    return productName.StartsWith("Windows 10");
-}
-```
-
-第三种办法，使用win32库的VersionHelper：https://docs.microsoft.com/zh-cn/windows/desktop/SysInfo/getting-the-system-version
-
-其他系统的版本：https://stackoverflow.com/questions/2819934/detect-windows-version-in-net
-
-用System.Runtime.InteropServices.RuntimeInformation.OSDescription可以获得Microsoft Windows 10.0.17134这样的字符串
+System.Runtime.InteropServices.RuntimeInformation.OSDescription：`Microsoft Windows 10.0.19043`字符串
 
 判断是不是Windows：OSVersion.Platform == PlatformID.Win32NT
 
 ### 判断框架版本
 
-```
-// 从 .NET Core 3.0 开始，.NET Core 提供的版本 API 现在可以返回你预期的信息。
-Console.WriteLine($"Environment.Version: {System.Environment.Version}");
-// Old result
-//   Environment.Version: 4.0.30319.42000
-// New result
-//   Environment.Version: 3.0.0
-
-Console.WriteLine($"RuntimeInformation.FrameworkDescription: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
-// Old result
-//   RuntimeInformation.FrameworkDescription: .NET Core 4.6.27415.71
-// New result (notice the value includes any preview release information)
-//   RuntimeInformation.FrameworkDescription: .NET Core 3.0.0-preview4-27615-11
-```
+* 从Core3开始，Environment.Version能正确返回版本；之前一直是4.0.30319.42000
+* System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription为`.NET Framework 4.8.4300.0`，但Core3之前的信息仍是错的
 
 检测以及获得管理员权限
 ----------------------
@@ -215,5 +186,3 @@ cmd.StandardInput.Flush();
 cmd.StandardInput.Close();
 Console.OutputEncoding = Encoding.UTF8;
 ```
-
-
