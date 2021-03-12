@@ -29,7 +29,7 @@ category: linux
 * axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
 * https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat
-* https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP
+* https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP，活着
 * authbind：允许普通用户绑定1024以下的端口
 * tldr：--update
 * gparted：图形化的管理磁盘分区的工具
@@ -275,6 +275,7 @@ order deny,allow
 * curl https://rclone.org/install.sh | sudo bash
 * rclone config, n, 22(onedrive)
 * (mkdir;) rclone mount onedrive: /www/wwwroot/your_ip/onedrive --allow-other --allow-non-empty --vfs-cache-mode writes &
+* https://github.com/rclone/rclone https://zhuanlan.zhihu.com/p/104480400
 
 ## axel多线程下载
 
@@ -344,7 +345,6 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可�
 
 ### TODO
 
-* rclone: https://zhuanlan.zhihu.com/p/104480400
 * unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691
 * zstd
 * https://github.com/iovisor/bcc

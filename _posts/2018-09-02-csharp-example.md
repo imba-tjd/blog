@@ -111,6 +111,8 @@ SendMessage(button1.Handle, BCM_SETSHIELD, 0, (IntPtr)1);
 调用Office
 ----------
 
+第三方库：https://github.com/EPPlusSoftware/EPPlus
+
 _Workbook和Workbook的区别：基本上一样，后者继承前者；后者表示当前Excel的Application里打开的对象，前者就是Excel对象
 
 例子：https://github.com/dotnet/samples/tree/master/core/extensions/ExcelDemo

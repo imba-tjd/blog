@@ -1,5 +1,5 @@
 ---
-title: Firefox和Chrome
+title: 浏览器
 ---
 
 ## Firefox
@@ -116,9 +116,13 @@ title: Firefox和Chrome
 * Password import
 * Experimental JavaScript
 * Future V8 VM features
-* sharing-qr-code-generator
+* Enable sharing page via QR Code
+* Parallel downloading
+* Out of process rasterization：在Cent上有bug
+* Zero-copy rasterizer：在chrome://gpu/中如果Native GpuMemoryBuffers是Software only就无法使用，当前状态在Tile Update Mode中，不清楚Default是否会合适时自动启用，有文章说启用后很容易崩溃；--disable-zero-copy
+* Skia API for compositing：还不稳定，且不兼容Overlay Scrollbars；--disable-skia-renderer
 
-#### [overlay scrollbar](https://www.zhihu.com/question/64630817/answer/223528093)
+#### [Overlay Scrollbars](https://www.zhihu.com/question/64630817/answer/223528093)
 
 * --enable-features=OverlayScrollbar --enable-prefer-compositing-to-lcd-text
 
@@ -142,3 +146,8 @@ title: Firefox和Chrome
 ### 忽略HSTS证书错误
 
 之前是badidea，现在变成了thisisunsafe
+
+## PAC
+
+* `function FindProxyForURL(url, host)`：其中url现在不包含协议和查询参数。返回一个字符串，如果为空或者为`DIRECT`就直连，`PROXY host:port`就使用HTTP代理，改为SOCKS就是SOCKS代理。支持用分号指定Fallback
+* 扩展名为pac，MIME为`application/x-ns-proxy-autoconfig`

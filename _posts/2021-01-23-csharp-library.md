@@ -61,3 +61,10 @@ writer.WriteEndObject();
 * IgnoreReadOnlyProperties/Fields：忽略只读或只有get的；还有[JsonIgnore]
 * Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping：默认会转义所有非ASCII字符，此选项是最大限度的放松
 * MaxDepth：默认64
+
+## 第三方库
+
+* https://www.hangfire.io/
+* https://github.com/icsharpcode/SharpZipLib
+* https://masstransit-project.com/
+* https://github.com/App-vNext/Polly

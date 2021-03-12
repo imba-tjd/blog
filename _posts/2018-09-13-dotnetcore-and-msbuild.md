@@ -5,9 +5,10 @@ category: dotnet
 
 ## 安装
 
-* Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian；还有自动安装脚本且支持在无root权限安装
 * Windows：https://dot.net
 * docker映像：https://hub.docker.com/_/microsoft-dotnet
+* Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian；
+* dotnet-install.sh自动安装脚本，支持无root权限安装，但只是用于CI环境临时使用
 
 ## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
@@ -106,14 +107,14 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 ```
 dotnet new webapi --no-https
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY *.csproj . # 或用 *.sln，但好像csproj的文件夹没法通配复制啊
 RUN dotnet restore
 COPY . .
 RUN dotnet publish -c release -o /app
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine # 默认已放行80和443
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine # 默认已放行80和443
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "myapp.dll"]
@@ -215,6 +216,11 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
     </packageSources>
 </configuration>
 ```
+
+## Upgrade Assistant
+
+* dotnet tool install -g try-convert upgrade-assistant
+* upgrade-assistant <MySolution.sln>
 
 ## 参考
 

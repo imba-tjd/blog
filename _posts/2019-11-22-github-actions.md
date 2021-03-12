@@ -171,3 +171,4 @@ zope.interface (4.3.2)
 * fregante/setup-git-user
 * mxschmitt/action-tmate
 * nektos/act
+* actions/github-script

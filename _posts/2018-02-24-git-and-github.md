@@ -345,6 +345,7 @@ collapsable content
 * gh repo create：在有.git的情况下自动创建网页版仓库并添加remote，但不会自动push
 * gh repo view user/repo -w -b dev
 * gh repo fork：无参时必须在本地repo中调用，用于fork之前clone到本地的非自己repo并自动把origin改成upstream；如果带user/repo参数，则相当于fork并clone，支持depth
+* gh api repos/:owner/:repo --jq '.full_name, .description'
 
 ## readme渲染顺序
 

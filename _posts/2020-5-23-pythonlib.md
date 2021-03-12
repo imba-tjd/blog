@@ -4,7 +4,8 @@ title: 第三方 Python 库
 
 ## 环境和打包
 
-预编译的Win下的包：https://www.lfd.uci.edu/~gohlke/pythonlibs/
+* 预编译的Win下的包：https://www.lfd.uci.edu/~gohlke/pythonlibs/
+* 依赖管理工具：https://github.com/David-OConnor/pyflow 也能下载和管理Python版本。但提交数不多，BUG多
 
 ### requirements.txt
 
