@@ -339,6 +339,24 @@ http google.com search=='HTTPie logo' 'Cookie:sessionid=foo;another-cookie=bar' 
 http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可重定向输入
 ```
 
+## FFmpeg
+
+* ffmpeg 全局参数 输入文件产生 -i 输入文件/文件列表.txt 输出文件参数 输出文件
+* -hide_banner隐藏编译参数
+* 可不加输出文件参数，则只会查看元数据
+* 转换编码：-c:v libx265
+* 转换容器会根据后缀自动处理，可用-c copy不重新编码加快速度
+* 调整码率：-minrate 964K -maxrate 3856K -bufsize 2000K
+* 调整分辨率：-vf scale=480:-1
+* 视频转音频：-vn -c:a copy；去除音频流：-an
+* 裁剪一段：-ss [start] -to [end]
+* 合并：-f concat
+
+## iperf3
+
+* 服务端：-s [-u]
+* 客户端：-c <serverip> -P 5多线程 -b 100M -t 60
+
 ## 参考
 
 * https://zhuanlan.zhihu.com/p/101601709

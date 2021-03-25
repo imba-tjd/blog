@@ -363,30 +363,19 @@ se.css('a').xpath('xxx').re(r'xxx').get()/.getall()
 
 ## Requests
 
-### 其它库
-
-* urllib.request.urlopen不提供复用，http.client更加底层，两者都无法实际使用
-* urllib3是第三方库，线程安全；urllib3.PoolManager().request('GET',url)，只能下到bytes，要自己手动解码`r.data.decode('u8')`，不默认发gzip但能自动解码
-* httpx的api差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
-* requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
-* httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
-* faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
-* h11：底层库，和http.client同级别
-* python-trio/hip：urllib3的fork，添加了异步，开发很早期，没有使用的价值
-
 ### Session
 
 * 能连接复用以及保留cookie
 * 即使使用了会话，方法级别的参数也不会保留
-* 非线程安全的，toolbelt提供了简单的多线程
+* 非线程安全，toolbelt提供了简单的多线程
 
 ```python
-s = requests.session() # 其实最好用with，这样发生了异常也能关闭
+s = requests.session() # with或s.close()能关闭所有连接(urllib3.PoolManager)，但之后仍可以继续使用，又会自动创建。一般用于出现异常时及时释放资源
 s.request = functools.partial(s.request, timeout=3) # 连接超时时间，可为小数，默认无穷大，不加会一直等；直接赋值只影响connect超时时间，可传递元组，第二个参数控制下载超时；Session级别的只能这样设置，是故意的
-allow_redirects=True; max_redirects=30 # 前者默认为True（head除外），会自动跟踪3xx因此结果直接是200；后者是默认值
-verify=True #【默】，也可设为CA文件的路径，默认用Mozilla的；cert参数是客户端验证的证书
+allow_redirects=True; max_redirects=30 #【默】最后结果是200不是3xx；head默认不跟踪
+verify=True #【默】，也可为自定义CA文件路径；cert参数是客户端验证的证书
 proxies={"http": "http://10.10.1.10:1080", "https": "http://10.10.1.10:1080"} # 默认会检测环境变量HTTP_PROXY，不直接支持socks
-headers={'User-Agent':'python-requests/2.23.0','Accept-Encoding':'gzip','Connection':'keep-alive'}.update({'Referer': referer}) #【基本默】普通dict，大小写不敏感
+headers={'User-Agent':'python-requests/2.23.0','Accept-Encoding':'gzip','Connection':'keep-alive'}) #【基本默】大小写不敏感的dict
 auth=('user', 'pass') # Authorization头，如果不放到session里，重定向时会自动去掉
 cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict。另有requests.utils.add_dict_to_cookiejar(cj, cookie_dict)、cookiejar_from_dict、dict_from_cookiejar几个函数；有可能第一次能用dict，之后就要用它们了，不能直接update
 ```
@@ -394,9 +383,10 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 ### 请求和响应
 
 * url必须要有scheme；必须每次写完整url，要不就用requests_toolbelt提供的BaseUrlSession
-* get的params会自动变成查询参数，且值为None的不会附加上去，值为list的会自动与k展开
-* post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，也因后者故最好不要传字符串形式的json给data，可以先loads一下
-* 传字符串给data不会有额外变化，就是设置body；传字符串给json无意义；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
+* get的params会自动变成查询参数，且值为None的不会附加上去
+* post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，前者是form
+* 传字符串给data是设置body，不要传字符串给json；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
+* post支持files={'filefield': file-like-objects-binary-mode}，requests-toolbelt提供了更多功能
 * RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
 
 ```python
@@ -405,30 +395,47 @@ r.raise_for_status(), r.status_code # 200，== requests.codes.ok
 r.json() # 即使解码成功也不一定意味着请求成功，因为有时服务器会在失败时也返回json
 r.text # 根据encoding解码的HTTP内容字符串
 r.encoding # 可赋值，一般在它等于'ISO-8859-1'时赋r.apparent_encoding
-r.content # HTTP内容二进制，但会自动解码gzip，适用于图片等
-r.url, r.history # 后者为重定向响应列表
-r.headers # 字典，此时为响应头部，仍可用r.request.headers访问请求头部
+r.content # 二进制，但会自动解码gzip，适用于图片等
+r.url, r.history # 前者包含查询参数，后者为重定向响应列表
+r.headers # 响应头部，可用r.request.headers访问请求头部
 
-# 保存二进制文件的推荐方式，会自动gzip解码
-with open(filename, 'wb') as fd:
-    for chunk in r.iter_content(chunk_size):
-        fd.write(chunk)
+# 流式API，get返回时只下了Header，可以进行一些处理，直到访问content才会下载响应体
+with requests.get(url, stream=True) as r:
+    if r.encoding is None: r.encoding = 'u8'
+    for line in r.iter_lines(decode_unicode=True):
+        if line: # filter out keep-alive new lines
+            print(json.loads(decoded_line))
+
+    with open(filename, 'wb') as fd: # 保存二进制文件的推荐方式
+        for chunk in r.iter_content(chunk_size): # 默认为1，但content和iter_lines另有默认值
+            fd.write(chunk)
 
 # 缓存，默认是保存在内存中的dict，还支持redis；另有requests-cache库星数更高但不是requests官方推荐的
 from cachecontrol import CacheControl
 cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachecontrol.caches.FileCache('.webcache')
 # 一些建议：params最好sorted一下、缓存的响应永远不要流式处理
-
-# stream=True，则get返回时只有Header被下载下来了，可以进行一些处理，直到访问content才会下载响应体；还可以使用raw属性，是urllib3里的原始响应，未gzip解码？
-with requests.get(url, stream=True) as r:
-    if r.encoding is None: r.encoding = 'utf-8'
-    for line in r.iter_lines(decode_unicode=True): # 迭代流式API
-        if line: # filter out keep-alive new lines
-            decoded_line = line.decode('utf-8')
-            print(json.loads(decoded_line))
-
-# post的files={'filename': file-like-objects}用于multipart/form-data类型的请求，但默认不支持流式处理，要用requests_toolbelt才行
 ```
+
+### urllib3
+
+* 线程安全
+* 自动gzip解码，requests也是
+* urllib3.PoolManager().request('GET',url)，只能下到bytes，要自己手动解码`r.data.decode('u8')`
+* 头：PM()和request()的headers参数都是在默认头上添加，无论设为None还是{}都这样，且此时pool.headers是{}；request()的是完全替换PM的
+* request_encode_xxx()的method必须大写，request()可小写
+* params接受的字典不需要dict[str, str]，会自动处理
+* post时构建查询参数：urllib.parse.urlencode(dict)
+* 上传文件：不支持file-like-obj，fields={'filefield':('filename', filestr)}，二进制内容设置body和Content-Type
+
+### 其它HTTP库
+
+* urllib.request.urlopen不提供复用，http.client更加底层，两者都无法实际使用
+* httpx的api差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
+* requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
+* httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
+* faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
+* h11：底层库，和http.client同级别
+* python-trio/hip：urllib3的fork，添加了异步，开发很早期，没有使用的价值
 
 ## Beautiful Soup
 

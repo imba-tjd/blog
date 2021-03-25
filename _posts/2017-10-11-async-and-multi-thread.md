@@ -124,8 +124,8 @@ private static void PropagateResult<T>(Task<T> completedTask,
 ## Parallel
 
 ```c#
-Parallel.For(0, arr.Length,
-    index => { Interlocked.Add(ref sum, arr[index]); });
+Parallel.For(0, arr.Length, index => { Interlocked.Add(ref sum, arr[index]); });
+Parallel.For(from, to, () => 0【线程局部变量初始化】, (i, loopstate, subtotal) => arr[i]+subtotoal【在一个线程中进行一定范围的计算，返回值作为下一次的subtotal】, x => Interlocked...【最终访问共享资源】);
 Parallel.ForEach(arr, item => Interlocked.Add(ref sum, item);
 Parallel.Invoke( // 并发调用多个函数
     () => WriteLine(),

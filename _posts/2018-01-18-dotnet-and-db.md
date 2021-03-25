@@ -138,6 +138,7 @@ OnPostDeleteAsync: await _context.Customers.FindAsync(id); if ... Remove ...
 * 连接字符串：`"DataSource=db.sqlite/:memory:;Mode=ReadWriteCreate（默）/ReadWrite/ReadOnly"`，SqliteConnectionStringBuilder略；不加参数会创建临时磁盘数据库，在连接关闭时删除；路径为相对CWD的；还支持url但应该是只读的；默认如果文件不存在会自动创建但无法自创文件夹
 * 事务默认隔离级别为可序列化，设置`Cache=Shared`再更改事务隔离级别才允许读取未提交内容
 * 支持cnn.BackupDatabase()，目前只有阻塞的
+* 默认启用了WAL
 
 ```c#
 // 排序规则默认支持 RTRIM忽略尾随空格、NOCASE英文字符不区分大小写、BINARY二进制比较 三种。可自定义支持Unicode的排序：
