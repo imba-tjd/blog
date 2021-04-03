@@ -158,6 +158,8 @@ trusted-host = mirrors.aliyun.com
 * Glances：监控所有系统信息（类似于vmstat）
 * userpath：添加和验证PATH的程序，也能作为库使用
 * fierce：扫描域名，基本上是取附近IP的反查PTR；aiodnsbrute爆破查找域名
+* csvkit：一系列命令行工具，包括能把xlsx和json转换成csv。但依赖太多了，还需要装libicu-dev
+* harelba/q：在csv上运行SQL语句，但没发布PyPI包
 
 ## Ruby
 

@@ -142,7 +142,7 @@ include_package_data = True # 将MANIFEST.in的内容打包进bdist，还可指�
 scripts =
     bin/script
     scripts/script
-zip_safe = False # 不启用时作为源码安装，方便调试，兼容性好；启用时作为.egg压缩包安装，性能好；对wheel无任何影响
+zip_safe = False # setup.py install默认启用，作为.egg压缩包安装。对wheel无影响
 # setup_requires可以加一个wheel；test_suite = tests；tests_require废弃了
 
 [options.entry_points]
@@ -741,8 +741,42 @@ async def app(scope, receive, send): # 使用Starlette简单封装uvicorn请求
 ### MySQL
 
 * pymysql：纯Py，当用gevent或者PyPy时可以用
-* mysql-connector-python：纯Py，Oracle官方实现，性能貌似比pymysql还要差
+* mysql-connector-python：纯Py，Oracle官方实现，性能貌似比pymysql还要差；https://dev.mysql.com/doc/connector-python/en/connector-python-coding.html https://dev.mysql.com/doc/x-devapi-userguide/en/devapi-connection-concepts.html https://dev.mysql.com/doc/dev/connector-python/8.0/tutorials/connection_pooling.html
 * mysqlclient-python：带有C扩展，性能最好
+
+### peewee
+
+* CharField, IntegerField, DataField, DataTimeField(default=datetime.now)
+* null=False, index=True, unique=True, primary_key=True
+* 线程池版连接在playhouse.pool中，也是本包的一部分
+
+```py
+import peewee as pw
+db = pw.SqliteDatabase('data.db', pragmas={'journal_mode':'wal', 'synchronous':1})
+mysql_db = MySQLDatabase('dbname', user='app', password='xxx', host='10.1.0.8', port=3306)
+
+class BaseModel(pw.Model):
+    class Meta: database = db
+class Person(BaseModel):
+    name = CharField(verbose_name='姓名', max_length=10)
+    class Meta:
+        table_name = 'people'
+class Pet(BaseModel):
+    owner = ForeignKeyField(Person, backref='pets')
+
+# db.connect(reuse_if_open=True) # 默认使用时会自动连接；用完了可close()
+db.create_tables([Person, Pet])
+# 操作对象
+p = Person.create(...) # 这样会自动保存
+p.save()
+p.delete_instance()
+p = Person.get(Person.name == 'xxx')
+# 操作数据；fn().XXX可调用任何SQL函数，后可跟.alias()命名
+query = Person.select().where(Person.birthday.between(...) | (...)).join(Pet, JOIN.LEFT_OUTER) # 也可用get()获得单条数据；可用.prefetch(Pet)替代join
+for p in query: print(p.pets.count())
+Person.delete().where().execute()
+Person.update({Person.name: ...}).where().execute()
+```
 
 ## PySnooper
 
@@ -762,6 +796,66 @@ watch=('foo.bar') # 查看非局部变量的值；watch_explode展开字典的�
 depth=2 # 调用其它函数的跟踪深度，默认为1
 ```
 
+## Cython
+
+* 在不需要与C库交互时一般用纯Python模式，在对应名字的pxd中写cdef/cpdef但不加实现，类似于pyi。也支持直接写type hint但与普通的有冲突比如要用cython.int
+* pyx默认Python2，但在不影响的情况下也可用3的语法，可加上`cython: language_level=3`；未来会改
+* cython命令行把pyx变成c，`cythonize -i **/*.pyx`把pyx变成so/pyd(build in place)，能直接import，还支持-j多线程；-a会产生html分析结果，黄色的是用了Python的
+* pyximport.install()后能不编译就import pyx，但只能用于调试因为需要环境里有Cython和编译器
+* Jypyter Notebook：%load_ext Cython之后在需要的块中%%cython [--annotate]
+* 等需要用到了再看：https://zhuanlan.zhihu.com/p/339599667
+
+```py
+# setup.py
+from Cython.Build import cythonize
+setup(ext_modules=cythonize('**/*.pyx')
+python setup.py build_ext --inplace # 生成so/pyd
+```
+
+## numba
+
+* 依赖numpy，不能加速pandas
+* 0.54会默认使用nopython模式，fallback变为opt-in
+* parallel=True可多线程执行；fastmath=True可启用精度较低但更快的浮点运算
+* TODO: https://numba.readthedocs.io/en/stable/user/jit.html
+
+## pyside6
+
+* 现在VSC的lint很有问题
+* Lib/site-packages/PySide6下有designer.exe
+* 教程：https://blog.csdn.net/baidu_36499789/article/details/113835688 https://doc.qt.io/qtforpython/quickstart.html https://github.com/maicss/PyQt5-Chinese-tutorial
+
+```py
+from PySide6 import QtCore, QtWidgets, QtGui
+class MyWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.button = QtWidgets.QPushButton("Click")
+        self.button.clicked.connect(self.magic)
+        self.text = QtWidgets.QLabel("Hello World", alignment=QtCore.Qt.AlignCenter)
+
+        self.layout = QtWidgets.QVBoxLayout()
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.button)
+        self.setLayout(self.layout)
+
+
+    @QtCore.Slot()
+    def magic(self):
+        self.text.setText("hello")
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+    # app.setStyle('Fusion')
+
+    widget = MyWidget()
+    widget.resize(800, 600)
+    widget.show()
+
+    sys.exit(app.exec_())
+```
+
 ## 杂项
 
 * colorama：控制台的前、背景色；rich：自动染色和格式化
@@ -769,10 +863,10 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * beeprint：格式化打印dict
 * python-dotenv：从`.env`中读取并设置环境变量
 * PyYAML：一定要用safe_load；或者用strictyaml
-* lazy_import：np = lazy_import.lazy_module("numpy")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的numpy也是lazy的
+* lazy_import：np = lazy_import.lazy_module("xxx")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的xxx也是lazy的
 * chardet：猜测编码
 * watchdog：用于监测文件变化
-* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq；huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
 * attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
@@ -800,7 +894,6 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * Seaborn bokeh plotly.py plotly/dash 数据可视化
 * https://github.com/dbader/schedule，据说自带的很不好用
 * 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
-* https://github.com/harelba/q：Run SQL directly on CSV or TSV files；csvkit
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * Nuitka：https://zhuanlan.zhihu.com/p/31721250 https://zhuanlan.zhihu.com/c_1245860717607686144 性能有提高，跨平台差；好像不能单文件
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
@@ -826,3 +919,4 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * 和C++交互：pybind11
 * streamlit：从程序生成网页，不过主要是为机器学习设计的
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
+* redis：https://github.com/coleifer/walrus
