@@ -163,6 +163,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * receipt：p不发音，/rɪˈsiːt/
 * suite：/swiːt/
 * journal：/dʒɜːnl/
+* asked：/ɑːskt/或非正式/ɑːst/
 
 ## 同词异义异音
 
