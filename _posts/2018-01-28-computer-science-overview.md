@@ -2,17 +2,7 @@
 title: 计算机科学概论笔记
 ---
 
-> 计算机科学概论（第12版）\
-> [美]J.格伦·布鲁克希尔（J.Glenn Brookshear），丹尼斯·布里罗（Dennis Brylow）
-
 ## 数据储存
-
-### 容量的度量
-
-* KB：kibi-byte
-* MB：mebi-byte
-* GB：gibi-byte
-* TB：tebi-byte
 
 ### 校验
 
