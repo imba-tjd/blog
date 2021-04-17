@@ -859,7 +859,7 @@ if __name__ == "__main__":
 ## 杂项
 
 * colorama：控制台的前、背景色；rich：自动染色和格式化
-* icecream：用来代替print输出调试信息的，比如无参调用会显示被调用时所在文件和行号，有参调用会显示参数内容和返回值，并再返回那个返回值，用disable()可关掉所有输出，install()可使得无需import也能用
+* icecream：代替print输出调试信息，无参调用会显示被调用时所在文件和行号，有参调用会显示参数内容和返回值，并再返回那个返回值；可一件关闭所有输出；未安装可透明回落不存在
 * beeprint：格式化打印dict
 * python-dotenv：从`.env`中读取并设置环境变量
 * PyYAML：一定要用safe_load；或者用strictyaml

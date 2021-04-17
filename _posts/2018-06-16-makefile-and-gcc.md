@@ -96,6 +96,7 @@ prog3 : prog3.o sort.o utils.o
 * [ccache](https://github.com/ccache/ccache)可以缓存编译信息
 * -Ofast可开启最高优化，比O3还高，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
+* -flto=thin可进行一些优化
 
 ### 编译步骤
 
@@ -141,3 +142,4 @@ prog3 : prog3.o sort.o utils.o
 * https://reactos.org/wiki/Building_MINGW-w64
 * -Wno-excessive-errors
 * https://zhuanlan.zhihu.com/p/296191493
+* https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/
