@@ -215,6 +215,12 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * 不进行自动转换：*.txt binary
 * 修改后可用`git add --renormalize .`改变已有文件的换行；使用前需要把当前文件都提交
 
+## 仅修改大小写
+
+* 直接只改大小写会检测不到
+* git -c core.ignorecase=false <实际命令> 会认为创建了新文件，且不认为删除了老文件
+* git mv abc ABC，-n会认为把abc改为ABC/abc，实际会直接失败
+
 ## SSH & GPG Keys
 
 ### [GPG](https://help.github.com/cn/articles/about-commit-signature-verification)

@@ -778,6 +778,25 @@ Person.delete().where().execute()
 Person.update({Person.name: ...}).where().execute()
 ```
 
+### walrus
+
+* redis-py的wrapper，peewee的作者
+* 基于lua脚本实现了Array，对于索引更友好
+* BloomFilter
+* 搜索“自动完成”的建议
+* 全文搜索
+* cache支持装饰器
+
+```py
+from walrus import *
+db = Walrus()
+db['walrus'] = 'tusk' # 普通情况下像dict
+l = db.List('names')
+z = db.ZSet('z1')
+z.add({'huey': 3, 'mickey': 6, 'zaizee': 2.5})
+z['huey']; z[:'mickey']; z[-2:]; z[-2:, True] # 分别为取/赋、比mickey小的Key、两个最大的的Key、且返回它们的权重
+```
+
 ## PySnooper
 
 * 每一行代码的执行
@@ -919,4 +938,3 @@ if __name__ == "__main__":
 * 和C++交互：pybind11
 * streamlit：从程序生成网页，不过主要是为机器学习设计的
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
-* redis：https://github.com/coleifer/walrus
