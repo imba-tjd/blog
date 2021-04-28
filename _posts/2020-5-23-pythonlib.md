@@ -149,7 +149,7 @@ zip_safe = False # setup.py install默认启用，作为.egg压缩包安装。�
 console_scripts = # 还支持gui_scripts，关闭父console还能运行；如果某一项需要额外的依赖，用方括号声明名字并在extras里写内容
     myexe = proj.__main__:_main # 若用proj:_main，得到的是init中的对象，而不是__main__.py的
 
-[options.extras_require] # pip安装时或entry_points用中括号才会装上
+[options.extras_require] # pip安装时或entry_points用中括号和逗号才会装上
 tests = tox; pytest # 不明白为什么列表变成分号了但是就是这样，也可分行写
 
 [options.packages.find]

@@ -39,7 +39,7 @@ title: Linux命令
 * free -mt：显示内存容量，以MB为单位
 * tail -f：跟踪指定文件，如果有变化立即显示，删除后停止；与less -F相同
 * tasksel：在Debian中快速安装软件
-* cat \<\<EOF\>out.txt：输入以后继续输入文字，当最后一行输入EOF文本的时候结束输入，用-EOF可以忽略空白字符
+* cat << EOF >out.txt：输入以后继续输入文字，当最后一行输入EOF文本的时候结束输入，用-EOF可以忽略空白字符
 * which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件；type可以区分内置还是外置命令，-a可以显示包含alias在内的命令查找顺序
 * xclip：复制到剪切板上，不自带
 * head -10：显示前10行信息
@@ -151,7 +151,7 @@ title: Linux命令
 * -p 5353：指定端口
 * AAAA：查询ipv6的记录；A：ipv4的记录；MX：邮件服务器记录；NS：该域名由哪个dns服务器负责解析；CNAME：查询别名；-x：查询PTR记录，只能用此参数，前面的方法不适用
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
-* ->\>HEADER\<\<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
+* ->>HEADER<<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
 * 查询EDNS状态：`dig edns-client-sub.net -t TXT @8.8.8.8`
 * 另外还有kdig（knot-utils）和host命令
 

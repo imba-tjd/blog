@@ -151,7 +151,7 @@ category: windows
 * Group-Object：进行分组，依据可为表达式；分组后有Count属性用于排序，Name属性为key，Group属性为内容
 * Get-Unique(gu/unique): 从排序列表返回唯一项目。但其实只会比较前一个，所以如果没有先排序就无法发挥作用，只能保证相邻不重复
 * Measure-Object(measure): 计算对象的数字属性以及字符串对象（如文本文件）中的字符数、单词数、行数、最大最小总和
-* Compare-Object(compare/diff): 比较两个对象数组，SideIndicator的=\>表示新增的对象；使用-Property参数可以比较对象的指定属性
+* Compare-Object(compare/diff): 比较两个对象数组，SideIndicator的=>表示新增的对象；使用-Property参数可以比较对象的指定属性
 * 任何平台的PS都不支持小于号的输入重定向，但Get-Content可以把文件中的内容写入管道
 
 ### 格式化和输入输出转换
