@@ -8,6 +8,7 @@ title: 浏览器
 * 网络状况：about:networking
 * 搜索的高亮只会显示1000个
 * 地址栏搜索选择非默认搜索引擎时按住shift可直接进行搜索而不触发联想
+* 按住alt键就可以开启强制选择模式，这样鼠标就不会发出拖拽等其他功能
 
 ### 下载
 
@@ -103,10 +104,6 @@ title: 浏览器
 * Quantum：https://addons.mozilla.org/zh-CN/firefox/addon/quantum-launch/
 * Rainbow Blur：https://addons.mozilla.org/zh-CN/firefox/addon/rainbow-blur-1
 
-### 其他
-
-* 按住alt键就可以开启强制选择模式，这样鼠标就不会发出拖拽等其他功能
-
 ## Chrome
 
 * http://static.centbrowser.cn/installer_64/
@@ -126,23 +123,6 @@ title: 浏览器
 #### [Overlay Scrollbars](https://www.zhihu.com/question/64630817/answer/223528093)
 
 * --enable-features=OverlayScrollbar --enable-prefer-compositing-to-lcd-text
-
-#### www
-
-> ```
-> Chrome 78 的 flags 页面中去掉了 omnibox-ui-hide-steady-state-url 相关的选项。
-> 但是经测试，可以在 chrome://flags 页面控制台执行
-> [
->   'omnibox-ui-hide-steady-state-url-path-query-and-ref',
->   'omnibox-ui-hide-steady-state-url-scheme',
->   'omnibox-ui-hide-steady-state-url-trivial-subdomains'
-> ].forEach(function(f) {
->   chrome.send('enableExperimentalFeature', [f + '@2', 'true']);
-> })
-> 来禁用这几个选项。代码中 @2 对应的是 Disabled。 @0 和 @1 分别对应 Default 和 Enabled。
-> ```
-
-然而我实测无效。
 
 ### 忽略HSTS证书错误
 

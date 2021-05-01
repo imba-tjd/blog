@@ -175,7 +175,7 @@ public sealed class MyAttributeAttribute:System.Attribute{...}
 * 不能在动态类型上直接调用扩展方法，但可以主动使用扩展方法
 * 不能直接把委托和lambda表达式赋给dynamic，但可强制转换后赋
 * 构造函数无法返回动态类型的对象，但是可以用工厂方法
-* 不能声明基类为dynamic的类，不能用于泛型类型参数的约束(where T: dynamic)，不能用于实现泛型接口的类型参数(:IEnumerable\<dynamic\>)；可以用于实现泛型类的类型参数(:List\<dynamic\>)或泛型接口变量
+* 不能声明父类为dynamic的类，不能用于泛型类型参数的约束(where T: dynamic)，不能用于实现泛型接口的类型参数(:IEnumerable\<dynamic\>)；可以用于实现泛型类的类型参数(:List\<dynamic\>)或泛型接口变量
 
 ### 静态方法动态调用
 
@@ -222,7 +222,7 @@ Console.WriteLine(expando.Second);
 * 构造函数设为私有，提供返回dynamic类型的工厂方法
 * 可以添加自己的索引器，这样直接使用自己就是自己，索引以后就是自己的兄弟；如果没有的话就要再来一个列表属性
 * 只有在使用的时候才会获取对应的值；即使获取相同的元素，也返回的是不同的引用
-* 支持简单成员；如果要实现动态成员和各种运算，需要覆盖Try...方法；binder.Name为调用的名字，不存在时返回基类的该方法；获取它的所有成员，覆盖GetDynamicMemberNames方法
+* 支持简单成员；如果要实现动态成员和各种运算，需要覆盖Try...方法；binder.Name为调用的名字，不存在时返回父类的该方法；获取它的所有成员，覆盖GetDynamicMemberNames方法
 
 #### Try...方法
 
