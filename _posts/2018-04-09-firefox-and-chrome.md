@@ -48,6 +48,7 @@ title: 浏览器
 * network.trr.exclude-etc-hosts 默认为true，即DoH时忽略hosts
 * network.preload：允许`link rel="preload"`
 * browser.urlbar.suggest.engines：false
+* browser.proton.enabled; browser.proton.contextmenus.enabled
 
 #### 页面翻译
 

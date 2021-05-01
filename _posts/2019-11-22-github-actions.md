@@ -32,6 +32,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: "! contains(github.event.head_commit.message, '[ci skip]')"
 
     steps:
     - uses: actions/checkout@v2 # 官方文档很完善了

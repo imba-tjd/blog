@@ -919,7 +919,7 @@ if __name__ == "__main__":
 * https://github.com/grantjenks/python-diskcache
 * https://github.com/Delgan/loguru 日志
 * https://github.com/mitmproxy/mitmproxy
-* https://github.com/gevent/gevent
+* https://github.com/gevent/gevent https://www.gevent.org/
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
 * https://github.com/serge-sans-paille/pythran https://github.com/numba/numba
 * https://github.com/mahmoud/boltons 纯Py utils大集合，不过社区贡献并不太多

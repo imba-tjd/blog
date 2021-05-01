@@ -198,7 +198,7 @@ aria2、axel、httpie放到软件的文章里去了。
 * 默认显示body，-I用HEAD请求，-i顺便显示Header，`-D –`不限方法只显示头，-X手动指定HTTP请求类型
 * -o或者>写入文件，-O使用网站提供的名字；多URL时要多次指定，或者后者可改用--remote-name-all
 * -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开指定
-* -x使用proxy（正代）
+* -x使用proxy（正代），默认端口1080，例外是https时是443
 * `-C -`断点续传
 * -e/--referer提供referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误

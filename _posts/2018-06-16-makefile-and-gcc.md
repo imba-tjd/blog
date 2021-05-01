@@ -127,6 +127,13 @@ prog3 : prog3.o sort.o utils.o
 * 安装：https://apt.llvm.org/
 * Win: https://github.com/mstorsjo/llvm-mingw
 
+## MinGW
+
+* https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z
+* http://www.equation.com/servlet/equation.cmd?fa=fortran
+* https://jmeubank.github.io/tdm-gcc/
+* https://gcc-mcf.lhmouse.com/
+
 ## 参考
 
 * https://blog.csdn.net/haoel/article/details/2886
