@@ -20,7 +20,7 @@ title: 枚举器和迭代器
 * 如果使用了yield return，会自动生成状态机，后面跟的是单个元素
 * 在完全不使用yield的情况下，可以直接return一个IEnumerable类型
 * 如果想返回空，可以用yield break或者Enumerable.Empty
-* 如果接受一个IEnumerable，又仍想返回一层的IEnumerable：如果已经用了yield，只能foreach消费传入的再yield return；要不就返回两层的，再在外面包一层SelectMany；如果没有，可以用Concat/Append，如果是在开头添加，可以从Empty接上
+* 如果接受一个IEnumerable，又仍想返回一层的IEnumerable：如果已经用了yield，只能foreach消费传入的再yield return；要不就返回两层的，再在外面包一层SelectMany；如果没有，可以用Concat/Append/Prepend
 
 ## IEnumerator<T>
 

@@ -508,3 +508,7 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * https://zhuanlan.zhihu.com/p/39692934
 * https://www.bilibili.com/video/av65313713
 * https://docs.microsoft.com/zh-cn/aspnet/core/fundamentals/index
+
+### TODO
+
+* https://github.com/davidfowl/AspNetCoreDiagnosticScenarios
