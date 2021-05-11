@@ -132,7 +132,7 @@ prog3 : prog3.o sort.o utils.o
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z
 * http://www.equation.com/servlet/equation.cmd?fa=fortran
 * https://jmeubank.github.io/tdm-gcc/
-* https://gcc-mcf.lhmouse.com/
+* https://gcc-mcf.lhmouse.com/ 小文件太多
 
 ## 参考
 
@@ -150,3 +150,4 @@ prog3 : prog3.o sort.o utils.o
 * -Wno-excessive-errors
 * https://zhuanlan.zhihu.com/p/296191493
 * https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/
+* CMake: https://zhuanlan.zhihu.com/p/361123818

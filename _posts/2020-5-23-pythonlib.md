@@ -463,22 +463,18 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 但对于输入时href中正常的&，输出时也会变为实体而出错，官方的理由是这样能最大程度保证输出的是有效的HTML。用formatter=None可以避免但是其它地方又不会转换了。
 ```
 
-## [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/usage.html)
+## PyInstaller
 
-* pyinstaller opts file.py/file.spec
-* -F：打包成单一的exe；默认-D创建dir，结果在dist文件夹中；build文件夹记录了构建过程，warn-xxx.txt记录了出错内容
-* -c：使用控制台，默认；-w：使用窗口
-* -i：改变icon；-y：重新生成时静默覆盖
-* -d：显示debug级别的信息
-* --uac-admin：Win下才有效，会申请UAC
-* 第一次运行pyinstaller时会生成`.spec`配置文件：exclude是要排除的包；datas是要添加的任意文件，允许通配符；pathex是运行时的工作目录；binary用于添加二进制依赖，如dll
-* pyi-bindepend：显示打包后的依赖，pyi-archive_viewer：显示打包后的内容，pyi-makespec：通过命令行选项生成`.spec`
-* 最好把它自己装到虚拟环境里，否则结果很大
-* 好像如果upx可用就会自动使用，Linux程序还可用-s(strip)
-* 控制import的内容能减少大小
-* 如果有共同的依赖，有方法合并，但好像有点复杂，且文档未更新
-* TODO: https://zhuanlan.zhihu.com/p/40716095 https://mp.weixin.qq.com/s/rL84_hBqH4CX-SmUXnjKAQ https://www.zhihu.com/question/281858271
-* 好像有个PyOxidizer是相同功能，但是需要装Rust且开发非常早期
+* 默认构建结果在dist文件夹中，build文件夹记录了构建过程，warn-xxx.txt记录了出错内容
+* -Fwy：单文件+使用窗口+重新生成时静默覆盖之前构建的内容；-i file.ico/exe：改变icon，Linux无效
+* --uac-admin：Win限定，会申请UAC。--uac-uiaccess不懂有什么区别，文档说与远程桌面有关
+* --collect-data/binaries/all MODULENAME，不知道和add-data的区别
+* `.spec`：datas是要添加的资源文件，允许通配符；binary用于添加二进制依赖，如dll；hiddenimports是添加没自动分析出来的模块引用
+* pyi-bindepend：显示打包后的依赖；pyi-archive_viewer：显示打包后的内容；pyi-makespec：仅生成`.spec`；没有时对目标运行pyinstaller命令行也会生成
+* 应在虚拟环境中使用，它自己也装进去
+* upx如果在Path里会自动使用，Linux程序还可用-s选项strip
+* TODO: https://zhuanlan.zhihu.com/p/86956717 https://pyinstaller.readthedocs.io/en/stable/runtime-information.html
+* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多，Nuitka也不够成熟
 
 ## python-fire
 

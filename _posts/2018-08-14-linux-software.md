@@ -28,7 +28,7 @@ category: linux
 * fpp：用管道传递给它可以自动把文件染色
 * axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
-* https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat
+* https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat；https://github.com/dundee/gdu 快速的du
 * https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP，活着
 * authbind：允许普通用户绑定1024以下的端口
 * tldr：--update

@@ -156,6 +156,7 @@ TODO。取代System.Data.SqlClient。
 * 数据库字段不区分大小写；查询参数必须和匿名对象名称相同，选取结果的名称也必须和映射类相同，否则参数需用DynamicParameters，选取结果在SQL语句中用as
 * 支持Ansi字符串（varchar），用new DbString；`reader.GetRowParser<T>(typeof(class))`支持同一列不同类型的读取；`new DataTable().Load(reader)`
 * Sqlite测试：当连接未打开时，创建表不报错，插入时才报错。当select xxx忘写from时，报的错是`no such column xxx`
+* DapperAOT，还在早期
 
 ```c#
 // 强类型查询，这样做Model类无需任何注释绑定；如果类中存在数据库没有的字段，会保留默认值，不会抛异常

@@ -18,7 +18,7 @@ System.IO
 * TextReader(abstract) -> StreamReader(Stream/string path)、StringReader(string src)
 * Synchronized静态方法返回线程安全的实例
 * BaseStream返回底层的流
-* TextWriter的AutoFlush指定是否每次Write后都flush
+* TextWriter的AutoFlush指定是否每次Write后都flush，默认false
 * TextReader的构造函数可指定是否读取BOM头来决定编码
 * 默认自动检测BOM，TextReader在第一次读取后才可用CurrentEncoding指示当前编码，或者用构造函数接受一个Encoding类的实例的重载指定编码方式；如果强制不自动检测，则为UTF8-BOM，读和写都是
 * StreamWriter默认是覆盖写，如果文件已有，不会创建新文件

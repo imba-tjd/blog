@@ -327,9 +327,9 @@ collapsable content
 * http://www.bewindoweb.com/224.html Github协议详解
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
 * CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（包括不允许翻译），NC是不用于商业目的
-* 选择开源协议：https://choosealicense.com/
+* 选择开源协议：https://choosealicense.com/，放在一起对比https://choosealicense.com/appendix/
 * 所有协议：https://opensource.org/licenses/category
-* https://www.gnu.org/licenses/gpl-faq.html
+* https://www.gnu.org/licenses/gpl-faq.zh-cn.html https://opensource.org/faq
 
 ## bare和mirror
 
@@ -382,3 +382,4 @@ collapsable content
 
 * git log https://zhuanlan.zhihu.com/p/259380550
 * git lfs https://zhuanlan.zhihu.com/p/146683392 https://docs.github.com/cn/github/managing-large-files
+* https://git.wiki.kernel.org/index.php/GitHosting
