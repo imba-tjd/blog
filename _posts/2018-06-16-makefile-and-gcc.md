@@ -115,6 +115,7 @@ prog3 : prog3.o sort.o utils.o
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
 * -ftrapv可以检测整数溢出？
+* 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 
 ### 超级静态的编译
 
@@ -125,14 +126,14 @@ prog3 : prog3.o sort.o utils.o
 ## Clang
 
 * 安装：https://apt.llvm.org/
-* Win: https://github.com/mstorsjo/llvm-mingw
+* Win: https://github.com/mstorsjo/llvm-mingw 有ucrt
 
 ## MinGW
 
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z
-* http://www.equation.com/servlet/equation.cmd?fa=fortran
-* https://jmeubank.github.io/tdm-gcc/
-* https://gcc-mcf.lhmouse.com/ 小文件太多
+* http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32，安装必须用它的程序，自己解压不能直接复制，会自动添加PATH
+* https://jmeubank.github.io/tdm-gcc/ 不太新
+* https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
 
 ## 参考
 
