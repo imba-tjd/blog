@@ -75,7 +75,7 @@ except ImportError:
 
 * 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
 * pip的包名与模块无关
-* python3 setup.py --help-commands；生成whl用bdist_wheel，需先装好wheel，生成过程在build文件夹里，生成的东西在dist文件夹里；install自动生成egg并安装模块，也会自动安装依赖但不会走pip自定义的源，实际上用的是easy_install；build_ext --inplace能生成c扩展，可用--compiler指定编译器；bdist --help-formats
+* python3 setup.py --help-commands；生成whl用bdist_wheel，需先装好wheel，生成过程在build文件夹里，生成的东西在dist文件夹里；install自动生成egg并安装模块，也会自动安装依赖但不会走pip自定义的源，实际上用的是easy_install；bdist --help-formats；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
 * pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软连接，当然setup自己除外；setup develop [--uninstall]效果类似一样但后者不会删入口点exe
 * pip wheel . 可以在pwd生成wheel，还是需要setup.py；注意不是python -m wheel
@@ -523,7 +523,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * edit：启动编辑器来输入交互式代码，关闭后会传到cli里；VSC会自动加一个\n，没啥好办法
 * store：持久化储存变量，store -r恢复
 * hist：查看历史命令，-n加上序号，-g pattern用grep搜索
-* timeit：统计语句运行的时间，会多次运行取平均值或手动指定-n；有%%；单次运行是time
+* timeit：统计语句运行的时间，会多次运行取平均值或手动指定-n，有%%；单次运行是time
 * xdel：删除变量并试图清除在其对象上的一切引用
 * who：显示当前所有变量，可指定要显示的类型；whos信息更丰富
 * pip：可以直接运行pip
@@ -688,7 +688,7 @@ def myfile(_):
 
 ### Uvicorn
 
-* pip install uvicorn[standard]：最小需要click和h11，标准版会装上基于Cython的uvloop和watchdog
+* pip install uvicorn[standard]：最小需要click和h11，标准版会装上uvloop和watchdog
 * uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询
 * --uds指定unix socket；--workers多线程
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips *信任所有
@@ -813,23 +813,80 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
-* 在不需要与C库交互时一般用纯Python模式，在对应名字的pxd中写cdef/cpdef但不加实现，类似于pyi。也支持直接写type hint但与普通的有冲突比如要用cython.int
-* pyx默认Python2，但在不影响的情况下也可用3的语法，可加上`cython: language_level=3`；未来会改
-* cython命令行把pyx变成c，`cythonize -i **/*.pyx`把pyx变成so/pyd(build in place)，能直接import，还支持-j多线程；-a会产生html分析结果，黄色的是用了Python的
-* pyximport.install()后能不编译就import pyx，但只能用于调试因为需要环境里有Cython和编译器
-* Jypyter Notebook：%load_ext Cython之后在需要的块中%%cython [--annotate]
-* 等需要用到了再看：https://zhuanlan.zhihu.com/p/339599667
+* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但与其它使用typing的库有冲突，且int要用cython.int，否则会视为object；支持用装饰器声明exceptval, cclass
+* 对numpy有一定支持，但应该不如numba
+* pyx默认Python2，3.0后为3
+* cython命令行把pyx变成c，`cythonize -i xxx.pyx`把pyx变成so/pyd(build in place)，能直接import；注意文件不存在时两者都无任何报错；-a会产生html分析结果，黄色的是与Python交互的
+* pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中。内部没有用cythonize，应该属于弃用用法或会在将来改，总之最好不要用于与C交互
+* setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
+* Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块
+* mypyc试图专注于纯Py模式，更简单，对typing一级支持，但还在开发中，且对Win支持不好；与C++交互：pybind11
+* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html array 内存视图
 
 ```py
 # setup.py
 from Cython.Build import cythonize
-setup(ext_modules=cythonize('**/*.pyx')
-python setup.py build_ext --inplace # 生成so/pyd
+setup(ext_modules=cythonize('**/*.pyx'))
+# CLI
+python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置；已有时不会重建，此时可用-f
+
+# 最简单的使用C函数的方式
+# test.c
+int fun(int a) { return a; }
+# testmod.pyx；必须不能是test.pyx，因为它俩在同一目录，而.pyx会编译成.c，就会冲突
+cdef extern from "test.c":
+    cpdef int fun(int a)
+
+# 声明函数、变量和类型
+def primes(int nb_primes): ... # def的函数只能在Py侧调用，cdef的只能在pyx中用，cpdef就都能用
+cdef inline int add(int a, int b): return a+b
+cdef int n
+cdef int p[1000]
+cdef object o # python对象，速度较慢
+cdef char* s = "abc" # 对应的是bytes
+cdef bint b # 对应Py的bool
+cdef void* v = <void*> n # 类型转换用尖括号
+@cython.boundscheck/wraparound/cdivision/initializedcheck(False) <函数定义> # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
+# Cython自带C标准库和一些posix库
+from libc.stdlib cimport atoi
+cdef parse_charptr_to_py_int(char* s): # 可不写返回类型但最好写
+    assert s is not NULL, "byte string value is NULL"
+    return atoi(s)
+
+# C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数：
+cdef extern from "queue.h":
+    ctypedef struct Queue: pass # 对应typedef struct _Queue Queue;
+    Queue* queue_new() # 隐式cdef extern
+    void queue_free(Queue* queue)
+# 在queue.pyx中写包装类，目的是把C风格的函数变成Py风格的类；基本名必须不同于那个.pxd
+# distutils: sources = lib/queue.c, another.c # 静态链接时必须指定
+# distutils: include_dirs = lib # 头文件所在文件夹，如果不在同一目录就也是必须的
+cimport cqueue # 导入pxd
+cdef class Queue:
+    cdef cqueue.Queue* _c_queue
+    def __cinit__(self): # 这里面只能给cdef的成员赋值，与c相关的内存分配如malloc()放这里
+        self._c_queue = cqueue.queue_new()
+        if self._c_queue is NULL: raise MemoryError()
+    def __dealloc__(self):
+        if self._c_queue is not NULL:
+            cqueue.queue_free(self._c_queue)
+
+    cdef extend_ints(self, int* values, size_t count): # Py不支持int*，显然不能用cpdef
+        cdef int value
+        for value in values[:count]:  # 使用for遍历数组的方法
+            self.append(value)
+    cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明。此函数只能返回int，要一个数表示出现了异常。仍能自动分辨-1是不是真的数据，不过还是选一个被有效用到的概率小的数比较好
+    # 支持Callbacks传递函数，但太复杂略
+
+# C++
+%%cython --cplus # distutils: language=c++
+from libcpp.string cimport string
+cdef string s = b'Hello world!'
 ```
 
 ## numba
 
-* 依赖numpy，不能加速pandas
+* 依赖numpy，不能加速pandas，需要一个较大的运行时依赖
 * 0.54会默认使用nopython模式，fallback变为opt-in
 * parallel=True可多线程执行；fastmath=True可启用精度较低但更快的浮点运算
 * TODO: https://numba.readthedocs.io/en/stable/user/jit.html
@@ -931,6 +988,5 @@ if __name__ == "__main__":
 * https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
 * GUI：PySimpleGUI kivy DearPyGui
-* 和C++交互：pybind11
 * streamlit：从程序生成网页，不过主要是为机器学习设计的
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
