@@ -84,6 +84,8 @@ except ImportError:
 * 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
 * MANIFEST.in额外控制sdist的内容，默认包含和不包含：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
 * 使用包内数据：importlib.resources.files("mypkg")/"data/data.csv" https://importlib-resources.readthedocs.io/en/latest/using.html；单个py_modules无法使用
+* 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
+* 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
 
 ```python
 # __init__.py；必须有此文件才能自动发现
@@ -108,6 +110,7 @@ setuptools.setup( # 也可无参调用，参数能覆盖cfg，写错没有警告
     py_modules=['test'], # 对应与setup.py同级的module.py，对于sub.test也可用且不会flat；或用[x.stem for x in Path().glob('*.py')]动态获取
     entry_points={"console_scripts": ["foo = foo.__main__:_main"],},
 )
+setuptools.sandbox.run_setup('setup.py', [args]/sys.argv[1:]) # 非命令行运行，好像不能写在setup.py自己里面否则就循环引用了
 
 # setup.cfg：https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html
 [metadata]
@@ -157,7 +160,7 @@ where = src
 include = pkg*
 exclude = tests
 
-[options.package_data] # 不要与include_package_data共用；还有个data_files能把文件安装到指定位置，但should be相对路径，相对于sys.prefix
+[options.package_data] # 不要与include_package_data共用；data_files弃用了，本来也对wheel无效
 * = *.txt, *.rst
 hello = *.msg
 
@@ -539,7 +542,6 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出放进输入中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
 * %%HTML、%%js、%%latex、%%markdown：将cell渲染成HTML输出；%%js运行JS
 * autoreload 2：需要load_ext加载。import模块后修改源文件能自动变化
-* matplotlib inline
 
 ### 配置
 
@@ -813,45 +815,51 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
-* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但与其它使用typing的库有冲突，且int要用cython.int，否则会视为object；支持用装饰器声明exceptval, cclass
+* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但与其它使用typing的库有冲突，且int要用cython.int，否则int会视为object；支持用装饰器声明exceptval, cclass
+* 出现异常时如果pyx源文件存在，会给出错地方，但仅仅时当时临时读取，如果改了没重编译就会对不上；Py_Object的函数调用出错不会在编译期给出
 * 对numpy有一定支持，但应该不如numba
 * pyx默认Python2，3.0后为3
-* cython命令行把pyx变成c，`cythonize -i xxx.pyx`把pyx变成so/pyd(build in place)，能直接import；注意文件不存在时两者都无任何报错；-a会产生html分析结果，黄色的是与Python交互的
+* cython命令行把pyx变成c，cythonize -i变成so/pyd；注意文件不存在时两者都无任何报错；-a会产生html分析结果，黄色的是与Python交互的
 * pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中。内部没有用cythonize，应该属于弃用用法或会在将来改，总之最好不要用于与C交互
 * setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
 * Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块
-* mypyc试图专注于纯Py模式，更简单，对typing一级支持，但还在开发中，且对Win支持不好；与C++交互：pybind11
-* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html array 内存视图
+* mypyc试图专注于纯Py模式，更简单，对typing一级支持，但还在开发中，且对Win支持不好，完全不支持mingw；与C++交互：pybind11
+* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 、Fused Types（类似模板/泛型）
 
 ```py
 # setup.py
 from Cython.Build import cythonize
 setup(ext_modules=cythonize('**/*.pyx'))
 # CLI
-python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置；已有时不会重建，此时可用-f
+python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f
+cythonize -i xxx.pyx
 
 # 最简单的使用C函数的方式
-# test.c
-int fun(int a) { return a; }
+int fun(int a) { return a; } # test.c
 # testmod.pyx；必须不能是test.pyx，因为它俩在同一目录，而.pyx会编译成.c，就会冲突
 cdef extern from "test.c":
     cpdef int fun(int a)
 
-# 声明函数、变量和类型
+# 基本使用，声明函数、变量和类型
+cimport cython
+from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库
 def primes(int nb_primes): ... # def的函数只能在Py侧调用，cdef的只能在pyx中用，cpdef就都能用
 cdef inline int add(int a, int b): return a+b
 cdef int n
-cdef int p[1000]
+cdef int arr[100] # 不支持VLA
+cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 必须强转，用尖括号；要free，一般放在finally里
 cdef object o # python对象，速度较慢
-cdef char* s = "abc" # 对应的是bytes
+cdef char* s = "abc" # 对应bytes，若为参数一般要assert s is not NULL
 cdef bint b # 对应Py的bool
-cdef void* v = <void*> n # 类型转换用尖括号
-@cython.boundscheck/wraparound/cdivision/initializedcheck(False) <函数定义> # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
-# Cython自带C标准库和一些posix库
-from libc.stdlib cimport atoi
-cdef parse_charptr_to_py_int(char* s): # 可不写返回类型但最好写
-    assert s is not NULL, "byte string value is NULL"
-    return atoi(s)
+@cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
+
+# 数组和内存视图，无需malloc，无需第三方依赖
+from cpython cimport array
+import array # 教程如此，实际测试不导入这个也行，也许是用于Py侧的传进来
+cdef array.array a = array.array('i', lst) # 仍视为object，但能用一些方便的API，如resize_smart、extend、zero
+cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；还有nogil的功能
+a.data.as_ints # 变为int*，用于调用C API；用as_voidptr变为void*
+cdef int value; for value in values[:count]: ... # 使用for遍历数组；数组转list用.tolist()，视图或raw用列表推导式
 
 # C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数：
 cdef extern from "queue.h":
@@ -861,6 +869,7 @@ cdef extern from "queue.h":
 # 在queue.pyx中写包装类，目的是把C风格的函数变成Py风格的类；基本名必须不同于那个.pxd
 # distutils: sources = lib/queue.c, another.c # 静态链接时必须指定
 # distutils: include_dirs = lib # 头文件所在文件夹，如果不在同一目录就也是必须的
+# distutils: define_macros=A=1 B # 定义宏
 cimport cqueue # 导入pxd
 cdef class Queue:
     cdef cqueue.Queue* _c_queue
@@ -871,10 +880,7 @@ cdef class Queue:
         if self._c_queue is not NULL:
             cqueue.queue_free(self._c_queue)
 
-    cdef extend_ints(self, int* values, size_t count): # Py不支持int*，显然不能用cpdef
-        cdef int value
-        for value in values[:count]:  # 使用for遍历数组的方法
-            self.append(value)
+    cdef extend_ints(self, int* values, size_t count): ... # Py不支持int*，显然不能用cpdef
     cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明。此函数只能返回int，要一个数表示出现了异常。仍能自动分辨-1是不是真的数据，不过还是选一个被有效用到的概率小的数比较好
     # 支持Callbacks传递函数，但太复杂略
 
@@ -887,9 +893,8 @@ cdef string s = b'Hello world!'
 ## numba
 
 * 依赖numpy，不能加速pandas，需要一个较大的运行时依赖
-* 0.54会默认使用nopython模式，fallback变为opt-in
+* 0.54会默认使用nopython模式，fallback变为opt-in。等0.54出来了再学
 * parallel=True可多线程执行；fastmath=True可启用精度较低但更快的浮点运算
-* TODO: https://numba.readthedocs.io/en/stable/user/jit.html
 
 ## pyside6
 
@@ -963,7 +968,7 @@ if __name__ == "__main__":
 
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/
 * PyNaCl https://github.com/pyca/cryptography
-* Seaborn bokeh plotly.py plotly/dash 数据可视化
+* 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
 * https://github.com/dbader/schedule，据说自带的很不好用
 * 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
@@ -988,5 +993,5 @@ if __name__ == "__main__":
 * https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
 * GUI：PySimpleGUI kivy DearPyGui
-* streamlit：从程序生成网页，不过主要是为机器学习设计的
+* streamlit：从程序生成网页，不过主要是为机器学习设计的。Gradio比前者限制更多，场景更具体
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
