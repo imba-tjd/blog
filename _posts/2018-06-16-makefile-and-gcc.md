@@ -97,19 +97,22 @@ prog3 : prog3.o sort.o utils.o
 * -Ofast可开启最高优化，比O3还高，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
 * -flto=thin可进行一些优化
+* -march=native生成为本机优化的代码，可能不能运行在其它机器上，用到的库没有自己编译也不要开。-mtune=native威力稍弱一些
+* -g等于-g2，-g3的体积更大；-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度。但无法与-flto一起使用
 
 ### 编译步骤
 
 1. gcc -E 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
 2. gcc -S -masm=intel可生成intel风格的汇编，否则是AT&T风格的；加-fverbose-asm可生成与源代码对应的注释
-3. gcc -c 生成二进制代码；-shared -fPIC生成动态库
-4. ar -crv libname.a ... 生成静态库；-t显示包含哪些.o
+3. gcc -c 生成二进制代码(.o)
+4. -shared -fPIC生成动态库(.so)，fpic产生的代码更小更快但在某些平台有限制一般不用
+5. ar -crv libname.a src.o ... 生成静态库；-t显示包含哪些.o
 
 ### 库
 
-* Linux下，.a是静态库，由多个.o组成，编译时当作.o用就是；.so是动态库，需要-L指定路径库名，当前目录用-L.，再-l库名，其中l和库名没有空格，L可有可无；L是只写库名而不写完整路径用的，否则可以不用；-l:库名.a可以手动指定不以lib开头的库
+* Linux下，.a是静态库，由多个.o组成，编译时当作.o附加到参数中就是；.so是动态库，需要-L指定库存在的文件夹，当前目录可省，再-l库名，也支持静态库但优先用动态的，可在前面加-Wl,-Bstatic优先用静态的；一般库都以lib开头，-l:库名.a可精确指定名字
 * Windows下，.lib是静态库，.dll是动态库；但与so相比，dll可不包含符号，此时符号在.lib中，即同一个后缀两个不同的作用
-* 先用`gcc -c`生成.o，生成.a用`ar -crv dest.a src1.o ...`，生成.so用`-shared -fPIC`；fpic产生的代码更小更快但在某些平台有限制一般不用
+* MinGW的-lxxx的搜索顺序：libxxx.dll.a xxx.dll.a libxxx.a cygxxx.dll libxxx.dll xxx.dll
 * ldd命令能查看程序所依赖的共享库
 * `-Wl,-rpath=/...` 可以指定**运行时**要搜索的动态库目录
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效

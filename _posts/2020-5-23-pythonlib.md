@@ -15,7 +15,7 @@ title: 第三方 Python 库
 pip freeze > requirements.txt # 需在venv中运行否则会把全局的写进去；类似于pip list --format=freeze，只是verb不同，freeze参数少
 pip install -r requirements.txt
 
---index https://xxx
+--index https://xxx # 如果repo以.py结尾，要加@setup.py
 SomeProject==1.4
 SomeProject>=1,<2 # 逗号为且；在CLI中运行需加引号否则大于号会被认为是重定向
 SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2”
@@ -75,11 +75,11 @@ except ImportError:
 
 * 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
 * pip的包名与模块无关
-* python3 setup.py --help-commands；生成whl用bdist_wheel，需先装好wheel，生成过程在build文件夹里，生成的东西在dist文件夹里；install自动生成egg并安装模块，也会自动安装依赖但不会走pip自定义的源，实际上用的是easy_install；bdist --help-formats；不存在--static-deps参数
+* python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
-* pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软连接，当然setup自己除外；setup develop [--uninstall]效果类似一样但后者不会删入口点exe
-* pip wheel . 可以在pwd生成wheel，还是需要setup.py；注意不是python -m wheel
-* pip download --only-binary :all: --dest . xxx 下载whl
+* pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，当然setup自己除外；setup develop [--uninstall]效果类似一样但后者不会删入口点exe
+* pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py；注意不是python -m wheel
+* pip download -d pkgs xxx/-r requirements.txt：把项目依赖下载到指定文件夹中方便在无网环境中install --no-index -f=pkgs -r
 * 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
 * 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
 * MANIFEST.in额外控制sdist的内容，默认包含和不包含：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
@@ -113,6 +113,9 @@ setuptools.setup( # 也可无参调用，参数能覆盖cfg，写错没有警告
 setuptools.sandbox.run_setup('setup.py', [args]/sys.argv[1:]) # 非命令行运行，好像不能写在setup.py自己里面否则就循环引用了
 
 # setup.cfg：https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html
+[global]
+verbose=1
+
 [metadata]
 name = xxx
 version = attr: mypkg.__version__
@@ -166,6 +169,10 @@ hello = *.msg
 
 [bdist_wheel] # 对应verb的开关
 universal = True # 能在py2和3上不做任何改变就运行且无C扩展才能开，命名上是py2.py3-none-any
+
+[build_ext]
+compiler=mingw32
+inplace=1
 
 # pyproject.toml
 [build-system]
@@ -476,6 +483,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * pyi-bindepend：显示打包后的依赖；pyi-archive_viewer：显示打包后的内容；pyi-makespec：仅生成`.spec`；没有时对目标运行pyinstaller命令行也会生成
 * 应在虚拟环境中使用，它自己也装进去
 * upx如果在Path里会自动使用，Linux程序还可用-s选项strip
+* 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * TODO: https://zhuanlan.zhihu.com/p/86956717 https://pyinstaller.readthedocs.io/en/stable/runtime-information.html
 * 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多，Nuitka也不够成熟
 
@@ -620,11 +628,10 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.get("/", summary='xxx', description='xxx')
-async def read_root():
-    return {"Hello": "World"}
+async def read_root(): return {"Hello": "World"}
 
 @app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Optional[str] = None): # 自动检测非路径参数；如果不加默认值就必须有
+def read_item(item_id: int, q: Optional[str] = None): # 自动检测非路径参数；如果不加默认值就必须有
     return {"item_id": item_id, "q": q}
 
 # 查询参数校验；如果不想设默认值但又为必要参数，设为...；还可设置title和description；Path对应路径参数校验，Body对应请求体
@@ -642,7 +649,7 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 ### Starlette
 
 * 也支持`@app.route`，但官网没这么写
-* 不以`/`结尾的路由会自动重定向
+* 不以`/`结尾的路由会自动重定向，`/{xxx}`时/后必须有内容否则不会匹配，不匹配时返回Not Found文本
 * taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖很多
 * Route还可以设置name，之后可用request或app.url_for获取那个名字的url
 * 使用类：继承starlette.endpoints.HTTPEndpoint，定义get等方法
@@ -660,7 +667,7 @@ from starlette.staticfiles import StaticFiles # 此项及FileResponse需要装ai
 def homepage(_): ...
 def user(request: Request):
     username = request.path_params['username'] # query_params, cookies, body()是bytes, json(), form()['filename'].read()
-    return PlainTextResponse('Hello, %s!' % username) # headers, set_cookie()
+    return PlainTextResponse('Hello, %s!' % username) # .headers, .set_cookie()；必须返回Response，不能直接返回str或dict
 
 routes = [
     Route('/', homepage, methods=['GET']), # 默认只接受GET，实际如果路由存在永远可用HEAD
@@ -692,8 +699,8 @@ def myfile(_):
 
 * pip install uvicorn[standard]：最小需要click和h11，标准版会装上uvloop和watchdog
 * uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询
-* --uds指定unix socket；--workers多线程
-* 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips *信任所有
+* --uds指定unix socket，--workers多线程，--log-level默认info
+* 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
 * scope中有scheme、method、path、headers
 
 ```python
@@ -717,7 +724,8 @@ async def app(scope, receive, send):
 if __name__ == "__main__": # 从脚本运行
     uvicorn.run("main:app",reload=True)
 
-async def app(scope, receive, send): # 使用Starlette简单封装uvicorn请求
+# 使用Starlette简单封装uvicorn请求
+async def app(scope, receive, send):
     request = Request(scope, receive)
     response = Response(content, media_type='text/plain')
     await response(scope, receive, send)
@@ -728,13 +736,14 @@ async def app(scope, receive, send): # 使用Starlette简单封装uvicorn请求
 * peewee
 * https://github.com/pudo/dataset：基于sqlalchemy
 * SQLAlchemy：等2.0
-* https://github.com/marshmallow-code/marshmallow 能把类序列化成json，但标记类型要用该库提供的
+* https://github.com/marshmallow-code/marshmallow 能把类序列化成json，也有校验功能，但标记类型要用该库提供的
 * jsonpickle：把任意类序列化成json
 * GINO：目前只支持pg
 * https://github.com/encode/orm：基于SQLAlchemy core的查询、databases的异步、typesystem的类型验证，但很不活跃
 * ponyorm、tortoise-orm
 * tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
 * edgedb：自创DML的关系型数据库，但好像是基于pg的
+* mashumaro：基于dataclass的序列化库，不够成熟
 
 ### MySQL
 
@@ -815,23 +824,23 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
-* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但与其它使用typing的库有冲突，且int要用cython.int，否则int会视为object；支持用装饰器声明exceptval, cclass
+* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突。还可以用装饰器声明locals(a = xxx), returns, exceptval, cfunc(=cdef), inline, ccall(=cpdef)
 * 出现异常时如果pyx源文件存在，会给出错地方，但仅仅时当时临时读取，如果改了没重编译就会对不上；Py_Object的函数调用出错不会在编译期给出
 * 对numpy有一定支持，但应该不如numba
 * pyx默认Python2，3.0后为3
 * cython命令行把pyx变成c，cythonize -i变成so/pyd；注意文件不存在时两者都无任何报错；-a会产生html分析结果，黄色的是与Python交互的
 * pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中。内部没有用cythonize，应该属于弃用用法或会在将来改，总之最好不要用于与C交互
 * setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
-* Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块
-* mypyc试图专注于纯Py模式，更简单，对typing一级支持，但还在开发中，且对Win支持不好，完全不支持mingw；与C++交互：pybind11
-* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 、Fused Types（类似模板/泛型）
+* Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-ffast-math --link-args=xxx
+* mypyc试图专注于纯Py模式，更简单，对typing一级支持，但还在开发中，且对Win支持不好，完全不支持mingw；与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL
+* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
 ```py
 # setup.py
 from Cython.Build import cythonize
 setup(ext_modules=cythonize('**/*.pyx'))
 # CLI
-python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f
+python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f；不支持-a
 cythonize -i xxx.pyx
 
 # 最简单的使用C函数的方式
@@ -840,26 +849,29 @@ int fun(int a) { return a; } # test.c
 cdef extern from "test.c":
     cpdef int fun(int a)
 
-# 基本使用，声明函数、变量和类型
+# 基本使用，声明函数、变量和类型；声明变量也可以使用cdef冒号缩进
 cimport cython
 from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库
 def primes(int nb_primes): ... # def的函数只能在Py侧调用，cdef的只能在pyx中用，cpdef就都能用
 cdef inline int add(int a, int b): return a+b
-cdef int n
+cdef int n = 3 # 不要忘记赋初值
 cdef int arr[100] # 不支持VLA
-cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 必须强转，用尖括号；要free，一般放在finally里
+cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 必须强转，用尖括号；要free，一般放在finally里；<T?>好像能进行检查是否能强转
 cdef object o # python对象，速度较慢
 cdef char* s = "abc" # 对应bytes，若为参数一般要assert s is not NULL
 cdef bint b # 对应Py的bool
 @cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
+@cython.infer_types(True) # 自动推断变量类型
+cython.address()等于&，但好像也支持直接用。cython.operator.dereference()等于*，不能直接用但可用[0]替代
+# 无论是通过结构体变量还是指针，访问结构体成员用.
 
 # 数组和内存视图，无需malloc，无需第三方依赖
 from cpython cimport array
 import array # 教程如此，实际测试不导入这个也行，也许是用于Py侧的传进来
-cdef array.array a = array.array('i', lst) # 仍视为object，但能用一些方便的API，如resize_smart、extend、zero
-cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；还有nogil的功能
+cdef array.array a = array.array('i', lst) # 复制一份，仍视为object，能用一些CAPI如resize_smart、extend、zero
+cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；能用with nogil, parallel()；ca[:]=0能把数组全部赋0
 a.data.as_ints # 变为int*，用于调用C API；用as_voidptr变为void*
-cdef int value; for value in values[:count]: ... # 使用for遍历数组；数组转list用.tolist()，视图或raw用列表推导式
+cdef int value; for value in values[:count]: ... # 使用for遍历int*；数组转list用.tolist()，视图或int*用列表推导式
 
 # C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数：
 cdef extern from "queue.h":
@@ -881,7 +893,7 @@ cdef class Queue:
             cqueue.queue_free(self._c_queue)
 
     cdef extend_ints(self, int* values, size_t count): ... # Py不支持int*，显然不能用cpdef
-    cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明。此函数只能返回int，要一个数表示出现了异常。仍能自动分辨-1是不是真的数据，不过还是选一个被有效用到的概率小的数比较好
+    cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明，否则会打印异常并忽略。此函数只能返回int，要一个数表示出现了异常。用?仍能自动分辨-1是不是真的数据，不过还是选一个被有效用到的概率小的数比较好
     # 支持Callbacks传递函数，但太复杂略
 
 # C++
@@ -990,7 +1002,7 @@ if __name__ == "__main__":
 * https://gitlab.com/mike01/pypacker socket库
 * https://github.com/prkumar/uplink 把REST API变成class
 * 自动重试：https://github.com/jd/tenacity
-* https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI
+* https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI；其他人练手的ASGI框架：abersheeran/index.py almarklein/asgineer
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
 * GUI：PySimpleGUI kivy DearPyGui
 * streamlit：从程序生成网页，不过主要是为机器学习设计的。Gradio比前者限制更多，场景更具体

@@ -45,7 +45,7 @@ title: Linux命令
 * head -10：显示前10行信息
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * sha1sum/md5sum -c xxx.sha1：自动验证对应的文件是否符合；不加-c是验证，未指定文件时从stdin读入
-* ln：参数意义与cp相同，-P硬链接（默认？），-s软连接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软连接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
+* ln：参数意义与cp相同，-P硬链接（默认？），-s软链接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软链接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
 * sudo update-grub：自动修复引导
 * lscpu：相比于`cat /proc/cpuinfo`，不会每个核都显示一遍
 * shred：粉碎文件
