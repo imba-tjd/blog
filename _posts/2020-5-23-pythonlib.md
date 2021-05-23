@@ -48,7 +48,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * 模块只初始化一次，所有变量归属于某个模块，import机制是线程安全的，所以模块本身是天然的单例实现。一个函数如果绑定了对应模块内的全局变量，当在别的地方`import *`后修改那个全局变量，函数仍然使用的是原来的变量，与class类似
 * python命令行也可运行目录，目标为那**一个**`__main__.py`；运行目标时会把`__name__`变量设为`'__main__'`
 * 不用-m会把目标所在的文件夹加到sys.path中，然后按路径直接执行目标，目标就是顶级模块；用-m会把cwd加到sys.path中，按模块名先一层层执行`__init__.py`再执行目标，会先编译成.pyc，会把`__package__`设为模块名的前一部分，cwd是顶级模块；该sys.path与环境变量的path无关，对于环境变量修改PYTHONPATH可更改搜索地点
-* 不要自己创建名为`runpy.py`的文件，因为系统存在runpy这个包
+* 不要自己创建名为`runpy.py`的文件，因为系统存在runpy这个包；site.py类似
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
 * 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
@@ -437,10 +437,27 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * post时构建查询参数：urllib.parse.urlencode(dict)
 * 上传文件：不支持file-like-obj，fields={'filefield':('filename', filestr)}，二进制内容设置body和Content-Type
 
+### urllib
+
+* 自带，但urlopen默认不支持keepalive，无法实际使用
+* http.client更加底层
+* User-Agent默认为Python-urllib/3.9
+
+```py
+req = urllib.request.Request(url, [method])
+req.add_header('k', 'v')/req.headers |= {'k':'v'}
+rsp = urllib.request.urlopen(req/url) # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
+html = rsp.read().decode()
+resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
+
+url = 'xxx?k=' + urllib.parse.quote(xxx, 'u8') # 有unquote
+parts = urllib.parse.urlparse(url) # 修改后可unparse
+parts.netloc域名
+```
+
 ### 其它HTTP库
 
-* urllib.request.urlopen不提供复用，http.client更加底层，两者都无法实际使用
-* httpx的api差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
+* httpx的api与requests差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
 * requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
 * httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
 * faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
@@ -484,8 +501,9 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 应在虚拟环境中使用，它自己也装进去
 * upx如果在Path里会自动使用，Linux程序还可用-s选项strip
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
+* 使用multiprocessing时要调用freeze_support()
 * TODO: https://zhuanlan.zhihu.com/p/86956717 https://pyinstaller.readthedocs.io/en/stable/runtime-information.html
-* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多，Nuitka也不够成熟
+* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，Nuitka也不够成熟
 
 ## python-fire
 
@@ -624,8 +642,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * bool查询参数会自动转换，b=1或者b=True或b=yes都可以
 
 ```python
-from fastapi import FastAPI
-app = FastAPI()
+app = fastapi.FastAPI()
 
 @app.get("/", summary='xxx', description='xxx')
 async def read_root(): return {"Hello": "World"}
@@ -650,11 +667,11 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 
 * 也支持`@app.route`，但官网没这么写
 * 不以`/`结尾的路由会自动重定向，`/{xxx}`时/后必须有内容否则不会匹配，不匹配时返回Not Found文本
-* taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖很多
 * Route还可以设置name，之后可用request或app.url_for获取那个名字的url
 * 使用类：继承starlette.endpoints.HTTPEndpoint，定义get等方法
 * 自带一些中间件：gzip、httpsredirect
 * Config封装了.env的读取
+* taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖太多，这么重不如用别的框架
 * TODO：https://github.com/Redocly/redoc https://github.com/swagger-api/swagger-ui https://www.starlette.io/schemas/
 
 ```python
@@ -664,9 +681,11 @@ from starlette.responses import PlainTextResponse,HTMLResponse,JSONResponse,Redi
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles # 此项及FileResponse需要装aiofiles
 
+Request: path_params从路由中取出定义的变量, url是string-like对象能取出一部分如.path, query_params多值字典, cookies, body()是bytes, json(), form()['filename'].read(), stream()用async for chunk in消费
+
 def homepage(_): ...
 def user(request: Request):
-    username = request.path_params['username'] # query_params, cookies, body()是bytes, json(), form()['filename'].read()
+    username = request.path_params['username']
     return PlainTextResponse('Hello, %s!' % username) # .headers, .set_cookie()；必须返回Response，不能直接返回str或dict
 
 routes = [
@@ -695,25 +714,28 @@ def myfile(_):
         return StreamingResponse(io.BytesIO(f.read()))
 ```
 
-### Uvicorn
+### ASGI和Uvicorn
 
 * pip install uvicorn[standard]：最小需要click和h11，标准版会装上uvloop和watchdog
 * uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询
-* --uds指定unix socket，--workers多线程，--log-level默认info
+* --uds指定unix socket，--workers多线程，--log-level默认info，客户端不会收到traceback
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
-* scope中有scheme、method、path、headers
+* scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)
+* abersheeran/a2wsgi：ASGI于WSGI的app互转
 
 ```python
-async def app(scope, receive, send):
-    while more_body:
-        message = await receive()
-        body += message.get('body', b'')
-        more_body = message.get('more_body', False)
-    await send({
+async def app(scope, receive, send): # 必须是异步的，也可以是定义了__call__的类
+    assert scope['type'] == 'http' # 不处理WebSocket和Lifespan
+    assert scope['method'] in ('GET', 'HEAD')
+
+    message = await receive()
+    assert message['more_body'] is False # 不处理TE
+
+    await send({ # 必须要有start；为HEAD会自动不发送body
         'type': 'http.response.start',
         'status': 200,
         'headers': [
-            [b'content-type', b'text/plain'],
+            (b'content-type', b'text/plain'),
         ],
     })
     await send({
@@ -722,13 +744,16 @@ async def app(scope, receive, send):
     })
 
 if __name__ == "__main__": # 从脚本运行
-    uvicorn.run("main:app",reload=True)
+    uvicorn.run("main:app", reload=True)
+
+class App: # 使用类定义的方式，指定运行目标是类名而不是实例；也可以定义一个只有scope的函数，返回参数为receive和send的异步函数
+    def __init__(self, scope): ...
+    async def __call__(self, receive, send): ...
 
 # 使用Starlette简单封装uvicorn请求
-async def app(scope, receive, send):
-    request = Request(scope, receive)
-    response = Response(content, media_type='text/plain')
-    await response(scope, receive, send)
+request = Request(scope, receive)
+response = Response(content)
+await response(scope, receive, send)
 ```
 
 ## ORM和数据库
@@ -960,7 +985,7 @@ if __name__ == "__main__":
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
 * pretty_errors：精简stacktrace，可全局安装
-* abersheeran/a2wsgi：ASGI于WSGI的app互转
+* uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
 
 ## 参考
 
@@ -1007,3 +1032,4 @@ if __name__ == "__main__":
 * GUI：PySimpleGUI kivy DearPyGui
 * streamlit：从程序生成网页，不过主要是为机器学习设计的。Gradio比前者限制更多，场景更具体
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
+* Pyarmor：混淆源代码，但有运行时依赖

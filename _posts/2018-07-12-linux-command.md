@@ -69,6 +69,8 @@ title: Linux命令
 
 ## 压缩/解压
 
+* split -b 50m huge_file，合并用cat
+
 ### tar
 
 * 压缩：tar czf jpg.tar.gz *.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
