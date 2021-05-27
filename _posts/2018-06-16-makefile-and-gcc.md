@@ -96,9 +96,10 @@ prog3 : prog3.o sort.o utils.o
 * [ccache](https://github.com/ccache/ccache)可以缓存编译信息
 * -Ofast可开启最高优化，比O3还高，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
-* -flto=thin可进行一些优化
+* -flto=thin可进行一些优化，编译和链接步骤都要用，除非手动用lld-link
 * -march=native生成为本机优化的代码，可能不能运行在其它机器上，用到的库没有自己编译也不要开。-mtune=native威力稍弱一些
 * -g等于-g2，-g3的体积更大；-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度。但无法与-flto一起使用
+* -###为dry-run，能显示具体编译用到的命令
 
 ### 编译步骤
 
@@ -129,7 +130,7 @@ prog3 : prog3.o sort.o utils.o
 ## Clang
 
 * 安装：https://apt.llvm.org/
-* Win: https://github.com/mstorsjo/llvm-mingw 有ucrt
+* Win: https://github.com/mstorsjo/llvm-mingw 有ucrt，但支持太多的target导致可执行文件有点多
 
 ## MinGW
 
@@ -137,6 +138,7 @@ prog3 : prog3.o sort.o utils.o
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，env文件控制自动添加PATH
 * https://jmeubank.github.io/tdm-gcc/ 不太新
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
+* __MINGW64_VERSION_MAJOR定义了它自己的版本
 
 ## 参考
 

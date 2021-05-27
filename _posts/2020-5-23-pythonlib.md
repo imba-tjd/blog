@@ -1029,7 +1029,7 @@ if __name__ == "__main__":
 * 自动重试：https://github.com/jd/tenacity
 * https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI；其他人练手的ASGI框架：abersheeran/index.py almarklein/asgineer
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
-* GUI：PySimpleGUI kivy DearPyGui
+* GUI：PySimpleGUI kivy跨平台太重了 DearPyGui
 * streamlit：从程序生成网页，不过主要是为机器学习设计的。Gradio比前者限制更多，场景更具体
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
 * Pyarmor：混淆源代码，但有运行时依赖

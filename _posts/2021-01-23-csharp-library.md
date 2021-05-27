@@ -41,6 +41,13 @@ doc.RootElement...
 数组：EnumerateArray()返回JsonElement列表，GetArrayLength()
 值：GetInt32()，GetDouble()，GetString()，GetBoolean()
 
+// System.Text.Json.Node
+JsonNode.Parse(jsonstr)
+jNode["prop"].GetValue<int>()
+new JsonObject {
+    ["key"] = new JsonObject {...}
+}.ToJsonString()
+
 using var stream = new MemoryStream();
 using var writer = new Utf8JsonWriter(stream);
 writer.WriteStartObject();

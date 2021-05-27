@@ -12,7 +12,6 @@ category: dotnet
 
 ## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
-* 从2015的格式迁移到新格式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/；https://github.com/hvanbakel/CsprojToVs2017
 * CoreRT必须要装VC
 * dotnet msbuild /pp | code -：查看完整生成的csproj
 
@@ -25,11 +24,9 @@ OutputType：Exe # 默认Library
 TargetFramework：net5.0 # 指定多个加s和分号
 RuntimeIdentifier：win-x64 # https://docs.microsoft.com/zh-cn/dotnet/core/rid-catalog
 
-PublishSingleFile：true # 5.0不再是简单地zip，对于自包含最好加上IncludeNativeLibrariesForSelfExtract=true
-PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到，可SuppressTrimAnalysisWarnings：false开启警告
-TrimMode：link # 默认按程序集裁剪，此项可按成员裁剪，粒度更细
+PublishSingleFile：true # 自包含最好加上IncludeNativeLibrariesForSelfExtract=true；6.0添加了[RequiresAssemblyFiles]和EnableCompressionInSingleFile
+PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到；现在默认TrimMode为link且开启了分析警告
 PublishReadyToRun：true # 混合AOT，必须指定RID，可与Trimmed一起用；提高启动速度，减少JIT数量，但代码质量不如JIT，不过会自动分层编译
-PublishReadyToRunUseCrossgen2：true
 InvariantGlobalization：true # 减少Linux下自包含的体积
 DebugType：none # 默认portable，VS模板默认pdbonly
 Prefer32Bit：默认false，但VS模板默认true
@@ -219,8 +216,10 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 
 ## Upgrade Assistant
 
+* https://devblogs.microsoft.com/dotnet/introducing-the-net-upgrade-assistant-preview/
 * dotnet tool install -g try-convert upgrade-assistant
 * upgrade-assistant <MySolution.sln>
+* 老的方式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/ https://github.com/hvanbakel/CsprojToVs2017
 
 ## 参考
 

@@ -206,7 +206,8 @@ _options = IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentVa
     "applicationUrl": "https://localhost:5001;http://*:5000"//多域名用分号
     "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-    }
+    },
+    "hotReloadProfile": "aspnetcore"
 }
 ```
 

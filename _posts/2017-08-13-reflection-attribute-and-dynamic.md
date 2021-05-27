@@ -162,6 +162,8 @@ public sealed class MyAttributeAttribute:System.Attribute{...}
 
 ## 动态类型
 
+* 事实上废弃了。好像会用到System.Linq.Expression表达式树，也废弃了
+
 ### 特点
 
 * 在CLR级别，dynamic就是应用了DynamicAttribute的object
