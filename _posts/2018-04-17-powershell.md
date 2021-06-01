@@ -187,6 +187,7 @@ category: windows
 * `-AllowPrerelease`和指定最小版本的参数不允许一次装多个
 * Get-Module显示已安装的模块，Update-Module更新所有或指定模块，Remove-Module与Import-Module相反，不是用来从硬盘上删除包的
 * 这样配置下来每次启动要花1000多ms
+* 因为breaking change，PSReadLine出现了严重的不兼容BUG，但是安装老版本时却永远说在运行中，因为它运行在所有会话中。必须先开CMD，用`pwsh -NoProfile -NonInteractive -Command "install-module psreadline -RequiredVersion 2.1.0 -Force"`才能安装
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser

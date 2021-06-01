@@ -97,9 +97,10 @@ prog3 : prog3.o sort.o utils.o
 * -Ofast可开启最高优化，比O3还高，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
 * -flto=thin可进行一些优化，编译和链接步骤都要用，除非手动用lld-link
-* -march=native生成为本机优化的代码，可能不能运行在其它机器上，用到的库没有自己编译也不要开。-mtune=native威力稍弱一些
+* -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
 * -g等于-g2，-g3的体积更大；-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度。但无法与-flto一起使用
 * -###为dry-run，能显示具体编译用到的命令
+* --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
 
 ### 编译步骤
 
@@ -118,7 +119,7 @@ prog3 : prog3.o sort.o utils.o
 * `-Wl,-rpath=/...` 可以指定**运行时**要搜索的动态库目录
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
-* -ftrapv可以检测整数溢出？
+* -ftrapv在linux下整数溢出时会触发core dump，会减慢速度
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 
 ### 超级静态的编译
@@ -136,8 +137,9 @@ prog3 : prog3.o sort.o utils.o
 
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，env文件控制自动添加PATH
-* https://jmeubank.github.io/tdm-gcc/ 不太新
+* https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
+* https://nuwen.net/mingw.html 较老
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
 
 ## 参考

@@ -75,3 +75,4 @@ writer.WriteEndObject();
 * https://github.com/icsharpcode/SharpZipLib
 * https://masstransit-project.com/
 * https://github.com/App-vNext/Polly
+* https://github.com/pythonnet/pythonnet

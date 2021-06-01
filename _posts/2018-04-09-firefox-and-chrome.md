@@ -107,6 +107,7 @@ title: 浏览器
 ## Chrome
 
 * http://static.centbrowser.cn/installer_64/
+* Ctrl+M：在当前窗口新建隐私页
 
 ### about:flags
 

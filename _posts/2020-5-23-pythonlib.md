@@ -77,7 +77,7 @@ except ImportError:
 * pip的包名与模块无关
 * python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
-* pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，当然setup自己除外；setup develop [--uninstall]效果类似一样但后者不会删入口点exe
+* pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe
 * pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py；注意不是python -m wheel
 * pip download -d pkgs xxx/-r requirements.txt：把项目依赖下载到指定文件夹中方便在无网环境中install --no-index -f=pkgs -r
 * 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
@@ -526,59 +526,56 @@ class Calculator: # 支持继承
 fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 ```
 
-## ipython
+## IPython
 
-* `In[]`和`Out[]`记录了每一次的输入和输出，关键是可以用中括号获取它们；最后三次输出保存在`_`,`__`,`___`中，输入保存在`_i`中
-* 退出用的是Ctrl+D，python在Win下用的是Ctrl+Z；支持Ctrl+r的与bash类似的历史搜索
+* `In[]`和`Out[]`数组记录了每一次的输入和输出；最后三次输出保存在`_`,`__`,`___`中，Out[n]也等价于`_n`
+* 退出用Ctrl+D，python在Win下用的是Ctrl+Z；支持Ctrl+r的与bash类似的历史搜索
 * 传递参数给文件或模块要用`--`，否则会被认为是传给ipython自己；而python不对`--`特别对待
 * 用pipx装的时候记得加`--system-site-packages`，且不要在里面的pip更新系统包
 * 交互式输出对象默认使用pprint，可以用%pprint关闭；在语句后加上分号会不显示交互式输出结果（不显示Out）
 * 普通代码中用`IPython.embed()`进入IPython环境，但只能手动交互，并不是之后的代码就由IPython自动执行了，也不会读取设置，好处是修改了全局变量等退出到原有Python环境中时能保留；start_ipython()是普通的启动IPython的方法，会读取设置
-* `from IPython.display import display`能输出html、jpeg、js、md、json
 * 自动括号和引号：`/fun 1 -> fun(1)`，`/fun 1,2 -> fun(1,2)`；`,fun a b` -> `fun('a','b')`；`;fun a b` -> `fun('a b')`
-* 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode可以改变这一行为但不懂怎么用
-* exit()的行为和python不一致
+* 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode可以专门进入测试模式
+* exit()的行为和python不一致，代码中应用sys.exit()
 * `get_ipython()`不为None就是在ipython中
 * ctrl+space不是自动完成，而是进入选择模式，受emacs的影响
-* TODO: https://github.com/ipython/ipython-in-depth
 
 ### [魔法命令](https://ipython.readthedocs.io/en/latest/interactive/magics.html)
 
 * 单个%是行魔法，回车就执行，默认开启了%automagic，无歧义时不加%也行；两个%%是cell魔法，会提示`...`允许多行输入，无法省略百分号
-* 命令的结果可以赋值给Python变量，此时无法省略%；命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`
+* 命令的结果可以赋值给Python变量，此时无法省略%；命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`到shell
 * quickref：显示所有魔法命令的简要参考；lsmagic：显示所有支持的魔法命令；?加魔法命令：显示指定命令的参考
-* run test.py：运行脚本，-i可以继承当前会话的变量，-d启动调试，-t计时，-p或%prun启动Profiler，-m调用模块（参数仍要--）
+* timeit：统计语句运行的时间，会多次运行取平均值或手动指定-n，有%%；单次运行是time；prun显示每个语句的执行时间，有%%
+* who：显示定义了的所有变量，后可跟筛选的变量类型，whos信息更丰富，who_ls返回列表
+* run test.py/ipynb：运行脚本，-i可以继承当前会话的变量，-d启动调试，-t计时，-p启动Profiler，-m调用模块（参数仍要--）
 * debug：在刚刚出现过异常后使用，能进入ipdb检视刚才的异常栈；当然也可以一开始就用，设置断点；支持%%，接下来输入代码就可以debug
 * edit：启动编辑器来输入交互式代码，关闭后会传到cli里；VSC会自动加一个\n，没啥好办法
 * store：持久化储存变量，store -r恢复
 * hist：查看历史命令，-n加上序号，-g pattern用grep搜索
-* timeit：统计语句运行的时间，会多次运行取平均值或手动指定-n，有%%；单次运行是time
 * xdel：删除变量并试图清除在其对象上的一切引用
-* who：显示当前所有变量，可指定要显示的类型；whos信息更丰富
 * pip：可以直接运行pip
 * macro name n1-n2 n3：把n1到n2及n3这几行代码命名为name的宏，之后输name即可，但那时就不显示具体输入内容了，可用store储存，用edit编辑
 * pastebin：自动把东西上传到GitHub的gist里并返回链接
 * alias：显示预定义的shell命令，也可设置自己的，不过直接设置不能持久化；rehashx：把path里的可执行文件都导入alias中，使用时就不用加叹号了
 * pycat：语法高亮地显示文件
-* bookmark、pwd、pushd、popd、dhist：与路径有关的一些操作
-* env：显示环境变量
-* !ls执行shell命令，但Win下默认是CMD，且编码为gbk；!!：没看懂和一个的区别
-* ?加命令：内省，会显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
-* ?加带有`*`的对象：显示匹配到的对象名；其实是psearch命令
-* save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出放进输入中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
-* %%HTML、%%js、%%latex、%%markdown：将cell渲染成HTML输出；%%js运行JS
-* autoreload 2：需要load_ext加载。import模块后修改源文件能自动变化
+* bookmark、pwd、pushd、popd、dhist、ls、cd：与路径有关的一些操作。不能用!cd因为那些程序执行完就终止了
+* env：显示或设置环境变量
+* !xxx执行shell命令，等价于system()，但Win下默认是CMD，且可能有编码问题；!!：捕获输出，看起来!赋给变量也是一样的，返回列表一行一条
+* ?加命令：显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
+* ?加带*的对象名：显示匹配的对象名；其实是psearch命令
+* save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出(_)输进终端中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
+* autoreload 2：需要%load_ext。import模块后修改源文件能自动变化
 
 ### 配置
 
 * ipython profile create [profilename]：创建`~/.ipython/profile_default/ipython_config.py`
 * 在`profile_default/startup/`中的.py或.ipy会自动执行，命名可以`10-xxx.py`这样含有优先级
 * config加不含c.的设置项可以动态读取和设置值
-* 使用`import os; os.environ['comspec']='powershell.exe'`更改`!`的shell；或者创建自己的魔法命令，从`-c -`读取
 
 ```python
 c.TerminalInteractiveShell.confirm_exit = False
 c.TerminalInteractiveShell.editor = 'code -w'
+c.InlineBackend.figure_format = 'svg' # 矢量图；或用retina表示高像素
 
 # 未更改的设置
 c.InteractiveShell.autocall = 0 # 启动自动括号，设为1时是智能模式，2是完全模式
@@ -601,27 +598,40 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 ## jupyter
 
 * pip install jupyter; jupyter notebook --no-browser --allow-root
-* 在反代之后需要配置`NotebookApp.allow_remote_access`或`c.NotebookApp.allow_origin`，否则会报`Blocking Cross Origin API request`或`Blocking request with non-local 'Host'`；`/api/kernels/`和`/terminals/`需要配websocket，各种配置中都设置了`Host`
 * 会往`%AppData%\jupyter`里写东西，但在商店的Python里会装到沙盘里
-* https://www.zhihu.com/search?type=content&q=jupyter https://www.zhihu.com/question/59392251
-* Docker映像文档：https://jupyter-docker-stacks.readthedocs.io/
-* 输出富文本：https://nbviewer.jupyter.org/github/ipython/ipython/blob/master/examples/IPython%20Kernel/Rich%20Output.ipynb
-* TODO: https://www.dataquest.io/blog/jupyter-notebook-tips-tricks-shortcuts/
+* Docker映像：https://jupyter-docker-stacks.readthedocs.io/
+* %%html、%%js、%%bash：将cell的内容渲染成HTML输出、运行JS/bash；IPython.display.IFrame/Image/Vedio/Audio能指定网址或路径嵌入内容，HTML/Javascript/JSON能运行相应内容，FileLinks('.')类似于tree且会生成可点击的链接
+* %matplotlib notebook
 
 ### 配置
 
-* jupyter notebook --generate-config 在 .jupyter/jupyter_notebook_config.py 下生成默认配置
-* c.NotebookApp.notebook_dir：指定启动目录
+* jupyter notebook --generate-config 在 ~/.jupyter/jupyter_notebook_config.py 下生成默认配置
+* c.NotebookApp.notebook_dir：启动目录（好像也是运行时的根目录）
 * c.NotebookApp.open_browser = False
 * c.NotebookApp.ip = '*'
 * c.NotebookApp.port = 8888
+* 密码：c.NotebookApp.allow_password_change=False，命令行jupyter notebook password输入密码（无回显）会在.jupyter中生成一个json，设置c.NotebookApp.password为里面的值即可
+* 在反代之后需要配置`NotebookApp.allow_remote_access`或`c.NotebookApp.allow_origin`，否则会报`Blocking Cross Origin API request`或`Blocking request with non-local 'Host'`；`/api/kernels/`和`/terminals/`需要配websocket，各种配置中都设置了`Host`
 
-### 快捷键
+### 快捷键(H显示所有)
 
-* a在上方添加代码块，b在下方，dd是删除
-* shift enter运行当前代码块并移动到下一块
-* j上移聚焦代码块，k下移
-* enter编辑当前块，esc返回一般模式
+* F在上方添加代码块，B在下方，DD是删除，X是剪切，C是复制，V是在下面粘贴，Z撤销删除
+* J上移聚焦代码块，K下移，Shift-K选取扩展到下一个代码块，空格向下滚动，Shift-空格向上滚动
+* Ctrl-Enter运行当前代码块，Shift-Enter运行当前并移动到下一块，Alt-Enter运行当前并在下方添加代码块
+* Enter编辑当前块，Esc返回一般模式（命令模式）
+* F查找和替换，S保存
+* M把当前代码块的类型改为MD，Y改为Code
+* Shift-M把选中的多个块合为一块，Ctrl-Shift-减号为编辑模式下从光标处分隔成两块
+* 编辑模式（用Monaco编辑器时不同，如谷歌Colab）：Tab补全，Shift-Tab提示文档（多按几次更详细），Ctrl-D删除整行
+
+### 扩展
+
+* 管理扩展的东西：pip install jupyter_contrib_nbextensions jupyter_nbextensions_configurator; jupyter contrib nbextension install --user
+* https://github.com/mwouts/jupytext 同时生成py且修改时能双向同步
+* 主题：https://github.com/dunovank/jupyter-themes jt -l列出，jt -t xxx切换，jt -r恢复
+* 格式化
+* Qgrid：提供类似Excel的功能
+* Hinterland：每次输入都有提示
 
 ## Conda
 
@@ -632,6 +642,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * conda比pip更加严格，conda会检查当前环境下所有包之间的依赖关系
 * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
 * conda create -n venv python=3.8; conda info -e; conda activate venv; conda remove -n venv --all
+* mamba用c++重新实现了一遍conda
 
 ## Web Server
 
@@ -865,7 +876,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 from Cython.Build import cythonize
 setup(ext_modules=cythonize('**/*.pyx'))
 # CLI
-python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f；不支持-a
+python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f，-j多线程；不支持-a
 cythonize -i xxx.pyx
 
 # 最简单的使用C函数的方式
