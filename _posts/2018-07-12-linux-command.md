@@ -218,6 +218,7 @@ aria2、axel、httpie放到软件的文章里去了。
 * --libcurl xxx.c：生成对应的c语言代码
 * --cert-status：检查OCSP
 * 访问httpbin.org/get可以看到服务器收到的请求信息
+* URL不会做UrlEncode，而是直接发送。比如get /测试.txt，Linux下为`/\u00e6\u00b5\u008b\u00e8\u00af\u0095`，Win下甚至为GBK编码，正确的是`/%E6%B5%8B%E8%AF%95`
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 

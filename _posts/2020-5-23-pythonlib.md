@@ -27,6 +27,7 @@ SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2�
 * pip install 不需要--user
 * 不能脱离本机环境，会在`venv/pyvenv.cfg`中硬编码Python的版本和home位置；如果Python是in-place升级了版本，可用venv --upgrade .venv，之后记得更新venv里的包；但如果Python自己的路径变化了，就只能手动改了；手动改之前shell就不要进venv了，否则报Permission denied
 * `--system-site-packages`使得虚拟环境可访问系统的包，install仍不影响系统，freeze的时候就要加--local
+* 对于同一窗口的Windows Terminal，激活venv，新建Tab，虽然提示符没变，仍处在venv中
 
 ```bash
 python3 -m venv .venv
@@ -75,10 +76,10 @@ except ImportError:
 
 * 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
 * pip的包名与模块无关
-* python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install；不存在--static-deps参数
+* python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install，命令行接口还会产生可能存在编码问题的xxx-script.py；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
-* pip install . 可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe
-* pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py；注意不是python -m wheel
+* pip install .：仍需wheel包；可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe
+* pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py和wheel包；注意不是python -m wheel
 * pip download -d pkgs xxx/-r requirements.txt：把项目依赖下载到指定文件夹中方便在无网环境中install --no-index -f=pkgs -r
 * 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
 * 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
@@ -997,6 +998,7 @@ if __name__ == "__main__":
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
 * pretty_errors：精简stacktrace，可全局安装
 * uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
+* amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
 
 ## 参考
 

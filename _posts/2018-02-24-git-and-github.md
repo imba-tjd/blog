@@ -319,7 +319,7 @@ collapsable content
 ```
 直接从PR获得文本diff：https://patch-diff.githubusercontent.com/raw/<user>/<repo>/pull/<id>.diff
 以tar.gz下载源代码：https://github.com/<user>/<repo>/tarball/master
-下载最新版release，但文件名需固定；如果是访问页面就去掉downlaod：https://github.com/<user>/<repo>/releases/download/latest/<filename>
+下载最新版release，但文件名需固定；如果是访问页面就去掉download：https://github.com/<user>/<repo>/releases/download/latest/<filename>
 ```
 
 ## License
