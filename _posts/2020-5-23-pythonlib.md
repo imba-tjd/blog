@@ -13,7 +13,7 @@ title: 第三方 Python 库
 
 ```bash
 pip freeze > requirements.txt # 需在venv中运行否则会把全局的写进去；类似于pip list --format=freeze，只是verb不同，freeze参数少
-pip install -r requirements.txt
+pip install -Ur requirements.txt
 
 --index https://xxx # 如果repo以.py结尾，要加@setup.py
 SomeProject==1.4
@@ -601,7 +601,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * pip install jupyter; jupyter notebook --no-browser --allow-root
 * 会往`%AppData%\jupyter`里写东西，但在商店的Python里会装到沙盘里
 * Docker映像：https://jupyter-docker-stacks.readthedocs.io/
-* %%html、%%js、%%bash：将cell的内容渲染成HTML输出、运行JS/bash；IPython.display.IFrame/Image/Vedio/Audio能指定网址或路径嵌入内容，HTML/Javascript/JSON能运行相应内容，FileLinks('.')类似于tree且会生成可点击的链接
+* %%html、%%js、%%bash：将cell的内容渲染成HTML输出、运行JS/bash；IPython.display.IFrame/Image/Vedio/Audio能指定网址或路径嵌入内容，但这些是从本地发起的请求而不是服务器，HTML/Javascript/JSON能运行相应内容，FileLinks('.')类似于tree且会生成可点击的链接
 * %matplotlib notebook
 
 ### 配置
@@ -624,6 +624,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * M把当前代码块的类型改为MD，Y改为Code
 * Shift-M把选中的多个块合为一块，Ctrl-Shift-减号为编辑模式下从光标处分隔成两块
 * 编辑模式（用Monaco编辑器时不同，如谷歌Colab）：Tab补全，Shift-Tab提示文档（多按几次更详细），Ctrl-D删除整行
+* Kaggle：Z撤销，Shift+Z重做
 
 ### 扩展
 
@@ -770,6 +771,8 @@ await response(scope, receive, send)
 
 ## ORM和数据库
 
+* SQLite和Python DB-API见主笔记
+* pymssql：connect(host=server, user, password, database="tempdb", autocommit=True)。不支持LocalDB
 * peewee
 * https://github.com/pudo/dataset：基于sqlalchemy
 * SQLAlchemy：等2.0
@@ -999,6 +1002,7 @@ if __name__ == "__main__":
 * pretty_errors：精简stacktrace，可全局安装
 * uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
+* lxml-stubs：不维护且不全，但比VSC自带的好
 
 ## 参考
 

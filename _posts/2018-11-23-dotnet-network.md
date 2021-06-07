@@ -63,7 +63,7 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 ## 给网址进行编码
 
 * 最合适的方法是先分别把键值对用Uri.EscapeDataString编码再手动合并起来，保留以下符号：`!'()*-._~0-9a-zA-Z`，会把`://`编码掉，5之后不再限制长度；解码用Uri.UnescapeDataString
-* Uri.EscapeUriString适合把**URL**中的中文编码掉；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错；只支持编码成utf8的转义，没有UnEscapeUriString方法
+* Uri.EscapeUriString过时了。适合把URL中的中文编码掉；会保留url中的以下符号：`!#$&'()*+,/:;=?@-._~0-9a-zA-Z`，所以会保留`://`；如果参数本身需要那些符号，此方法就会出错；只支持编码成utf8的转义，没有UnEscapeUriString方法
 * System.Net.WebUtility与System.Web.HttpUtility类似，但后者在.Net Core上是在Web命名空间里唯一的一个类了；HttpUtility.UrlEncode可以指定编码方式，WebUtility.UrlEncode与Uri.EscapeDataString相比会编码波浪号
 * 曾经空格会被编码成加号，后来弃用了；但表单的提交不符合最新标准，仍用加号，许多实现也支持把加号解码成空格
 * WebUtility.HtmlEncode：此方法用于把Html特殊字符转换成Html实体，比如大于小于符号，与url编码无关

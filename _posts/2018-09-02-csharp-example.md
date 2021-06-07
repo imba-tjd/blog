@@ -147,7 +147,7 @@ System.Diagnostics.Process类
 
 ### StartInfo
 
-* UseShellExecute：此处的shell包括GUI程序，即与对应文件相关联的外部程序；当不指定真正的exe时这个需要为true，例如FileName为网页和txt文件；需要重定向输入输出流时必须为false；默认值FX为true，Core为false；基本上为false就是在当前控制台中执行
+* UseShellExecute：当不指定真正的exe时需要设为true，例如FileName为网页和txt文件，这样才能读取关联；需要重定向输入输出流时必须为false；默认值FX为true，Core为false；基本上为false就是在当前控制台中执行
 * WorkingDirectory：当UseShellExecute为true时，为需要执行的文件的路径，如果为空，与自己相同，而工作目录直接与自己相同；为false时，为设定那个文件的工作目录
 * Verb：启动时的谓词，是个字符串，可用Verbs获取所有可用的；一般包括Edit、Print等，不同后缀可用的不同
 * WindowStyle：普通、最小/大化、隐藏；UseShellExecute必须为true

@@ -89,6 +89,7 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 * --runtime/-r rid
 * SCD独立部署(自包含)带运行时体积大，必须指定rid且一旦指定就默认加了--self-contained
 * FDD和FDE依赖框架的部署，两者区别是前者必须用dotnet xxx.dll，3.0默认后者能生成.exe但实际程序仍是dll；要么不指定rid，要么指定rid且加--self-contained=false
+* 设置COREHOST_TRACE环境变量可详细显示编译过程
 
 ### 全局工具
 

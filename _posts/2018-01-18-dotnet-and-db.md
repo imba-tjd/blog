@@ -189,7 +189,7 @@ cnn.GetAll<Student>();
 
 * [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重
 * SSDT：https://www.youtube.com/watch?v=ijDcHGxyqE4
-* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但好像已经比前者更好了
+* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但有人说已经比前者更好了
 * Linq to SQL：已经不维护了，且只支持SQL Server
 
 ## ADO.NET
@@ -200,7 +200,7 @@ SQL Server、OLE DB、ODBC、Oracle分别有System.Data下的命名空间，以�
 * Command
 * DataReader：数据源Stream
 
-连接模式：读取：数据库——Connection——Command——DataReader——页面；写入：页面——Command——Connection——数据库
+连接模式：读取：数据库——Connection——Command——DataReader——页面。写入：页面——Command——Connection——数据库
 
 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。但是感觉不如用EF。
 
@@ -212,28 +212,26 @@ SQL Server、OLE DB、ODBC、Oracle分别有System.Data下的命名空间，以�
 * Database：数据库名称
 * State：Open、Connecting、Closed等
 * IDb的没有DataSource属性
-* Open()、Close()、Dispose()、ChangeDatabase()
+* ChangeDatabase()
 * CreateCommand()、BeginTransaction()
 * 还有个DbProviderFactory用于从app.config中获得DbConnection，不过没什么必要
 
-app.config中的configuration节点可以全站统一配置，且修改后只需重启程序就可以变化，无需重新编译。
-
 ```c#
+app.config中的configuration节点可以全站统一配置，且修改后只需重启程序就可以变化，无需重新编译。但Core不使用此文件。
 <connectionStrings>
   <add name = "连接字符串名称" connectionString="连接字符串" providerName="System.Data.SqlClient" />
 </connectionStrings>
 
 string cnnstr = System.Configuration.ConfigurationManager.ConnectionStrings["连接字符串名称"].connectionString;
-var cnn = new SqliteConnection(cnnstr);
+using var cnn = new SqliteConnection(cnnstr);
 cnn.Open(); // Command的构建在连接没Open时也可以，读取数据就必须Open了
 ```
 
 ### IDbCommand
 
 * CommandText：获取或设置要执行的SQL命令/储存过程/数据表名称
-* CommandType：Text、StoredProcedure、TableDirect；但Sqlite只支持Text，估计默认值是Text
+* CommandType：Text（默认）、StoredProcedure、TableDirect。Sqlite只支持Text
 * Parameters：SQL命令参数集合
-* Transaction：设置所属的事物
 * CommandTimeout
 * Cancel()
 * ExecuteNonQuery()：只能执行Insert、Update和Delete，返回被影响的行数
@@ -241,7 +239,7 @@ cnn.Open(); // Command的构建在连接没Open时也可以，读取数据就必
 * ExecuteScalar()：以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令
 
 ```c#
-var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
+using var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
 
 cmd.CommandText ="INSERT INTO user (name) VALUES (@name)";
 cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，这诡异的写法居然没问题。一般还是给AddWithValue的返回值赋一个变量再进一步设置
@@ -249,7 +247,6 @@ var param=cmd.CreateParameter(); param.ParameterName="@name"; param.Value=name; 
 cmd.ExecuteNonQuery();
 
 using var tran = cnn.BeginTransaction(); // ADO.NET事务，不是数据库事务？
-...
 tran.Commit()/Rollback();
 ```
 
@@ -258,10 +255,9 @@ tran.Commit()/Rollback();
 * 一个向前只读的记录指针
 * FieldCount：一行数据中的字段数
 * HasRows：是否包含数据，一般只在最初的时候使用
-* Close()、IsClosed
 * GetSchemaTable()：获得元数据
 * NextResult()：如果CommandText有多条SQL语句（批处理），此函数会继续执行下一条，指向下一个结果集，之后自己继续用Read()；Dispose时会自动执行完
-* GetValue(index)：返回当前行指定索引列的值，object类型，直接对reader取索引也一样；也可用GetInt32、GetString等方法；SqliteDataReader有`GetFieldValue<T>()`
+* GetValue(index)：返回当前行指定索引列的值，object类型，与直接对reader取索引一样；也可用GetInt32、GetString等方法，有的还有`GetFieldValue<T>()`
 * GetName(index)：获得列名；GetOrdinal()：根据列名返回它的索引
 * GetValues(object[])：会把当前行所有数据保存到一个数组里。可以根据FieldCount设定数组长度
 * GetDataTypeName(index)：输入列索引，返回该列的类型名；SqliteDataReader有`GetFieldType()`返回Type对象
@@ -269,10 +265,10 @@ tran.Commit()/Rollback();
 
 ```c#
 cmd.CommandText = "SELECT * FROM DB";
-using (var reader = cmd.ExecuteReader())
-    while (reader.Read()) { // 读完时返回false
-        var name = reader.GetString(0); // 把第一列当作string读取
-        var length = reader.GetInt32(1);
+using var reader = cmd.ExecuteReader();
+while (reader.Read()) { // 读完时返回false
+    string name = reader.GetString(0); // 把第一列当作string读取
+    int length = reader.GetInt32(1);
     }
 ```
 
