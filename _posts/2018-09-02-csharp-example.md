@@ -151,7 +151,7 @@ System.Diagnostics.Process类
 * WorkingDirectory：当UseShellExecute为true时，为需要执行的文件的路径，如果为空，与自己相同，而工作目录直接与自己相同；为false时，为设定那个文件的工作目录
 * Verb：启动时的谓词，是个字符串，可用Verbs获取所有可用的；一般包括Edit、Print等，不同后缀可用的不同
 * WindowStyle：普通、最小/大化、隐藏；UseShellExecute必须为true
-* CreateNoWindow：默认为false，为true时必须确保目标程序能自己结束，否则就必须用Kill；UseShellExecute为true或是Core会忽略该选项，前者一定会创建新窗口，而后者不支持创建窗口
+* CreateNoWindow：默认为false，设为true后运行cmd就不会弹窗；为true时必须确保目标程序能自己结束，否则就必须用Kill；UseShellExecute为true或是Core会忽略该选项，前者一定会创建新窗口，而后者不支持创建窗口
 
 ### 执行CMD命令
 

@@ -169,4 +169,4 @@ UnauthorizedAccessException
 * Path is a directory.
 * Path specified a read-only file.
 
-
+https://sakno.github.io/dotNext/features/io/index.html

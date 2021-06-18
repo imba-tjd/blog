@@ -50,6 +50,7 @@ title: 浏览器
 * network.preload：允许`link rel="preload"`
 * browser.urlbar.suggest.engines：false
 * browser.proton.enabled; browser.proton.contextmenus.enabled
+* browser.newtabpage.activity-stream.improvesearch.handoffToAwesomebar：false 在新标签页的搜索引擎栏不要直接输到标签栏里
 
 #### 页面翻译
 
@@ -120,6 +121,7 @@ title: 浏览器
 * Out of process rasterization：在Cent上有bug
 * Zero-copy rasterizer：在chrome://gpu/中如果Native GpuMemoryBuffers是Software only就无法使用，当前状态在Tile Update Mode中，不清楚Default是否会合适时自动启用，有文章说启用后很容易崩溃；--disable-zero-copy
 * Skia API for compositing：还不稳定，且不兼容Overlay Scrollbars；--disable-skia-renderer
+* edge-enhance-text-contrast 更好的字体渲染
 
 #### [Overlay Scrollbars](https://www.zhihu.com/question/64630817/answer/223528093)
 
