@@ -78,7 +78,7 @@ except ImportError:
 * pip的包名与模块无关
 * python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install，命令行接口还会产生可能存在编码问题的xxx-script.py；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
-* pip install .：仍需wheel包；可以识别setup.py和那个toml，无需-f就能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe
+* pip install .：仍需wheel包；可以识别setup.py和那个toml，已安装了也能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe；pip install --force-reinstall才是重新安装，不能用-f，那是另一个参数的简写
 * pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py和wheel包；注意不是python -m wheel
 * pip download -d pkgs xxx/-r requirements.txt：把项目依赖下载到指定文件夹中方便在无网环境中install --no-index -f=pkgs -r
 * 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
@@ -504,7 +504,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()
 * TODO: https://zhuanlan.zhihu.com/p/86956717 https://pyinstaller.readthedocs.io/en/stable/runtime-information.html
-* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，Nuitka也不够成熟
+* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，Nuitka也不够成熟，shiv类似于zipapp但也打包依赖
 
 ## python-fire
 
@@ -601,7 +601,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * pip install jupyter; jupyter notebook --no-browser --allow-root
 * 会往`%AppData%\jupyter`里写东西，但在商店的Python里会装到沙盘里
 * Docker映像：https://jupyter-docker-stacks.readthedocs.io/
-* %%html、%%js、%%bash：将cell的内容渲染成HTML输出、运行JS/bash；IPython.display.IFrame/Image/Vedio/Audio能指定网址或路径嵌入内容，但这些是从本地发起的请求而不是服务器，HTML/Javascript/JSON能运行相应内容，FileLinks('.')类似于tree且会生成可点击的链接
+* %%html、%%js、%%bash：将cell的内容渲染成HTML输出、运行JS/bash；IPython.display.IFrame/Image/Vedio/Audio能指定网址或路径嵌入内容，但这些是从本地发起的请求而不是服务器，width一般设为"100%"，HTML/Javascript/JSON能运行相应内容，FileLinks('.')类似于tree且会生成可点击的链接
 * %matplotlib notebook
 
 ### 配置
@@ -624,7 +624,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * M把当前代码块的类型改为MD，Y改为Code
 * Shift-M把选中的多个块合为一块，Ctrl-Shift-减号为编辑模式下从光标处分隔成两块
 * 编辑模式（用Monaco编辑器时不同，如谷歌Colab）：Tab补全，Shift-Tab提示文档（多按几次更详细），Ctrl-D删除整行
-* Kaggle：Z撤销，Shift+Z重做
+* Kaggle：Z撤销，Shift+Z重做。选中一段内容后用鼠标点执行能只执行片段，但撤销时有bug
 
 ### 扩展
 
@@ -985,6 +985,105 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 ```
 
+## pandas
+
+* 大部分运算都是非原地的，且可指定inplace=True
+* axis=0指行，1指列，但是大部分函数有index和column的命名参数，优先用这个
+* Series具有广播特性：赋单个值就全变成该值，赋list/range/Series就依次改变。与比较运算符计算会产生值都为bool的Series，与另一个Series运算就依次处理，不会变成两列的df。但是不支持'xxx' in S1，要自己用map
+* 一种常见的技巧：sum([True, True, False])计算有多少符合条件的
+* 如果是自动生成的行名，第0列不为行名
+* TODO: 如何按两列之差排序；df1['new_col'] = df2.col会报A value is trying to be set on a copy of a slice from a DataFrame
+* pandas-bokeh：简单做出交互图
+
+```py
+import pandas as pd
+data = pd.read_csv('data.csv', index_col=0 如果csv中已存有行编号或行名)/excel/json/sql/sql_table/sql_query，编码默认u8；保存用to_xxx()，可指定index=False
+pd.DataFrame({'A': [1, 2], 'B': [3, 4]}) # 两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
+pd.DataFrame([[1,3], [2,4]], columns=['A', 'B']) # 另一种创建方式，按行输入数据
+pd.Series([1,3], index=['A','B']) # 一行数据
+pd.Series([1,2], name='A') # 一列数据
+df.columns/index
+df.shape行列数
+df.head(n=5)/tail() # 显示最开始/后面的几行
+df.describe() # 以8*n的表格显示各列的count、平均值、最大最小值等
+df.info() # 显示所有列的名称类型占用空间
+
+df.A/df['A'] # 获取一列，保留行名，再用[]能取出指定行的值；后一种方式适用于列名含空格
+df.[['A','B']] # 获取多列，仍为DataFrame，不能用小括号
+df[0:2]/[1:] # 获取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使只有一行
+df.iloc[0]/[:, 0]/[[0,1,2], 0] # 第一个索引是行范围，用:就是选择所有行，第二个索引是选择列；单索引时类型为Series，且index变为原columns的内容因此可用.A
+df.loc # 单纯使用与iloc类似，但是支持基于名称的选择；最大的不同是loc[0:10]会选取11条，即闭区间，这是为了支持指定名称的slice范围：loc['A':'C']，而不必是A,B,C
+df[(data.A == 'xxx') & (data.B > 10)] # 数据in用.isin()；逻辑或用|，使用比较运算符时一定要加括号
+
+df1.append(df2) # 合并行
+pd.merge([df1, df2], on='key') # 合并列
+df1.join(df2, on='key')
+pd.concat([rows1, rows2]) # 合并行，设置axis可变为合并列
+
+df.A.value_counts() # 计算某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序
+df.sort_values(by = 'A') # 默认ascending=True，by可以是[]；还有sort_index()在groupby后可能用到
+df.A.str.xxx  # 把数据看作字符串使用对应的函数
+df.A.unique()、isnull()/notnull()、max()、idxmax()返回最大值的index常见于loc中以获取那一行
+df.A.map(lambda)
+df.apply(lambda row: ..., axis=1) # 用于整个df，默认按列，设定axis=1后就是按行处理，类型是Series，用.A可获取列的值。df.applymap处理单个元素
+df.agg([max, min]) # 对每一列都调用对应的函数，产生以max和min为index的聚合结果；Series也适用
+
+df.filter(regex='^L')
+df.rename(columns={'old': 'new'}, index=...) # 也可df.index = [...]
+df.dropna()删除包含空值的行，设置how='all'只处理全为空的；fillna(x)用x填充空值，drop_duplicates()删除重复值
+df.drop([xxx]) # 删除行；删列还能用del，且是原地的
+
+df.groupby(['A']).B.max() # 按A分组后把对应范围的B聚合，产生以A为index的Series
+# groupby多个列时，会产生MultiIndex，一般用reset_index()去掉命名变成编号
+# groupby后的结果可看作含有df的Series，可.apply(lambda df: ...)，但必须返回一行或一个值，即需要聚合
+df.pivot_table(index=col1,columns=col2,values=[col3,col4],aggfunc=max) # 数据透视表，以col1为行，col2为列，取col3和col4的最大值
+```
+
+## scikit-learn
+
+* 树的层数太浅会导致underfitting，无论是训练还是验证都具有较大误差；层数太多会导致overfitting，能非常好的匹配训练，但验证却有很大误差；应处于中间，一种控制方法是创建model时设定max_leaf_nodes
+* xgboost.XGBRegressor貌似是最好的决策树，但实测不调任何参数时与rf不相上下
+* https://scikit-learn.org.cn/
+
+```py
+y = data.Price # 选择一个列作为预测目标
+X = data[['col1','col2']] # 选择一些列作为“features”
+
+from sklearn.model_selection import train_test_split # 把源数据分成训练的和验证的两部分
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=1)
+
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换
+dt_model = DecisionTreeRegressor(random_state=1) # 设定random_state使得每次运行结果一样
+dt_model.fit(train_X, train_y) # 填充数据
+val_predicted_prices = dt_model.predict(val_X) # 预测结果，类型是numpy.ndarray
+
+from sklearn.metrics import mean_absolute_error # MAE平均绝对误差，等于avg(abs(预测值-真实值))
+mean_absolute_error(val_y, val_predicted_prices)
+
+from sklearn.impute import SimpleImputer # 填充空值的一种方法
+my_imputer = SimpleImputer()
+imputed_X_train = pd.DataFrame(my_imputer.fit_transform(X_train))
+imputed_X_valid = pd.DataFrame(my_imputer.transform(X_valid))
+imputed_X_train.columns = X_train.columns # Imputation removed column names; put them back
+imputed_X_valid.columns = X_valid.columns
+```
+
+## BigQuery
+
+```py
+from google.cloud import bigquery
+client = bigquery.Client()
+dataset_ref = client.dataset("hacker_news", project="bigquery-public-data") # 描述要请求的内容
+dataset = client.get_dataset(dataset_ref) # 进行请求获取数据
+client.list_tables(dataset)
+
+table_ref = dataset_ref.table("full")
+table = client.get_table(table_ref)
+table.schema
+client.list_rows(table, max_results=5).to_dataframe() # 数据转df
+```
+
 ## 杂项
 
 * colorama：控制台的前、背景色；rich：自动染色和格式化
@@ -995,7 +1094,7 @@ if __name__ == "__main__":
 * lazy_import：np = lazy_import.lazy_module("xxx")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的xxx也是lazy的
 * chardet：猜测编码
 * watchdog：用于监测文件变化
-* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq；huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq；huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列；APScheduler
 * attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
@@ -1050,3 +1149,9 @@ if __name__ == "__main__":
 * streamlit：从程序生成网页，不过主要是为机器学习设计的。Gradio比前者限制更多，场景更具体
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
 * Pyarmor：混淆源代码，但有运行时依赖
+* fuzzywuzzy：字符串模糊匹配
+* NLTK：自然语言处理
+* https://github.com/jpadilla/pyjwt
+* memcached：pymemcache pylibmc
+* cache：python-diskcache cacheout
+* mkdocs mkdocs-material
