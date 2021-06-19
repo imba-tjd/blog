@@ -6,6 +6,7 @@ title: C#库
 
 * 默认只序列化公共属性
 * 包含System.Net.Http.Json后HttpClient可用GetFromJsonAsyn和PostAsJsonAsync，且具有Web选项
+* json-everything：第三方库，包括JsonSchema、JsonPath等
 
 ```c#
 using System.Text.Json;
@@ -74,5 +75,5 @@ writer.WriteEndObject();
 * https://www.hangfire.io/
 * https://github.com/icsharpcode/SharpZipLib
 * https://masstransit-project.com/
-* https://github.com/App-vNext/Polly
+* https://github.com/App-vNext/Polly 弹性及瞬态故障处理库，方便指定重试次数、超时、熔断等
 * https://github.com/pythonnet/pythonnet
