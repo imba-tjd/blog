@@ -8,7 +8,7 @@ category: dotnet
 * Windows：https://dot.net
 * docker映像：https://hub.docker.com/_/microsoft-dotnet
 * Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian；
-* dotnet-install.sh自动安装脚本，支持无root权限安装，但只是用于CI环境临时使用
+* dotnet-install.sh自动安装脚本，支持无root权限安装，但只是用于CI环境临时使用。且需要手动添加Path：`export PATH=~/.dotnet:$PATH`、`$env:Path="$env:LocalAppdata\Microsoft\dotnet;"+$env:Path`
 
 ## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
@@ -41,6 +41,7 @@ NoWarn：NU1602,NU1604
 WarningsAsErrors：$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618 # 几个nullable的视为error
 GenerateAssemblyInfo：默认为true，自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明
 DefineConstants：未看
+AnalysisMode：AllEnabledByDefault启用更多的Lint，但可能太多了，比如public filed都会有警告
 
 WPF：
 OutputType：WinExe # 存在下一条时，设为Exe也可，会被自动替换
@@ -89,7 +90,7 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 * --runtime/-r rid
 * SCD独立部署(自包含)带运行时体积大，必须指定rid且一旦指定就默认加了--self-contained
 * FDD和FDE依赖框架的部署，两者区别是前者必须用dotnet xxx.dll，3.0默认后者能生成.exe但实际程序仍是dll；要么不指定rid，要么指定rid且加--self-contained=false
-* 设置COREHOST_TRACE环境变量可详细显示编译过程
+* 设置COREHOST_TRACE=1环境变量可详细显示编译过程
 
 ### 全局工具
 

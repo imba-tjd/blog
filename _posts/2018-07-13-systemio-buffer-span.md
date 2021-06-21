@@ -161,6 +161,8 @@ System.Buffer
 
 https://stackoverflow.com/questions/415291/best-way-to-combine-two-or-more-byte-arrays-in-c-sharp；必须是基元数组，不能是string[]
 
+BlockCopy按块复制，能保持字节序，但速度不如普通的Array.Copy
+
 UnauthorizedAccessException
 ---------------------------
 

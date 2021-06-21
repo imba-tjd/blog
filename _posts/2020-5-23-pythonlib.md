@@ -504,7 +504,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()
 * TODO: https://zhuanlan.zhihu.com/p/86956717 https://pyinstaller.readthedocs.io/en/stable/runtime-information.html
-* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，Nuitka也不够成熟，shiv类似于zipapp但也打包依赖
+* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，不过现在发现它俩是基于setup.py的，可以考虑，Nuitka也不够成熟，shiv类似于zipapp但也打包依赖
 
 ## python-fire
 

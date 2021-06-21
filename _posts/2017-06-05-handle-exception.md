@@ -48,3 +48,4 @@ Best Practice
 * Trace.Listeners是一个静态列表，程序运行后自动产生一个DefaultTraceListener，可取出来指定LogFileName，之后Trace.Print()既可以记录日志了
 * Debug.Assert必须定义/d:DEBUG才有效，不会导致程序结束，会产生超丑的WinForm提示框，可直接点ignore。可使用listener.AssertUiEnabled=False关掉
 * System.Diagnostics.Debugger.Break()相当于加断点
+* 貌似更合适的选择是System.Diagnostics.Contracts
