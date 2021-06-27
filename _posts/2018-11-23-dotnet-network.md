@@ -154,7 +154,6 @@ Ping：new System.Net.NetworkInformation.Ping().SendPingAsync(host, 5); p.Status
 ### HttpWebRequest
 
 * 默认没有UserAgent，Timeout为100秒
-* 更改并发数：req.ServicePoint.ConnectionLimit
 
 ```c#
 var req = HttpWebRequest.CreateHttp(ADDR);
@@ -170,7 +169,6 @@ request.ContentLength = data.Length;
 using var s = req.GetRequestStream();
 s.Write(data, 0, data.Length);
 ```
-
 
 ### WebClient
 

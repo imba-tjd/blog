@@ -9,6 +9,7 @@ category: dotnet
 * docker映像：https://hub.docker.com/_/microsoft-dotnet
 * Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian；
 * dotnet-install.sh自动安装脚本，支持无root权限安装，但只是用于CI环境临时使用。且需要手动添加Path：`export PATH=~/.dotnet:$PATH`、`$env:Path="$env:LocalAppdata\Microsoft\dotnet;"+$env:Path`
+* 源代码：https://source.dot.net/，部分API只会显示Linux的。FX的源码：https://referencesource.microsoft.com
 
 ## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
@@ -28,11 +29,11 @@ PublishSingleFile：true # 自包含最好加上IncludeNativeLibrariesForSelfExt
 PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到；现在默认TrimMode为link且开启了分析警告
 PublishReadyToRun：true # 混合AOT，必须指定RID，可与Trimmed一起用；提高启动速度，减少JIT数量，但代码质量不如JIT，不过会自动分层编译
 InvariantGlobalization：true # 减少Linux下自包含的体积
-DebugType：none # 默认portable，VS模板默认pdbonly
+DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdbonly，与full等价，在Win下使用专有格式。embedded嵌入文件内部
 Prefer32Bit：默认false，但VS模板默认true
 
 LangVersion：latest/preview
-AllowUnsafeBlocks：true
+AllowUnsafeBlocks：true # 启用后才能写unsafe块，不是默认全局unsafe
 AssemblyName：MSBuildSample # 还有个RootNamespace
 OutputPath：Bin/ # 最好加上目录分隔符
 CheckForOverflowUnderflow：true # 溢出时抛异常
@@ -58,6 +59,7 @@ ApplicationManifest：app.manifest
 
   <PackageReference Include="Newtonsoft.Json" Version="12.*" />
   <ProjectReference Include="..\xxx\xxx.csproj" />
+  <Reference Hintpath="xxx.dll" />
 </ItemGroup>
 
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">
@@ -67,29 +69,24 @@ ApplicationManifest：app.manifest
 
 ### 默认编译项
 
-```
 EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
-最小的全自定义Compile项：<Compile Include="**/*.cs" Exclude="**/*.csproj; **/*.sln; bin/**; obj/**" />，不能只写bin，必须加/**
+最小的全自定义Compile项：`<Compile Include="**/*.cs" Exclude="**/*.csproj; **/*.sln; bin/**; obj/**" />`，不能只写bin，必须加/**
 所有默认排除项可用$(DefaultItemExcludes)引用。
-```
 
 ## dotnet CLI
 
 * dotnet add/remove package xxx；dotnet list package --outdated
 * dotnet add app/app.csproj reference **/*.csproj；dotnet list/remove reference
 * dotnet sln todo.sln add **/*.csproj；dotnet sln remove
-* dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的
-* dotnet watch run：任何文件修改后就重新编译一遍，ASP比较有效
-* --roll-forward LatestMajor：使用最新runtime跑老应用。例如某个tools没更新，可指定DOTNET_ROLL_FORWARD来运行
+* dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的。无法在sln目录下运行，必须加-p csproj的目录
+* dotnet watch：任何文件修改后就重新编译一遍，程序退出后有修改又会自动再启动运行；对ASP比较有用。VSC修改后有一直重启的BUG
 * 未读：dotnet user-secrets
-
-## 部署及选项
-
 * --configuration/c Release：默认Debug
-* --output/-o dir：指定存放目录，默认是./bin/Debug/net5.0
 * --runtime/-r rid
+* --output/-o dir：指定存放目录，默认是./bin/Debug/net5.0
 * SCD独立部署(自包含)带运行时体积大，必须指定rid且一旦指定就默认加了--self-contained
-* FDD和FDE依赖框架的部署，两者区别是前者必须用dotnet xxx.dll，3.0默认后者能生成.exe但实际程序仍是dll；要么不指定rid，要么指定rid且加--self-contained=false
+* FDD和FDE依赖框架的部署，前者运行必须用dotnet xxx.dll，3.0默认后者，能生成.exe但实际程序仍是dll；要么不指定rid，要么指定rid且加--self-contained=false
+* --roll-forward LatestMajor：使用最新runtime跑老应用。也可指定DOTNET_ROLL_FORWARD环境变量，用于某个非自己开发的程序没更新
 * 设置COREHOST_TRACE=1环境变量可详细显示编译过程
 
 ### 全局工具
@@ -192,29 +189,16 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 </Target>
 ```
 
-## nuget
+## nuget及打包
 
-* 需要在csproj中创建一些元数据，具体条目见csproj的新增内容文章
-* dotnet pack打包
+* 在PropertyGroup中添加PackageId、PackageVersion、Title、Authors等属性，替代.nuspec，dotnet pack打包
 * 进入.nupkg，dotnet nuget push name.nupkg -k API_Key -s https://api.nuget.org/v3/index.json
 * 上传后不能删，即使没有任何包依赖也不行
 * 403错误可能是和别人的包重名了
-* dotnet nuget locals --clear all：清除所有本地缓存目录的文件
-* 暂时还没有dotnet update，Feature Request在：https://github.com/NuGet/Home/issues/4103，可能的脚本解决办法：https://gist.github.com/JonCanning/a083e80c53eb68fac32fe1bfe8e63c48
-* https://www.myget.org/gallery 也有一些，且不是nuget.org的镜像，且没有免费版
-* 缓存：%LocalAppData%\NuGet\v3-cache
-
-### [nuget.config](https://docs.microsoft.com/zh-cn/nuget/reference/nuget-config-file)
-
-```xml
-<configuration>
-    <packageSources>
-        <!-- <clear /> --> // 清除全局设置
-        <add key="dotnet-core" value="https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" />
-        <!-- <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" /> -->
-    </packageSources>
-</configuration>
-```
+* dotnet nuget locals --clear all：清除所有本地缓存目录的文件，包括%LocalAppData%\NuGet\v3-cache和~/.nuget等
+* 暂时还没有dotnet update，Feature Request在：https://github.com/NuGet/Home/issues/4103
+* nuget.config能指定第三方源，包括本地文件夹
+* Version指定的是最低兼容版本，用*可指定最高版本
 
 ## Upgrade Assistant
 

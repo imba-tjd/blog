@@ -105,7 +105,7 @@ public class XXXMiddleware {
 public void ConfigureServices(IServiceCollection services) {
     services.AddRazorPages();
     services.AddControllersWithView()//MVC;UseMvc()和UseRouter() Deprecated了
-// 即时编译：在上面两者**紧接着**用.AddRazorRuntimeCompilation()，要先添加Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包；但它只适用于View；另一种方式是用dotnet watch run跑
+// 即时编译：在上面两者**紧接着**用.AddRazorRuntimeCompilation()，要先添加Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包；但它只适用于View；另一种方式是用dotnet watch
     services.AddController()[.AddXmlSerializerFormatters()]; // WebAPI
 
     services.AddResponseCompression();

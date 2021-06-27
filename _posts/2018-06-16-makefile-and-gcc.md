@@ -107,7 +107,7 @@ prog3 : prog3.o sort.o utils.o
 1. gcc -E 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
 2. gcc -S -masm=intel可生成intel风格的汇编，否则是AT&T风格的；加-fverbose-asm可生成与源代码对应的注释
 3. gcc -c 生成二进制代码(.o)
-4. -shared -fPIC生成动态库(.so)，fpic产生的代码更小更快但在某些平台有限制一般不用；fPIE用于可执行文件；Win用-shared -mdll
+4. -shared -fPIC生成动态库(.so)，fpic产生的代码更小更快但在某些平台有限制一般不用；fPIE用于可执行文件；Win下的-mdll或--dll现在的效果与shared相同
 5. ar -crv libname.a src.o ... 生成静态库；-t显示包含哪些.o
 
 ### 库

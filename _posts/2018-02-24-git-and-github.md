@@ -30,7 +30,7 @@ title: Git/GitHub笔记
 * git merge patch [master]：把patch分支合并到**当前分支**/master里，patch分支指针不变；`--no-ff`可以强制不快速前进；分支名用`-`可指代上一次切换过来的分支
 * git cherry-pick [refspec1 ...]：选择某几次改动复制到当前branch/HEAD；可用`A..B`表示范围，A应该更老，但此范围不包括A，如果要包括就用A^
 * git rebase master [patch]：把**patch**/当前分支依次复制提交合并到master里，并移动**patch/当前分支**到master前面，master分支指针不变
-* git rebase -i HEAD~n：处理当前分支的最后n个提交，只会更改当前分支；如果为refspec，不会修改它，只会改到它后一个；squash最前面必须是pick
+* git rebase -i HEAD~n：处理当前分支的最后n个提交，只会更改当前分支；如果为refspec，不会修改它，只会改到它后一个；squash最前面必须是pick，直接修改message不会生效要用reword
 * 快速前进是切换到落后的分支，merge/rebase先进的分支，两者一样是因为rebase没有要复制的，只利用它移动当前到指定之后
 * git的rebase和GitHub的不同：都是在目标分支上再现，但git会移动当前分支到目标分支前面，目标分支不动；GitHub则是目标分支移动，当前分支不变
 * 如果要继续在子分支上开发，最好选择merge，这样才能有公共的父结点；否则下一次合并的时候会再把之前的比较一遍，一旦master有提交，就会产生冲突。另一种方法是squash前把master merge进dev，这一步可能产生冲突，是正常现象，否则合并到master本来也会冲突；这样就会产生一个公共结点，再把dev squash进master；如果担心污染dev此处也可以用squash

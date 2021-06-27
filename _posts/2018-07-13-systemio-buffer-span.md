@@ -7,7 +7,6 @@ title: System.IO、Buffer和Span
 > https://docs.microsoft.com/zh-cn/dotnet/standard/io/
 > https://docs.microsoft.com/zh-cn/dotnet/api/system.io?view=netcore-2.1
 > 未读：https://zhuanlan.zhihu.com/p/39223648 Pipelines
-> ArrayPool\<T\>，需安装System.Buffers
 > [C# 7 Series, Part 10: Span\<T\> and universal memory management](https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/)
 
 System.IO
@@ -132,6 +131,8 @@ Span、Memory
 ------------
 
 > https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/
+> https://docs.microsoft.com/zh-cn/archive/msdn-magazine/2018/january/csharp-all-about-span-exploring-a-new-net-mainstay
+> https://docs.microsoft.com/zh-cn/dotnet/standard/memory-and-spans/memory-t-usage-guidelines
 
 * System.MemoryExtensions类包含许多扩展方法：AsSpan对stirng转换成ReadOnlySpan，对所有数组转换成普通Span、Trim、IsWhiteSpace（不需要复制整个string了）、ToUpper；因为是System的静态类，所有方法直接都有了
 * Span是ref struct，不能装箱或分配给object和dynamic、不能是类的字段、不能跨await和yield边界；但是Span实例可以指向托管类型
@@ -156,13 +157,6 @@ IntPtr array = new IntPtr();
 Span<int> span3 = new Span<int>(array.ToPointer(), 1)
 ```
 
-System.Buffer
--------------
-
-https://stackoverflow.com/questions/415291/best-way-to-combine-two-or-more-byte-arrays-in-c-sharp；必须是基元数组，不能是string[]
-
-BlockCopy按块复制，能保持字节序，但速度不如普通的Array.Copy
-
 UnauthorizedAccessException
 ---------------------------
 
@@ -172,3 +166,7 @@ UnauthorizedAccessException
 * Path specified a read-only file.
 
 https://sakno.github.io/dotNext/features/io/index.html
+
+System.Buffers：是个命名空间，Core才自带；System.Buffer是个类，早就有了。ArrayPool、MemoryPool
+
+Buffer.MemoryCopy：接受void*
