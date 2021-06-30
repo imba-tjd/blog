@@ -28,7 +28,7 @@ title: Linux命令
 * gcp：有进度条的复制工具，不自带；或者rsync -a --progress src dest
 * fdisk -l：显示磁盘信息；cfdisk：命令行中的图形化的分区工具；mkfs.ext4：格式化分区
 * basename，dirname：取得路径的文件名与目录名
-* du -sh [filename]：显示目录的占用空间；df -h：显示挂载点的总大小、已用空间、剩余空间
+* du -sh [filename]：显示目录的占用空间；df -h：显示挂载点的总大小、已用空间、剩余空间；dust：新版du
 * mount | column -t：显示挂载分区状态
 * mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
 * unar：https://theunarchiver.com/command-line，可以正确解压非Unicode的zip
@@ -66,6 +66,7 @@ title: Linux命令
 * logrotate：切割日志的程序
 * nroff -man manpage.1 | more：显示man格式的.1文件
 * mktemp：在/tmp下创建一个空的临时文件，输出该文件路径，因此一般用法为FILE=$(mktemp) ...
+* broot：新版tree
 
 ## 压缩/解压
 

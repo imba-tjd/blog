@@ -20,7 +20,7 @@ System.IO
 * TextWriter的AutoFlush指定是否每次Write后都flush，默认false
 * TextReader的构造函数可指定是否读取BOM头来决定编码
 * 默认自动检测BOM，TextReader在第一次读取后才可用CurrentEncoding指示当前编码，或者用构造函数接受一个Encoding类的实例的重载指定编码方式；如果强制不自动检测，则为UTF8-BOM，读和写都是
-* StreamWriter默认是覆盖写，如果文件已有，不会创建新文件
+* StreamWriter默认是覆盖写，如果文件已有，不会创建新文件。默认编码是UTF8NoBOM
 * BinaryReader/Writer构造函数接受Stream，之后Write接受许多重载，而读取使用许多以Read为前缀的方法
 * 理论设计上读写器能处理任意Stream，但不拥有Stream；实际中StreamWriter是Stream的Owner
 

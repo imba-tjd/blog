@@ -85,6 +85,7 @@ title: Git/GitHub笔记
 * core.fileMode false：不再将权限变化视为改动
 * --unset：删除设置
 * pull.rebase true：pull自动-r
+* help.autocorrect：打错字时自动使用建议的内容
 
 ### 查看diff信息的工具
 
@@ -98,7 +99,7 @@ title: Git/GitHub笔记
 ## 记录
 
 * git blame [filename]：查看文件每一行是由谁在哪次commit中修改的, 按q退出，-w忽略空格变更
-* git show [hash]或[branchname]:[filename]：查看某次修改的记录，或其它branch中的文件，加上重定向即可保存到当前分支里；不加参数就是看上一次提交的
+* git show [refspec]:[filename]：查看指定记录或其它branch中的文件，加上重定向即可保存到当前分支里；不加记录就是看上一次提交的
 * git log --stat：查看提交信息及更新的文件，--shortstat只显示变化了的文件数量和行号
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git shortlog -sn：显示各个作者的提交次数
@@ -131,7 +132,7 @@ title: Git/GitHub笔记
 ## 其它git命令
 
 * git checkout HEAD~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD~3^2
-* git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now/：手动清理它们
+* git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now --aggressive：手动清理它们
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin），-X只清除ignore的
 * git bisect：以二分的方式找需要的记录，示例https://www.worldhello.net/2016/02/29/git-bisect-on-git.html
 * 在文件夹中添加一个.gitkeep可以上传空文件夹；没有内容的提交：--allow-empty，没有信息的提交：--allow-empty-message
@@ -140,6 +141,7 @@ title: Git/GitHub笔记
 * git update-ref -d HEAD：把所有的改动都放回local并清空所有的commit
 * git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支
 * git worktree add -B gh-pages public upstream/gh-pages：在当前分支的一个文件夹中checkout另一个分支
+* git rev-list --all | xargs git fgrep "xxx"：搜索所有历史中指定文字出现地点。git log -S/-G搜索指定内容在哪个提交中变动
 
 ## git stash
 

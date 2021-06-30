@@ -128,6 +128,8 @@ wctype.h提供与ctype.h类似的宽字符函数：
 
 wtypes.h和WCHAR是Windows的头文件。
 
+在C++下，C的流是有“方向”的，最初流是无方向的，一旦使用了窄系函数，就会确定下来，就不能再用宽系函数了，只有freopen才能更改。
+
 ## TODO
 
 * asprintf：非标准库，好像也不是posix，是GNU的

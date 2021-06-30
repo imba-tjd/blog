@@ -293,3 +293,7 @@ do {
 * 检测：如果所有的对应位置都为1，则可能在集合内；只要有一个位置不为1，就一定不在集合内
 * Hash算法应当彼此独立且均匀分布
 * 无法删除元素，改用int数组存count则可以删除
+
+TimSort：
+最好O(n)，最差O(nlogn)，但空间需求O(n)
+https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
