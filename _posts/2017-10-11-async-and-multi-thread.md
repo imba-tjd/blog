@@ -22,14 +22,6 @@ void TimerCallback( object state);
 * period是两次调用回调函数之间的间隔，如果设置为Timeout.Ifinite则回调在被首次调用后不会被再次调用
 * state可以为null
 
-### System.Windows.Forms.Timer
-
-* 定期把WM_TIMER消息放到程序的消息队列中。程序从队列获取消息后会在主用户接口线程中同步处理
-
-### System.Timers.Timer
-
-* 这个类很复杂，包含了很多成员，使我们可以通过属性和方法来操作计时器。可以运行在用户接口线程或工作线程上
-
 ## 互斥与同步机制
 
 总共要解决三个问题：原子性、有序性、可见性（读到的一定是最后一次写入的，不会缓存到寄存器里）
@@ -120,3 +112,6 @@ try {
 * System.Threading.SemaphoreSlim：信号量，相比于lock对异步更友好
 * https://docs.microsoft.com/zh-cn/dotnet/standard/threading/foreground-and-background-threads
 * https://zhuanlan.zhihu.com/p/46673002 看到 使用Monitor来同步
+* https://zhuanlan.zhihu.com/p/345492089 System.Threading.Channels
+* AutoResetEvent
+* list.SyncRoot

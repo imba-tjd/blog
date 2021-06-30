@@ -13,7 +13,6 @@ title: 枚举器和迭代器
 * 执行遇到yield return时，程序返回一个值并暂停执行，下次在此处继续；yield自动生成的迭代器未实现reset；可用于属性
 * 可以用try...finally...包裹迭代器块，遇到yield break或者正常结束或者手动释放迭代器或抛出异常后就会执行；如果存在catch块，则不能在try中用yield return
 * 如果需要接受需手动释放的资源，可以选择公开接受创建资源的参数，私有重载创建资源，完成后自己释放
-* 什么时候不应使用yield：https://stackoverflow.com/questions/3856625
 
 ### 返回类型为IEnumerable的函数
 
@@ -22,18 +21,13 @@ title: 枚举器和迭代器
 * 如果想返回空，可以用yield break或者Enumerable.Empty
 * 如果接受一个IEnumerable，又仍想返回一层的IEnumerable：如果已经用了yield，只能foreach消费传入的再yield return；要不就返回两层的，再在外面包一层SelectMany；如果没有，可以用Concat/Append/Prepend
 
-## IEnumerator<T>
+## IEnumerator
 
-### T Current
-
-* 只读属性
-* 返回构造类型的引用
-
-### bool MoveNext()
-
-* 把枚举器位置前进到集合中下一项的方法
-* 如果新的位置是有效的，返回true，否则返回false
-* 在第一次使用Current之前就被调用
+* Current：只读，返回构造类型的引用
+* MoveNext()
+  * 把枚举器位置前进到集合中下一项
+  * 如果新的位置是有效的，返回true，否则返回false
+  * 应在在第一次使用Current之前就调用
 
 ## 迭代器模式
 

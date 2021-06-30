@@ -2,8 +2,6 @@
 title: 类的转换和模式匹配
 ---
 
-> 《Illustrated C# 2012 (4th Edition)》
-
 值类型转换
 ----------
 
@@ -95,24 +93,15 @@ static string FloatToBinary(float f)
 ```
 
 隐式引用转换
-------------
 
-* 所有引用类型可以被隐式转换为object类型
-* 任何类型可以隐式转换到它继承的接口
-
-### 类可以隐式转换到：
-
-* 它继承链中的任何类
-* 它实现的任何接口
-
-### 委托可以隐式转换成：
+### 委托可以隐式转换成
 
 * System.Delegate
 * System.MulticastDelegate
 * System.ICloneable
 * System.Runtime.Serialization.ISerializable
 
-### 数组可以隐式转换成：
+### 数组可以隐式转换成
 
 * System.Array
 * System.ICloneable
@@ -120,7 +109,7 @@ static string FloatToBinary(float f)
 * System.ICollection
 * System.IEnumerable
 
-### 数组之间的隐式转换：
+### 数组之间的隐式转换
 
 * 两个数组有一样的维度
 * 元素类型都是引用类型
@@ -194,14 +183,6 @@ Clone方法复制数组
 
 以上两个转换可以把弱类型集合转换为强类型集合，**只能进行引用类型的转换或拆箱**。
 
-类型推断
---------
-
-* C#3开始，类型推断分为两个阶段：阶段一处理显示类型实参，阶段二处理隐式类型实参
-* 如果阶段二能够通过已知的类型确定剩下的非固定类型，则固定那些类型，并重复阶段二
-* 如果非固定类型有多个推断，看它们是否能转换成其中的一个，则把那个作为固定类型。这称作协同确定类型实参
-* Lambda表达式的类型依赖于主体和参数输入的内容，所以需要重复阶段二
-
 out变量的作用域
 ---------------
 
@@ -254,6 +235,8 @@ switch的模式匹配
 * 可以为case A a:...、值类型、case null；可以用`var a when ...`（用var不需加when时用default就行），弃元也可匹配到一切；此时模式变量的域仅在case标签中
 * case和catch后可加when语句指定条件
 * 可以方便地遍历`IEnumerable<object>`
+* https://docs.microsoft.com/zh-cn/dotnet/csharp/fundamentals/functional/pattern-matching https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/operators/patterns https://docs.microsoft.com/zh-cn/dotnet/csharp/fundamentals/tutorials/pattern-matching
+* 等C#10出来再学
 
 ```
 RGBColor FromRainbow(Rainbow colorBand) => colorBand switch{ //变量名加switch
@@ -263,5 +246,3 @@ RGBColor FromRainbow(Rainbow colorBand) => colorBand switch{ //变量名加switc
     _             => throw new ArgumentException("invalid enum value", nameof(colorBand)), // 相当于原来的default
 };
 ```
-
-
