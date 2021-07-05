@@ -6,7 +6,7 @@ title: System.IO、Buffer和Span
 >
 > https://docs.microsoft.com/zh-cn/dotnet/standard/io/
 > https://docs.microsoft.com/zh-cn/dotnet/api/system.io?view=netcore-2.1
-> 未读：https://zhuanlan.zhihu.com/p/39223648 Pipelines
+> 未读：https://zhuanlan.zhihu.com/p/39223648 https://zhuanlan.zhihu.com/p/39453491 Pipelines
 > [C# 7 Series, Part 10: Span\<T\> and universal memory management](https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/)
 
 System.IO

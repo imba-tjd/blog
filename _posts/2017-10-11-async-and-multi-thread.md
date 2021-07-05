@@ -28,13 +28,13 @@ void TimerCallback( object state);
 
 Lock、Monitor、Mutex可用于进程间同步，用到了Win32内核对象；4.0后新增了几个轻量的，只能用于线程间同步
 
-### Volatile
+### volatile
 
 * 告诉编译器变量在作用域以外的地方被修改
 * 每次读取都从内存中读，写都写到内存中
 * 可以保证有序性和可见性，~~以及变量单次的读和写的原子性~~。但是不能保证复合操作（比如++）的原子性
-* 不可用于局部变量，只能用于类成员。不能用于long和double，感觉只能用于本来的读取和写入就是原子的类型。
-* Thread.VolatileRead和Thread.VolatileWrite可保证可见性，但是不能用于Volatile修饰的变量。应该是比把变量声明为volatile的开销更小
+* 不可用于局部变量，只能用于类成员。不能用于long和double，感觉只能用于本来的读取和写入就是原子的类型
+* 对该字段的读写内部自动使用Thread.VolatileRead/VolatileWrite
 
 #### 双重检查锁定（可用于单例）
 
@@ -110,8 +110,13 @@ try {
 ### TODO
 
 * System.Threading.SemaphoreSlim：信号量，相比于lock对异步更友好
-* https://docs.microsoft.com/zh-cn/dotnet/standard/threading/foreground-and-background-threads
+* https://docs.microsoft.com/zh-cn/dotnet/standard/io/common-i-o-tasks
+* https://docs.microsoft.com/zh-cn/dotnet/standard/threading/index
+* https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/index
+* https://docs.microsoft.com/zh-cn/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
+* https://stackoverflow.com/questions/50985593/how-do-i-implement-an-async-i-o-bound-operation-from-scratch
+* https://stackoverflow.com/questions/1949131/net-dictionary-locking-vs-concurrentdictionary
+* https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/
 * https://zhuanlan.zhihu.com/p/46673002 看到 使用Monitor来同步
-* https://zhuanlan.zhihu.com/p/345492089 System.Threading.Channels
-* AutoResetEvent
+* https://zhuanlan.zhihu.com/p/345492089 https://zhuanlan.zhihu.com/p/349503079 System.Threading.Channels
 * list.SyncRoot

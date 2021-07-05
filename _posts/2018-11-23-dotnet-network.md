@@ -68,6 +68,7 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 * 曾经空格会被编码成加号，后来弃用了；但表单的提交不符合最新标准，仍用加号，许多实现也支持把加号解码成空格
 * WebUtility.HtmlEncode：此方法用于把Html特殊字符转换成Html实体，比如大于小于符号，与url编码无关
 * HttpUtility.UrlPathEncode：不要使用此方法，已弃用
+* System.Text.Encodings.Web.UrlEncoder.Default.Encode：Core新增
 * 几种编码方式的结果对比：https://stackoverflow.com/a/21771206/9606292；Uri的两个方法的对比：https://stackoverflow.com/questions/4396598；
 
 ## 安全性
@@ -153,31 +154,18 @@ Ping：new System.Net.NetworkInformation.Ping().SendPingAsync(host, 5); p.Status
 
 ### HttpWebRequest
 
-* 默认没有UserAgent，Timeout为100秒
-
 ```c#
 var req = HttpWebRequest.CreateHttp(ADDR);
 using var response = request.GetResponse(); // 有对应的Async方法
 using var receiveStream = response.GetResponseStream(); // 另一种用法是CopyTo(Async)到内存流
 using var reader = new System.IO.StreamReader(receiveStream);
 string content = reader.ReadToEnd();
-
-// POST
-req.Method = "POST";
-request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-request.ContentLength = data.Length;
-using var s = req.GetRequestStream();
-s.Write(data, 0, data.Length);
 ```
 
 ### WebClient
 
-```c#
-WebClient myClient = new WebClient();
-Stream response = myClient.OpenRead("http://www.contoso.com/index.htm");
-// The stream data is used here.
-response.Close();
-```
+* var client = new System.Net.WebClient()
+* client.DownloadString()、DownloadFile()
 
 ## 其它
 

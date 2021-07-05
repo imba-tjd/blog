@@ -29,7 +29,7 @@ PublishSingleFile：true # 自包含最好加上IncludeNativeLibrariesForSelfExt
 PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到；现在默认TrimMode为link且开启了分析警告
 PublishReadyToRun：true # 混合AOT，必须指定RID，可与Trimmed一起用；提高启动速度，减少JIT数量，但代码质量不如JIT，不过会自动分层编译
 InvariantGlobalization：true # 减少Linux下自包含的体积
-DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdbonly，与full等价，在Win下使用专有格式。embedded嵌入文件内部
+DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdbonly，与full等价，在Win下使用专有格式。embedded嵌入文件内部，但直接用csc时不会报行号
 Prefer32Bit：默认false，但VS模板默认true
 
 LangVersion：latest/preview
@@ -206,6 +206,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * dotnet tool install -g try-convert upgrade-assistant
 * upgrade-assistant <MySolution.sln>
 * 老的方式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/ https://github.com/hvanbakel/CsprojToVs2017
+* Microsoft.Windows.Compatibility：对于FX项目，添加此包可直接迁移到Core，它包含了那些被移除的API
 
 ## 参考
 
