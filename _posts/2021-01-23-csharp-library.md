@@ -13,3 +13,4 @@ title: C#库
 * https://github.com/dotnet/command-line-api：System.CommandLine；https://dotnetcoretutorials.com/2021/01/16/creating-modern-and-helpful-command-line-utilities-with-system-commandline/
 * https://github.com/dotnet/reactive
 * https://github.com/natemcmaster/CommandLineUtils
+* https://github.com/autofac/Autofac 轻量依赖注入

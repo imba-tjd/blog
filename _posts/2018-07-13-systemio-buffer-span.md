@@ -170,3 +170,9 @@ https://sakno.github.io/dotNext/features/io/index.html
 System.Buffers：是个命名空间，Core才自带；System.Buffer是个类，早就有了。ArrayPool、MemoryPool
 
 Buffer.MemoryCopy：接受void*
+
+
+System.IO.IsolatedStorage命名空间，不关心实际文件位置，保证具有读写权限
+IsolatedStorageFile isoStore = IsolatedStorageFile.GetUserStoreForDomain();
+isoStore.CreateFile/CreateDirectory/OpenFile/GetFileNames()
+isoStore.Remove()

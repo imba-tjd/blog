@@ -39,7 +39,7 @@ eɪ make face day break plane/plain rain danger；KK中写作e
 ʌ - æ, uncle - ankle, bunk - bank, but - bat, cup - cap, swum - swam
 e - ɪ, medal - middle, dead - did, fell - fill, pen - pin
 ʊ - uː, look - Luke, should - shrwed, pull - pool, full(有点像flower开头) - fool
-ɜː - ɔː, work/word - walk
+ɜː - ɔː, work/word - walk/ward(病房)
 ʊə - ɔː, tour - tore, poor - pore, moor - more
 əʊ - ɔː, coat - caught, dough(/dəu/) - door, sew(/səu/) - saw, flow - floor, bowl - ball
 əʊ - ɒ, robot(/rəʊbɒt/) - robert(/rɒbət/)
@@ -164,6 +164,8 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * suite：/swiːt/
 * journal：/dʒɜːnl/
 * asked：/ɑːskt/或非正式/ɑːst/
+* tongue：/tʌŋ/
+* wander /wɒndə/，wonder /wʌndə/
 
 ## 同词异义异音
 

@@ -45,7 +45,7 @@ DefineConstants：未看
 AnalysisMode：AllEnabledByDefault启用更多的Lint，但可能太多了，比如public filed都会有警告
 
 WPF：
-OutputType：WinExe # 存在下一条时，设为Exe也可，会被自动替换
+OutputType：WinExe # 存在下一条时设置为exe也可，会自动替换，但不能不设置；有选项关闭自动替换
 UseWPF：true # 还有UseWindowsForms
 TargetFramework：net5.0-windows
 ApplicationIcon：favicon.ico
@@ -199,6 +199,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 暂时还没有dotnet update，Feature Request在：https://github.com/NuGet/Home/issues/4103
 * nuget.config能指定第三方源，包括本地文件夹
 * Version指定的是最低兼容版本，用*可指定最高版本
+* 国内镜像，VS中使用时要删掉原来的，不知是不是BUG：https://nuget.cdn.azure.cn/v3/index.json
 
 ## Upgrade Assistant
 
@@ -211,3 +212,13 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ## 参考
 
 * https://zhuanlan.zhihu.com/p/35979897
+
+### TODO
+
+```
+ItemGroup:
+<Folder Include="datafiles\" />
+	<None Update="datafiles\datafile.db">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+         </None>
+```
