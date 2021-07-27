@@ -167,7 +167,7 @@ UnauthorizedAccessException
 
 https://sakno.github.io/dotNext/features/io/index.html
 
-System.Buffers：是个命名空间，Core才自带；System.Buffer是个类，早就有了。ArrayPool、MemoryPool
+System.Buffers：是个命名空间，Core才自带；System.Buffer是个类，早就有了。ArrayPool<T>.Shared.Rent(size)/Return(arr)、MemoryPool
 
 Buffer.MemoryCopy：接受void*
 

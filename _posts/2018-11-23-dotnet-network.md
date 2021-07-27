@@ -154,11 +154,16 @@ Ping：new System.Net.NetworkInformation.Ping().SendPingAsync(host, 5); p.Status
 
 ### HttpWebRequest
 
+* 默认已KeepAlive
+* 用完后释放Response或Stream都可以
+* POST：设置Method和ContentLength，往GetRequestStream()里写
+* 有一些Async方法，但不能和同步的混用
+
 ```c#
-var req = HttpWebRequest.CreateHttp(ADDR);
-using var response = request.GetResponse(); // 有对应的Async方法
-using var receiveStream = response.GetResponseStream(); // 另一种用法是CopyTo(Async)到内存流
-using var reader = new System.IO.StreamReader(receiveStream);
+var request = WebRequest.CreateHttp(ADDR);
+using WebResponse response = request.GetResponse(); // 必要时强转
+var receiveStream = response.GetResponseStream(); // 另一种用法是CopyTo到内存流
+var reader = new StreamReader(receiveStream);
 string content = reader.ReadToEnd();
 ```
 
