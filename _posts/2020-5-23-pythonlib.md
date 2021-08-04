@@ -28,6 +28,7 @@ SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2�
 * 不能脱离本机环境，会在`venv/pyvenv.cfg`中硬编码Python的版本和home位置；如果Python是in-place升级了版本，可用venv --upgrade .venv，之后记得更新venv里的包；但如果Python自己的路径变化了，就只能手动改了；手动改之前shell就不要进venv了，否则报Permission denied
 * `--system-site-packages`使得虚拟环境可访问系统的包，install仍不影响系统，freeze的时候就要加--local
 * 对于同一窗口的Windows Terminal，激活venv，新建Tab，虽然提示符没变，仍处在venv中
+* Win下不会创建python3的链接，无法理解，是BUG吗？Linux下有
 
 ```bash
 python3 -m venv .venv
@@ -440,9 +441,10 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib
 
-* 自带，但urlopen默认不支持keepalive，无法实际使用
+* 自带，但urlopen默认不支持keepalive，无法大量使用；需要with
 * http.client更加底层
 * User-Agent默认为Python-urllib/3.9
+* POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode()
 
 ```py
 req = urllib.request.Request(url, [method])

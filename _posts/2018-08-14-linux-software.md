@@ -198,7 +198,7 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 
 ### 虚拟主机
 
-1. Apache1需要去掉`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和`Include conf/extra/httpd-vhosts.conf`前的井号。Apache2不是这样。把sites-available下的文件软连接到sites-enable下即可启用，mods同理。ssl默认是不启用的。
+1. Apache1需要去掉`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和`Include conf/extra/httpd-vhosts.conf`前的井号。Apache2不是这样。把sites-available下的文件软链接到sites-enable下即可启用，mods同理。ssl默认是不启用的。
 2. Apache1修改conf/extra/httpd-vhosts.conf，Apache2直接改sites-available里的文件。
 3. 修改虚拟主机文件
 

@@ -55,7 +55,7 @@ title: Linux命令
 * exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
-* cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软连接，可以追踪到源文件；cp -a：相当于-dpR
+* cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软链接，可以追踪到源文件；cp -a：相当于-dpR
 * iconv -f gbk -t utf-8 source-file -o target-file
 * eval
 * vmstat：监控系统状况的程序。`vmstat 5 5`：在5秒时间内进行5次采样；-f显示从系统启动至今的fork数量，-s显示内存相关统计信息，-d查看磁盘的读写，-m查看slab信息
@@ -85,7 +85,7 @@ title: Linux命令
 * 不做把多个文件打包成一个文件的工作
 * 流压缩：cat a.txt | xz -9e > a.txt.xz；注意源文件名不会保留，解压后的名字就是去掉.xz的部分；不加文件名或文件名是-就是这种模式
 * 分别压缩多个文件：xz -9e files；默认压缩完了就把源文件删了，-k可以保留
-* 解压：xz -d file.xz；加-c可以写到stdout中；也可以使用unxz，则不用加-d，其实就是xz的软连接
+* 解压：xz -d file.xz；加-c可以写到stdout中；也可以使用unxz，则不用加-d，其实就是xz的软链接
 
 ### unzip
 
