@@ -352,7 +352,7 @@ process.start()
 * parsel.utils.flatten()：将多层嵌套的可迭代对象变为list
 * parsel.css2xpath()：把css变为xpath
 * 安装parselcli包，可使用parsel命令行，可直接输入css选择器，输`-xpath`切换到xpath选择器，输`+strip`就能自动过滤空白的，`-help`显示帮助，`-embed`启动python解释器
-* 只能以lxml解析HTML，有人开了PR添加`lxml.html.html5lib`的后端，但是没合并最后关了
+* 默认只能以lxml的非html5模式解析HTML，parsel#83有讨论支持h5的
 
 ```python
 from parsel import Selector
@@ -469,7 +469,7 @@ parts.netloc域名
 
 ## Beautiful Soup
 
-* 支持不同的HTML Parser，其中html5lib最接近真实网页，是纯Python，相对慢；lxml（其实是lxml.html）容错性性中游，速度最快；自带的html.parser容错性差；另外还有一个html5-parser，基于c更快但star只有11，不考虑
+* 支持不同的HTML Parser，其中html5lib最接近真实网页，是纯Python，相对慢；lxml(lxml.html)容错性性中游，速度最快；标准库的html.parser容错性差。还有一些bs不支持但存在的解析器：lxml.html.html5parser、html5-parser基于c
 * HTML分为四种对象：bs4.BeautifulSoup（文档）、bs4.element.Tag（标签）、bs4.element.NavigableString（文本）、bs4.element.Comment（注释）；XML还有其他对象
 * 有的属性是多值属性，如class，bs会自动处理成list（xml不做处理）。但像id中即使有空格，也只会直接返回字符串
 * 支持修改，许多东西可以直接赋值和`del`删除；还有一些其它的用于修改树的方法，暂时不学
@@ -686,7 +686,7 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 * 使用类：继承starlette.endpoints.HTTPEndpoint，定义get等方法
 * 自带一些中间件：gzip、httpsredirect
 * Config封装了.env的读取
-* taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖太多，这么重不如用别的框架
+* taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖太多，这么重不如用别的框架，也不活跃
 * TODO：https://github.com/Redocly/redoc https://github.com/swagger-api/swagger-ui https://www.starlette.io/schemas/
 
 ```python
@@ -737,6 +737,7 @@ def myfile(_):
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
+* 默认是http的，如果用https访问，会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
 
 ```python
 async def app(scope, receive, send): # 必须是异步的，也可以是定义了__call__的类
@@ -744,13 +745,14 @@ async def app(scope, receive, send): # 必须是异步的，也可以是定义�
     assert scope['method'] in ('GET', 'HEAD')
 
     message = await receive()
+    body = message['body']
     assert message['more_body'] is False # 不处理TE
 
     await send({ # 必须要有start；为HEAD会自动不发送body
         'type': 'http.response.start',
         'status': 200,
         'headers': [
-            (b'content-type', b'text/plain'),
+            (b'content-type', b'text/plain; encoding=utf-8'),
         ],
     })
     await send({
@@ -844,6 +846,31 @@ l = db.List('names')
 z = db.ZSet('z1')
 z.add({'huey': 3, 'mickey': 6, 'zaizee': 2.5})
 z['huey']; z[:'mickey']; z[-2:]; z[-2:, True] # 分别为取/赋、比mickey小的Key、两个最大的的Key、且返回它们的权重
+```
+
+### pyodbc
+
+* Win自带mdb的32位Jet驱动，2007改成了accdb格式，2010有支持它的ACE驱动但需要单独下，最新的为2016，或者装Office
+* 驱动的32/64位必须与Py对应，且若系统中有Office也要对应
+* pyodbc.drivers()列出所有可用驱动
+* autocommit默认为False，但只是cursor层级没有，cnn层级是有的，connect的时候打开，cnn.commit时提交，with connect也会提交
+* cur.fetchval()：非标准API，适合返回单一值，等于fetchone判断不为None再取0
+* row可直接按名称访问列
+* 编码好像不需要改，从2000开始字符串就是用的Unicode储存
+* 本来Access的like用?表示一个字符，*表示0或多个字符，#表示一个数字；但本模块要用_和%
+* 不支持命名参数查询
+
+```py
+import pyodbc
+cnnstr = (
+    'DRIVER={Microsoft Access Driver (*.mdb)};'
+    'DBQ=./data.mdb;' # 不加./可能出现Not a valid file name. (-1044)的问题
+)
+cnn = pyodbc.connect(cnnstr)
+cur = cnn.cursor()
+for row in cur.tables(tableType='table'): # 显示所有用户定义的表名，
+    print(row.table_name)
+# 表的列名用cur.columns('tb'); row.column_name，本次选取了的列名用cur.description; row[0]
 ```
 
 ## PySnooper
@@ -1086,6 +1113,50 @@ table.schema
 client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ```
 
+## Jinja3
+
+### 模板
+
+* `{% ... %}`语句，需要`{% endxxx %}`结束
+  * 循环：`{% for e in arr/range [if ...] %} <li><a href="{{e.a}}">{{e.b}}</a></li>`，默认不支持break和continue。内部可用loop变量，如index0、previtem
+  * 测试：if age is equalto 5
+  * 原始文本：raw
+  * 赋值：set a = 1。顶层的可导出
+  * 导入：import 'xxx.html' as xxx，之后作为变量使用
+  * 包含：include 'xxx.html'，渲染此模板内容并显示，默认会导入上下文
+  * 默认情况下，模板标签产生的空行会去除，普通空格会保留。在%旁加+或-可控制其行为
+  * 宏：类似于函数
+* `{{ ... }}`表达式
+  * 变量可用a.b代替a['b']
+* `{# ... #}`注释
+* filter：变量后加|
+  * default：当变量未定义时使用此函数提供的值，第二个参数允许变量评估为False时也使用
+  * join：参数是分隔符，可无参调用
+  * map
+  * tojson
+  * escape/e：当渲染可能含有html的文本时使用。但未来会默认转义，想不转义用safe
+  * format、length
+  * select
+  * slice
+* block语句和模板继承
+  * base中定义`block xxx`，结束块可选相同名称，里面的内容可为没有覆盖时的默认内容，在整个页面可随时用`{{self.xxx}}`引用
+  * 子模板第一行`extends "xxx.html"`，再也用`block xxx`覆盖内容；内部可用`{{super()}}`渲染父模板的内容，当多层继承时可链式调用
+  * 默认情况下块中不能访问外面的变量，因为替换后可能就变了；添加scoped修饰可传递变量
+  * 标记为required表示必须覆盖
+
+### API
+
+```py
+from jinja2 import Environment, PackageLoader, select_autoescape
+env = Environment(
+    loader=PackageLoader("yourapp"), # 会在yourapp/templates/中搜索，还可用FileSystemLoader('templates')
+    autoescape=select_autoescape(),
+    enable_async=True # 之后可用render_async
+)
+template = env.get_template("mytemplate.html")
+print(template.render(the="variables", go="here"))
+```
+
 ## 杂项
 
 * colorama：控制台的前、背景色；rich：自动染色和格式化
@@ -1129,7 +1200,6 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * Nuitka：https://zhuanlan.zhihu.com/p/31721250 https://zhuanlan.zhihu.com/c_1245860717607686144 性能有提高，跨平台差；好像不能单文件
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
-* https://github.com/grantjenks/python-diskcache
 * https://github.com/Delgan/loguru 日志
 * https://github.com/mitmproxy/mitmproxy
 * https://github.com/gevent/gevent https://www.gevent.org/
@@ -1155,5 +1225,5 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * NLTK：自然语言处理
 * https://github.com/jpadilla/pyjwt
 * memcached：pymemcache pylibmc
-* cache：python-diskcache cacheout
+* 缓存：python-diskcache cacheout rafalp/async-caches
 * mkdocs mkdocs-material

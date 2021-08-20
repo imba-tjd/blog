@@ -35,7 +35,7 @@ eɪ make face day break plane/plain rain danger；KK中写作e
 
 ## 元音辨析
 
-ɪ - iː, hit - heat, lip - leap, sick - seek, will - wheel, litter - litre(升), chip - cheap, fit - feet, his(/hɪz/) - he's(/hɪːz/), pitch - peach, ship - sheep
+ɪ - iː, hit - heat, lip - leap, sick - seek, will - wheel, litter - litre(升), chip - cheap, fit - feet, his(/hɪz/) - he's(/hɪːz/), pitch - peach, ship - sheep。一个偏高，一个偏宽
 ʌ - æ, uncle - ankle, bunk - bank, but - bat, cup - cap, swum - swam
 e - ɪ, medal - middle, dead - did, fell - fill, pen - pin
 ʊ - uː, look - Luke, should - shrwed, pull - pool, full(有点像flower开头) - fool
