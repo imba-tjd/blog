@@ -317,29 +317,26 @@ bt-enable-lpd=true
 bt-tracker=xxx,xxx
 ```
 
-## [httpie](https://httpie.org/)
+## httpie
 
-* 专注于http协议的curl的替代品，安装后有http和https两个命令，还支持`http+unix://`
+```cmd
+http :8080 # 相当于localhost:8080，只用一个单独的冒号相当于80
+http POST httpbin.org/post header:123 q=="你 好" name=John field=@file.txt # 协议、头、查询字符串（内容自动转义）、JSON数据（自动设置Content-Type，默认把value用字符串括起来，需要为数字等时用:=，=@读取文件内容），-f设为form-encoded，file域略
+http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定向标准输入也为原始数据
+```
+
 * 网卡的时候无法响应Ctrl+C
-* 内置的json高亮，但会导致必须完全接收响应才进行输出，-S关闭缓冲但仍能按单行高亮；重定向时默认关高亮
-* 默认请求gzip，默认`User-Agent: HTTPie/<version>`，使用`User-Agent:`清除默认头，使用`Host:`添加空值的头
-* 默认同时显示响应的header和body，相当于--print hb，H和B代表请求的；单独的-h或-b是--print h或b的缩写，不要用-hb；-h不会使用HEAD协议，但在接收完头之后就会关闭；-v相当于--all --print=bHBh
-* -a username:password设置basic验证
-* -F跟随跳转，默认最多30次重定向；--all显示中间响应，--history-print h只显示中间响应的响应头
-* --proxy=http:http://[user:pass@]127.0.0.1:1080；https的开头必须指定`https:`，但目标可以是http；目标不直接支持socks
+* 自带json染色，但导致必须完全接收响应才输出，-S关闭缓冲但仍能单行染色；重定向时默认关染色
+* 默认请求gzip，UA为HTTPie/xxx
+* 默认显示header和body，相当于--print hb，H和B代表请求的；单独的-h或-b是--print h或b，不支持-hb；-h不会使用HEAD，但在接收完头之后就会关闭；-v相当于--all --print=bHBh
+* -a user:pass设置basic验证
+* -F跟随跳转，--all显示中间响应，--history-print h只显示中间响应的响应头
 * --session=./session.json明文保存和使用cookie等信息；如果不含斜杠，只有名字和“后缀”，就会保存到一个特定的httpie/sessions目录下；另有只读会话
-* --verify=no跳过TLS验证，--ssl=tls1.3指定版本，默认是SSL v2.3？没看懂，好像说是会自动协商用最高级的
-* -d下载模式（隐含-F），会往终端里打印头但把body保存到文件中，且会显示用时和大小，手动指定文件名同时用-o；单独用-o也是只保存body，但不会显示头；-c断点续传；可连起来用-dco加文件名；别直接用重定向，PS上有bug
-* --check-status如果请求失败，在命令行中返回错误代码；--ignore-stdin在非交互式shell如脚本中使用比较好
+* -d下载模式，隐含-F，会在终端显示header但把body保存到文件中，且会显示用时和大小，-o另外指定文件名；单独-o也是只保存body，但不会显示头；-c断点续传；可连起来用-dco加文件名；PS上不要用重定向
+* --check-status如果请求失败，在命令行中返回错误代码；--ignore-stdin用户非交互式脚本使用
 * --timeout超时时间，默认为0即无限
-* http-prompt为交互式的请求器
-
-```
-http :8080 # 相当于http://localhost:8080；单独的冒号为80
-http POST httpbin.org/post X-API-Token:123 name=John field=@file.txt # 方便地设置头和data，且类型默认为json，-f设为form
-http google.com search=='HTTPie logo' 'Cookie:sessionid=foo;another-cookie=bar' # 两个等号是查询字符串，空格会自动转义
-http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；也可重定向输入
-```
+* http-prompt：同组织的另一个库，交互式的客户端
+* https://pie.dev/ 自建的httpbin
 
 ## FFmpeg
 

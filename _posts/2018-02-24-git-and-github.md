@@ -103,7 +103,7 @@ title: Git/GitHub笔记
 * git log --stat：查看提交信息及更新的文件，--shortstat只显示变化了的文件数量和行号
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git shortlog -sn：显示各个作者的提交次数
-* git archive --format tar --output /path/to/file.tar master：将master以tar格式打包到指定文件
+* git archive -o repo.zip/.tar.gz：打包
 * git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
 * cat .git/HEAD：显示HEAD的指向
 * git tag [tagname] [hash] 新建tag，-n显示tag及commit信息，-d删除；git push --tags：推送所有标签；删除远端标签：git push origin :refs/tags/v0.9

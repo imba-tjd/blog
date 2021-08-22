@@ -54,6 +54,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
 * 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
+* `__file__`是当前文件名的绝对路径，`import __main__`后也可调用它的该属性
 
 ```python
 # 绝对import，以sys.path中的目录开始搜索
@@ -495,17 +496,20 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 
 ## PyInstaller
 
+* 应在虚拟环境中使用，它自己也装进去
 * 默认构建结果在dist文件夹中，build文件夹记录了构建过程，warn-xxx.txt记录了出错内容
+* 第一次对入口点文件使用`pyinstaller main.py`，会生成main.spec，之后就对该spec使用
+* spec
+  * datas：资源文件，是个`[('src','dest')]`，其中若src是文件夹而dest是.就会解包一层。src允许通配符。有`PyInstaller.utils.hooks.collect_data_files('mylib')`自动添加模块中的文件，否则默认只会处理py
+  * binary：二进制依赖，如dll
+  * hiddenimports：添加没自动分析出来的模块引用。如果有库的模块不全，用`hiddenimports = PyInstaller.utils.hooks.collect_submodules('xxx')`
 * -Fwy：单文件+使用窗口+重新生成时静默覆盖之前构建的内容；-i file.ico/exe：改变icon，Linux无效
 * --uac-admin：Win限定，会申请UAC。--uac-uiaccess不懂有什么区别，文档说与远程桌面有关
-* --collect-data/binaries/all MODULENAME，不知道和add-data的区别
-* `.spec`：datas是要添加的资源文件，允许通配符；binary用于添加二进制依赖，如dll；hiddenimports是添加没自动分析出来的模块引用
-* pyi-bindepend：显示打包后的依赖；pyi-archive_viewer：显示打包后的内容；pyi-makespec：仅生成`.spec`；没有时对目标运行pyinstaller命令行也会生成
-* 应在虚拟环境中使用，它自己也装进去
+* 有一定的增量生成功能，但在最初的测试阶段最好用--clean重新生成
+* pyi-bindepend：显示打包后的依赖；pyi-archive_viewer：显示打包后的内容
 * upx如果在Path里会自动使用，Linux程序还可用-s选项strip
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()
-* TODO: https://zhuanlan.zhihu.com/p/86956717 https://pyinstaller.readthedocs.io/en/stable/runtime-information.html
 * 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，不过现在发现它俩是基于setup.py的，可以考虑，Nuitka也不够成熟，shiv类似于zipapp但也打包依赖
 
 ## python-fire
@@ -731,8 +735,8 @@ def myfile(_):
 
 ### ASGI和Uvicorn
 
-* pip install uvicorn[standard]：最小需要click和h11，标准版会装上uvloop和watchdog
-* uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询
+* pip install uvicorn：依赖click和h11，[standard]还会装上uvloop（Win不支持）等数个依赖
+* uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询默认监视CWD
 * --uds指定unix socket，--workers多线程，--log-level默认info，客户端不会收到traceback
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)
@@ -1026,7 +1030,7 @@ if __name__ == "__main__":
 
 ```py
 import pandas as pd
-data = pd.read_csv('data.csv', index_col=0 如果csv中已存有行编号或行名)/excel/json/sql/sql_table/sql_query，编码默认u8；保存用to_xxx()，可指定index=False
+data = pd.read_csv('data.csv', index_col=0 如果csv中已存有行编号或行名)/excel/json/sql/sql_table/sql_query，编码默认u8；保存用to_xxx()，可指定index=False；指定sep=None可自动检测分隔符
 pd.DataFrame({'A': [1, 2], 'B': [3, 4]}) # 两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
 pd.DataFrame([[1,3], [2,4]], columns=['A', 'B']) # 另一种创建方式，按行输入数据
 pd.Series([1,3], index=['A','B']) # 一行数据
@@ -1165,7 +1169,6 @@ print(template.render(the="variables", go="here"))
 * python-dotenv：从`.env`中读取并设置环境变量
 * PyYAML：一定要用safe_load；或者用strictyaml
 * lazy_import：np = lazy_import.lazy_module("xxx")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的xxx也是lazy的
-* chardet：猜测编码
 * watchdog：用于监测文件变化
 * celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq；huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列；APScheduler
 * attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
