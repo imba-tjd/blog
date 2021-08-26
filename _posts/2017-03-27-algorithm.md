@@ -294,6 +294,37 @@ do {
 * Hash算法应当彼此独立且均匀分布
 * 无法删除元素，改用int数组存count则可以删除
 
+## 二项式定理
+
+* 关键点是不能只写`binom 0 0 = 1`等那几个，那样递归太多
+
+```hs
+binom :: Integer -> Integer -> Integer
+binom n 0 = 1
+binom n k = if n == k then 1 else x + y
+    where
+    x = binom (n-1) k
+    y = binom (n-1) (k-1)
+```
+
+## 化简分数
+
+* 用(a,b)表示a/b
+* (2,4) -> (1,2)，(-2,-4) -> (-1,2)，(2,-4) -> (-1,2)
+
+```hs
+normalize:: Fraction -> Fraction
+normalize (0, b) = (0, 1)
+normalize (a, b) = (x, y)
+    where
+    a' = abs a
+    b' = abs b
+    gcd' = gcd a' b'
+    sign = div a a' * div b b'
+    x = sign * div a' gcd'
+    y = div b' gcd'
+```
+
 TimSort：
 最好O(n)，最差O(nlogn)，但空间需求O(n)
 https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272

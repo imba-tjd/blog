@@ -54,7 +54,9 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
 * 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
-* `__file__`是当前文件名的绝对路径，`import __main__`后也可调用它的该属性
+* `__file__`是当前文件名的绝对路径
+* 直接运行的目标模块是`__main__`，在其它地方也可以import它，且可用它的`__file__`。但注意通过uvicorn等非直接运行时就不能依赖了
+* 没有一种表示
 
 ```python
 # 绝对import，以sys.path中的目录开始搜索
@@ -500,17 +502,28 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 默认构建结果在dist文件夹中，build文件夹记录了构建过程，warn-xxx.txt记录了出错内容
 * 第一次对入口点文件使用`pyinstaller main.py`，会生成main.spec，之后就对该spec使用
 * spec
-  * datas：资源文件，是个`[('src','dest')]`，其中若src是文件夹而dest是.就会解包一层。src允许通配符。有`PyInstaller.utils.hooks.collect_data_files('mylib')`自动添加模块中的文件，否则默认只会处理py
+  * datas：资源文件，是个`[('src','dest')]`，其中若src是文件夹而dest是`.`就会解包一层。src允许通配符。有`PyInstaller.utils.hooks.collect_data_files('mylib')`自动添加模块中的非.py且非二进制文件
   * binary：二进制依赖，如dll
-  * hiddenimports：添加没自动分析出来的模块引用。如果有库的模块不全，用`hiddenimports = PyInstaller.utils.hooks.collect_submodules('xxx')`
-* -Fwy：单文件+使用窗口+重新生成时静默覆盖之前构建的内容；-i file.ico/exe：改变icon，Linux无效
+  * hiddenimports：添加没自动分析出来的模块引用。全添加用`hiddenimports = PyInstaller.utils.hooks.collect_submodules('xxx')`
+* data
+  * CWD的相对路径不变
+  * `__file__`意义基本不变，单文件模式下会放到临时文件夹中
+  * sys.executable和sys.argv[0]：单文件下是加载器的路径，前者还会解软链接
+* -y：再次生成时静默覆盖之前构建的内容
+* -Fw：单文件+使用窗口；-i file.ico/exe：改变icon，Linux无效
+* 有一定的增量生成功能，但在最初的测试阶段存在依赖问题时最好用--clean重新生成
 * --uac-admin：Win限定，会申请UAC。--uac-uiaccess不懂有什么区别，文档说与远程桌面有关
-* 有一定的增量生成功能，但在最初的测试阶段最好用--clean重新生成
 * pyi-bindepend：显示打包后的依赖；pyi-archive_viewer：显示打包后的内容
 * upx如果在Path里会自动使用，Linux程序还可用-s选项strip
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
-* 使用multiprocessing时要调用freeze_support()
-* 其它打包项目：PyOxidizer开发处于早期，py2exe和cx_freeze活着但Star数不多兼容性差没必要学，不过现在发现它俩是基于setup.py的，可以考虑，Nuitka也不够成熟，shiv类似于zipapp但也打包依赖
+* 使用multiprocessing时要调用freeze_support()，但好像它已经patch过了
+* pywin32-ctype：用纯Py重新实现的pywin32，但只有一小部分API，且很久没更新了
+* 其它打包项目
+  * PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式不会释放到临时文件夹
+  * cx_freeze：扩展了distutils的setup.py，也可用简单的命令行。不支持单文件
+  * Nuitka：编译到C，之后运行就不需要解释器了；速度快，可能有兼容性问题，不够成熟。https://zhuanlan.zhihu.com/c_1245860717607686144
+  * shiv：类似于zipapp创建pyz，能打包依赖，不包含解释器，Linux下借助shebang能看起来直接运行，Win下要用`py`。pex类似但更复杂
+  * py2exe：Star少，贡献者只有10人，不学
 
 ## python-fire
 
@@ -638,7 +651,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * https://github.com/mwouts/jupytext 同时生成py且修改时能双向同步
 * 主题：https://github.com/dunovank/jupyter-themes jt -l列出，jt -t xxx切换，jt -r恢复
 * 格式化
-* Qgrid：提供类似Excel的功能
+* Qgrid：提供对标题筛选的功能。qgrid_df=qgrid.show_grid(df, show_toolbar=True); qgrid_df.get_changed_df()将筛选后的数据取出来
 * Hinterland：每次输入都有提示
 
 ## Conda
@@ -742,6 +755,7 @@ def myfile(_):
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
 * 默认是http的，如果用https访问，会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
+* 只支持HTTP1.1，直接基于asyncio。hypercorn支持HTTP/2，Daphne依赖twisted
 
 ```python
 async def app(scope, receive, send): # 必须是异步的，也可以是定义了__call__的类
@@ -1161,6 +1175,17 @@ template = env.get_template("mytemplate.html")
 print(template.render(the="variables", go="here"))
 ```
 
+## 定时任务和任务队列
+
+* threading.Timer(秒数, fun).start()：自带，非阻塞，不易管理
+* sched：自带，使用麻烦
+* dbader/schedule：every(10).minutes.do(fun)/every().hour 无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455
+* rq：使用redis的任务队列，比celery简单
+* huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
+* dramatiq：需用redis或rabbitmq
+* APScheduler：支持定时任务，可用redis。感觉设计比较复杂
+
 ## 杂项
 
 * colorama：控制台的前、背景色；rich：自动染色和格式化
@@ -1170,7 +1195,6 @@ print(template.render(the="variables", go="here"))
 * PyYAML：一定要用safe_load；或者用strictyaml
 * lazy_import：np = lazy_import.lazy_module("xxx")，且也会将lazy化的模块放到sys.modules里，之后其它模块用的xxx也是lazy的
 * watchdog：用于监测文件变化
-* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455；rq：使用Redis的任务队列，简单；dramatiq；huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列；APScheduler
 * attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
 * lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
@@ -1198,16 +1222,14 @@ print(template.render(the="variables", go="here"))
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/
 * PyNaCl https://github.com/pyca/cryptography
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
-* https://github.com/dbader/schedule，据说自带的很不好用
 * 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
-* Nuitka：https://zhuanlan.zhihu.com/p/31721250 https://zhuanlan.zhihu.com/c_1245860717607686144 性能有提高，跨平台差；好像不能单文件
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
 * https://github.com/Delgan/loguru 日志
 * https://github.com/mitmproxy/mitmproxy
 * https://github.com/gevent/gevent https://www.gevent.org/
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
-* https://github.com/serge-sans-paille/pythran https://github.com/numba/numba
+* https://github.com/serge-sans-paille/pythran 不支持类 https://github.com/numba/numba
 * https://github.com/mahmoud/boltons 纯Py utils大集合，不过社区贡献并不太多
 * https://github.com/rthalley/dnspython
 * https://github.com/scrapinghub/splash 具有HTTP API的轻型浏览器js渲染引擎
@@ -1230,3 +1252,5 @@ print(template.render(the="variables", go="here"))
 * memcached：pymemcache pylibmc
 * 缓存：python-diskcache cacheout rafalp/async-caches
 * mkdocs mkdocs-material
+* ansible
+* Wagtail：基于Django的CMS

@@ -2,6 +2,10 @@
 title: 浏览器
 ---
 
+## 通用
+
+* F6：聚焦到地址栏
+
 ## Firefox
 
 * 正在进行的实验：about:studies
@@ -130,6 +134,10 @@ title: 浏览器
 ### 忽略HSTS证书错误
 
 之前是badidea，现在变成了thisisunsafe
+
+### 书签
+
+* 没有保存历史版本，仅本地保存了上一个版本，在`User Data\Default\Bookmarks.bak`中
 
 ## PAC
 
