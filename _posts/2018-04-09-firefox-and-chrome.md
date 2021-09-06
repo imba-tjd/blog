@@ -55,6 +55,7 @@ title: 浏览器
 * browser.urlbar.suggest.engines：false
 * browser.proton.enabled; browser.proton.contextmenus.enabled
 * browser.newtabpage.activity-stream.improvesearch.handoffToAwesomebar：false 在新标签页的搜索引擎栏不要直接输到标签栏里
+* security.tls.enable_0rtt_data
 
 #### 页面翻译
 
