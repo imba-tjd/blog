@@ -103,7 +103,7 @@ title: Git/GitHub笔记
 * git log --stat：查看提交信息及更新的文件，--shortstat只显示变化了的文件数量和行号
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git shortlog -sn：显示各个作者的提交次数
-* git archive -o repo.zip/.tar.gz：打包
+* git archive -o repo.zip/.tar.gz HEAD：打包
 * git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
 * cat .git/HEAD：显示HEAD的指向
 * git tag [tagname] [hash] 新建tag，-n显示tag及commit信息，-d删除；git push --tags：推送所有标签；删除远端标签：git push origin :refs/tags/v0.9
@@ -366,6 +366,10 @@ collapsable content
 * 以`.`开头会排到前面
 * 大写字母开头会排在小写字母的前面；但有一次例外：gist名仍用的是大写开头的，而点开后却是小写开头的排在前面，也许是点开后的排序是先字母再大小写？
 
+## 工具
+
+* npx degit user/repo：下最新的tar.gz，缓存起来
+
 ## 参考
 
 * https://rogerdudler.github.io/git-guide/index.zh.html
@@ -386,3 +390,4 @@ collapsable content
 * git lfs https://zhuanlan.zhihu.com/p/146683392 https://docs.github.com/cn/github/managing-large-files
 * https://git.wiki.kernel.org/index.php/GitHosting
 * Git Hooks https://github.com/typicode/husky
+* git fetch --deepen有啥区别，如何unshallow指定数量的提交

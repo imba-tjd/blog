@@ -325,6 +325,7 @@ http POST httpbin.org/post header:123 q=="你 好" name=John field=@file.txt # �
 http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定向标准输入也为原始数据
 ```
 
+* 依赖requests
 * 网卡的时候无法响应Ctrl+C
 * 自带json染色，但导致必须完全接收响应才输出，-S关闭缓冲但仍能单行染色；重定向时默认关染色
 * 默认请求gzip，UA为HTTPie/xxx

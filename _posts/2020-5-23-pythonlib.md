@@ -56,7 +56,8 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
 * `__file__`是当前文件名的绝对路径
 * 直接运行的目标模块是`__main__`，在其它地方也可以import它，且可用它的`__file__`。但注意通过uvicorn等非直接运行时就不能依赖了
-* 没有一种表示
+* 没有一种表示“项目根目录”的方法
+* pip uninstall不支持--user，默认就会先卸载user的
 
 ```python
 # 绝对import，以sys.path中的目录开始搜索
