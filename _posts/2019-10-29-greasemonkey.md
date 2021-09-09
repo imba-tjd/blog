@@ -6,66 +6,69 @@ title: 油猴
 
 ```js
 // ==UserScript==
-// @name:XX-YY   Hello World // 冒号后是多国语言代码，可不加
-// @namespace    用来区分name相同但作者不同的脚本，一般是一个网页链接
+// @name         Hello World
+// @name:zh      你好（多语言信息）
+// @namespace    用于区分name相同但作者不同，一般是一个网址
 // @version      0.1
-// @description:XX-YY  描述
+// @description  描述，也支持多语言
 // @author       You
-// @grant        none // https://wiki.greasespot.net/Greasemonkey_Manual:API
-// @include      * // 不加则默认就是*
-// @exclude      http://diveintogreasemonkey.org/*
-// @match        与include类似，但对*更严格，见http://open.chrome.360.cn/extension_dev/match_patterns.html
-// @require      https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js
-// 只能是白名单里的网站：https://greasyfork.org/zh-CN/help/external-scripts
+// @homepageURL  http://example.com
 // @license      MIT
-// @icon         http://www.example.net/icon.png
-// @run-at       默认是document-end即在html加载后、其它资源加载前执行；可以改为document-start或document-idle（全部加载完后）
-// @resource     resourceName url
-// 其它：https://greasyfork.org/zh-CN/help/meta-keys
+// @icon         http://www.example.com/icon.png
+
+// @grant        使用GM API时需要加，可多次声明
+// @include      不加则默认是*。会对URL从头开始匹配，一般写 https://xxx.com/* 和 https://*.xxx.com/* ，访问末尾不带/的链接也有效。如果要http就再加两条，写*://不安全。也可以用JS的正则
+// @exclude      优先于include
+// @match        与include类似，但对*更严格，见https://open.chrome.360.cn/extension_dev/match_patterns.html
+// @require      https://xxx.com/xxx.min.js
+// @run-at       默认document-end即在html加载后、其它资源加载前执行；可以改为document-start或document-idle（全部加载完后）
+// @resource     resourceName url/xxx_string
 // ==/UserScript==
 ```
 
 ## 主体
 
-```js
-// 其实已经可以直接写js了，不过如果要用strict：
-!function(){
-    'use strict';
-    ....
-}();
-// 也可以用(function(){...})()或者(()=>{...})()或者(async ()=>{...})()
-// 一般都会放到立即执行函数里，以防止和外部的产生命名冲突
-```
+* 后缀名为`.user.js`
+* 一般会全放到立即执行函数`!function(){...}();`里，但其实早就沙盒化了，顶层是个sandbox对象，不会命名冲突
+* 支持'use strict'
+* 不清楚是否能顶层await，还是说与浏览器有关。如果需要，可考虑`(async ()=>{...})()`
+* setTimeout(f, ms)：第一个参数可用函数对象或匿名函数，但不能是`'f()'`，因为GM脚本执行完后整个环境就消除了，会报未定义
+* 可以直接访问和修改document，但默认不能访问window
+* 插入的元素受那个页面的CSS影响，如有必要可用iframe
 
-## 延迟调用函数
+## [GM API](https://wiki.greasespot.net/Greasemonkey_Manual:API)
 
-* 不能直接用`setTimeout("helloworld()", 60);`，因为GM脚本执行完后helloworld就没了，会报未定义
-* 可以在定义时把函数手动附到window上：`window.helloworld = function() { ... }`？
-* 也可以用匿名函数闭包
+* 大部分都是promise，也可以await
+* GM.info：metadata对象
+* GM.setValue getValue listValue deleteValue：跨page和origin储存数据
+* GM.getResourceUrl：根据resourceName获得其内容string，没有其他处理
+* GM.notification
+* GM.openInTab
+* GM.registerMenuCommand：4.11新版功能
+* GM.setClipboard
+* GM.xmlHttpRequest：能跨域，不遵守same-origin
+* unsafeWindow：对应BOM的window对象
 
-## unsafeWindow
+## 其他API
 
-* 其实就是访问window。要尽量避免以防止滥用
-* 可以不用它完成的一些操作：https://wiki.greasespot.net/Category:Coding_Tips:Interacting_With_The_Page
-* 如果实在要使用，用`// @grant unsafeWindow`
+* 如果只需要储存单域名的数据，可用Web Storage API
+* 4.0后完全用WebExtension重写了，所有的GM_开头的都是老的API，新的是`GM.`。GM_log、GM_addStyle没有新的，不过前者console.log就好，后者用其他手段吧。有个gist重新引入但也没必要
+* https://github.com/sizzlemctwizzle/GM_config 给用户提供图形化设置选项，非官方
+* window.focus()：能让浏览器转到运行脚本的页面，不需要grant。普通JS环境调用它无效因为需要service worker权限
+* $x()：XPath Helper
 
-## 变化
+## Greasy Fork
 
-* 4.0后完全用WebExtension重写了，所有的GM_开头的都是老的API
-* GM_log、GM_addStyle都没了。但有人以js脚本的形式提供了：`@require https://gist.githubusercontent.com/arantius/3123124/raw/grant-none-shim.js`
-* 储存单域名的数据可以用Web Storage API
+* 不能minify
+* require的只能是白名单里的网站：https://greasyfork.org/zh-CN/help/external-scripts
 
-## 其它（编程技巧）
+## 其他
 
-* jQuery非冲突模式：this.$ = this.jQuery = jQuery.noConflict(true);
-* https://wiki.greasespot.net/XPath_Helper
-* https://wiki.greasespot.net/Conditional_Logging
-* https://wiki.greasespot.net/CSS_Independent_Content
-* https://wiki.greasespot.net/Capturing_and_Bubbling
+* jq有可能与页面自带的冲突，考虑用`this.$ = this.jQuery = jQuery.noConflict(true)`
+* https://violentmonkey.github.io/guide/using-modern-syntax/ 介绍了现代化的开发方式，提供了简单的JSX Runtime
+* User Style：https://userstyles.org/ https://openuserjs.org/ https://github.com/openstyles/stylus
 
 ## 参考
 
-* https://cologler.gitbooks.io/greasemonkey/content/
-* https://www.52pojie.cn/thread-614101-1-1.html
 * https://wiki.greasespot.net
-* https://jixunmoe.github.io/gmDevBook/#/doc/intro/gmScript
+* TODO: https://github.com/FirefoxBar/userscript 学习其他人是怎么写的
