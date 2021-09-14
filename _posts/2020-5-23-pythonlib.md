@@ -502,8 +502,9 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 应在虚拟环境中使用，它自己也装进去
 * 默认构建结果在dist文件夹中，build文件夹记录了构建过程，warn-xxx.txt记录了出错内容
 * 第一次对入口点文件使用`pyinstaller main.py`，会生成main.spec，之后就对该spec使用
+* 会把.py编译成.pyc放到一个文件中，文件夹模式下如果没更新依赖，重新部署就只要更新那个文件即可。不跨平台，不支持交叉编译
 * spec
-  * datas：资源文件，是个`[('src','dest')]`，其中若src是文件夹而dest是`.`就会解包一层。src允许通配符。有`PyInstaller.utils.hooks.collect_data_files('mylib')`自动添加模块中的非.py且非二进制文件
+  * datas：资源文件，是个`[('src','dest')]`，其中若src是文件夹而dest是`.`就会解包一层。src允许通配符。有`PyInstaller.utils.hooks.collect_data_files('mylib')`自动添加模块中的非.py且非二进制文件。没有exclude_data的功能
   * binary：二进制依赖，如dll
   * hiddenimports：添加没自动分析出来的模块引用。全添加用`hiddenimports = PyInstaller.utils.hooks.collect_submodules('xxx')`
 * data
@@ -512,13 +513,14 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
   * sys.executable和sys.argv[0]：单文件下是加载器的路径，前者还会解软链接
 * -y：再次生成时静默覆盖之前构建的内容
 * -Fw：单文件+使用窗口；-i file.ico/exe：改变icon，Linux无效
+* --log-level DEBUG：更详细的编译期信息。-d all：原样复制.py，不处理成pyc和打包，运行时对解释器传递-v显示加载模块的详细信息
 * 有一定的增量生成功能，但在最初的测试阶段存在依赖问题时最好用--clean重新生成
-* --uac-admin：Win限定，会申请UAC。--uac-uiaccess不懂有什么区别，文档说与远程桌面有关
+* --uac-admin：Win限定，会申请UAC。--uac-uiaccess不懂有什么区别，文档说与远程桌面有关。单文件模式不推荐使用管理员权限
 * pyi-bindepend：显示打包后的依赖；pyi-archive_viewer：显示打包后的内容
 * upx如果在Path里会自动使用，Linux程序还可用-s选项strip
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()，但好像它已经patch过了
-* pywin32-ctype：用纯Py重新实现的pywin32，但只有一小部分API，且很久没更新了
+* pywin32-ctypes：用纯Py重新实现的pywin32，但只有一小部分API，且很久没更新了
 * 其它打包项目
   * PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式不会释放到临时文件夹
   * cx_freeze：扩展了distutils的setup.py，也可用简单的命令行。不支持单文件
@@ -585,7 +587,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * ?加命令：显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
 * ?加带*的对象名：显示匹配的对象名；其实是psearch命令
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出(_)输进终端中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
-* autoreload 2：需要%load_ext。import模块后修改源文件能自动变化
+* load_ext autoreload; autoreload 2修改源文件后会自动重载，autoreload 1修改被aimport a,b的文件后自动重载；对C模块无效
 
 ### 配置
 
@@ -1187,6 +1189,15 @@ print(template.render(the="variables", go="here"))
 * dramatiq：需用redis或rabbitmq
 * APScheduler：支持定时任务，可用redis。感觉设计比较复杂
 
+## PDF
+
+* pdfminer.six：纯Py，主要用于提取内容
+* pdfplumber：基于pdfminer.six
+* reportlab：用于创建，商业版的开源版本
+* pikepdf：偏底层
+* PyMuPDF：功能全面但是GPL
+* 不维护的：PyPDF2 pdfrw pdfminer
+
 ## 杂项
 
 * colorama：控制台的前、背景色；rich：自动染色和格式化
@@ -1255,3 +1266,4 @@ print(template.render(the="variables", go="here"))
 * mkdocs mkdocs-material
 * ansible
 * Wagtail：基于Django的CMS
+* Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器

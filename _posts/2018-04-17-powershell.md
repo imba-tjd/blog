@@ -137,7 +137,7 @@ category: windows
 ### meta
 
 * Get-Location(pwd)：（以表格形式）显示当前路径；Get-Location | select -ExpandProperty Path的输出就和pwd一样了，或者先赋给变量，再用属性
-* Get-Command(gcm)：显示匹配的cmdlet，模式可加`*`，-ParameterType加类型可查询以指定类型为参数的cmdlet。另外无参数调用比用纯`*`的结果少；Show-Command：显示一个gui窗口来填参数
+* Get-Command(gcm)：显示匹配的cmdlet，模式可加`*`，一般用-None指定名词，-ParameterType加类型可查询以指定类型为参数的cmdlet。无参数调用比用`*`的结果少；Show-Command：显示一个gui窗口来填参数
 * Get-History、Invoke-History *id*
 * Update-Help
 

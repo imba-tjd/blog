@@ -17,11 +17,11 @@ title: 油猴
 // @icon         http://www.example.com/icon.png
 
 // @grant        使用GM API时需要加，可多次声明
-// @include      不加则默认是*。会对URL从头开始匹配，一般写 https://xxx.com/* 和 https://*.xxx.com/* ，访问末尾不带/的链接也有效。如果要http就再加两条，写*://不安全。也可以用JS的正则
+// @include      不加则默认是*。会对URL从头开始匹配，一般写 https://xxx.com/* 和 https://*.xxx.com/* ，访问末尾不带/的链接也有效。如果要http就再加两条，写*://不安全因为可以匹配到中间的。或者可用JS的正则
 // @exclude      优先于include
 // @match        与include类似，但对*更严格，见https://open.chrome.360.cn/extension_dev/match_patterns.html
 // @require      https://xxx.com/xxx.min.js
-// @run-at       默认document-end即在html加载后、其它资源加载前执行；可以改为document-start或document-idle（全部加载完后）
+// @run-at       默认document-end即在html加载后、其它资源加载前执行；可以改为document-start或document-idle全部加载完后
 // @resource     resourceName url/xxx_string
 // ==/UserScript==
 ```
@@ -52,7 +52,7 @@ title: 油猴
 ## 其他API
 
 * 如果只需要储存单域名的数据，可用Web Storage API
-* 4.0后完全用WebExtension重写了，所有的GM_开头的都是老的API，新的是`GM.`。GM_log、GM_addStyle没有新的，不过前者console.log就好，后者用其他手段吧。有个gist重新引入但也没必要
+* 4.0后完全用WebExtension重写了，所有的GM_开头的都是老的API，新的是`GM.`。GM_log、GM_addStyle没有新的，不过前者console.log就好，后者用其他手段吧。有个gist重新引入但也没必要。好像就与TamperMonkey不兼容了
 * https://github.com/sizzlemctwizzle/GM_config 给用户提供图形化设置选项，非官方
 * window.focus()：能让浏览器转到运行脚本的页面，不需要grant。普通JS环境调用它无效因为需要service worker权限
 * $x()：XPath Helper
@@ -66,7 +66,8 @@ title: 油猴
 
 * jq有可能与页面自带的冲突，考虑用`this.$ = this.jQuery = jQuery.noConflict(true)`
 * https://violentmonkey.github.io/guide/using-modern-syntax/ 介绍了现代化的开发方式，提供了简单的JSX Runtime
-* User Style：https://userstyles.org/ https://openuserjs.org/ https://github.com/openstyles/stylus
+* 其他脚本站：https://openuserjs.org/ https://www.userscript.zone https://userscripts-mirror.org/ 好像原站挂了
+* User Style：https://userstyles.org/ https://github.com/openstyles/stylus
 
 ## 参考
 
