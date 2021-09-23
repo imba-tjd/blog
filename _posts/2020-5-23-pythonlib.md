@@ -54,7 +54,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
 * 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
-* `__file__`是当前文件名的绝对路径
+* `__file__`是当前文件名的绝对路径；命名空间包没有此属性
 * 直接运行的目标模块是`__main__`，在其它地方也可以import它，且可用它的`__file__`。但注意通过uvicorn等非直接运行时就不能依赖了
 * 没有一种表示“项目根目录”的方法
 * pip uninstall不支持--user，默认就会先卸载user的
@@ -1180,9 +1180,9 @@ print(template.render(the="variables", go="here"))
 
 ## 定时任务和任务队列
 
-* threading.Timer(秒数, fun).start()：自带，非阻塞，不易管理
+* threading.Timer(秒数, fun[,args,kwargs]).start()：自带，非阻塞，只执行一次，不易管理
 * sched：自带，使用麻烦
-* dbader/schedule：every(10).minutes.do(fun)/every().hour 无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
+* dbader/schedule：every(10).minutes/every().hour.do(fun) 轻量无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
 * celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455
 * rq：使用redis的任务队列，比celery简单
 * huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
@@ -1197,6 +1197,14 @@ print(template.render(the="variables", go="here"))
 * pikepdf：偏底层
 * PyMuPDF：功能全面但是GPL
 * 不维护的：PyPDF2 pdfrw pdfminer
+
+## Streamlit
+
+* 从纯py生成网页，主要是为机器学习设计的，自带托管平台
+* 不支持32位，依赖pandas等一大堆
+* 对于用户的每一次交互，整个脚本从头到尾执行一遍
+* 中文文档：http://cw.hubwiz.com/card/c/streamlit-manual/
+* streamlit run xxx.py/URL
 
 ## 杂项
 
@@ -1255,7 +1263,6 @@ print(template.render(the="variables", go="here"))
 * https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI；其他人练手的ASGI框架：abersheeran/index.py almarklein/asgineer
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
 * GUI：PySimpleGUI kivy跨平台太重了 DearPyGui
-* streamlit：从程序生成网页，不过主要是为机器学习设计的。Gradio比前者限制更多，场景更具体
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
 * Pyarmor：混淆源代码，但有运行时依赖
 * fuzzywuzzy：字符串模糊匹配
@@ -1267,3 +1274,4 @@ print(template.render(the="variables", go="here"))
 * ansible
 * Wagtail：基于Django的CMS
 * Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器
+* decorator：更方便地创建装饰器

@@ -351,6 +351,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 视频转音频：-vn -c:a copy；去除音频流：-an
 * 裁剪一段：-ss [start] -to [end]
 * 合并：-f concat
+* 为Web优化，将元数据放在开头：-movflags faststart
 
 ## iperf3
 
