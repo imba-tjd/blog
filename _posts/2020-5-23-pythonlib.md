@@ -611,12 +611,13 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 ## pdb
 
 * VSC调试用的并不是pdb，故先不学了
-* python -m ipdb
+* python -m ipdb xxx.py
 * 输入单个问号能显示功能命令
 * Debugging a broken unit test: pytest ... --pdbcls=IPython.terminal.debugger:TerminalPdb --pdb
-* breakpoint()：进入pdb，是原版python就有的功能，相当于`pdb.set_trace()`？
+* breakpoint()：内置，进入pdb。相当于`pdb.set_trace()`？
 * 命令教程：https://zhuanlan.zhihu.com/p/37218789 https://zhuanlan.zhihu.com/p/43846098
 * 还有个pdb++(pdbpp)项目
+* pdb：w/where 打印调用栈
 
 ## jupyter
 
@@ -656,6 +657,11 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * 格式化
 * Qgrid：提供对标题筛选的功能。qgrid_df=qgrid.show_grid(df, show_toolbar=True); qgrid_df.get_changed_df()将筛选后的数据取出来
 * Hinterland：每次输入都有提示
+
+### Binder
+
+* https://mybinder.org/v2/gh/<user>/<repo>/HEAD?urlpath=nteract
+* repo2docker构建时自动处理requirements.txt apt.txt postBuild（只会运行一次的脚本） start（相当于EntryPoint） runtime.txt（指定Python-3.9）；或只处理Dockerfile
 
 ## Conda
 

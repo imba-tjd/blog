@@ -17,7 +17,7 @@ title: 油猴
 // @icon         http://www.example.com/icon.png
 
 // @grant        使用GM API时需要加，可多次声明
-// @include      不加则默认是*。会对URL从头开始匹配，一般写 https://xxx.com/* 和 https://*.xxx.com/* ，访问末尾不带/的链接也有效。如果要http就再加两条，写*://不安全因为可以匹配到中间的。或者可用JS的正则
+// @include      不加则默认是*。会从头开始匹配URL，一般写 *://xxx.com/*，且对末尾不带/的URL也有效。也支持JS的正则。协议其实只支持http和https
 // @exclude      优先于include
 // @match        与include类似，但对*更严格，见https://open.chrome.360.cn/extension_dev/match_patterns.html
 // @require      https://xxx.com/xxx.min.js

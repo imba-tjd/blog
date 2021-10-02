@@ -370,6 +370,27 @@ collapsable content
 
 * npx degit user/repo：下最新的tar.gz，缓存起来
 
+## Git客户端
+
+* GitHub Desktop：添加多个repo时，启动后会自动全部fetch，导致电脑很卡
+* TortoiseGit：另有SVN版
+* Sourcetree：原支持SVN
+* VSC
+* https://github.com/gitextensions/gitextensions 与Windows Explorer集成
+* https://github.com/jesseduffield/lazygit Terminal UI
+* https://github.com/FredrikNoren/ungit JS写的，网页界面
+* https://aurees.com/ 不开源
+* https://www.cycligent.com/git-tool 不开源
+
+收费的：
+
+* https://git-fork.com
+* https://www.gitkraken.com/ 学生包里免费
+* https://www.sublimemerge.com/
+* https://gitblade.com/
+* https://www.git-tower.com
+* https://www.syntevo.com/smartgit/
+
 ## 参考
 
 * https://rogerdudler.github.io/git-guide/index.zh.html
