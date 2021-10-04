@@ -208,7 +208,11 @@ password:
 
 ## Scrapy
 
-TO READ：我的一个gist
+* TO READ：我的一个gist
+* https://www.zyte.com 官方平台，所有的Tools都是收费的，只能用Scrapy Cloud，数据最多保留四个月
+* robots.txt：Crawl-delay指定了抓取延迟
+* crawler和spider同义，指通用爬虫，目的是发现URL；scraper是某一网站专用的，目的是提取数据
+* 分析：需要哪些数据、从哪些网站上获取、多久提取一次、如何保证准确、如何消费。法律风险：个人数据、有版权的数据、需要登录的数据
 
 ### CLI
 
@@ -216,33 +220,38 @@ TO READ：我的一个gist
 * genspider -t crawl myspider url：用模板创建目标爬虫，只会有单个py文件，需要在项目中使用
 * shell url：交互式爬取页面；fetch/view url：使用当前项目的设置来爬取并把内容输出到终端/浏览器上，有助于发现是否存在AJAX请求
 * check：检查有没有错误
-* crawl prjname -o items.json：进行爬取，可以用-a传递k=v，在爬虫的构造函数中获取；runspider myspider.py：不在项目中运行单个爬虫文件
+* crawl prjname -o items.json：进行爬取，可以用-a传递k=v，在爬虫的构造函数中获取
+* runspider myspider.py：不在项目中运行单个爬虫文件
 
 ### spiders
 
 * 在spiders文件夹下创建
 * response.body默认是bytes，如果要find中文，用body_as_unicode()
 * 可把response.text传给bs4手动用非lxml解析HTML，或者改下载器中间件
+* scrapy.FormRequest(url, formdata)、from_response是更简化的用法
 
 ```python
 import scrapy
-class XXXSpider(scrapy.Spider): # 必须继承
+class XXXSpider(scrapy.Spider):
     name='xxx'
-    allowed_domains=[] # 允许爬的域名；必须是list
-    start_urls=[] # 或def start_requests(self):yield scrapy.Request(url=url, callback=self.parse, method = 'POST')
+    allowed_domains = [] # 允许爬的域名
+    start_urls = [] # 起始爬的链接；或定义start_requests函数yield Request(url, callback=self.parse)
+
     def parse(self, response): # 还有parse_post
-        item = Douban250Item()
         self.log(xxx)
-        v = response.css('xxx')
+        val = response.css('xxx')
+
+        item = Douban250Item()
         item['key'] = v # 也可在Item的构造函数里赋值
         yield item # 也可以直接返回字典
-        next_page=xxx
-        if next_page:
-            yield response.follow(next_page, callback=self.parse) # 相当于创建Request，支持相对路径无需urljoin，且对于<a>会自动用href属性，可直接用css='ul.pager a'作为第一个参数；还有follow_all
+
+        if next_page := xxx:
+            yield response.follow(next_page, callback=self.parse) # 相当于创建Request，支持相对路径无需手动urljoin，且对于<a>会自动用href属性，可直接用css='ul.pager a'作为第一个参数；还有follow_all
+
     # 传递命令行参数
     def __init__(self, category=None, *args, **kwargs):
-        super(XXXSpider, self).__init__(*args, **kwargs)
-        self.start_urls = ['http://www.example.com/categories/%s' % category]
+        super().__init__(*args, **kwargs)
+        self.start_urls = ['https://example.com/categories/' + category]
 
 #先检测是否有更新再下载，还需处理起始url；无法用于Rule
 def parse(self, response):
@@ -250,7 +259,7 @@ def parse(self, response):
     for url in urls:
         yield Request(url, method='HEAD', self.check)
 def check(self, response):
-    date = response.headers[' Last-Modified']
+    date = response.headers['Last-Modified']
     #check date to your db
     if db_date > date:  # or whatever is your case
         yield Request(response.url, self.success)
@@ -269,12 +278,13 @@ class XXXSpider(CrawlSpider):
 
 ### Items
 
-* 相当于Model，可防止给未声明变量赋值
-* 在spider中from ..items import xxxItem
-* 传入dict()就变成字典，把字典传给构造函数就变成Item
+* 相当于Model
+* 可防止给未声明变量赋值
+* 使用时在spider中from ..items import xxxItem
+* 支持与dict互转：dict(item)、xxxItem(d)
 
-```
-from scrapy.item import Item,Field
+```python
+from scrapy.item import Item, Field
 class Douban250Item(Item):
     ranking = Field()
 ```
@@ -345,37 +355,73 @@ process.start()
 
 ### Parsel
 
-* 在cssselect和lxml上构建的库；pyquery也是这两这上构建的。但是cssselect和Parsel都是scrapy开发的
-* get()以后就变为普通的字符串了
-* getall()永远返回列表
-* css提供::text取文本，返回值仍为Selector；不会取到子元素的，理论上用` *::text`可获取，但实际失败了，最好用xpath的string()
-* .attrib['href']及非标准的::attr可取属性，前者的结果是普通的字符串，且只会取第一个的
-* 如果HTML代码有BUG（如标签未闭合），出现了多个根元素，可用`len(se.xpath('/*')) > 1`检测；直接用css只会处理第一个根元素
-* xpath可以用`$k`嵌入变量，在后续参数中传入`k=v`替换
-* css不允许回溯到父元素
-* parsel.utils.flatten()：将多层嵌套的可迭代对象变为list
-* parsel.css2xpath()：把css变为xpath
-* 安装parselcli包，可使用parsel命令行，可直接输入css选择器，输`-xpath`切换到xpath选择器，输`+strip`就能自动过滤空白的，`-help`显示帮助，`-embed`启动python解释器
-* 默认只能以lxml的非html5模式解析HTML，parsel#83有讨论支持h5的
-
 ```python
 from parsel import Selector
-se = Selector(s)
-se.css('a').xpath('xxx').re(r'xxx').get()/.getall()
+se = Selector(doc)
+se.css('a') # 为SelectorList，可直接进一步.css或.xpath()；也可看作[Selector]
+.get() # 返回None或元素对应的字符串，若存在多个则只取第一个
+.getall() # 返回[str]
+.re(r'xxx') # 返回[str]；re_first()取第一个
+
+css('p::text').get() # 取文本，非标准，不会取到子元素的
+css('div *::text').getall() # div的所有子元素的文本节点
+css('a::attr(href)').getall() # 取属性
+css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其中元素再取
+```
+
+* 基于cssselect和lxml(.html)，由Scrapy团队开发
+* 如果HTML代码有BUG（如标签未闭合）出现了多个根元素，直接用css只会处理第一个根元素
+* parsel.utils.flatten()：将多层嵌套的可迭代对象变为list
+* parsel.css2xpath()：把css变为xpath
+* parselcli库：提供parsel命令行，能repl css处理本地文件和url
+* pyquery库：也基于cssselect和lxml，API风格为jQuery的
+
+### lxml
+
+* 有时文本节点不会直接为str，这样能判断是不是tail文本，以及找回父节点
+* lxml.objectify：像操作Python对象一样操作XML。不能与etree混用，不能用于HTML
+* html5parser：把html5lib作为lxml的后端构建etree，用法直接把它传给fromstring的参数即可；还有个soupparser但BS又会用内置的html.parser，所以没有任何意义
+* Python自带xml.etree.ElementTree
+* lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
+
+```python
+from lxml import etree, html
+
+root = etree.Element('root') # 可看作list，支持append，取索引和区间，for in遍历，len()，list()；无子元素不会被认为是False
+root.tag # root
+root.append(etree.Element('child1', CustomAttribute='hello')) # XML支持属性
+c = root[0]; c.getparent()/getprevious()/getnext(); c.attrib所有属性的dict; c.text='world'; c.tail某个元素后面的文本
+etree.tostring(root) # pretty_print=True格式化
+root.iter() # 按SAX风格遍历所有节点；for in只会遍历直接子节点
+
+etree.parse('filename'/file-like-obj) # 返回tree，用.getroot()获得document root；子元素用.getroottree()获得tree
+etree.fromstring('xml literal') # 返回Element，基本相当于etree.XML()
+etree.dump(root) # 格式化输出到sysout，应仅用于调试；没有html.dump
+etree.xmlfile() # 用于创建xml文件，类似于open()
+
+html.fromstring() # 尝试同时处理document和fragment
+html.document_fromstring() # 有一定处理不完整内容的能力，如没有html和body元素时会添加，会把style放到head中，基本相当于etree.HTML()
+html.fragment_fromstring() # 必须是单个元素，fragments_fromstring()
+
+tree.getpath(e) # 根据tree和e返回xpath
+doc.body.xpath() # 一般返回[Element]或[str]
+p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
 ```
 
 ### Xpath
 
-* `.`代表当前节点，`..`代表父节点
-* 选择当前节点下的某一元素直接用元素名，`xxx`相当于`./xxx`；选择某一层所有节点用`*`，不能不用否则什么都选不到
-* 以`/`开头的选择器会从创建Xpath的根重新开始搜索，即使当前已经在子节点了
-* `//`进行traversal，注意如果要从当前节点下搜索仍要加`.`
-* `|`：表示取或/并集
-* 获取属性的值：`@href`；过滤属性：`li[contains/starts-with(@class, "list") and/or @name="item"`，其中contains用于值有多个时满足一个即可；选取存在指定属性名但不限值的元素：`[@xxx]`，选取只要存在任何属性的元素：`[@*]`
-* 选择当前节点不含子节点的文本：`text()`，含子节点：`string()`；只会是一个字符串且保留空格，大概就是把所有尖括号里的去掉了
-* 列表位置以1开始，最后一个用`li[last()]`，前两个用`li[position()<3]`
-* 有个`node()`表示匹配任何类型的节点，不知和`*`比有什么区别
-* 存在Axes(轴)的语法，用于选择兄弟元素和父元素等；还有一些其它函数：concat、not、string-length等很多
+* 有层次，像e.xpath(`div`)只会选取e节点的直接子div，相当于`./div`；`*`选择当前元素所有子元素节点，`*/div`选取孙子节点，node()等于*加文本节点str，测试没有注释
+* 能回溯到父元素，`..`为父节点。以`/`开头会从根开始搜索，与当前节点的层次无关
+* traversal递归下降：`//`从根开始，`.//div`从当前节点下开始，`a//b`从当前节点下的a开始
+* 过滤属性：`[@attr]`、`[@attr="val"]`引号不可省、`//*[@id="xxx"]`按id选择、`[@*]`存在任何属性都行；获得属性的值：`./@attr`、`.//@attr`
+* 当前节点不含子节点的文本：`text()`，含子节点：`string()`；结果为一个字符串且保留空格，大概就是去掉所有尖括号的内容
+* 取索引：`[n]`，n从1开始。最后一个用`[last()]`，倒数第二个用`[last()-1]`，前两个用`[position()<3]`，与递归一起用一般加括号`(//div)[1]`，否则就相当于:first-child了
+* 并集运算符，不重复：`//a | //div`、`(a|div)/span`，但不支持`a/(div|span)`，即要用只能从最外层开始
+* 子元素筛选：`div[a]`存在a子元素的div元素，`div[not(a)]`不存在a子元素的div元素
+* 中括号其实是比较一般的条件过滤，可与一些函数结合使用：`[contains(text(), "123") and/or starts-with(@attr, "val")]`
+* Axes(轴)语法：加`xxx::`，改变冒号后的意义，不必用在pattern最开头。如`attribute::lang`选取当前节点的lang属性，`ancestor::div`选取当前节点的div祖先。默认是child轴
+* 还可进行计算：`+-* div mod >= !=`，也有一大堆函数，包括正则命名空间。但一般来说不用，因为不知道实现情况如何
+* 嵌入变量：在调用xpath()时传参k=v，在pattern里用$k获取
 
 ## Requests
 
@@ -401,8 +447,8 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * url必须要有scheme；必须每次写完整url，要不就用requests_toolbelt提供的BaseUrlSession
 * get的params会自动变成查询参数，且值为None的不会附加上去
 * post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，前者是form
-* 传字符串给data是设置body，不要传字符串给json；data还支持file-like-objects且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
-* post支持files={'filefield': file-like-objects-binary-mode}，requests-toolbelt提供了更多功能
+* 传字符串给data是设置body，不要传字符串给json；data还支持file-like-obj且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
+* post支持files={'filefield': file-like-obj-bin}，requests-toolbelt提供了更多功能
 * RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
 
 ```python
@@ -445,17 +491,18 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib
 
-* 自带，但urlopen默认不支持keepalive，无法大量使用；需要with
+* 自带，但urlopen默认不支持keepalive，无法大量使用
 * http.client更加底层
 * User-Agent默认为Python-urllib/3.9
-* POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode()
+* POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')
 
 ```py
 req = urllib.request.Request(url, [method])
 req.add_header('k', 'v')/req.headers |= {'k':'v'}
-rsp = urllib.request.urlopen(req/url) # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
+with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
 html = rsp.read().decode()
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
+resp.info().get_content_charset()
 
 url = 'xxx?k=' + urllib.parse.quote(xxx, 'u8') # 有unquote
 parts = urllib.parse.urlparse(url) # 修改后可unparse
@@ -473,11 +520,11 @@ parts.netloc域名
 
 ## Beautiful Soup
 
-* 支持不同的HTML Parser，其中html5lib最接近真实网页，是纯Python，相对慢；lxml(lxml.html)容错性性中游，速度最快；标准库的html.parser容错性差。还有一些bs不支持但存在的解析器：lxml.html.html5parser、html5-parser基于c
+* 支持不同的HTML Parser：html5lib最接近真实网页，是纯Python，相对慢；lxml(默认就是lxml.html)容错性中等，速度最快；标准库html.parser容错性差，但现在好像还行。另有html5-parser基于c，支持解析成lxml和BS的对象，但完全不支持whl
 * HTML分为四种对象：bs4.BeautifulSoup（文档）、bs4.element.Tag（标签）、bs4.element.NavigableString（文本）、bs4.element.Comment（注释）；XML还有其他对象
 * 有的属性是多值属性，如class，bs会自动处理成list（xml不做处理）。但像id中即使有空格，也只会直接返回字符串
-* 支持修改，许多东西可以直接赋值和`del`删除；还有一些其它的用于修改树的方法，暂时不学
-* `==`判断结构是否相同，如果要严格判断是否是同一对象，用is
+* 支持修改，许多东西可以直接赋值和`del`删除，有一些修改树的方法
+* 支持`==`判断结构相同
 
 ```python
 pip install html5lib beautifulsoup4
@@ -749,7 +796,7 @@ def test_homepage():
         response = client.get("/")
         assert response.status_code == 200
 
-# 手动模拟FileResponse，必须先全部读完再包装成file-like obj，且不具有ETag和Content-Length且不会自动猜测media_type
+# 手动模拟FileResponse，必须先全部读完再包装成file-like-obj，且不具有ETag和Content-Length且不会自动猜测media_type
 def myfile(_):
     with open('test.txt', 'rb') as f:
         return StreamingResponse(io.BytesIO(f.read()))
@@ -1227,7 +1274,6 @@ print(template.render(the="variables", go="here"))
 * pretty_errors：精简stacktrace，可全局安装
 * uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
-* lxml-stubs：不维护且不全，但比VSC自带的好
 
 ## 参考
 
