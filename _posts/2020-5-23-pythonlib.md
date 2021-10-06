@@ -1292,12 +1292,11 @@ print(template.render(the="variables", go="here"))
 ## TODO
 
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/
-* PyNaCl https://github.com/pyca/cryptography
+* PyNaCl https://github.com/pyca/cryptography pyOpenSSL
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
 * 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
-* https://github.com/Delgan/loguru 日志
 * https://github.com/mitmproxy/mitmproxy
 * https://github.com/gevent/gevent https://www.gevent.org/
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
@@ -1314,7 +1313,7 @@ print(template.render(the="variables", go="here"))
 * 自动重试：https://github.com/jd/tenacity
 * https://github.com/hugapi/hug 基于 falconry/falcon 的WebAPI框架，但hug有一段时间没提交了，falcon比较活跃但更底层，考虑学falcon，还支持ASGI；其他人练手的ASGI框架：abersheeran/index.py almarklein/asgineer
 * profiler：https://github.com/benfred/py-spy https://github.com/emeryberger/scalene
-* GUI：PySimpleGUI kivy跨平台太重了 DearPyGui
+* PySimpleGUI，基于tk的。其余的功能强大的GUI库统统不学，毕竟有qt。
 * https://github.com/jek/blinker 功能简单的非分布式信号（事件）库
 * Pyarmor：混淆源代码，但有运行时依赖
 * fuzzywuzzy：字符串模糊匹配

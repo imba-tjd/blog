@@ -141,6 +141,7 @@ prog3 : prog3.o sort.o utils.o
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
 * https://nuwen.net/mingw.html 较老
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
+* https://osdn.net/projects/mingw/releases/ MinGW32，官网都挂了
 
 ## 参考
 
