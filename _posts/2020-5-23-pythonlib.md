@@ -569,10 +569,11 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 使用multiprocessing时要调用freeze_support()，但好像它已经patch过了
 * pywin32-ctypes：用纯Py重新实现的pywin32，但只有一小部分API，且很久没更新了
 * 其它打包项目
-  * PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式不会释放到临时文件夹
+  * PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式能不释放到临时文件夹
   * cx_freeze：扩展了distutils的setup.py，也可用简单的命令行。不支持单文件
   * Nuitka：编译到C，之后运行就不需要解释器了；速度快，可能有兼容性问题，不够成熟。https://zhuanlan.zhihu.com/c_1245860717607686144
-  * shiv：类似于zipapp创建pyz，能打包依赖，不包含解释器，Linux下借助shebang能看起来直接运行，Win下要用`py`。pex类似但更复杂
+  * shiv：类似于zipapp创建pyz，能打包依赖，不包含解释器，Linux下借助shebang能看起来直接运行，Win下要用`py`
+  * pex：类似于可移植的pip+venv，感觉没必要学
   * py2exe：Star少，贡献者只有10人，不学
 
 ## python-fire
