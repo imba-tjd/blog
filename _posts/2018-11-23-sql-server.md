@@ -138,8 +138,8 @@ Transact-SQL
 
 ### 排序规则
 
-* 服务器级别的只能在建立时选择，建立后无法修改；数据库级别的修改用`alter database xxx collate xxx`，查询用`select collation_name from sys.databases`
-* LocalDB默认的是Latin1_General，无法显示中文；正常的默认是Chinese_PRC_CI_AS，用
+* 服务器级别的只能在建立时选择，建立后无法修改；数据库级别的修改用`alter database db1 collate xxx`，查询用`select name, collation_name from sys.databases`
+* LocalDB默认的是Latin1_General，无法显示中文，用nvarchar也不行；正常的默认是Chinese_PRC_CI_AS
 
 ### 预定义数据库角色
 
