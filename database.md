@@ -239,3 +239,7 @@ ISNULL NVL https://www.runoob.com/sql/sql-isnull.html
 MySQL可以通过explain查看sql语句的执行计划，通过执行计划来分析索引使用情况
 
 https://roadmap.sh/postgresql-dba
+
+ACCESS:
+Get-OdbcDriver
+https://www.microsoft.com/zh-cn/download/details.aspx?id=54920
