@@ -13,6 +13,7 @@ category: linux
 * apt-cache rdepends -i：查询反向依赖；-i理论上是只显示已安装的，但实际好像有些未安装的也显示了？
 * apt-mark hold/unhold <pkgname>：锁定/解锁版本，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
 * 使用前最好安装一下gnupg2（apt-key需要）、apt-transport-https、ca-certificates
+* apt edit-sources
 
 ### 软件列表
 
@@ -69,7 +70,7 @@ deb https://mirrors.aliyun.com/debian-security testing-security main contrib non
 
 ### Ubuntu
 
-发行版命名，测试版是focal。可以看出是根据首字母来的。
+发行版命名根据首字母，目前测试版是hirsute
 
 ```
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse

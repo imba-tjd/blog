@@ -520,11 +520,14 @@ parts.netloc域名
 
 ## Beautiful Soup
 
-* 支持不同的HTML Parser：html5lib最接近真实网页，是纯Python，相对慢；lxml(默认就是lxml.html)容错性中等，速度最快；标准库html.parser容错性差，但现在好像还行。另有html5-parser基于c，支持解析成lxml和BS的对象，但完全不支持whl
+* 支持不同的HTML Parser：html5lib最接近真实网页，是纯Python，相对慢；lxml(默认就是lxml.html)容错性中等，速度最快；标准库html.parser容错性差，但现在好像还行
 * HTML分为四种对象：bs4.BeautifulSoup（文档）、bs4.element.Tag（标签）、bs4.element.NavigableString（文本）、bs4.element.Comment（注释）；XML还有其他对象
 * 有的属性是多值属性，如class，bs会自动处理成list（xml不做处理）。但像id中即使有空格，也只会直接返回字符串
 * 支持修改，许多东西可以直接赋值和`del`删除，有一些修改树的方法
 * 支持`==`判断结构相同
+* BS不支持但存在的解析库
+  * html5-parser 基于c，支持解析成lxml和BS的对象，但完全不支持whl，必须连lxml也要用动态链接
+  * selectolax 是另外两个c后端的Py绑定，自己的API，支持css选择器
 
 ```python
 pip install html5lib beautifulsoup4
@@ -554,6 +557,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
   * datas：资源文件，是个`[('src','dest')]`，其中若src是文件夹而dest是`.`就会解包一层。src允许通配符。有`PyInstaller.utils.hooks.collect_data_files('mylib')`自动添加模块中的非.py且非二进制文件。没有exclude_data的功能
   * binary：二进制依赖，如dll
   * hiddenimports：添加没自动分析出来的模块引用。全添加用`hiddenimports = PyInstaller.utils.hooks.collect_submodules('xxx')`
+  * excludes：模块名列表。排除后仍能导入未打包进去的模块
 * data
   * CWD的相对路径不变
   * `__file__`意义基本不变，单文件模式下会放到临时文件夹中
@@ -571,7 +575,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 其它打包项目
   * PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式能不释放到临时文件夹
   * cx_freeze：扩展了distutils的setup.py，也可用简单的命令行。不支持单文件
-  * Nuitka：编译到C，之后运行就不需要解释器了；速度快，可能有兼容性问题，不够成熟。https://zhuanlan.zhihu.com/c_1245860717607686144
+  * Nuitka：编译到C，速度快，可能有兼容性问题，不够成熟。https://zhuanlan.zhihu.com/c_1245860717607686144
   * shiv：类似于zipapp创建pyz，能打包依赖，不包含解释器，Linux下借助shebang能看起来直接运行，Win下要用`py`
   * pex：类似于可移植的pip+venv，感觉没必要学
   * py2exe：Star少，贡献者只有10人，不学
@@ -807,7 +811,8 @@ def myfile(_):
 
 * pip install uvicorn：依赖click和h11，[standard]还会装上uvloop（Win不支持）等数个依赖
 * uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询默认监视CWD
-* --uds指定unix socket，--workers多线程，--log-level默认info，客户端不会收到traceback
+* --uds指定unix socket，--workers多线程
+* --log-level默认info，没有简单的指定日志文件的方法；客户端不会收到traceback
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
