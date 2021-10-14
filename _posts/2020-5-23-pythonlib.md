@@ -208,150 +208,199 @@ password:
 
 ## Scrapy
 
-* TO READ：我的一个gist
-* https://www.zyte.com 官方平台，所有的Tools都是收费的，只能用Scrapy Cloud，数据最多保留四个月
-* robots.txt：Crawl-delay指定了抓取延迟
-* crawler和spider同义，指通用爬虫，目的是发现URL；scraper是某一网站专用的，目的是提取数据
+* robots.txt中的Crawl-delay指定了抓取延迟
+* 通用概念：crawler和spider同义，指通用爬虫，目的是发现URL；scraper是某一网站专用的，目的是提取数据
+* 大量依赖，包括Twisted lxml等30多个
 * 分析：需要哪些数据、从哪些网站上获取、多久提取一次、如何保证准确、如何消费。法律风险：个人数据、有版权的数据、需要登录的数据
+* 难点：限制IP、登录、验证码、复杂的ajax
+* Crawler类包括settings signals stats extensions engine spider，属于核心
 
 ### CLI
 
-* startproject prjname; cd prjname
-* genspider -t crawl myspider url：用模板创建目标爬虫，只会有单个py文件，需要在项目中使用
-* shell url：交互式爬取页面；fetch/view url：使用当前项目的设置来爬取并把内容输出到终端/浏览器上，有助于发现是否存在AJAX请求
-* check：检查有没有错误
-* crawl prjname -o items.json：进行爬取，可以用-a传递k=v，在爬虫的构造函数中获取
-* runspider myspider.py：不在项目中运行单个爬虫文件
+* startproject MyPrj .：产生项目模板。scrapy.cfg所在目录是项目根目录，default的值就是scrapy命令行使用的项目，但此文件基本没用。
+* genspider [-t crawl] douban url：在MyPrj/spiders中产生douban.py单个文件，类名自动为DoubanSpider
+* shell url：交互式爬取指定页面。Ctrl+C退出。如果venv中有ipython，会自动使用
+* fetch/view url：根据当前项目的配置（如改了UA）发出请求，内容输出到终端/浏览器上。不会进入REPL
+* parse url：获取内容并根据选项进行到哪一步的解析
+* check：检查parse的docstring中声明`@url xxx要自动测试的网址; @returns items 2 5最少yield2个最多5个; @scrapes field1返回的item必须有field1`
+* crawl spidername -o items.json：进行爬取
+  * -o追加，-O覆盖，不加就只会在log中记录
+  * items.json中是[{},{}]
+  * 支持jl后缀表示jsonlines使得多次爬取没问题，还支持csv
+  * -a k=v传命令行参数，默认自动变成Spider的属性
+  * -s JOBDIR==crawls/somespider-1：可以随时Ctrl+C，下次再加上相同的参数就能恢复
+* runspider xxx.py：支持不在项目中运行单个爬虫。但没必要在这种地方轻量，因为Scrapy已经太重了
 
 ### spiders
 
-* 在spiders文件夹下创建
-* response.body默认是bytes，如果要find中文，用body_as_unicode()
-* 可把response.text传给bs4手动用非lxml解析HTML，或者改下载器中间件
-* scrapy.FormRequest(url, formdata)、from_response是更简化的用法
+* request
+  * Request(url, callback=self.parse, method, headers:{}, body:str/bytes, cookies:{}) 还可指定errback发送错误时的处理函数，cb_kwargs传给回调的额外参数
+  * Request.from_curl()
+  * scrapy.FormRequest(url, formdata)
+  * scrapy.FormRequest.from_response(response, formcss, formdata, callback) 方便处理input type=hidden
+  * scrapy.http.JsonRequest(url, data)
+* response
+  * body是bytes
+  * text是包括doctype和head的str
+  * headers.getlist('Set-Cookie')
+  * json()
+  * url、status、ip_address
+* self.state：dict，放需要被持久化的内容
+* 回调支持async
 
 ```python
 import scrapy
-class XXXSpider(scrapy.Spider):
-    name='xxx'
-    allowed_domains = [] # 允许爬的域名
-    start_urls = [] # 起始爬的链接；或定义start_requests函数yield Request(url, callback=self.parse)
+from scrapy.http.response.html import HtmlResponse
 
-    def parse(self, response): # 还有parse_post
-        self.log(xxx)
+class MySpider(scrapy.Spider):
+    name='xxx' # 必须
+    allowed_domains = [] # 允许爬的域名 TODO: 如果为空是都不允许还是都允许？
+    start_urls = [] # 起始待爬的链接
+
+    # 还有parse_post
+    def parse(self, response: HtmlResponse): # TODO: 确定response有哪些属性
+        self.logger.info(xxx)
         val = response.css('xxx')
 
-        item = Douban250Item()
-        item['key'] = v # 也可在Item的构造函数里赋值
-        yield item # 也可以直接返回字典
+        yield MyItem(key=val) # 也可返回dict和dataclass
 
-        if next_page := xxx:
-            yield response.follow(next_page, callback=self.parse) # 相当于创建Request，支持相对路径无需手动urljoin，且对于<a>会自动用href属性，可直接用css='ul.pager a'作为第一个参数；还有follow_all
+        yield from response.follow_all(response.css('ul.pager a')/css='ul.pager a') # 自动提取所有a元素的href并处理相对路径作为新请求
 
-    # 传递命令行参数
-    def __init__(self, category=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.start_urls = ['https://example.com/categories/' + category]
+        # 老式做法
+        if next_page := response.css('li.next a::attr(href)').get(): # 单个href字符串
+            next_page = response.urljoin(next_page) # 创建绝对路径
+            yield scrapy.Request(next_page)
 
-#先检测是否有更新再下载，还需处理起始url；无法用于Rule
-def parse(self, response):
-    urls = []
+# 先检测是否有更新再下载的做法
+def start_requests(self): # 覆盖start_urls
+    urls = [...]
     for url in urls:
-        yield Request(url, method='HEAD', self.check)
+        yield Request(url, self.check, 'HEAD')
 def check(self, response):
     date = response.headers['Last-Modified']
-    #check date to your db
-    if db_date > date:  # or whatever is your case
-        yield Request(response.url, self.success)
-def success(self, response):
-    yield item
+    # 从db中获取上次修改的时间
+    if db_date > date:
+        yield Request(response.url)
 
-#CrawlSpider通用爬虫，自动跟进链接
+# CrawlSpider通用爬虫，自动跟进链接；不要使用和修改parse()
+from scrapy.linkextractors import LinkExtractor # 从HTML中提取a的href。也可以修改tags和attrs属性实现提取任意元素的属性
 from scrapy.spiders import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor
-class XXXSpider(CrawlSpider):
-    rules=( # LinkExtractor的默认tags=('a','area'), attrs='href'
-        Rule(LinkExtractor(allow=r'category\.php',deny=xxx,allow_domains=xxx), # 这几个参数都可以是列表；follow的默认值，不设置回调时是True，否则是False
-        Rule(LinkExtractor(allow=r'.*/index\.html'), callback='parse_item', follow=True), # 回调不能是也不要改parse
+class MySpider2(CrawlSpider):
+    rules=(
+        Rule(LinkExtractor(allow=r'.*/index\.html'/[...], deny=..., allow_domains=..., restrict_css=...), callback='parse_item', follow=True), # follow的默认值，不设置callback时是True，否则是False
+        Rule(...)
     )
 ```
 
 ### Items
 
 * 相当于Model
-* 可防止给未声明变量赋值
-* 使用时在spider中from ..items import xxxItem
-* 支持与dict互转：dict(item)、xxxItem(d)
+* 自动阻止给未声明字段赋值
+* 在spider中使用要自己import
+* 自带deepcopy()
 
 ```python
 from scrapy.item import Item, Field
-class Douban250Item(Item):
-    ranking = Field()
+class Product(Item):
+    Price = Field()
+item = Product(Price=123)
+item['Price'] = 456 # 可当作dict用
+d = dict(item)
+item2 = Product(d)
+item.Price 报错、item['Price2'] 报错
+
+# ItemLoader，用于填充Item
+# 但还必须在定义scrapy.Field()的时候指定input/output_processor。itemloaders.processors和w3lib.html中提供了一些工具方法
+from scrapy.loader import ItemLoader
+def parse(self, response):
+    l = ItemLoader(item=Product(), response=response)
+    l.add_css('Price', '#price')
+    return l.load_item()
 ```
 
-### Pipeline
+### Item Pipeline
 
 * 处理item的，可以用来清理HTML数据、验证爬取的数据、查重和丢弃、保存到数据库
-* 还需在settings.py里设置ITEM_PIPELINES
+* 还需在settings里设置ITEM_PIPELINES才能启用
+* 自带scrapy.pipelines.files.FilesPipeline和图像管道，前者设置FILES_STORE，Spider返回时如果有`file_urls`，中间件就会下载文件，并添加files字段，里面有储存到的本地路径等一些元数据
 
 ```python
-import pymongo
-from scrapy.conf import settings
-class Douban250Pipeline(object):
+class DoubanPipeline:
     def open_spider(self, spider):
-        self.client = pymongo.MongoClient(host=settings["MONGODB_HOST"], port=settings["MONGODB_PORT"])
-        self.mydb = self.client[settings["MONGODB_DBNAME"]]
-        self.post = self.mydb[settings["MONGODB_SHEETNAME"]]
+        self.db = 初始化数据库连接
     def close_spider(self, spider):
-        self.client.close()
+        self.db.close()
     def process_item(self, item, spider):
-        data = dict(item)
-        self.post.insert(data)
-        return item # 或raise DropItem("Missing price")
-```
-
-### Middleware
-
-```python
-class BeautifulSoupMiddleware(object):
-    def __init__(self, crawler):
-        super(BeautifulSoupMiddleware, self).__init__()
-        self.parser = crawler.settings.get('BEAUTIFULSOUP_PARSER', "html.parser")
-
-    @classmethod
-    def from_crawler(cls, crawler): # 好像如果在__init__()里使用crawler.settings，就必须重新设置一遍该方法
-        return cls(crawler)
-
-    def process_response(self, request, response, spider):
-        return response.replace(body=str(BeautifulSoup(response.body, self.parser)))
+        it = itemadapter.ItemAdapter(item) # 能把dataclass包装成类dict一致处理
+        self.db.add(it.asdict())
+        return item 或 raise scrapy.exceptions.DropItem("Missing price")
 ```
 
 ### Settings
 
-* TODO：如何读取设置
+* 使用时可当作dict，不过也有一些方法
+* crawler.settings
+* 在命令行中指定：-s k=v
+* 在Spider中设置：custom_settings={k:v}，读取：self.settings
 
 ```python
-USER_AGENT='xxx'
-ROBOTSTXT_OBEY=True # 默认
-LOG_LEVEL='WARNING' # 默认DEBUG
-FEEDS = {'items.json':{'format': 'json','encoding': 'utf8','store_empty': False}}
+# 默认设置
+USER_AGENT = "Scrapy/VERSION (+https://scrapy.org)"
+ROBOTSTXT_OBEY = True
+LOG_LEVEL = 'DEBUG' # 命令行用-L指定
+CONCURRENT_REQUESTS = 16 # 爬多域名时最好调高
+CONCURRENT_REQUESTS_PER_DOMAIN = 8
+DEFAULT_REQUEST_HEADERS = { 'Accept': 'text/html, ...', 'Accept-Language': 'en' }
+DEPTH_LIMIT = 0 # 不限
+DOWNLOAD_DELAY = 0 # 不限，秒数，支持小数，默认还会在此基础上随机乘以0.5-1.5
+DOWNLOAD_TIMEOUT = 100 # 秒数。可被Spider和Request.meta的download_timeout覆盖
+RETRY_TIMES = 2 # 对于HTTP错误码，只有RETRY_HTTP_CODES中指定的才会重试
+HTTPCACHE_ENABLED = False # 启用后会在临时文件夹缓存，不遵循HTTP头的指示
+HTTPCACHE_GZIP = False
+REDIRECT_MAX_TIMES = 20
+COOKIES_ENABLED = true # 有时Cookie会被用来识别机器人，此时可考虑禁用；爬多域名一般也禁用
+COOKIES_DEBUG = False # 启用后会把cookie记录到日志中
+MEMUSAGE_LIMIT_MB = 0 # 超出设定值后会shutdown，一般还设置邮件通知
+AUTOTHROTTLE_ENABLED = False # 启用后就不用考虑DOWNLOAD_DELAY了
+AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+TELNETCONSOLE_ENABLED = True # 一般关闭
+SCHEDULER_PRIORITY_QUEUE 默认深度优先，爬多域名推荐用 'scrapy.pqueues.DownloaderAwarePriorityQueue'，这不是完全的广度优先
+
+# 储存数据的后端，支持FTP和S3
+FEEDS = {'data-%(time)s.json':{'format': 'json','encoding': 'utf8','store_empty': False}}
 ```
 
 ### Debug
 
 ```python
-#在IDE中debug，在scrapy.cfg同级下创建run.py；对于VSC还要"cwd": "${fileDirname}"
+# CWD为scrapy.cfg
 from scrapy import cmdline
 cmd = 'scrapy crawl MySpider'
 cmdline.execute(cmd.split())
 
-#官方的方法，在自己的爬虫类里创建Twisted
+# 官方的做法
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 process = CrawlerProcess(get_project_settings())
-process.crawl(MyCrawler, domain='scrapinghub.com') # 理论上第一个参数也可以是爬虫的name，但是我测试会报找不到失败，只能用类
+process.crawl(MyCrawler, domain='scrapinghub.com') # 第一个参数是爬虫类本身，也可以用name
 process.start()
 ```
+
+### Middleware
+
+* DOWNLOADER_MIDDLEWARES_BASE设置中列出了默认启用的自带中间件
+* HttpAuthMiddleware：在spider中设置http_user http_pass http_auth_domain属性，就能自动Basic验证
+* 自定义的需要在设置中启用
+* Downloader中间件，构造函数接受crawler参数，定义process_request process_response process_exception方法
+* 还有Spider中间件
+
+### 相关项目
+
+* https://www.zyte.com 官方平台，所有的Tools都是收费的，只能用Scrapy Cloud，数据最多保留四个月
+* Gerapy 调度管理系统，基于Scrapyd Django
+* https://github.com/Python3WebSpider/ProxyPool 定时抓取免费代理网站的代理池，需要Docker或Python+Redis
+* scrapy-redis 分布式爬虫
+* https://github.com/scrapinghub/splash
 
 ### Parsel
 
@@ -375,6 +424,7 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * parsel.css2xpath()：把css变为xpath
 * parselcli库：提供parsel命令行，能repl css处理本地文件和url
 * pyquery库：也基于cssselect和lxml，API风格为jQuery的
+* Chrome的devtools中对于表格会自动加上tbody
 
 ### lxml
 
@@ -422,6 +472,7 @@ p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
 * Axes(轴)语法：加`xxx::`，改变冒号后的意义，不必用在pattern最开头。如`attribute::lang`选取当前节点的lang属性，`ancestor::div`选取当前节点的div祖先。默认是child轴
 * 还可进行计算：`+-* div mod >= !=`，也有一大堆函数，包括正则命名空间。但一般来说不用，因为不知道实现情况如何
 * 嵌入变量：在调用xpath()时传参k=v，在pattern里用$k获取
+* 不适合过滤class，因为可能由空格分隔
 
 ## Requests
 
@@ -1298,7 +1349,7 @@ print(template.render(the="variables", go="here"))
 ## TODO
 
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/
-* PyNaCl https://github.com/pyca/cryptography pyOpenSSL
+* PyNaCl https://github.com/pyca/cryptography pyOpenSSL pycryptodome
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
 * 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
