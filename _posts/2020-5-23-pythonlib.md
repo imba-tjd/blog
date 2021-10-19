@@ -384,6 +384,13 @@ from scrapy.utils.project import get_project_settings
 process = CrawlerProcess(get_project_settings())
 process.crawl(MyCrawler, domain='scrapinghub.com') # 第一个参数是爬虫类本身，也可以用name
 process.start()
+
+# parse中启动scrapy shell
+from scrapy.shell import inspect_response
+if xxx:
+    return item
+else:
+    inspect_response(response, self)
 ```
 
 ### Middleware
@@ -1306,6 +1313,7 @@ print(template.render(the="variables", go="here"))
 * reportlab：用于创建，商业版的开源版本
 * pikepdf：偏底层
 * PyMuPDF：功能全面但是GPL
+* pdf2docx：基于PyMuPDF，生成的docx能在一定程度上保留格式
 * 不维护的：PyPDF2 pdfrw pdfminer
 
 ## Streamlit
@@ -1383,3 +1391,4 @@ print(template.render(the="variables", go="here"))
 * Wagtail：基于Django的CMS
 * Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器
 * decorator：更方便地创建装饰器
+* 操控浏览器：playwright-python Splinter pyppeteer selenium

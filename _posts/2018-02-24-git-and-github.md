@@ -412,3 +412,4 @@ collapsable content
 * https://git.wiki.kernel.org/index.php/GitHosting
 * Git Hooks https://github.com/typicode/husky
 * git fetch --deepen有啥区别，如何unshallow指定数量的提交
+* git switch --trace origin/master：当本地没有master分支但有origin/master时，创建并跟踪。好像checkout是自动的？
