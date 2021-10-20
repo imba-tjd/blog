@@ -59,7 +59,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * 没有一种表示“项目根目录”的方法
 * pip uninstall不支持--user，默认就会先卸载user的
 
-```python
+```py
 # 绝对import，以sys.path中的目录开始搜索
 import x # 引用顶级目录的x/__init__.py，若不存在再找顶级目录的x.py，再找库模块x；以下将前两者简称x模块
 import x.y # 在x文件夹中找y模块，仍会调用x/__init__.py
@@ -93,7 +93,7 @@ except ImportError:
 * 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
 * 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
 
-```python
+```py
 # __init__.py；必须有此文件才能自动发现
 from impl import fun # 从实现中公开函数
 __version__ = '0.0.1' # 默认0.0.0
@@ -248,7 +248,7 @@ password:
 * self.state：dict，放需要被持久化的内容
 * 回调支持async
 
-```python
+```py
 import scrapy
 from scrapy.http.response.html import HtmlResponse
 
@@ -299,7 +299,7 @@ class MySpider2(CrawlSpider):
 * 在spider中使用要自己import
 * 自带deepcopy()
 
-```python
+```py
 from scrapy.item import Item, Field
 class Product(Item):
     Price = Field()
@@ -324,7 +324,7 @@ def parse(self, response):
 * 还需在settings里设置ITEM_PIPELINES才能启用
 * 自带scrapy.pipelines.files.FilesPipeline和图像管道，前者设置FILES_STORE，Spider返回时如果有`file_urls`，中间件就会下载文件，并添加files字段，里面有储存到的本地路径等一些元数据
 
-```python
+```py
 class DoubanPipeline:
     def open_spider(self, spider):
         self.db = 初始化数据库连接
@@ -343,7 +343,7 @@ class DoubanPipeline:
 * 在命令行中指定：-s k=v
 * 在Spider中设置：custom_settings={k:v}，读取：self.settings
 
-```python
+```py
 # 默认设置
 USER_AGENT = "Scrapy/VERSION (+https://scrapy.org)"
 ROBOTSTXT_OBEY = True
@@ -372,7 +372,7 @@ FEEDS = {'data-%(time)s.json':{'format': 'json','encoding': 'utf8','store_empty'
 
 ### Debug
 
-```python
+```py
 # CWD为scrapy.cfg
 from scrapy import cmdline
 cmd = 'scrapy crawl MySpider'
@@ -411,7 +411,7 @@ else:
 
 ### Parsel
 
-```python
+```py
 from parsel import Selector
 se = Selector(doc)
 se.css('a') # 为SelectorList，可直接进一步.css或.xpath()；也可看作[Selector]
@@ -441,7 +441,7 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * Python自带xml.etree.ElementTree
 * lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
 
-```python
+```py
 from lxml import etree, html
 
 root = etree.Element('root') # 可看作list，支持append，取索引和区间，for in遍历，len()，list()；无子元素不会被认为是False
@@ -489,7 +489,7 @@ p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
 * 即使使用了会话，方法级别的参数也不会保留
 * 非线程安全，toolbelt提供了简单的多线程
 
-```python
+```py
 s = requests.session() # with或s.close()能关闭所有连接(urllib3.PoolManager)，但之后仍可以继续使用，又会自动创建。一般用于出现异常时及时释放资源
 s.request = functools.partial(s.request, timeout=3) # 连接超时时间，可为小数，默认无穷大，不加会一直等；直接赋值只影响connect超时时间，可传递元组，第二个参数控制下载超时；Session级别的只能这样设置，是故意的
 allow_redirects=True; max_redirects=30 #【默】最后结果是200不是3xx；head默认不跟踪
@@ -509,7 +509,7 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * post支持files={'filefield': file-like-obj-bin}，requests-toolbelt提供了更多功能
 * RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
 
-```python
+```py
 r: Response = s.get(url,params={k:v})、post(url,data/json = {k:v}/str)、put/delete/head/options
 r.raise_for_status(), r.status_code # 200，== requests.codes.ok
 r.json() # 即使解码成功也不一定意味着请求成功，因为有时服务器会在失败时也返回json
@@ -587,7 +587,7 @@ parts.netloc域名
   * html5-parser 基于c，支持解析成lxml和BS的对象，但完全不支持whl，必须连lxml也要用动态链接
   * selectolax 是另外两个c后端的Py绑定，自己的API，支持css选择器
 
-```python
+```py
 pip install html5lib beautifulsoup4
 from bs4 import BeautifulSoup
 
@@ -647,7 +647,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * `python -m fire xxx`可以对目标模块做任何改变而使用
 * BUG：对于对象，--help/-h无法显示verb，必须要用`- -h`才行
 
-```python
+```py
 import fire
 def hi(name='world'): return 'hello'+name
 fire.Fire(hello) # python cli.py world或--name=world
@@ -705,7 +705,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * 在`profile_default/startup/`中的.py或.ipy会自动执行，命名可以`10-xxx.py`这样含有优先级
 * config加不含c.的设置项可以动态读取和设置值
 
-```python
+```py
 c.TerminalInteractiveShell.confirm_exit = False
 c.TerminalInteractiveShell.editor = 'code -w'
 c.InlineBackend.figure_format = 'svg' # 矢量图；或用retina表示高像素
@@ -792,7 +792,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * 如果路径中需要出现后缀，如`/test.txt`，路径需要声明成`{file_path:path}`
 * bool查询参数会自动转换，b=1或者b=True或b=yes都可以
 
-```python
+```py
 app = fastapi.FastAPI()
 
 @app.get("/", summary='xxx', description='xxx')
@@ -825,7 +825,7 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 * taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖太多，这么重不如用别的框架，也不活跃
 * TODO：https://github.com/Redocly/redoc https://github.com/swagger-api/swagger-ui https://www.starlette.io/schemas/
 
-```python
+```py
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse,HTMLResponse,JSONResponse,RedirectResponse,FileResponse
@@ -877,7 +877,7 @@ def myfile(_):
 * 默认是http的，如果用https访问，会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
 * 只支持HTTP1.1，直接基于asyncio。hypercorn支持HTTP/2，Daphne依赖twisted
 
-```python
+```py
 async def app(scope, receive, send): # 必须是异步的，也可以是定义了__call__的类
     assert scope['type'] == 'http' # 不处理WebSocket和Lifespan
     assert scope['method'] in ('GET', 'HEAD')
@@ -1018,7 +1018,7 @@ for row in cur.tables(tableType='table'): # 显示所有用户定义的表名，
 * 返回值
 * 持续时间
 
-```python
+```py
 @pysnooper.snoop(normalize=True)
 def f(): ...
 # 在函数中的某一部分上使用：with pysnooper.snoop():
