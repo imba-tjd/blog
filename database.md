@@ -128,6 +128,7 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * info列出所有的实例，info加实例名显示一些信息
 * create、delete、start、stop
 * 需指定数据库级别的排序规则：`create/alter database <dbname> COLLATE Chinese_PRC_CI_AS`（中国默认），非localdb还可以加`_UTF8`；只修改此级别不会影响已有的列，还需要ALTER TABLE一下
+* http://downloadsqlserverexpress.com
 
 ## MySQL
 
