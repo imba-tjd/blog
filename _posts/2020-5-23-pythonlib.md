@@ -1359,7 +1359,6 @@ print(template.render(the="variables", go="here"))
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/
 * PyNaCl https://github.com/pyca/cryptography pyOpenSSL pycryptodome
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
-* 命令行选项创建工具：https://github.com/docopt/docopt （很久没更新了） https://github.com/pallets/click/ 很复杂但最好 https://github.com/tiangolo/typer；把命令行程序变成GUI：https://github.com/chriskiehl/Gooey
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
 * https://github.com/mitmproxy/mitmproxy
