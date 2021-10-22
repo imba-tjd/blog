@@ -1031,24 +1031,29 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
-* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突。还可以用装饰器声明locals(a = xxx), returns, exceptval, cfunc(=cdef), inline, ccall(=cpdef)
-* 出现异常时如果pyx源文件存在，会给出错地方，但仅仅时当时临时读取，如果改了没重编译就会对不上；Py_Object的函数调用出错不会在编译期给出
+* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突。还可以用装饰器声明locals(a=xxx), returns, exceptval, cfunc(等价于cdef), inline, ccall(等价于cpdef)
+* 出现异常时如果pyx源文件存在，会给出错地方，但仅仅是当时临时读取，如果改了没重编译就会对不上；Py_Object的函数调用出错不会在编译期给出
 * 对numpy有一定支持，但应该不如numba
 * pyx默认Python2，3.0后为3
-* cython命令行把pyx变成c，cythonize -i变成so/pyd；注意文件不存在时两者都无任何报错；-a会产生html分析结果，黄色的是与Python交互的
 * pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中。内部没有用cythonize，应该属于弃用用法或会在将来改，总之最好不要用于与C交互
 * setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
 * Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-ffast-math --link-args=xxx
-* mypyc试图专注于纯Py模式，更简单，对typing一级支持，但还在开发中，且对Win支持不好，完全不支持mingw；与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL
+* mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
+* 与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL
+* 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
 ```py
 # setup.py
 from Cython.Build import cythonize
 setup(ext_modules=cythonize('**/*.pyx'))
+from mypyc.build import mypycify
+setup(ext_modules=mypycify(['xxx.py'])) # 或用 list(set(glob('*.py'))-{'setup.py','main.py'})，但会出现一个随机字符串的文件，应该是BUG
 # CLI
 python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f，-j多线程；不支持-a
-cythonize -i xxx.pyx
+cython xxx.pyx -a # 变成c，产生与Py交互的分析。小心文件名写错或忘加后缀时无任何提示
+cythonize -i xxx.pyx # 变成so/pyd。之后就只能import使用，无法从命令行调用了
+python .venv/Scripts/mypyc xxx.py
 
 # 最简单的使用C函数的方式
 int fun(int a) { return a; } # test.c
