@@ -1048,12 +1048,12 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 from Cython.Build import cythonize
 setup(ext_modules=cythonize('**/*.pyx'))
 from mypyc.build import mypycify
-setup(ext_modules=mypycify(['xxx.py'])) # 或用 list(set(glob('*.py'))-{'setup.py','main.py'})，但会出现一个随机字符串的文件，应该是BUG
+setup(ext_modules=mypycify(['xxx.py'])) # 或用 list(set(glob('*.py'))-{'setup.py','main.py'})；不要自己创建mypycify.py否则有bug
 # CLI
 python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f，-j多线程；不支持-a
 cython xxx.pyx -a # 变成c，产生与Py交互的分析。小心文件名写错或忘加后缀时无任何提示
-cythonize -i xxx.pyx # 变成so/pyd。之后就只能import使用，无法从命令行调用了
-python .venv/Scripts/mypyc xxx.py
+cythonize -i xxx.pyx # 变成so/pyd，也会产生对应的.c .o .def临时文件。之后就只能import使用，无法从命令行调用了
+python .venv/Scripts/mypyc xxx.py # 很干净，只有so/pyd
 
 # 最简单的使用C函数的方式
 int fun(int a) { return a; } # test.c
