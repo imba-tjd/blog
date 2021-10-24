@@ -113,7 +113,7 @@ python3 -m pip install -U pip setuptools wheel
 pip3 list [--outdated/-o]
 pip3 install <package_name> [--upgrade/-U] [--pre预览版] [--user]
 pip3 install local.whl/tar.gz -or- 包名 -f <含有whl的文件夹> -or- setup.py install
-pip3 install git+https://github.com/user/repo.git@branch # 也可用ssh://，会下到所有历史且pip维护者拒绝加depth，可改用下zip代替，下不到submodule
+pip3 install git+https://github.com/user/repo.git@branch # 会下到所有历史且pip维护者拒绝加depth，可改用下zip代替，下不到submodule
 pip3 show <package_name>
 pip3 uninstall：不会卸载依赖，可用pip-autoremove代替
 pip3 check：能显示出某个模块的依赖冲突和缺失

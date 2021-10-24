@@ -15,7 +15,6 @@ title: 第三方 Python 库
 pip freeze > requirements.txt # 需在venv中运行否则会把全局的写进去；类似于pip list --format=freeze，只是verb不同，freeze参数少
 pip install -Ur requirements.txt
 
---index https://xxx # 如果repo以.py结尾，要加@setup.py
 SomeProject==1.4
 SomeProject>=1,<2 # 逗号为且；在CLI中运行需加引号否则大于号会被认为是重定向
 SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2”
@@ -92,6 +91,7 @@ except ImportError:
 * 使用包内数据：importlib.resources.files("mypkg")/"data/data.csv" https://importlib-resources.readthedocs.io/en/latest/using.html；单个py_modules无法使用
 * 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
 * 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
+* --global-option "-a" --install-option "-b"相当于setup.py -a install -b
 
 ```py
 # __init__.py；必须有此文件才能自动发现
@@ -148,7 +148,7 @@ project_urls =
 packages = find: # 还有一种find_namespace:
 install_requires =
     requests;python_version<'3.4' # https://www.python.org/dev/peps/pep-0508/
-    pywin32 >= 1.0;platform_system=='Windows'
+    pywin32 >= 1.0;platform_system=='Windows' # 还有platform_machine=='x86_64'
 python_requires = >=2.7, !=3.0.*
 include_package_data = True # 将MANIFEST.in的内容打包进bdist，还可指定exclude_package_data优先去除bdist的内容
 scripts =
