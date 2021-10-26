@@ -37,3 +37,5 @@ title: 枚举器和迭代器
 * 产生多个可枚举类型，只需实现多个返回IEnumerable<T\>接口的不同的方法即可
 * 可以将迭代器（返回IEnumerator<T>）作为属性，GetEnumerator方法根据判断返回指定的迭代器
 * 在编译器生成的枚举器中，Reset方法没有实现
+
+return yield foreach（等于Py的yield from）: https://github.com/dotnet/csharplang/discussions/378
