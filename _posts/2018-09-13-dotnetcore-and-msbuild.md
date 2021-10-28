@@ -201,6 +201,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * nuget.config能指定第三方源，包括本地文件夹
 * Version指定的是最低兼容版本，用*可指定最高版本
 * 国内镜像，VS中使用时要删掉原来的，不知是不是BUG：https://nuget.cdn.azure.cn/v3/index.json
+* `error NU1100: Unable to resolve xxx for 'net6.0'`：删除%AppData%\NuGet\NuGet.Config
 
 ## Upgrade Assistant
 
