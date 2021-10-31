@@ -924,7 +924,7 @@ await response(scope, receive, send)
 * https://github.com/encode/orm：基于SQLAlchemy core的查询、databases的异步、typesystem的类型验证，但很不活跃
 * ponyorm、tortoise-orm
 * tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
-* edgedb：自创DML的关系型数据库，但好像是基于pg的
+* edgedb：自创DML的关系型数据库，基于pg
 * mashumaro：基于dataclass的序列化库，不够成熟
 
 ### MySQL

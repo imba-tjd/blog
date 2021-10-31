@@ -22,7 +22,7 @@ title: ".NET网络编程"
 * UseCookies默认为true，用CookieContainer可以获取/设置cookies
 * UseProxy默认为true，Proxy默认为null，会使用系统的代理设置；new Proxy可手动设置代理
 * AllowAutoRedirect默认为true（从https自动重定向http好像会抛异常）
-* AutomaticDecompression枚举默认为None不使用压缩，可以用GZip和Flags特性
+* AutomaticDecompression枚举默认为None不使用压缩，可以用GZip和Flags特性，无需再手动添加Accept-Encoding
 * 可以使用链式处理：自定义一个继承DelegatingHandler的类，然后把下一个handler传给InnerHandler属性，最后一个通常是无参的HttpClientHandler。发送请求时是从前往后处理，接收时从后往前
 * core2.1后会自动使用更高级的SocketsHttpHandler，使用了Span
 
@@ -59,6 +59,7 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 * 修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`，默认不存在
 * ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" }
 * TryGetValues可以获取它的值
+* Connection.ParseAdd("keep-alive");
 
 ## 给网址进行编码
 
@@ -155,13 +156,14 @@ Ping：new System.Net.NetworkInformation.Ping().SendPingAsync(host, 5); p.Status
 ### HttpWebRequest
 
 * 默认已KeepAlive
-* 用完后释放Response或Stream都可以
-* POST：设置Method和ContentLength，往GetRequestStream()里写
+* 默认超时时间为100秒
+* POST：设置Method，往GetRequestStream()里写，ContentLength会自动计算
 * 有一些Async方法，但不能和同步的混用
 
 ```c#
 var request = WebRequest.CreateHttp(ADDR);
-using WebResponse response = request.GetResponse(); // 必要时强转
+request.AutomaticDecompression = DecompressionMethods.GZip;
+using WebResponse response = request.GetResponse(); // 必要时强转；释放此项后就不用管Stream了，但若有请求流还是要Close()
 var receiveStream = response.GetResponseStream(); // 另一种用法是CopyTo到内存流
 var reader = new StreamReader(receiveStream);
 string content = reader.ReadToEnd();

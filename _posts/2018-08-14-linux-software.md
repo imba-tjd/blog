@@ -102,9 +102,9 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted 
 * 删除python2：apt autoremove python2.7-minimal libpython2.7-minimal，但可能造成已有的程序无法启动。如果想改python这个命令，可以用alternatives，不要直接删了然后ln
 * 二进制安装位置：/usr/local/bin/；~/.local/bin/；%AppData%\Python\Python38\Scripts；%LocalAppData%\Programs\Python\Python39\DLLs\Scripts
 * 依赖安装位置，用pip show xxx或者python -m site能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
-* 缓存：`%LocalAppData%\pip\Cache`；~/.cache/pip；现在可用pip cache purge清除wheel，但是还是有http缓存；可用pip cache dir显示缓存位置
+* pip cache purge清除缓存；dir显示缓存文件夹，info显示占用大小，list显示缓存了哪些包
 * 许多包也能从apt获得，以`python3-`加包名获得；若用pip卸载时提示：`Not uninstalling xxx at /usr/lib/python3/dist-packages, outside environment /usr`，这表明此包是用apt装的
-* 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager全部更新，或直接--force-reinstall
+* 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager全部更新，或--force-reinstall
 
 ```bash
 python3 -m ensurepip --upgrade --default-pip # 一般用不到，除非安装python时没有装pip

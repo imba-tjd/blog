@@ -32,6 +32,7 @@ PublishReadyToRunComposite：显著增加体积和编译时间，稍微增加R2R
 InvariantGlobalization：true # 减少Linux下自包含的体积
 DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdbonly，与full等价，在Win下使用专有格式。embedded嵌入文件内部，但直接用csc时不会报行号
 Prefer32Bit：默认false，但VS模板默认true
+ImplicitUsings：true 自动添加System Generic IO Linq Http Tasks的引用
 
 LangVersion：latest/preview
 AllowUnsafeBlocks：true # 启用后才能写unsafe块，不是默认全局unsafe
