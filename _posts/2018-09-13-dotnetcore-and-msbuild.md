@@ -36,13 +36,12 @@ ImplicitUsings：true 自动添加System Generic IO Linq Http Tasks的引用
 
 LangVersion：latest/preview
 AllowUnsafeBlocks：true # 启用后才能写unsafe块，不是默认全局unsafe
-AssemblyName：MSBuildSample # 还有个RootNamespace
 OutputPath：Bin/ # 最好加上目录分隔符
 CheckForOverflowUnderflow：true # 溢出时抛异常
 Nullable：enable
 NoWarn：NU1602,NU1604
 WarningsAsErrors：$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618 # 几个nullable的视为error
-GenerateAssemblyInfo：默认为true，自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明
+GenerateAssemblyInfo：默认为true。自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明，则还要定义RootNamespace和AssemblyName
 DefineConstants：未看
 AnalysisMode：AllEnabledByDefault启用更多的Lint，但可能太多了，比如public filed都会有警告
 
@@ -51,7 +50,7 @@ OutputType：WinExe # 存在下一条时设置为exe也可，会自动替换，�
 UseWPF：true # 还有UseWindowsForms
 TargetFramework：net5.0-windows
 ApplicationIcon：favicon.ico
-ApplicationManifest：app.manifest
+ApplicationManifest：app.manifest # 好像会自动使用
 
 <ItemGroup>
   <Content Include="lib\**">
@@ -74,6 +73,8 @@ ApplicationManifest：app.manifest
 EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 最小的全自定义Compile项：`<Compile Include="**/*.cs" Exclude="**/*.csproj; **/*.sln; bin/**; obj/**" />`，不能只写bin，必须加/**
 所有默认排除项可用$(DefaultItemExcludes)引用。
+
+.settings和.resx需要手动加入：https://docs.microsoft.com/zh-cn/dotnet/desktop/winforms/migration/#resources-and-settings
 
 ## dotnet CLI
 
@@ -211,6 +212,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * upgrade-assistant <MySolution.sln>
 * 老的方式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/ https://github.com/hvanbakel/CsprojToVs2017
 * Microsoft.Windows.Compatibility：对于FX项目，添加此包可直接迁移到Core，它包含了那些被移除的API
+* https://marketplace.visualstudio.com/items?itemName=ConnieYau.NETPortabilityAnalyzer VS的插件，分析从FX迁移到Core的兼容性问题
 
 ## 参考
 

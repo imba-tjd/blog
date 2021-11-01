@@ -14,3 +14,4 @@ title: C#库
 * https://github.com/dotnet/reactive
 * https://github.com/natemcmaster/CommandLineUtils
 * https://github.com/autofac/Autofac 轻量依赖注入
+* https://github.com/SixLabors/ImageSharp 处理图片，跨平台，替代System.Drawing
