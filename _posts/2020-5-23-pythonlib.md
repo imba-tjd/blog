@@ -1037,7 +1037,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * pyx默认Python2，3.0后为3
 * pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中。内部没有用cythonize，应该属于弃用用法或会在将来改，总之最好不要用于与C交互
 * setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
-* Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-ffast-math --link-args=xxx
+* Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-Ofast --link-args=xxx
 * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
 * 与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL
 * 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
@@ -1393,6 +1393,7 @@ print(template.render(the="variables", go="here"))
 * mkdocs mkdocs-material
 * ansible
 * Wagtail：基于Django的CMS
-* Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器
+* Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器；pyodide 编译到WA
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium
+* pyinstrument：使用简单的profile工具

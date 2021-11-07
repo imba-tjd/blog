@@ -94,7 +94,7 @@ prog3 : prog3.o sort.o utils.o
 * gcc -o如果没有后缀，会自动加exe；touch也是这样
 * 链接过程中，需要进行符号解析，并且是按照顺序解析；如果库链接在前，就可能出现库中的符号不会被需要，链接器不会把它加到未解析的符号集合中，那么后面引用这个符号的目标文件就不能解析该引用，导致最后链接失败。因此链接库的一般准则是将它们放在命令行的结尾
 * [ccache](https://github.com/ccache/ccache)可以缓存编译信息
-* -Ofast可开启最高优化，比O3还高，但可能产生不符合标准的行为
+* -Ofast可开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
 * -flto=thin可进行一些优化，编译和链接步骤都要用，除非手动用lld-link
 * -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
@@ -126,6 +126,15 @@ prog3 : prog3.o sort.o utils.o
 
 ```
 -static-libgcc -static-libstdc++ -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
+```
+
+### 临时禁用警告
+
+```c
+#pragma GCC diagnostic push  // 如果在整个本文件中忽略，也可不用它
+#pragma GCC diagnostic ignored "-Wunused-value"
+...
+#pragma GCC diagnostic pop
 ```
 
 ## Clang
