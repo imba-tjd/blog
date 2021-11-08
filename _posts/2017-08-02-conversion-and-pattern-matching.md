@@ -93,30 +93,6 @@ static string FloatToBinary(float f)
 }
 ```
 
-隐式引用转换
-
-### 委托可以隐式转换成
-
-* System.Delegate
-* System.MulticastDelegate
-* System.ICloneable
-* System.Runtime.Serialization.ISerializable
-
-### 数组可以隐式转换成
-
-* System.Array
-* System.ICloneable
-* System.IList
-* System.ICollection
-* System.IEnumerable
-
-### 数组之间的隐式转换
-
-* 两个数组有一样的维度
-* 元素类型都是引用类型
-* 元素类型存在隐式转换
-* 然而数组的协变被认为是语言缺陷，不要使用
-
 显式引用转换
 ------------
 
