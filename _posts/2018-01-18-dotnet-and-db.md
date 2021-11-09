@@ -139,6 +139,7 @@ OnPostDeleteAsync: await _context.Customers.FindAsync(id); if ... Remove ...
 * 事务默认隔离级别为可序列化，设置`Cache=Shared`再更改事务隔离级别才允许读取未提交内容
 * 支持cnn.BackupDatabase()，目前只有阻塞的
 * 默认启用了WAL
+* System.Data.SQLite并不是内置库，也不是微软出的
 
 ```c#
 // 排序规则默认支持 RTRIM忽略尾随空格、NOCASE英文字符不区分大小写、BINARY二进制比较 三种。可自定义支持Unicode的排序：
@@ -194,15 +195,37 @@ cnn.GetAll<Student>();
 
 ## ADO.NET
 
-SQL Server、OLE DB、ODBC、Oracle分别有System.Data下的命名空间，以下四种类的前面有不同的前缀，也可用它们实现了的IDb前缀的通用接口：
+* IDb前缀是通用接口，各个数据库也有自己的实现
+  * Connection
+  * Command
+  * DataReader：类似于数据源Stream
+* 连接模式：读取：数据库——Connection——Command——DataReader——页面。写入：页面——Command——Connection——数据库
+* 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。但是感觉不如用EF
 
-* Connection
-* Command
-* DataReader：数据源Stream
+```c#
+string cnnstr = System.Configuration.ConfigurationManager.ConnectionStrings["连接字符串名称"].connectionString;
+using var cnn = new SqliteConnection(cnnstr);
+cnn.Open(); // 没Open时也可以创建Command，读取数据就必须Open了
 
-连接模式：读取：数据库——Connection——Command——DataReader——页面。写入：页面——Command——Connection——数据库
+using var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
 
-断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。但是感觉不如用EF。
+cmd.CommandText ="INSERT INTO user (name) VALUES (@name)";
+cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，这诡异的写法居然没问题。一般还是给AddWithValue的返回值赋一个变量再进一步设置
+var param=cmd.CreateParameter(); param.ParameterName="@name"; param.Value=name; param.Direction=ParameterDirection.Input; param.Size = 30; cmd.Parameters.Add(param); // 正常写法
+
+cmd.ExecuteNonQuery(); // 执行Insert、Update和Delete，返回被影响的行数
+using var reader = cmd.ExecuteReader(); // 执行Select，返回SqlDataReader对象
+ExecuteScalar() // 以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令，无值时为null
+
+while (reader.Read()) { // 读完时返回false
+    string name = reader.GetString(0); // 把第一列当作string读取
+    int length = reader.GetInt32(1);
+}
+
+using var tran = cnn.BeginTransaction(); // ADO.NET事务，不是数据库事务
+cmd.Transaction = tran;
+tran.Commit()/Rollback();
+```
 
 ### IDbConnection
 
@@ -216,17 +239,6 @@ SQL Server、OLE DB、ODBC、Oracle分别有System.Data下的命名空间，以�
 * CreateCommand()、BeginTransaction()
 * 还有个DbProviderFactory用于从app.config中获得DbConnection，不过没什么必要
 
-```c#
-app.config中的configuration节点可以全站统一配置，且修改后只需重启程序就可以变化，无需重新编译。但Core不使用此文件。
-<connectionStrings>
-  <add name = "连接字符串名称" connectionString="连接字符串" providerName="System.Data.SqlClient" />
-</connectionStrings>
-
-string cnnstr = System.Configuration.ConfigurationManager.ConnectionStrings["连接字符串名称"].connectionString;
-using var cnn = new SqliteConnection(cnnstr);
-cnn.Open(); // Command的构建在连接没Open时也可以，读取数据就必须Open了
-```
-
 ### IDbCommand
 
 * CommandText：获取或设置要执行的SQL命令/储存过程/数据表名称
@@ -234,21 +246,6 @@ cnn.Open(); // Command的构建在连接没Open时也可以，读取数据就必
 * Parameters：SQL命令参数集合
 * CommandTimeout
 * Cancel()
-* ExecuteNonQuery()：只能执行Insert、Update和Delete，返回被影响的行数
-* ExecuteReader()：用于执行返回多条记录的Select命令，返回SqlDataReader对象
-* ExecuteScalar()：以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令
-
-```c#
-using var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
-
-cmd.CommandText ="INSERT INTO user (name) VALUES (@name)";
-cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，这诡异的写法居然没问题。一般还是给AddWithValue的返回值赋一个变量再进一步设置
-var param=cmd.CreateParameter(); param.ParameterName="@name"; param.Value=name; param.Direction=ParameterDirection.Input; param.Size = 30; cmd.Parameters.Add(param); // 正常写法
-cmd.ExecuteNonQuery();
-
-using var tran = cnn.BeginTransaction(); // ADO.NET事务，不是数据库事务？
-tran.Commit()/Rollback();
-```
 
 ### IDataReader
 
@@ -263,16 +260,7 @@ tran.Commit()/Rollback();
 * GetDataTypeName(index)：输入列索引，返回该列的类型名；SqliteDataReader有`GetFieldType()`返回Type对象
 * IsDBNull(index)：输入当前行的列索引，判断是否为空
 
-```c#
-cmd.CommandText = "SELECT * FROM DB";
-using var reader = cmd.ExecuteReader();
-while (reader.Read()) { // 读完时返回false
-    string name = reader.GetString(0); // 把第一列当作string读取
-    int length = reader.GetInt32(1);
-    }
-```
-
-## DataSet
+### DataSet
 
 ```c#
 var adapter = new SqlDataAdapter(queryString, cnn);
