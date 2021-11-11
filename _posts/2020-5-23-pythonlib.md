@@ -725,7 +725,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * 输入单个问号能显示功能命令
 * Debugging a broken unit test: pytest ... --pdbcls=IPython.terminal.debugger:TerminalPdb --pdb
 * breakpoint()：内置，进入pdb。相当于`pdb.set_trace()`？
-* 命令教程：https://zhuanlan.zhihu.com/p/37218789 https://zhuanlan.zhihu.com/p/43846098
+* 命令教程：https://zhuanlan.zhihu.com/p/37218789 https://zhuanlan.zhihu.com/p/43846098 https://realpython.com/python-debugging-pdb/
 * 还有个pdb++(pdbpp)项目
 * pdb：w/where 打印调用栈
 
