@@ -1039,7 +1039,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
 * Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-Ofast --link-args=xxx
 * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
-* 与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL
+* 与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
 * 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
