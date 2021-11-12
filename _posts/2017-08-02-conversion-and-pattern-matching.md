@@ -5,26 +5,19 @@ title: 类的转换和模式匹配
 值类型转换
 ----------
 
-### double转到float
+* double转到float
+  * 如果值太小，那么值会被设置为正0或负0
+  * 如果值太大，那么值会被设置为正无穷大或负无穷大
+* float或double转换到整数类型
+  * 如果用强制转换，值会舍掉小数，截断为最近的整数；负数也是如此
+  * 强制转换如果转换后的值不在目标类型的范围内（溢出）：如果溢出检测上下文是checked，则CLR会抛出OverflowException异常；如果上下文是unchecked，则未定义
+  * 如果用Convert类，会发生四舍五入。溢出时必定抛异常
 
-* 如果值太小，那么值会被设置为正0或负0
-* 如果值太大，那么值会被设置为正无穷大或负无穷大
-
-### float或double转换到整数类型
-
-* 如果用强制转换，值会舍掉小数，截断为最近的整数；负数也是如此
-* 强制转换如果转换后的值不在目标类型的范围内（溢出）：如果溢出检测上下文是checked，则CLR会抛出OverflowException异常；如果上下文是unchecked，则未定义
-* 如果用Convert类，会发生四舍五入。溢出时必定抛异常
-
-类型转换帮助器
---------------
-
-### Convert类
+### 类
 
 * ChangeType方法：将实现了IConvertible接口的类型转换为指定的类型
 * 以To开头的方法：将参数中传入的对象转换为指定的类型对象
-* ToBase64String/CharArray, FromBase64String/CharArray：前两者先要用Encoding类转换成byte[]，后两者返回byte[]后要再解码；~~另有try...方法处理可能出现不符合base64规则字符的情形~~并没看见这样的方法
-* IsDBNull：检测对应的值是否为DBNull
+* ToBase64String/CharArray, FromBase64String/CharArray：前两者先要用Encoding类转换成byte[]，后两者返回byte[]后要再解码；Core提供TryFromBase64String用于可能存在非base64字符的字符串
 * .NET5引入了 Convert.ToHexString 和 FromHexString 把byte[]转成与16进制字符串互转
 
 ### BitConverter
@@ -93,31 +86,6 @@ static string FloatToBinary(float f)
 }
 ```
 
-显式引用转换
-------------
-
-* 从object到任何引用类型的转换
-* 从父类到从它继承的类的转换
-
-如果显式引用转换后的对象存在对显式引用转换前的对象不存在的成员的引用，CLR会在**运行**时捕获到这种不正确的强制转换并抛出InvalidCastException异常，但它不会导致编译错误。
-
-```
-class A { }
-class B : A { }
-static void Main()
-{
-    // A a1 = new A();
-    // B b1 = (B)a1;
-    // 异常
-
-    A a2 = new B(); // 隐式转换
-    B b2 = (B)a2; // 允许
-
-    A a3 = null;
-    B b3 = (B)a3; // 允许
-}
-```
-
 运算符重载和用户自定义转换
 --------------------------
 
@@ -145,14 +113,6 @@ public static TargetType operator x(SourceType operand){
 }
 ```
 
-Clone方法复制数组
------------------
-
-* Clone方法为数组进行浅复制
-* Clone值类型数组会产生两个独立数组
-* Clone引用类型数组会产生指向相同对象的两个数组
-* 其实实现就是object.MemberwiseClone
-
 泛型集合转换
 ------------
 
@@ -160,34 +120,6 @@ Clone方法复制数组
 * OfType\<T\>：把集合中能够转换成T的转换了
 
 以上两个转换可以把弱类型集合转换为强类型集合，**只能进行引用类型的转换或拆箱**。
-
-out变量的作用域
----------------
-
-```
-// https://github.com/dotnet/docs/issues/7552
-
-void F1()
-{ // This brace opens the scope for result.
-  if (int.TryParse("123", out var result)) // if的小括号不产生scope
-        Console.WriteLine(result);
-    Console.WriteLine(result); // 可用，与is声明不同，out变量的赋值会泄露到外面
-} // This brace closes the scope for result.
-
-void F2() {
-    if (false) ;
-    else if (int.TryParse("123", out var result)) // in "else" scope
-        Console.WriteLine(result);
-    Console.WriteLine(result); // 'result' does not exist in the current context
-}
-
-void F3() {
-    if (false) ;
-    else { if (int.TryParse("123", out var result))
-        Console.WriteLine(result);
-    else Console.WriteLine(result); } // 不出错，因为声明处于可省略的大括号的范围中
-}
-```
 
 as 和 is 运算符
 ---------------

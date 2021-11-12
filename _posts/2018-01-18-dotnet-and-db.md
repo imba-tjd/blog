@@ -258,7 +258,7 @@ tran.Commit()/Rollback();
 * GetName(index)：获得列名；GetOrdinal()：根据列名返回它的索引
 * GetValues(object[])：会把当前行所有数据保存到一个数组里。可以根据FieldCount设定数组长度
 * GetDataTypeName(index)：输入列索引，返回该列的类型名；SqliteDataReader有`GetFieldType()`返回Type对象
-* IsDBNull(index)：输入当前行的列索引，判断是否为空
+* IsDBNull(index)：输入当前行的列索引，判断是否为空。TODO: DBNull怎么用
 
 ### DataSet
 
