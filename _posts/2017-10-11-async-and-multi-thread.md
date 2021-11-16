@@ -118,5 +118,5 @@ try {
 * https://stackoverflow.com/questions/1949131/net-dictionary-locking-vs-concurrentdictionary
 * https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/
 * https://zhuanlan.zhihu.com/p/46673002 看到 使用Monitor来同步
-* https://zhuanlan.zhihu.com/p/345492089 https://zhuanlan.zhihu.com/p/349503079 System.Threading.Channels
+* https://zhuanlan.zhihu.com/p/345492089 https://zhuanlan.zhihu.com/p/349503079 https://devblogs.microsoft.com/dotnet/an-introduction-to-system-threading-channels/ System.Threading.Channels
 * list.SyncRoot

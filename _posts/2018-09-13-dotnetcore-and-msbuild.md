@@ -214,6 +214,12 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * Microsoft.Windows.Compatibility：对于FX项目，添加此包可直接迁移到Core，它包含了那些被移除的API
 * https://marketplace.visualstudio.com/items?itemName=ConnieYau.NETPortabilityAnalyzer VS的插件，分析从FX迁移到Core的兼容性问题
 
+## infersharp
+
+* https://github.com/microsoft/infersharp
+* 能检测代码中的空引用、资源泄露、线程安全
+* 可用Actions和Docker映像，但好像无法在Win下运行
+
 ## 参考
 
 * https://zhuanlan.zhihu.com/p/35979897
