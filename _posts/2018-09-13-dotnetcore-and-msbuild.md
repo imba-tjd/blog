@@ -7,7 +7,7 @@ category: dotnet
 
 * Windows：https://dot.net
 * docker映像：https://hub.docker.com/_/microsoft-dotnet
-* Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian；
+* Linux(不支持x86)：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian
 * dotnet-install.sh自动安装脚本，支持无root权限安装，但只是用于CI环境临时使用。且需要手动添加Path：`export PATH=~/.dotnet:$PATH`、`$env:Path="$env:LocalAppdata\Microsoft\dotnet;"+$env:Path`
 * 源代码：https://source.dot.net/，部分API只会显示Linux的。FX的源码：https://referencesource.microsoft.com
 
