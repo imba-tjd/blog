@@ -5,13 +5,14 @@ title: 类的转换和模式匹配
 值类型转换
 ----------
 
-* double转到float
-  * 如果值太小，那么值会被设置为正0或负0
-  * 如果值太大，那么值会被设置为正无穷大或负无穷大
-* float或double转换到整数类型
-  * 如果用强制转换，值会舍掉小数，截断为最近的整数；负数也是如此
-  * 强制转换如果转换后的值不在目标类型的范围内（溢出）：如果溢出检测上下文是checked，则CLR会抛出OverflowException异常；如果上下文是unchecked，则未定义
-  * 如果用Convert类，会发生四舍五入。溢出时必定抛异常
+* double转换到float
+  * 如果值太小，结果为正0或负0
+  * 如果值太大，结果为正无穷大或负无穷大
+* double转换到int
+  * 强制转换会去掉小数，向0截断为最近的整数
+  * 强制转换如果转换后的值不在目标类型的范围内（溢出）：在checked()或{}中会抛OverflowException，如果溢出上下文是unchecked则未定义
+  * 如果用Convert类，会发生四舍五入，溢出时必定抛异常
+* TODO: int溢出是否是定义了的行为。checked()不会检查左移右移溢出
 
 ### 类
 
@@ -49,9 +50,6 @@ string s = Convert.ToString((int)a, 2).PadLeft(8, '0'); // char可直接强转�
 s = Convert.ToString(intTen, 8);
 // 十进制数转十六进制
 s = intTen.ToString("X"); // 或者使用string.Format和Convert类也可以
-
-// Binary literal
-intTen = 0b_1010;
 ```
 
 #### 浮点数
@@ -107,35 +105,9 @@ public static implicit/explicit operator TargetType(SourceType identifier) {
     return ObjectOfTargetType;
 }
 
-// 运算符重载；其中x是要重载的
-public static TargetType operator x(SourceType operand){
-    return operand x operand;
-}
+// 运算符重载，其中x是待重载的运算符
+public static TargetType operator x(SourceType operand) => operand x operand
 ```
-
-泛型集合转换
-------------
-
-* Cast\<T\>：把集合中的所有元素转换成T，如果无法转换，会在遍历到那一项时抛出异常
-* OfType\<T\>：把集合中能够转换成T的转换了
-
-以上两个转换可以把弱类型集合转换为强类型集合，**只能进行引用类型的转换或拆箱**。
-
-as 和 is 运算符
----------------
-
-* A a = b as A：仅执行引用转换（两者都是引用类型）、可空值类型的转换和装箱转换（仅当b为值或值表达式且A为object）；无法执行用户定义的转换
-* if(b is A)：可以执行所有as允许的转换加上拆箱转换的检测，即b是object对象时A可以是int；能转换过去时值为true；另外b为null时会评估为false，但此时as能成功，虽然结果也为null
-* if(b is A a)：相当于`A a; if(b is A) { a=b as A; ... }`，但其中a只在if子域中有**值**，而与if**同级**的域内a仍**存在但未初始化**，如果if子域不存在（比如`_=b is A a;`）就相当于声明但没赋值，出了if同级域后完全消失；如果A用var，则a的类型与表达式b相同且永远会成功，即使b为null，一般用于临时在括号内创建变量
-* 模式变量还可用于catch中的when，则域为catch
-* 7.0开始，后面可以跟枚举常量、const变量、字符串常量
-
-### as和cast对比
-
-* 优先使用as，少用cast：
-* cast即使成功了，还是要判断是否为null，因为原变量就可能为null
-* 对于存在自定义转换的两个类A和B，如果从共同父类的引用（比如object o = new A()）转换到具体的实例（o as B），as和cast都会在运行时失败，因为cast只会考虑编译期的类型（object）和目标之间有没有转换；当然，如果仅从A自己独有的父类转换到B，两者都会报编译期错误
-* foreach语句如果类型和序列不一样，用的是cast；如果序列为非泛型的IEnumerable，又用了自定义类型转换，就会发生上一点的错误
 
 switch的模式匹配
 ----------------
@@ -146,13 +118,12 @@ switch的模式匹配
 * case和catch后可加when语句指定条件
 * 可以方便地遍历`IEnumerable<object>`
 * https://docs.microsoft.com/zh-cn/dotnet/csharp/fundamentals/functional/pattern-matching https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/operators/patterns https://docs.microsoft.com/zh-cn/dotnet/csharp/fundamentals/tutorials/pattern-matching
-* 等C#10出来再学
 
 ```
 RGBColor FromRainbow(Rainbow colorBand) => colorBand switch{ //变量名加switch
     Rainbow.Red   => new RGBColor(0xFF, 0x00, 0x00), // 不用写break
     Rainbow.Green => new RGBColor(0x00, 0xFF, 0x00),
     Rainbow.Blue  => new RGBColor(0x00, 0x00, 0xFF),
-    _             => throw new ArgumentException("invalid enum value", nameof(colorBand)), // 相当于原来的default
+    _             => throw new ArgumentException("invalid enum value", nameof(colorBand)),
 };
 ```
