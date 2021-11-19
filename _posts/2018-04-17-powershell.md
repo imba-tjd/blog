@@ -245,5 +245,6 @@ Profile文件
 * https://leanpub.com/thebigbookofpowershellgotchas/read
 * https://powershell.org/forums/forum/windows-powershell-qa/
 * 粘贴数据时有bug，无法粘贴`1・`等，但可以单独粘贴那个点，或点前没内容也可以，注意不是`·`，好像键盘无法直接打出；又发现在Windows Terminal中无法用右键粘贴中文冒号分号等`1：`，但ctrl v可以
+* 创建快捷方式：https://stackoverflow.com/questions/9701840
 
 ISE无法识别utf8
