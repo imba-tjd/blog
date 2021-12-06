@@ -193,7 +193,7 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 
 ## 传输文件
 
-aria2、axel、httpie放到软件的文章里去了。
+aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文件，需要服务端
 
 ### curl
 
@@ -221,6 +221,7 @@ aria2、axel、httpie放到软件的文章里去了。
 * 访问httpbin.org/get可以看到服务器收到的请求信息
 * URL不会做UrlEncode，而是直接发送。比如get /测试.txt，Linux下为`/\u00e6\u00b5\u008b\u00e8\u00af\u0095`，Win下甚至为GBK编码，正确的是`/%E6%B5%8B%E8%AF%95`
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
+* 不自带“下载文件中的所有链接”的功能，可用`xargs -n 1 curl -O < urls.txt`，不要按每一行手动运行因为那样无法利用keepalive
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 
 ### scp
@@ -241,6 +242,11 @@ aria2、axel、httpie放到软件的文章里去了。
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
 * 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
 * TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps https://zhuanlan.zhihu.com/p/331838860
+
+### wget2
+
+* 自动多线程
+* -i下载文件中列出的url
 
 ## sed
 

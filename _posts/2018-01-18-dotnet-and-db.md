@@ -201,6 +201,7 @@ cnn.GetAll<Student>();
   * DataReader：类似于数据源Stream
 * 连接模式：读取：数据库——Connection——Command——DataReader——页面。写入：页面——Command——Connection——数据库
 * 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。但是感觉不如用EF
+* 连接字符串的DataSource支持魔值`|DataDirectory|`，winform下表示bin/debug等
 
 ```c#
 string cnnstr = System.Configuration.ConfigurationManager.ConnectionStrings["连接字符串名称"].connectionString;
@@ -263,7 +264,7 @@ tran.Commit()/Rollback();
 ### DataSet
 
 ```c#
-var adapter = new SqlDataAdapter(queryString, cnn);
+var adapter = new SqlDataAdapter(sqlstr, cnn);
 var ds = new DataSet();
 ds.Locale = CultureInfo.InvariantCulture;
 adapter.Fill(ds, "Customers");
@@ -277,6 +278,7 @@ var query = from order in orders
 foreach (var onlineOrder in query)
     WriteLine("Order ID: {0} Order number: {1}",
         onlineOrder.SalesOrderID, onlineOrder.SalesOrderNumber);
+dataGridView1.DataSource = dt.DefaultView;
 ```
 
 ## [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)
