@@ -15,3 +15,4 @@ title: C#库
 * https://github.com/natemcmaster/CommandLineUtils
 * https://github.com/autofac/Autofac 轻量依赖注入
 * https://github.com/SixLabors/ImageSharp 处理图片，跨平台，替代System.Drawing
+* https://github.com/microsoft/FASTER 包括一个日志库和一个KV数据库

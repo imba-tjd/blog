@@ -96,9 +96,9 @@ prog3 : prog3.o sort.o utils.o
 * [ccache](https://github.com/ccache/ccache)可以缓存编译信息
 * -Ofast可开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
-* -flto=thin可进行一些优化，编译和链接步骤都要用，除非手动用lld-link
+* -flto=thin可进行一些优化，编译和链接步骤都要用；此选项也可以为auto，另外还有个-ffat-lto-objects
 * -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
-* -g等于-g2，-g3的体积更大；-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度。但无法与-flto一起使用
+* -g等于-g2，-g3的体积更大，-g0禁用前面的-g。-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度，但无法与-flto一起使用
 * -###为dry-run，能显示具体编译用到的命令
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
 
@@ -121,6 +121,12 @@ prog3 : prog3.o sort.o utils.o
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
 * -ftrapv在linux下整数溢出时会触发core dump，会减慢速度
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
+* 减少体积
+  * -Wl,--as-needed
+  * -Wl,--strip-all
+  * -Wl,-dead_strip 好像只有lld支持
+  * -ffunction-sections -fdata-sections -Wl,--gc-sections
+  * strip -s或--strip-unneeded
 
 ### 超级静态的编译
 
