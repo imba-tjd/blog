@@ -206,20 +206,20 @@ DROP TABLE [IF EXISTS] tb1; -- 都可用
 -- 修改表名（MSSQL除外）
 ALTER TABLE tb1 RENAME TO tb2
 -- 添加列，注意不需要加括号；只有MSSQL不支持写成ADD COLUMN；MySQL支持AFTER col1指定在某一列后添加，否则和其余的都在最后添加
-ALTER TABLE tb1 ADD col3 type, 表约束
+ALTER TABLE tb1 ADD col3 type, 表约束
 -- 重命名列（MSSQL除外）
 ALTER TABLE tb1 RENAME COLUMN col1 TO col2
 -- SQLite的ALTER TABLE只支持以上三项
 -- 删除列
-ALTER TABLE tb1 DROP COLUMN col1
+ALTER TABLE tb1 DROP COLUMN col1
 
 -- 修改列类型和约束，如果列中已有数据会尝试转换，但各数据库容忍程度不同
-ALTER TABLE tb1 ALTER COLUMN col1 type [NOT NULL] -- MSSQL, Oracle，只有非空约束可以在这里改；PG真的要加TYPE
-ALTER TABLE tb1 MODIFY col1 ... -- MySQL，可改任何约束；还有一种CHANGE语句，也能用来修改列名，但若不修改则要写两遍原列名
+ALTER TABLE tb1 ALTER COLUMN col1 type [NOT NULL] -- MSSQL, Oracle，只有非空约束可以在这里改；PG真的要加TYPE
+ALTER TABLE tb1 MODIFY col1 ... -- MySQL，可改任何约束；还有一种CHANGE语句，也能用来修改列名，但若不修改则要写两遍原列名
 
 -- 添加约束，如果已有数据不符合会失败；修改约束都要先DROP再ADD
-ALTER TABLE tb1 ADD [CONSTRAINT cons1] UNIQUE/PRIMARY KEY/FOREIGN KEY/CHECK(col1) -- 除PG外通用，cons1只是命名
-ALTER TABLE tb1 ADD DEFAULT n FOR col1 -- MSSQL，CREATE DEFAULT弃用了
+ALTER TABLE tb1 ADD [CONSTRAINT cons1] UNIQUE/PRIMARY KEY/FOREIGN KEY/CHECK(col1) -- 除PG外通用，cons1只是命名
+ALTER TABLE tb1 ADD DEFAULT n FOR col1 -- MSSQL，CREATE DEFAULT弃用了
 ALTER TABLE tb1 ALTER COLUMN col1 SET NOT NULL/DEFAULT n -- MySQL, PG
 
 -- 创建非聚集索引
@@ -271,8 +271,8 @@ AS SELECT ...
 CREATE PROCEDURE proc1(@var1[=default_value1] [output], ...)
 AS SELECT/INSERT ...
 
-* exec *ProcedureName LiteralValue/*@*Variable1* = ..., @*OutputVariable1*, ...
-* select *ColumnName* = @*OutputVariable1, ...*
+* exec *ProcedureName LiteralValue/*@*Variable1* = ..., @*OutputVariable1*, ...
+* select *ColumnName* = @*OutputVariable1, ...*
 ```
 
 ### 触发器 TODO:
@@ -308,7 +308,7 @@ CREATE ROLE r1 [*AUTHORIZATION*]
 create/alter/drop user *UserName*
 
 grant [系统权限/角色] to [用户名/角色]
-revoke [系统权限/角色] from [用户名/角色]
+revoke [系统权限/角色] from [用户名/角色]
 grant all/对象权限 on [表名] to [用户/public] [with grant option]（允许它将此权限授予其他用户）
 revoke ... from [CASCADE]（级联，也收回它授予其它用户的权限）
 
