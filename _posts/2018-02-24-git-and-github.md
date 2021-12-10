@@ -98,10 +98,10 @@ title: Git/GitHub笔记
 
 ## 记录
 
-* git blame [filename]：查看文件每一行是由谁在哪次commit中修改的, 按q退出，-w忽略空格变更
+* git blame [filename]：查看文件每一行是由谁在哪次commit中修改的, 按q退出，-w忽略空格变更
 * git show [refspec]:[filename]：查看指定记录或其它branch中的文件，加上重定向即可保存到当前分支里；不加记录就是看上一次提交的
 * git log --stat：查看提交信息及更新的文件，--shortstat只显示变化了的文件数量和行号
-* git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
+* git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git shortlog -sn：显示各个作者的提交次数
 * git archive -o repo.zip/.tar.gz HEAD：打包
 * git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表

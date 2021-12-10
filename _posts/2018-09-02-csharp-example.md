@@ -13,13 +13,13 @@ System.Diagnostics.Process.Start("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
 ```
 
 ```
-WebBrowser wb = new WebBrowser();
+WebBrowser wb = new WebBrowser();
 wb.Navigate(@"c:\temp");
 ```
 
 ```
 // 添加引用SystemRoot%\system32\SHELL32.dll
-Shell32.ShellClass sh = new Shell32.ShellClass();
+Shell32.ShellClass sh = new Shell32.ShellClass();
 sh.Explore(@"c:\");
 ```
 

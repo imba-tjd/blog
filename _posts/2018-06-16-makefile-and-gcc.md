@@ -60,7 +60,7 @@ COMMA:=$(EMPTY),$(EMPTY)
 
 还可以使用vpath关键字：
 
-1. vpath pattern directories ：为符合模式的文件指定搜索目录。
+1. vpath pattern directories ：为符合模式的文件指定搜索目录。
 2. vpath pattern：清除符合模式的文件的搜索目录。
 3. vpath：清除所有已被设置好了的文件搜索目录。
 

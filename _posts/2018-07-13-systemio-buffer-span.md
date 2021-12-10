@@ -58,7 +58,7 @@ System.IO
 #### File/FileInfo
 
 * File在每次使用时接受路径参数，FileInfo在实例化时接受路径参数，但该路径都可以不存在，Directory同理
-* FileStream Create/Open/OpenRead/OpenWrite；StreamReader/Writer  CreateText/AppendText/OpenText；注意必须要用using，否则文件不能移动和删除
+* FileStream Create/Open/OpenRead/OpenWrite；StreamReader/Writer  CreateText/AppendText/OpenText；注意必须要用using，否则文件不能移动和删除
 * 如果返回IEnumerable（比如用了Linq或者yield），序列会直到使用时才生成；如果是接受stream的方法，可能使用时文件已经被关闭，或者如果同时调用两个序列，文件会打开失败，解决方法：要么先全部读到数组里再yield返回，要么只接受文件名和Action，打开和关闭文件在函数自己内部操作（这个也只能开一个）
 * Exists：File是方法，FileInfo是属性
 * Move/MoveTo/Copy/CopyTo：参数路径只接受string，可以为相对路径；目标路径必须写到文件名，不能写到文件夹名，否则会说目标文件已存在，其实是不能把文件的名字改成那个文件夹的名字，在最后加上斜杠也不行
