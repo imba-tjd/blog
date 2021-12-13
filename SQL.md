@@ -331,3 +331,4 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 * https://www.sqlite.org/windowfunctions.html
 * https://www.sqlite.org/gencol.html
 * 唯一约束是否会自动创建唯一索引？
+* http://www.sqlintern.com/jamie
