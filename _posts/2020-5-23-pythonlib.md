@@ -777,9 +777,9 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 * conda是一款软件管理软件，相当于windows里面的应用商店。miniconda和anaconda中都包含了conda。miniconda只包含了conda、python、和一些必备的软件工具；anaconda包含了数据科学和机器学习要用到的很多软件
 * pip只用来安装python的whl和源码，后者有时需要编译器，有的需要操作系统的包管理器安装依赖
-* conda用来安装conda package二进制包，大部分是python的，但也支持了不少非python语言的依赖项如mkl、cuda这种c/c++写的包；有些包只能用conda，比如rdkit；但包的总数远少于PyPI
+* conda用来安装conda package二进制包，大部分是python的，但也支持了不少非python语言的依赖项如mkl、cuda这种c/c++写的包；可以安装gcc且不需要root权限；有些包只能用conda，比如rdkit；但包的总数远少于PyPI
 * conda自己可以用来创建虚拟环境，可以很轻松地管理多个版本的python
-* conda比pip更加严格，conda会检查当前环境下所有包之间的依赖关系
+* conda会检查当前环境下所有包之间的依赖关系，比pip更严格
 * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
 * conda create -n venv python=3.8; conda info -e; conda activate venv; conda remove -n venv --all
 * mamba用c++重新实现了一遍conda
@@ -926,6 +926,7 @@ await response(scope, receive, send)
 * tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
 * edgedb：自创DML的关系型数据库，基于pg
 * mashumaro：基于dataclass的序列化库，不够成熟
+* psycopg2：PG的adapter
 
 ### MySQL
 

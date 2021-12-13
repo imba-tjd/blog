@@ -205,6 +205,13 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 国内镜像，VS中使用时要删掉原来的，不知是不是BUG：https://nuget.cdn.azure.cn/v3/index.json
 * `error NU1100: Unable to resolve xxx for 'net6.0'`：删除%AppData%\NuGet\NuGet.Config
 
+## manifest
+
+* https://docs.microsoft.com/windows/win32/sbscs/application-manifests#ultraHighResolutionScrollingAware
+* heapType:SegmentHeap 需要2004
+* longPathAware 需要1607
+* activeCodePage:UTF-8 需要1903
+
 ## Upgrade Assistant
 
 * https://devblogs.microsoft.com/dotnet/introducing-the-net-upgrade-assistant-preview/
