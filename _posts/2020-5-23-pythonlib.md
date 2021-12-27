@@ -1399,3 +1399,4 @@ print(template.render(the="variables", go="here"))
 * 操控浏览器：playwright-python Splinter pyppeteer selenium
 * pyinstrument：使用简单的profile工具
 * multibuild：用于产生多平台的wheel
+* birdseye：调试工具，与pysnooper是同类的

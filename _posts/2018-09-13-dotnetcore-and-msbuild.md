@@ -97,7 +97,8 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 * 安装：dotnet tool install -g PackageName --add-source ./
 * 列出、卸载、升级：dotnet tool list、dotnet tool uninstall、dotnet tool update
 * 自己创建：https://docs.microsoft.com/zh-cn/dotnet/core/tools/global-tools-how-to-create
-* 收集：https://github.com/natemcmaster/dotnet-tools
+* 收集：https://www.nuget.org/packages?packagetype=dotnettool
+* dotnet-script
 
 ## Docker
 
