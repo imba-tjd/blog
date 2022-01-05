@@ -69,23 +69,27 @@ title: Git/GitHub笔记
 
 ## Config
 
-* --global user.email、user.name
-* global的设置在~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；-e打开文本编辑器进行操作
+* global的设置在~/.gitconfig里，system的设置在/etc/gitconfig里，local的设置在git仓库的.git/config里；-e打开文本编辑器进行操作；以下默认都是global的
+* --get-all remote.origin.url：获取对应section的值，效果与--list中看到的一样。主要是有的无法被设置，只能用这个看
+* --unset：删除设置
+* user.email、user.name
+* rebase.autosquash true：rebase -i时自动移动fixup提交的位置
 * color.ui：彩色的git输出，默认为auto无需更改
-* --global credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里；如果安装了GitGUI则默认为manager，要求输入账户密码时是打开一个网页，Win下可设为wincred，这俩都会储存到控制面板的账户里的Credential Manager中，后者可用git credential-wincred管理
+* credential.helper store：储存密码，输入一次以后就会明文放在~/.git-credential里；如果安装了GitGUI则默认为manager，要求输入账户密码时是打开一个网页，Win下可设为wincred，这俩都会储存到控制面板的账户里的Credential Manager中，后者可用git credential-wincred管理
 * gc.pruneexpire "30 days"：不在branch上的30天后清理；gc.auto 0：关闭gc
 * core.quotePath false：当路径出现中文时，不会进行转义，即能显示中文
 * core.ignorecase false：默认情况下，已经push到远端的文件夹，在本地只修改文件名大小写是不会被检测的；但启用后仅仅只是会push一个另一个大小写的文件过去？可以考虑在Linux端改名，Win端直接删除文件，然后pull
-* rebase.autosquash true：rebase -i时自动移动fixup提交的位置
-* --global core.editor "code --wait"：编辑信息时要使用的编辑器；不过普通WSL下会有问题，要Remote扩展才行
-* --global https.https://github.com.proxy socks5://127.0.0.1:1080：这样可以只访问github时代理。但对ssh无效，ssh要修改`~/.ssh/config`
-* --global http.postBuffer 10485760：每块数据的接收大小，默认不超过1M，此为10M，有人说能加速传输，有人说无效
-* --get-all remote.origin.url：获取对应section的值，效果与--list中看到的一样。主要是有的无法被设置，只能用这个看
-* feature.manyFiles/experimental true：启用实验性功能
+* core.editor "code --wait"：编辑信息时要使用的编辑器；不过普通WSL下会有问题，要Remote扩展才行
+* https.https://github.com.proxy socks5://127.0.0.1:1080：这样可以只访问github时代理。但对ssh无效，ssh要修改`~/.ssh/config`
 * core.fileMode false：不再将权限变化视为改动
-* --unset：删除设置
 * pull.rebase true：pull自动-r
-* help.autocorrect：打错字时自动使用建议的内容
+* help.autocorrect true：打错字时自动使用建议的内容
+* core.symlinks true：默认是启用的，但不知为何VS附带的Git把它设为了false
+* 性能
+  * core.fscache true：仅Win有效，缓存status
+  * core.fsyncObjectFiles：设为false表示交给操作系统flush数据，对于现代文件系统没必要设为true但好像默认是它，batch在NTFS下安全性应和true相当，但目前VS附带的Git版本不够，要2.34
+  * core.usebuiltinfsmonitor true：Win和Mac有效，启用后好像会产生守护进程
+  * feature.manyFiles true：相当于修改另外两项设置，遇到大量文件时有一些优化
 
 ### 查看diff信息的工具
 
@@ -205,7 +209,7 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 
 ### 全局设置
 
-* Windows下：git config --global core.autocrlf true，提交时转换为LF，检出时转换为CRLF；如果本地已经是LF了，提交不会改变本地文件，但reset时会
+* Windows下：git config --global core.autocrlf true，提交时转换为LF，检出时转换为CRLF；如果本地已经是LF了，提交不会改变本地文件，但reset时会；VS附带的Git默认为true
 * Linux下：git config --global core.autocrlf input，提交时转换为LF，检出时不转换
 * 关闭自动转换：git config --global core.autocrlf false
 * 允许提交混合换行符：git config --global core.safecrlf true/false/warn

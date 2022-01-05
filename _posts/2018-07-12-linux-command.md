@@ -5,7 +5,6 @@ title: Linux命令
 ## 命令集合网站
 
 * https://ss64.com/bash/
-* https://man.linuxde.net/
 * https://www.runoob.com/linux/linux-command-manual.html
 * https://tldr.ostera.io/
 * https://github.com/chubin/cheat.sh
@@ -35,8 +34,8 @@ title: Linux命令
 * ls：-r倒序，-R递归，-t按日期降序，-S按文件大小升序，-d显示当前文件夹自己的信息，-1每一行只显示一个文件名；ls -1A | wc -l或ls -A | wc -w：显示出有多少个文件，使用A就不会包含.和..；sl：显示火车
 * date：http://www.runoob.com/linux/linux-comm-date.html
 * fsck：检测文件系统错误
-* cd -：切换到之前的目录，cd !$：切换到刚刚用mkdir新建的目录
-* free -mt：显示内存容量，以MB为单位
+* cd -：切换到之前的目录f
+* free -ht
 * tail -f：跟踪指定文件，如果有变化立即显示，删除后停止；与less -F相同
 * tasksel：在Debian中快速安装软件
 * cat << EOF >out.txt：输入以后继续输入文字，当最后一行输入EOF文本的时候结束输入，用-EOF可以忽略空白字符
@@ -128,6 +127,7 @@ title: Linux命令
 * fgrep：只查找指定的表达式，没有通配符和正则，但速度快
 * grep "aaa" file* -lZ | xargs -0 rm：删除多个文件，Z为0字节后缀输出
 * grep -- -a：`-a`不会被认为是grep的参数
+* TODO: ripgrep https://einverne.github.io/post/2019/09/ripgrep-recursively-searches-directories-using-regex-pattern.html
 
 ## xargs
 

@@ -20,14 +20,10 @@ category: linux
 * ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
 * software-properties-common：含有add-apt-repository
-* autoremove python(2)以后会被删除的包：sudo
-* mtr： traceroute + ping
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
 * netcat
-* ag/rg：比grep、ack更快地递归搜索文件内容；https://einverne.github.io/post/2019/09/ripgrep-recursively-searches-directories-using-regex-pattern.html
 * jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；还有个yq是py的；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
-* axel：多线程下载工具
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
 * https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat；https://github.com/dundee/gdu 快速的du
 * https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP，活着
@@ -38,7 +34,6 @@ category: linux
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
 * pv：用于显示进度，放在两个管道之间或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
-* ripgrep：快速的正则搜索程序，安装后使用rg命令
 * ssl-cert：方便地自签证书
 * nmap
 * neofetch：显示一些基本信息，不过需要安装较多依赖。linuxlogo可替代一小部分
@@ -178,7 +173,7 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 * [browsh](https://github.com/browsh-org/browsh)：基于文本的运行于终端的浏览器，图片是像素化显示的
 * [deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)：安装后可安装微信QQ
 * VSC 32bit：https://go.microsoft.com/fwlink/?LinkID=760680 官方最后的版本是1.35.1
-* [uGet](https://ugetdm.com/)：下载工具，开源但不在GitHub上
+* [uGet](https://ugetdm.com/)：图形化下载工具，开源但不在GitHub上
 * [hfish](https://hfish.io/)：各种蜜罐
 * https://github.com/chaitin/xray ：扫描常见的Web安全问题，不开源
 * [Teleconsole](https://www.teleconsole.com/)：分享当前Shell，也能支持端口转发
