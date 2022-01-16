@@ -54,12 +54,13 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 
 ### HttpRequestHeaders
 
-* 本身位于System.Net.Http.Headers命名空间中，但是一般用`HttpClient.DefaultRequestHeaders`获取，回复用`response.Headers`；是引用类型，修改它就好，不需要也不能再赋值回来；或者每次请求也可以单独使用它
-* 用于设置HTTP请求头
+* 本身位于System.Net.Http.Headers命名空间中
+* 是引用类型，获取后修改那个对象即可，不需要也不能再赋值回来
+* 发送头可用`HttpClient.DefaultRequestHeaders`获取，响应头用`response.Headers`；SendAsync的requestMessage.Headers也可获取，但Get系和Post却根本无法方便的按每次请求添加头
 * 修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`，默认不存在
 * ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" }
 * TryGetValues可以获取它的值
-* Connection.ParseAdd("keep-alive");
+* Connection.ParseAdd("keep-alive"); TODO: 难道默认没有？
 
 ## 给网址进行编码
 
@@ -70,7 +71,8 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 * WebUtility.HtmlEncode：此方法用于把Html特殊字符转换成Html实体，比如大于小于符号，与url编码无关
 * HttpUtility.UrlPathEncode：不要使用此方法，已弃用
 * System.Text.Encodings.Web.UrlEncoder.Default.Encode：Core新增
-* 几种编码方式的结果对比：https://stackoverflow.com/a/21771206/9606292；Uri的两个方法的对比：https://stackoverflow.com/questions/4396598；
+* 几种编码方式的结果对比：https://stackoverflow.com/a/21771206/9606292；Uri的两个方法的对比：https://stackoverflow.com/questions/4396598
+* TODO: 确定编码后的大小写
 
 ## 安全性
 

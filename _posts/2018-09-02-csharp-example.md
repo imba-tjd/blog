@@ -39,7 +39,7 @@ DriveInfo[] di = DriveInfo.GetDrives();
 ------------------
 
 * System.Reflection.Assembly.GetExecutingAssembly().Location
-* System.Windows.Forms.Application.ExecutablePath
+* System.Windows.Forms.Application.ExecutablePath 还有个 StartupPath
 * System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName
 
 ### 当前程序的MD5

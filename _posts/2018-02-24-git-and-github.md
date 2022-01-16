@@ -7,7 +7,7 @@ title: Git/GitHub笔记
 * git init/git clone git@github.com:user/repo [本地目标文件夹/.]
 * git pull [--rebase] [upstream master] = git fetch + git merge（到当前分支）；rebase会先stash当前更改，更新后再pop
 * git add -A（所有修改）/.或*（包括修改和新建，不包括删除）/-u（更新，包括修改和删除，不包括新建）
-* git status；加-uno会不检测未stage的文件，大大加快执行速度；-s显示简单信息，且clean时没有输出
+* git status；加-uno会不检测未跟踪的文件加快执行速度；-s显示简单信息，在工作区干净时没有任何输出
 * git commit -am "message"
 * git push -u origin master
 
@@ -417,3 +417,4 @@ collapsable content
 * Git Hooks https://github.com/typicode/husky
 * git fetch --deepen有啥区别，如何unshallow指定数量的提交
 * git switch --trace origin/master：当本地没有master分支但有origin/master时，创建并跟踪。好像checkout是自动的？
+* git grep
