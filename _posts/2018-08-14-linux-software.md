@@ -28,7 +28,6 @@ category: linux
 * https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat；https://github.com/dundee/gdu 快速的du
 * https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP，活着
 * authbind：允许普通用户绑定1024以下的端口
-* tldr：--update
 * gparted：图形化的管理磁盘分区的工具
 * network-manager、network-manager-gnome：为了使网络配置尽可能简单而开发的网络管理软件包
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
@@ -155,7 +154,8 @@ trusted-host = mirrors.aliyun.com
 * userpath：添加和验证PATH的程序，也能作为库使用
 * fierce：扫描域名，基本上是取附近IP的反查PTR；aiodnsbrute爆破查找域名
 * csvkit：一系列命令行工具，包括能把xlsx和json转换成csv。但依赖太多了，还需要装libicu-dev
-* harelba/q：在csv上运行SQL语句，但没发布PyPI包
+* harelba/q：在csv和sqlite上运行SQL语句，但没发布PyPI包
+* xsv：rust的csv处理工具
 
 ## Ruby
 
@@ -366,3 +366,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/robertdavidgraham/masscan
 * airflow 任务调度
 * pyload 离线下载
+* supervisor(python)、PM2 (for node.js)
+* tasksel：用于安装一组软件
+* arping：能检查ip是否重复。arp-scan。ntopng：网络的top，web界面。addrwatch
+* rustdesk：远程桌面

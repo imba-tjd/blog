@@ -513,3 +513,4 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 ### TODO
 
 * https://github.com/davidfowl/AspNetCoreDiagnosticScenarios
+* https://zhuanlan.zhihu.com/p/460624318 WebApplicationBuilder

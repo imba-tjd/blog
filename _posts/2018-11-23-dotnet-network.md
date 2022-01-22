@@ -114,6 +114,26 @@ HttpClient一般用单例模式/复用，不要用using，否则会耗尽socket�
 
 .NET Core 2.1后加入了HttpClientFactory，用于统一管理HttpClient实例。但是太复杂了看不懂。而且在FX上用需要装两个包，几百兆。
 
+## Socket
+
+* 更底层的Socket类先不学
+* 还有UdpClient，发送接收二合一，Connect()指定默认远程主机方便Send()时不指定
+
+```c#
+var client = new TcpClient(host, port); // 远程主机的信息
+NetworkStream ns = client.GetStream();
+byte[] bytes = new byte[1024];
+int bytesRead = ns.Read(bytes, 0, bytes.Length);
+string s = Encoding.UTF8.GetString(bytes,0,bytesRead);
+
+var listener = new TcpListener(IPAddress.Any, port);
+listener.Start();
+TcpClient client = listener.AcceptTcpClient();
+NetworkStream ns = client.GetStream();
+ns.Write(bytes, 0, bytes.Length);
+ns.Close(); client.Close();
+```
+
 ## 其它
 
 * 如果 ThreadPool 设置了最大并行数量，一旦超过最大并行数，CLR会先挂起所有线程，然后在排队进行，但是Http是不支持挂起的，就会直接终止

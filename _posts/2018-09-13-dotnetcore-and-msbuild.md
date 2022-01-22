@@ -127,7 +127,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 
 ### 命令行参数
 
-* `/property:xxx=yyy`或/p：重写属性值
+* `/property:xxx=yyy;aaa=bbb`或/p：重写属性值
 * `/target:xxx;yyy`或/t：生成这些目标
 * `/maxcpucount[:n]`或/m：指定要使用的cpu个数并行生成，不加为1，加了但不指定n就是最大
 * `/consoleloggerparameters:ShowTimestamp`或/clp：每条命令前显示时间；还有一些其它的选项
