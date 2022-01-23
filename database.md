@@ -253,3 +253,5 @@ https://dba.stackexchange.com
 https://clickhouse.com/ 高性能OLAP
 
 https://github.com/questdb/questdb/blob/master/i18n/README.zh-cn.md 国产，基于PG，JAVA
+  
+https://www.zhihu.com/question/38815156/answer/2316506766 utf8mb4
