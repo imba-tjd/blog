@@ -96,18 +96,19 @@ prog3 : prog3.o sort.o utils.o
 * [ccache](https://github.com/ccache/ccache)可以缓存编译信息
 * -Ofast可开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
-* -flto=thin可进行一些优化，编译和链接步骤都要用；此选项也可以为auto，另外还有个-ffat-lto-objects
+* -flto：编译和链接都要用，与make -j同时用或自动多线程时加=auto，-fno-fat-lto-objects能减少生成时间但无法进行普通链接，只需在编译时用，没看懂默认是否启用。clang支持=thin比普通的更好
 * -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
 * -g等于-g2，-g3的体积更大，-g0禁用前面的-g。-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度，但无法与-flto一起使用
 * -###为dry-run，能显示具体编译用到的命令
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
+* -fuse-ld=gold比普通的ld快，MinGW不自带
 
 ### 编译步骤
 
 1. gcc -E 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
 2. gcc -S -masm=intel可生成intel风格的汇编，否则是AT&T风格的；加-fverbose-asm可生成与源代码对应的注释
 3. gcc -c 生成二进制代码(.o)
-4. -shared -fPIC生成动态库(.so)，fpic产生的代码更小更快但在某些平台有限制一般不用；fPIE用于可执行文件；Win下的-mdll或--dll现在的效果与shared相同
+4. -shared -fPIC生成动态库(.so)，fpic产生的代码更小更快但在某些平台有限制一般不用；fPIE用于可执行文件；Win下的-mdll或--dll现在的效果与shared相同，简化起见永远使用shared
 5. ar -crv libname.a src.o ... 生成静态库；-t显示包含哪些.o
 
 ### 库
@@ -176,3 +177,4 @@ prog3 : prog3.o sort.o utils.o
 * https://zhuanlan.zhihu.com/p/296191493
 * https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/
 * CMake: https://zhuanlan.zhihu.com/p/361123818
+* https://github.com/rui314/mold

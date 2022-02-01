@@ -83,8 +83,8 @@ except ImportError:
 * python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install，命令行接口还会产生可能存在编码问题的xxx-script.py；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
 * pip install .：仍需wheel包；可以识别setup.py和那个toml，已安装了也能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe；pip install --force-reinstall才是重新安装，不能用-f，那是另一个参数的简写
-* pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py和wheel包；注意不是python -m wheel
-* pip download -d pkgs xxx/-r requirements.txt：把项目依赖下载到指定文件夹中方便在无网环境中install --no-index -f=pkgs -r
+* pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py和wheel包，-v显示依赖安装过程，-vv显示pyx处理过程；注意不是python -m wheel
+* pip download：理论功能是下载包及其依赖方便离线安装，实际遇到非whl又需要构建的包时会去构建但最后结果却又是源码包，最好干脆不用
 * 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
 * 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
 * MANIFEST.in额外控制sdist的内容，默认包含和不包含：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
@@ -1113,6 +1113,11 @@ cdef class Queue:
 %%cython --cplus # distutils: language=c++
 from libcpp.string cimport string
 cdef string s = b'Hello world!'
+
+# 手动编译
+$pybase = $(python -c "print(__import__('sys').base_prefix+'\\')");
+gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
+# 生成可执行文件，仍依赖整个Py环境：先用cython --embed，再用gcc -municode且不能有-shared，好像可以不用-D_UNICODE和UNICODE
 ```
 
 ## numba

@@ -18,7 +18,6 @@ title: 浏览器
 
 * 历史版本：https://ftp.mozilla.org/pub/firefox/releases/
 * 最新版本：https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=zh-CN
-* https://download-installer.cdn.mozilla.net/pub/firefox/releases/74.0/win64/zh-CN/Firefox%20Setup%2074.0.exe （Firefox Setup 74.0.exe）
 
 ### about:config
 
