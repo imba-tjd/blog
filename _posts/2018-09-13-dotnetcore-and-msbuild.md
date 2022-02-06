@@ -156,7 +156,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 使用`$(PropertyName)`使用属性，属性名不区分大小写
 * 预定义属性：https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-reserved-and-well-known-properties
 * 条件属性：`<Configuration Condition=" '$(Configuration)' == ''">Debug</Configuration>`：当Configuration未指定时，会等于""；还可在MakeDir中用!Exist判断文件夹不存在
-* 字符串里如果含有[特殊字符](https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-special-characters)，使用反斜杠是无法转义的，要写%+16进制
+* 字符串里如果含有[特殊字符](https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-special-characters)，使用反斜杠是无法转义的，要写%+十六进制
 * 获取注册表值：`$(registry:Hive\MyKey\MySubKey@Value)`，去掉@Value可获取子键默认值
 * $()中也可以使用类型PS与.NET交互的语法，字符串要用反引号
 * OutDir与TargetDir的区别是后者是相对路径；会自动根据rid进行变化但不会根据publish进行变化

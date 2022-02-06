@@ -19,7 +19,7 @@ title: 类的转换和模式匹配
 * ChangeType方法：将实现了IConvertible接口的类型转换为指定的类型
 * 以To开头的方法：将参数中传入的对象转换为指定的类型对象
 * ToBase64String/CharArray, FromBase64String/CharArray：前两者先要用Encoding类转换成byte[]，后两者返回byte[]后要再解码；Core提供TryFromBase64String用于可能存在非base64字符的字符串
-* .NET5引入了 Convert.ToHexString 和 FromHexString 把byte[]转成与16进制字符串互转
+* .NET5引入了 Convert.ToHexString 和 FromHexString 把byte[]转成与十六进制字符串互转
 
 ### BitConverter
 
@@ -27,7 +27,7 @@ title: 类的转换和模式匹配
 * BitConverter.ToString：接受一个byte[]，结果类似于`"E1-0A-DC-39"`
 * BitConverter.ToInt32和ToDouble等：byte[]转换为对应类型
 * 用循环直接输出byte[]元素会以十进制数字输出
-* 16进制明文字符串转普通字符串：没有太好的方法。对于ASCII，用span/substring每两个字符转换成int再转换成char加到stringbuilder里；否则byte.Parse加到List\<byte\>里再解码
+* 十六进制明文字符串转普通字符串：没有太好的方法。对于ASCII，用span/substring每两个字符转换成int再转换成char加到stringbuilder里；否则byte.Parse加到List\<byte\>里再解码
 
 ### 进制转换
 
