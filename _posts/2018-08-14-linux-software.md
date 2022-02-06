@@ -157,6 +157,17 @@ trusted-host = mirrors.aliyun.com
 * harelba/q：在csv和sqlite上运行SQL语句，但没发布PyPI包
 * xsv：rust的csv处理工具
 
+## APK
+
+* apk info：列出安装了的包，加包名显示指定包的描述信息，再加-a显示依赖 被依赖 二进制 大小
+* apk update
+* apk upgrade：升级全局包
+* apk add [-u] 包名：安装包
+* apk del
+* apk search -v
+* sed -i -r -e 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' -e 's/v[.0-9]+/latest-stable/g' /etc/apk/repositories
+* 缓存：/var/cache/apk
+
 ## Ruby
 
 ```bash
