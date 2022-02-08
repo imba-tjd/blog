@@ -6,48 +6,48 @@ string.h
 --------
 
 strlen返回一个类型为size_t的值，而无符号整数的运算结果永远不可能小于零。所以以下两条语句不相等，第一条是正确的。
-if( strlen(x) \>= strlen(y) )
-if( strlen(x) - strlen(y) \>= 0 )
-而无符号整数比有符号整数高级，所以if( strlen(x) - 100 \>= 0 )同样永远为真。
+if(strlen(x) >= strlen(y))
+if(strlen(x) - strlen(y) >= 0)
+而无符号整数比有符号整数高级，所以if(strlen(x) - 100 >= 0)同样永远为真。
 
-因为返回值的缘故，连接字符串可以嵌套调用：strcat( strcpy( dst, a), b);如果源字符串和目标字符串重叠，结果未定义；小心溢出；如果目标未初始化，用strcpy而不是strcat，否则会有垃圾值。
+因为返回值的缘故，连接字符串可以嵌套调用：strcat(strcpy(dst, a), b);如果源字符串和目标字符串重叠，结果未定义；小心溢出；如果目标未初始化，用strcpy而不是strcat，否则会有垃圾值。
 
 strncpy：如果源数组复制完了，指定数目的剩下的空间用'\0'填充；如果达到了指定数目还没有复制完，不会添加'\0'。
 strncat：最多复制指定数目的字符，并添加一个'\0'。
 strncmp：不要把返回值当作布尔值。
 
 在一个字符串中查找特定字符，区分大小写，如果不存在则返回NULL，获取索引可以减去str。第二个函数查找最后一次出现的位置，第三个查找匹配group中任意一个字符的字符：
-char* strchr( const char* str, char ch)
-char* strrchr( const char* str, char ch)
-char* strpbrk( const char* str, const char* group)
+char* strchr(const char* str, char ch)
+char* strrchr(const char* str, char ch)
+char* strpbrk(const char* str, const char* group)
 
-char* strstr( const char* s1, const char* s1)：在s1中查找是否有包含s2的子串。如果s2为空，返回s1；如果找不到，返回NULL。
+char* strstr(const char* s1, const char* s1)：在s1中查找是否有包含s2的子串。如果s2为空，返回s1；如果找不到，返回NULL。
 
 查找一个字符串前缀：
-size_t strspn( const char* str, const char* group)
-size_t strcspn( const char* str, const char* group)
+size_t strspn(const char* str, const char* group)
+size_t strcspn(const char* str, const char* group)
 group指示一个或多个字符，strspn返回str起始部分匹配group中任意字符的数目，空格等空白字符和标点也有效。str + strspn可获得指针。strcspn对不符合group的字符计数。
 如：
 
 ```c
-strspn( "25,142,330,abc", "0123456789" ); // 2
-strspn( "25,142,330,abc", ",0123456789" ); // 11
+strspn("25,142,330,abc", "0123456789"); // 2
+strspn("25,142,330,abc", ",0123456789"); // 11
 ```
 
 分隔字符串：
-char* strtok( char* str, const char* sep );
+char* strtok(char* str, const char* sep);
 sep指示用作分隔符的字符集合。当strtok函数执行时，它将会修改它所处理的字符串，如果源字符串不可修改，需要自己先复制一份，再传递给strtok函数。当函数第一次调用时，它会保存局部状态信息，所以不能用它同时解析两个字符串。当第一个参数为NULL时，函数会在保存好的字符串中继续查找;第二个参数可以变化，这样调用它的时候会查找不同的字符集合。
 
 ```c
-void print_tokens( char* line )
+void print_tokens(char* line)
 {
     static char whitespace[] = " \t\f\r\v\n";
 
-    for( char* token = strtok( line, whitespace );
+    for(char* token = strtok(line, whitespace);
         token != NULL;
-        token = strtok( NULL, whitespace )
+        token = strtok(NULL, whitespace)
     )
-        printf( "%s", token ）;
+        printf("%s", token ）;
 }
 ```
 
@@ -68,11 +68,11 @@ putchar("0123456789ABCDEF"[value%16]);
 
 与字符串的那些函数类似，但是不会以'\0'来结束。
 
-* void* memcpy( void* dst, const void* src, size_t length); // 不能重叠，如果类型相同，length可以为sizeof( src )；如果需要指定长度，count * sizeof( src[0] )
-* void* memmove( void* dst, const void* src, size_t length); // 可以重叠（src会先复制到临时位置）
-* void* memcmp( const void* a, const void* b, size_t length); // 按照无符号字符逐字节比较
-* void* memchr( const void* a, int ch, size_t length); // 从a的位置开始查找字符ch第一次出现的位置，并返回指向该位置的指针
-* void* memset( void* a, int ch, size_t length); // 把从a开始的length个字节设置为字符ch，ch只会取8位，不能用于int数组的初始化
+* void* memcpy(void* dst, const void* src, size_t len); // 不能重叠否则未定义，可能会从后往前复制；如果类型相同，len可以为sizeof(src)；如果需要指定长度，count * sizeof(src[0])
+* void* memmove(void* dst, const void* src, size_t len); // 可以重叠（src会先复制到临时位置）
+* void* memcmp(const void* a, const void* b, size_t len); // 按照无符号字符逐字节比较
+* void* memchr(const void* a, int ch, size_t len); // 从a的位置开始查找字符ch第一次出现的位置，并返回指向该位置的指针
+* void* memset(void* a, int ch, size_t len); // 把从a开始的len个字节设置为字符ch，ch只会取8位，不能用于int数组的初始化
 * alloca是非标准函数，memory.h是非标准函数库
 
 ### 注意事项
@@ -134,3 +134,4 @@ wtypes.h和WCHAR是Windows的头文件。
 
 * asprintf：非标准库，好像也不是posix，是GNU的
 * itoa：非标准库，可以把数字转换成字符串，可指定进制
+* 库函数大全：http://c.biancheng.net/ref/
