@@ -7,7 +7,6 @@ title: System.IO、Buffer和Span
 > https://docs.microsoft.com/zh-cn/dotnet/standard/io/
 > https://docs.microsoft.com/zh-cn/dotnet/api/system.io?view=netcore-2.1
 > 未读：https://zhuanlan.zhihu.com/p/39223648 https://zhuanlan.zhihu.com/p/39453491 Pipelines
-> [C# 7 Series, Part 10: Span\<T\> and universal memory management](https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/)
 
 System.IO
 ---------
@@ -15,7 +14,6 @@ System.IO
 ### 读写器
 
 * TextReader(abstract) -> StreamReader(Stream/string path)、StringReader(string src)
-* Synchronized静态方法返回线程安全的实例
 * BaseStream返回底层的流
 * TextWriter的AutoFlush指定是否每次Write后都flush，默认false
 * TextReader的构造函数可指定是否读取BOM头来决定编码
@@ -29,7 +27,6 @@ System.IO
 * BinaryReader(File.Open(fileName, FileMode.Open))
 * Stream -> (BufferedStream、FileStream、MemoryStream、NetworkStream、PipeStream)：Read、Write、Seek、CanRead、CanWrite、CanSeek、Position、**Length**、SetLength；FlushAsync、Read/WriteAsync、Read/WriteByte
 * Null：空流
-* Synchronized：静态方法，接受Stream，返回线程安全的流
 * 定位到流末尾：Seek(0, SeekOrigin.End)
 * 读写都需要手动指定byte数组、开始的位置、数据长度，比较底层
 * 写入的时候长度可用byte数组的长度，读取时byte数组的长度可用流的长度
@@ -38,8 +35,7 @@ System.IO
 
 #### FileStream
 
-* 构造函数的isAsync参数或
-    useAsync或FileOptions.Asynchronous可以使IsAsync属性为true；如果为false，调用以Async结尾的方法不会阻塞UI，但实际IO流是同步的；而调用Begin开头的函数会变成真异步IO，但读取小文件反而会变慢
+* 构造函数的isAsync参数或useAsync或FileOptions.Asynchronous可以使IsAsync属性为true；如果为false，调用以Async结尾的方法不会阻塞UI，但实际IO流是同步的；而调用Begin开头的函数会变成真异步IO，但读取小文件反而会变慢
 * 构造函数的FileShare.None可以以独占的方式打开，其他程序读都不让
 * Name：打开的文件的绝对路径
 * Lock、Unlock：锁定/解锁文件的一部分
@@ -76,7 +72,7 @@ System.IO
 * Directory.GetFiles/EnumerateFiles：如果path是相对路径，返回的也是；DirectoryInfo的见FileInfo.ToString
 * CreateDirectory(string path).ToString()的返回值与path相同，如果只写文件夹名不写完整路径，返回的也只有文件夹名，当然创建文件夹会成功
 * ToString：如果用的是构造函数，返回原始的路径；如果是GetDirectory创建的，返回基本名
-* Directory.Get/SetCurrentDirectory与Environment.CurrentDirectory效果一样；AppContext.BaseDirectory是程序集所在目录
+* Directory.Get/SetCurrentDirectory与Environment.CurrentDirectory效果一样
 
 ### Path
 
@@ -119,7 +115,7 @@ System.IO
 
 * 可以处理极大的文件，可以让多个程序同时使用
 * 位于System.IO.MemoryMappedFiles命名空间
-* 示例参见[文档教程](https://docs.microsoft.com/zh-cn/dotnet/standard/io/memory-mapped-files)
+* https://docs.microsoft.com/zh-cn/dotnet/standard/io/memory-mapped-files
 
 权限
 ----
@@ -133,6 +129,7 @@ Span、Memory
 > https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/
 > https://docs.microsoft.com/zh-cn/archive/msdn-magazine/2018/january/csharp-all-about-span-exploring-a-new-net-mainstay
 > https://docs.microsoft.com/zh-cn/dotnet/standard/memory-and-spans/memory-t-usage-guidelines
+> [C# 7 Series, Part 10: Span\<T\> and universal memory management](https://blogs.msdn.microsoft.com/mazhou/2018/03/25/c-7-series-part-10-spant-and-universal-memory-management/)
 
 * System.MemoryExtensions类包含许多扩展方法：AsSpan对stirng转换成ReadOnlySpan，对所有数组转换成普通Span、Trim、IsWhiteSpace（不需要复制整个string了）、ToUpper；因为是System的静态类，所有方法直接都有了
 * Span是ref struct，不能装箱或分配给object和dynamic、不能是类的字段、不能跨await和yield边界；但是Span实例可以指向托管类型
@@ -176,3 +173,6 @@ System.IO.IsolatedStorage命名空间，不关心实际文件位置，保证具�
 IsolatedStorageFile isoStore = IsolatedStorageFile.GetUserStoreForDomain();
 isoStore.CreateFile/CreateDirectory/OpenFile/GetFileNames()
 isoStore.Remove()
+
+string[] d = Environment.GetLogicalDrives();
+DriveInfo[] di = DriveInfo.GetDrives();
