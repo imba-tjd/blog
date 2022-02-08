@@ -5,60 +5,23 @@ title: C#实例
 打开/获取“我的电脑”
 -------------------
 
-> https://zhidao.baidu.com/question/357446118.html
-> http://bbs.csdn.net/topics/240045376
-
 ```
 System.Diagnostics.Process.Start("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
-```
-
-```
-WebBrowser wb = new WebBrowser();
-wb.Navigate(@"c:\temp");
-```
-
-```
-// 添加引用SystemRoot%\system32\SHELL32.dll
-Shell32.ShellClass sh = new Shell32.ShellClass();
-sh.Explore(@"c:\");
-```
-
-```
-string s = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
-Console.WriteLine(s); // 空行
-var a = Directory.GetFiles(s); // 异常
-System.Diagnostics.Process.Start("explorer.exe", "/n," + s); // 有效
-```
-
-```
-string[] d = Environment.GetLogicalDrives();
-DriveInfo[] di = DriveInfo.GetDrives();
+System.Diagnostics.Process.Start("explorer.exe /n," + Environment.GetFolderPath(Environment.SpecialFolder.MyComputer));
 ```
 
 当前程序的真实路径
 ------------------
 
 * System.Reflection.Assembly.GetExecutingAssembly().Location
-* System.Windows.Forms.Application.ExecutablePath 还有个 StartupPath
+* System.Windows.Forms.Application.ExecutablePath，与MainModule.FileName一样；还有个Application.StartupPath，与CWD一样
 * System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName
-
-### 当前程序的MD5
-
-* https://stackoverflow.com/questions/8875296/how-do-i-get-the-hash-of-current-exe
+* AppContext.BaseDirectory和AppDomain.CurrentDomain.BaseDirectory：目录，含有末尾反斜杠
 
 设置环境变量
 ------------
 
 * Environment.SetEnvironmentVariable(string name, string path, EnvironmentVariableTarget target)
-
-处理路径中的斜杠和反斜杠
-------------------------
-
-> https://github.com/xunit/xunit/commit/3c006e5db2fa79c9aa4b1b2718e611091f253ccc
-
-```
-if (Path.DirectorySeparatorChar == '/')    return "/" + codeBase;return codeBase.Replace('/', Path.DirectorySeparatorChar);
-```
 
 判断Windows10
 -------------
@@ -95,17 +58,7 @@ System.Runtime.InteropServices.RuntimeInformation.OSDescription：`Microsoft Win
 if(!new System.Security.Principal.WindowsPrincipal(
     System.Security.Principal.WindowsIdentity.GetCurrent()
     ).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))
-    ....
-```
-
-在按钮或菜单上绘制UAC盾牌的图标：
-
-```
-[DllImport("user32", CharSet = CharSet.Auto, SetLastError = true)]
-public static extern int SendMessage(IntPtr hWnd, UInt32 Msg, int wParam, IntPtr lParam);
-public const UInt32 BCM_SETSHIELD = 0x160C;
-
-SendMessage(button1.Handle, BCM_SETSHIELD, 0, (IntPtr)1);
+    { 不是管理员 }
 ```
 
 调用Office
