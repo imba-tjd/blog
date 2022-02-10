@@ -5,10 +5,7 @@ title: C标准函数库
 string.h
 --------
 
-strlen返回一个类型为size_t的值，而无符号整数的运算结果永远不可能小于零。所以以下两条语句不相等，第一条是正确的。
-if(strlen(x) >= strlen(y))
-if(strlen(x) - strlen(y) >= 0)
-而无符号整数比有符号整数高级，所以if(strlen(x) - 100 >= 0)同样永远为真。
+strlen比较两个字符串的长度要用if(strlen(x)>=strlen(y))而非if(strlen(x)-strlen(y)>=0)，后者永远为真
 
 因为返回值的缘故，连接字符串可以嵌套调用：strcat(strcpy(dst, a), b);如果源字符串和目标字符串重叠，结果未定义；小心溢出；如果目标未初始化，用strcpy而不是strcat，否则会有垃圾值。
 
