@@ -32,7 +32,7 @@ title: 浏览器
 * browser.urlbar.trimURLs：地址栏隐藏http
 * xpinstall.signatures.required：允许安装未签名扩展
 * extensions.pocket.enabled false：禁用pocket扩展
-* security.tls.version.min 3：1为TLS1.0
+* security.tls.version.min：1为TLS1.0
 * network.IDN_show_punycode true：中文域名时显示真正的域名
 * network.http.rcwn.enabled：是否启用raced竞速请求。当FF检测到磁盘较慢时，会无视缓存直接发网络请求，理论上会使用先成功的，另一个就取消掉，实际好像不是这样
 * devtools.selfxss.count：在console中粘贴时会提示“欺诈警告：粘贴您不了解的东西时请务必小心...如果仍想粘贴，请在下方输入allow pasting（不必按回车键）以允许粘贴”。此项可提高阈值，默认是0

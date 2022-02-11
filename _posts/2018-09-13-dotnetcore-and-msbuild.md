@@ -228,6 +228,21 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 能检测代码中的空引用、资源泄露、线程安全
 * 可用Actions和Docker映像，但好像无法在Win下运行
 
+## NGen
+
+* C:\Windows\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
+* ngen install xxx.exe；ngen display xxx
+* ngen update /queue：空闲时更新所有本机映像
+* 需要管理员权限
+
+## bflat
+
+* https://github.com/MichalStrehovsky/bflat 删去lib里的Linux和arm64，不要删pdb
+* bflat build src.cs lib.cs
+* 支持C#10的“顶级语句”
+* 如果源文件没有EntryPoint自动视为库生成dll，函数要指定`[UnmanagedCallersOnly(EntryPoint="xxx")]`，之后从C#中调用必须用P/Invoke，可选内嵌进最终exe
+* 仅x64，不支持csproj
+
 ## 参考
 
 * https://zhuanlan.zhihu.com/p/35979897
