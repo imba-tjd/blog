@@ -7,142 +7,122 @@ title: Linux命令
 * https://ss64.com/bash/
 * https://www.runoob.com/linux/linux-command-manual.html
 * https://tldr.ostera.io/
-* https://github.com/chubin/cheat.sh
+* https://cheat.sh/
+* http://bropages.org/
 
 ## 简单笔记
 
-* zless：查看压缩文件内容
-* lsblk：列出块设备。除了RAM外，以标准的树状输出格式，整齐地显示块设备。-l参数为列表；lsusb：显示usb设备
-* md5sum
-* dd：刻录
-* history：按住“CTRL + R”就可以搜索已经执行过的命令，它可以在你写命令时自动补全
 * cal 月 年：日历
-* stat：查看文件的属性；file：以自然语言描述文件是什么，但debian不自带
-* source/.：解析配置文件
 * setleds：设置键盘指示灯
-* top：显示进程内存/cpu占用信息，会自动更新；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
-* screen：窗口管理器的命令行界面版本
-* uname -a：查看内核版本
 * chroot：改变根目录
-* gcp：有进度条的复制工具，不自带；或者rsync -a --progress src dest
-* fdisk -l：显示磁盘信息；cfdisk：命令行中的图形化的分区工具；mkfs.ext4：格式化分区
-* basename，dirname：取得路径的文件名与目录名
-* du -sh [filename]：显示目录的占用空间；df -h：显示挂载点的总大小、已用空间、剩余空间；dust：新版du
-* mount | column -t：显示挂载分区状态
-* mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
-* unar：https://theunarchiver.com/command-line，可以正确解压非Unicode的zip
-* ls：-r倒序，-R递归，-t按日期降序，-S按文件大小升序，-d显示当前文件夹自己的信息，-1每一行只显示一个文件名；ls -1A | wc -l或ls -A | wc -w：显示出有多少个文件，使用A就不会包含.和..；sl：显示火车
-* date：http://www.runoob.com/linux/linux-comm-date.html
-* fsck：检测文件系统错误
-* cd -：切换到之前的目录f
-* free -ht
-* tail -f：跟踪指定文件，如果有变化立即显示，删除后停止；与less -F相同
-* tasksel：在Debian中快速安装软件
-* cat << EOF >out.txt：输入以后继续输入文字，当最后一行输入EOF文本的时候结束输入，用-EOF可以忽略空白字符
-* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件；type可以区分内置还是外置命令，-a可以显示包含alias在内的命令查找顺序
+* date：http://www.runoob.com/linux/linux-comm-date.html %s为时间戳
 * xclip：复制到剪切板上，不自带
-* head -10：显示前10行信息
-* rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
-* sha1sum/md5sum -c xxx.sha1：自动验证对应的文件是否符合；不加-c是验证，未指定文件时从stdin读入
-* ln：参数意义与cp相同，-P硬链接（默认？），-s软链接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软链接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
 * sudo update-grub：自动修复引导
-* lscpu：相比于`cat /proc/cpuinfo`，不会每个核都显示一遍
-* shred：粉碎文件
-* ldd --version：查看glibc版本
-* sshfs：把远程目录挂载到本地，不自带
-* base64：默认加密，-c解密，-w0不换行；直接跟文件名就是处理文件，可以用管道给到输入流或者用\<\<\<
-* exec：常用来替代当前 shell 并重新启动一个 shell，换句话说，并没有启动子 shell。使用这一命令时任何现有环境都将会被清除。在有些脚本中要用exec命令运行node应用。否则不能顺利地关闭容器，因为SIGTERM信号会被bash脚本进程吞没。exec命令启动的进程可以取代脚本进程，因此所有的信号都会正常工作
 * htpasswd -nb -B admin password | cut -d ":" -f 2
-* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
-* cp . dest/：会把当前文件夹下的内容复制过去，而不是只复制一整个文件夹；cp -L/--dereference：如果src是软链接，可以追踪到源文件；cp -a：相当于-dpR
-* iconv -f gbk -t utf-8 source-file -o target-file
-* eval
-* vmstat：监控系统状况的程序。`vmstat 5 5`：在5秒时间内进行5次采样；-f显示从系统启动至今的fork数量，-s显示内存相关统计信息，-d查看磁盘的读写，-m查看slab信息
-* cat > file：接下来输入内容，ctrl+d结束；可以快速地创建一个有内容的文件
-* less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 * fc：在editor中编辑上一条输入的命令，并在退出时执行
 * factor：求一个数的所有因数
 * logrotate：切割日志的程序
-* nroff -man manpage.1 | more：显示man格式的.1文件
-* mktemp：在/tmp下创建一个空的临时文件，输出该文件路径，因此一般用法为FILE=$(mktemp) ...
+* nroff -man manpage.1：显示man格式的.1文件
 * broot：新版tree
 
-## 压缩/解压
+## xargs
 
-* split -b 50m huge_file，合并用cat
+* 把标准输入按空白字符分隔变成指定命令的参数，默认命令是echo
+* 默认一次传所有参数，-n3一次传3个参数
+* -d：指定分隔符
+* -0：以NUL字符分隔读取，但需要源程序配合
+* -t：先打印待执行的命令再执行，-p先询问再执行
+* -P：多进程并行处理，设为0时尽可能多
+* -i：按行处理，并把每一行替换到命令中的`{}`作为单个参数
+* 对cd无效，因为会使用外置的命令
 
-### tar
+## 系统信息
+
+* free -ht：内存信息
+* vmstat：监控系统状况，但对人类很难读，不学
+* ldd --version：能看到glibc版本
+* top：显示进程内存/cpu占用信息，会自动更新；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
+* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
+* lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍
+
+## 文件处理
+
+* cp . dest/：复制当前文件夹下的内容，而非一个整文件夹；-L/--dereference：如果src是软链接，可复制源文件；cp -a：相当于-dpR
+* stat：查看文件的属性；file：以自然语言描述文件格式
+* gcp：有进度条的复制工具，不自带；或者rsync -a --progress src dest
+* basename，dirname：取得路径的文件名或目录。前者第二个参数传后缀还会去掉它。后者支持任意数量的参数，处理后每个一行
+* mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
+* ls：-R递归，-r倒序，-t按日期降序，-S按文件大小降序，-d显示当前文件夹自己的信息，-A列出除.和..以外的所有文件
+* cd -：切换到之前的目录
+* tail -f：持续输出指定文件，如果有变化立即显示；与less -F相同
+* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件
+* rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
+* shasum/md5sum：指定文件时默认二进制模式，从stdin读取时默认文本模式，-c验证
+* base64：默认加密，-d解密，-w0加密时输出不换行，支持跟文件或从stdin读取
+* ln：参数意义与cp相同，-P硬链接（默认？），-s软链接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软链接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
+* shred：粉碎文件
+* FILE=$(mktemp)：在/tmp下创建临时文件并获得文件名
+* iconv -f gbk -t utf-8 source-file -o target-file
+* less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
+* split -b 50m huge_file分隔文件，合并用cat
+
+### find
+
+* `find path -name '*.txt' -exec wc -l {}\;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件
+* -type指定文件类型，f为普通文件，l为链接文件，d为文件夹
+* -not -path：排除目录；默认会搜索隐藏目录，但好像不能递归排除；还有个-prune更快
+* -size +1m：大于1M的文件
+* -mtime -1：一天之内修改的；atime 访问时间，ctime 创建时间
+* -print0：与xargs -0配合用
+* -delete：直接删除找到的文件
+* -maxdepth：最大搜索深度
+* 进入当前目录下所有子文件夹分别执行命令：`find . -maxdepth 1 -type d ! \( -name ".*" -o -name "System Volume Information" -o -name '$RECYCLE.BIN' \) -exec ./script.sh {} \;`
+* https://www.zhihu.com/question/487213837
+
+#### fd
+
+* fd abc相当于`find -iname '*abc*'`，第二个参数指定开始搜索的根目录
+* 模式默认为正则，-g改为glob
+* 模式只存在小写字母时大小写不敏感，有大写字母时自动变为大小写敏感
+* 默认忽略点开头文件和gitignore中的文件，用-HI分别禁用前后者，小心禁用前者后能搜到.git中的文件
+* 无参使用会递归列出所有文件，模式用`.`仅列出当前文件夹
+* -t/--type指定type
+* -e指定后缀，可多次使用
+* 默认只匹配文件名(基本名)，指定-p匹配路径
+* -x并行执行外部命令，每项都执行一次；-X执行一次外部命令，把所有项当作那一次的参数；-i交互模式每次执行前询问。占位符支持{.}路径去扩展，{/}文件名带扩展，{//}父目录，{/.}文件名无扩展；不存在时默认在最后加一个{}
+* -E排除路径，为glob
+* 原生不具有-delete功能
+* Debian在fd-find包中，安装后的二进制名为fdfind
+
+### 压缩/解压
+
+* unar：自动正确解压非Unicode的zip，可惜最后更新时间2015年
+* unzip：不自带，最后更新时间2009年
+* 分卷zip，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
+* gunzip是用来解压gzip(gz)的，不是用来解压zip的
+* unrar：是rar官方的，但在non-free中
+* upx --lzma
+* zless：查看压缩文件内容
+
+#### tar
 
 * 压缩：tar czf jpg.tar.gz *.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
-* 解压：tar xf abc.tar.gz（x为解压缩；类型现在都可以自动识别了；最后可跟路径来只解压指定的部分文件）
+* 解压：tar xf abc.tar.gz（x为解压缩；类型现在都可以自动识别了；最后可跟路径来只解压指定的部分文件；文件名用-为从stdin读取）
 * 其他主选项：t查看内容，r追加，u更新；这仨和c和x只能选其中一个
 * 其它参数：C指定解压目录，v显示详细信息，j代表tar.bz2，-J/--xz代表xz
-* 默认即使用*也不会打包以点开头的文件，可以加`.[!.]*`匹配上
 
-### xz
+#### xz
 
 * 不做把多个文件打包成一个文件的工作
 * 流压缩：cat a.txt | xz -9e > a.txt.xz；注意源文件名不会保留，解压后的名字就是去掉.xz的部分；不加文件名或文件名是-就是这种模式
 * 分别压缩多个文件：xz -9e files；默认压缩完了就把源文件删了，-k可以保留
-* 解压：xz -d file.xz；加-c可以写到stdout中；也可以使用unxz，则不用加-d，其实就是xz的软链接
+* 解压：xz -d file.xz；加-c可以写到stdout中；也可用unxz，就是xz的软链接，相当于-d
 
-### unzip
+## 网络
 
-* 不自带；可以考虑使用`python -m zipfile`替代
-* -p写到stdout中
-* tldr的文档是错的
-* gunzip是用来解压gzip(gz)的，不是用来解压zip的
-* 对于分卷压缩包，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
+### dig
 
-## find
-
-* `find path -name '*.txt' -exec wc -l {}\;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件；也可以使用|xargs
-* -type指定文件类型，f为普通文件，l为链接文件（f不包含这一项），d为文件夹
-* -not -path：排除目录；默认会搜索隐藏目录，但这个参数好像不能递归排除；另外还存在一个prune参数作用好像也是排除
-* -size +1m：大于1M的文件
-* -mtime -1：一天之内修改的；atime是访问时间，ctime是创建时间
-* -print0：与xargs -0匹配使用
-* -delete：直接删除找到的文件
-* -maxdepth：最大搜索深度
-* 进入当前目录下所有子文件夹分别执行命令：`find . -maxdepth 1 -type d ! \( -name ".*" -o -name "System Volume Information" -o -name '$RECYCLE.BIN' \) -exec ./script.sh {} \;`
-
-## awk
-
-* 如果以文件作为参数，记得用xargs
-* 如果分隔符是分号，要用单引号包裹
-
-### 选择除第一列以外的列
-
-* awk '{$1="";print}'，但直接输出结果，会在最前面加个空格
-* awk '{for(i=2;i<=NF;i++) printf $i" ";printf "\n"}'
-* 以上两种方法似乎都会对行进行一次排序？总之行序和本来的不同
-
-## grep
-
-* 如果直接使用管道传递给grep，会被当作标准输入而不是参数，因此如果要把文件作为参数传给它，要用xargs；如果是选取文件名本身，才用find和非xargs的grep
-* grep *option* *pattern* *filenames*，其中文件名可以是*；如果文件名有多个，会在每一行前面打印出匹配到内容的文件名，可用-h隐藏；如果文件名只有一个，可用-H强制显示出来（用find -exec就是这种情况）；如果只想显示出文件名，可用-l；显示的路径风格和提供的相同
-* 使用正则表达式可用grep -E或egrep，但前者用某些元字符（比如大括号）需要转义，后者不需要；-o可以只显示匹配到的内容而不显示一整行
-* 统计每个文件内匹配到了多少次用-c，多个文件会显示文件名；顺便输出行号用-n；递归搜索用-r；忽略大小写用-i；pattern之间-e匹配多个模式，相当于或；不输出结果用-q，可用于返回值判断；-v反向查找
-* 打印匹配文本之前、之后、两边的几行，分别用-A、-B、-C
-* fgrep：只查找指定的表达式，没有通配符和正则，但速度快
-* grep "aaa" file* -lZ | xargs -0 rm：删除多个文件，Z为0字节后缀输出
-* grep -- -a：`-a`不会被认为是grep的参数
-* TODO: ripgrep https://einverne.github.io/post/2019/09/ripgrep-recursively-searches-directories-using-regex-pattern.html
-
-## xargs
-
-* 把由管道获得的标准输入变成指定命令的参数，默认命令是echo
-* 不会从标准输入读取的程序：kill、rm
-* 例如在1.txt这个文件的内容中找1，以下三条命令的效果相同：grep 1 1.txt、cat 1.txt|grep 1、echo 1.txt|xargs grep 1
-* 把文件的内容变成单行输出：cat test.txt | xargs。-n3指定3列换行，实际就是一次传3个参数
-* -d指定分隔符，默认是换行符；分隔符会去掉不要然后加上空格
-* -P 并行处理；默认每次只获取一部分数据
-* `ls *.jpg | xargs -n1 -I cp {} /data/images`：复制所有图片文件到 /data/images 目录下。-I指定一个替换字符串，默认为{}，这个字符串在xargs扩展时会被替换掉，每一个参数命令都会被执行一次
-* 无法用`... | xargs cd`，因为后者会变成/bin/cd，但只用bash的内置cd命令才能改变当前目录；可用`cd $(...)`
-
-## dig
-
-* sudo apt install dnsutils
+* 在dnsutils包中
 * `dig @dns.googlehosts.org www.baidu.com`
 * +vc：查询时使用tcp（不一定支持）
 * +short：只显示ip（但可能有多个）
@@ -158,28 +138,47 @@ title: Linux命令
 * 查询EDNS状态：`dig edns-client-sub.net -t TXT @8.8.8.8`
 * 另外还有kdig（knot-utils）和host命令
 
-## crontab
+### nmap
 
-* crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}`
-* crontab -e：编辑；-r：删除
-* 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
-* systemctl list-timers（systemd-timer）
-* https://crontab.guru/
-* https://zhuanlan.zhihu.com/p/58719487
+* nmap -s[scan method] -p[portrange] targetip
+* ip范围可以用-和/和逗号；端口范围可以用-和逗号，且可在前面加U:和T:表示UDP和TCP
+* 默认扫描TOP1000的端口，-F扫TOP100的；-r不打乱端口顺序
+* -T0-6：扫描时序，越高速度越快，一般用T4；-A为进攻性(Aggressive)扫描，会完整全面地扫描
+* -sL：仅列出解析指定范围后的IP
+* 主机发现(-sn)：默认会发ICMP和80和443，只要有一个回复就说明在线，局域网内是ARP；-Pn跳过主机发现，将所有指定的主机视作开启的
+* 端口扫描：-sS/sT/sA/sW/sM/sN/sF/sX分别为TCP SYN/Connect()/ACK/Window/Maimon/Null/FIN/Xmas，后三种比较隐蔽；-sU为UDP
+* 服务与版本侦测(-sV)：用于确定目标主机开放端口上运行的具体的应用程序及版本信息，--version-light使用轻量侦测，--version-all尝试使用所有的probes进行侦测
+* 操作系统扫描：-O
+* 指定后面的项目会把前面的也都进行一遍；扫描方式可以同时使用多个，如果什么都不加应该就是SYN，也有一种说法是会用四种方式
+* 规避技巧：-S伪造源IP，--spoof-mac伪造mac，--data-length随机填充数据到指定长度，--badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙
+* TODO: https://nmap.org/man/zh/   nmap -sP -PR：ARP搜索？
+* nping --tcp -p 443 addr：V6要用`--tcp-connect -6`，--tcp效果很差，连回显都没有，注意addr无需也不能用中括号因为端口单独指定；这样V6虽然有回显了但少了很多信息，如果想看seq win mss只能用--tcp -e interface --source-ip --source-mac --dest-mac
 
-每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
+### mtr
 
-分布式的：cronsun，国人开发的。
+* 命令行在mtr-tiny包中，图形界面在mtr包中
+* mtr [-6] -rw addr，-rw是终端输出总结结果，-p是输出每条结果，都不用就会进入另一个界面
+* -c是次数
+* 本来-T是TCP，-P指定端口，但不懂为什么未监听的端口也不丢包
+* WSL需要管理员权限运行PS再运行bash才能用，无需sudo，但是速度超级慢
 
-## iproute2
+### iproute2
 
 替代net-tools(ifconfig, arp, route, netstat)。
 https://www.cnblogs.com/sparkdev/p/9253409.html
 https://www.cnblogs.com/sparkdev/p/9262825.html
 
-* ip
+#### ip
 
-### ss(Socket Statistics)
+ip route get xxx 可以直接查找其对应的路由
+ip route show cache
+ip route flush cache
+ip route list/show
+ip neigh
+ip addr
+ip link
+
+#### ss(Socket Statistics)
 
 * 替代netstat
 * ss -t为TCP，-u为UDP，-w为raw，-x为Unix Socket，不加就都有
@@ -191,7 +190,7 @@ https://www.cnblogs.com/sparkdev/p/9262825.html
 * Local Address指的就是本机，但它既可以是Listen的，也可以是发出的；Perr Address就是“另一端”
 * 监听地址为*的就是双栈，`[::]`就只是V6
 
-## 传输文件
+## 下载和传输文件
 
 aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文件，需要服务端
 
@@ -218,11 +217,12 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * -ssl：自动升级到https，如果无法建立仍用http
 * --libcurl xxx.c：生成对应的c语言代码
 * --cert-status：检查OCSP
-* 访问httpbin.org/get可以看到服务器收到的请求信息
+* 访问httpbin.org/get可以看到服务器收到的请求信息；reqbin.com/echo/get/json简单的返回请求的body
 * URL不会做UrlEncode，而是直接发送。比如get /测试.txt，Linux下为`/\u00e6\u00b5\u008b\u00e8\u00af\u0095`，Win下甚至为GBK编码，正确的是`/%E6%B5%8B%E8%AF%95`
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 * 不自带“下载文件中的所有链接”的功能，可用`xargs -n 1 curl -O < urls.txt`，不要按每一行手动运行因为那样无法利用keepalive
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
+* Win版：https://curl.se/windows/
 
 ### scp
 
@@ -248,17 +248,108 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * 自动多线程
 * -i下载文件中列出的url
 
-## sed
+### youtube-dl
 
-* -i为直接修改文件内容
-* -e指定后一个参数为sed的指令，当需要一次性指定多个时有用
+* -F：列出可用格式；-f使用指定格式，可指定数字或类型，一般手动指定-f best
+* --download-archive archive.txt：下载列表时保存已下过的，恢复更快，可用于会更新的列表
+* --write-sub --sub-lang zh；--write-auto-sub(仅u2b)，--skip-download仅下载字幕
+* -x：把视频转成音频；--audio-quality 9，默认5
+* -o：支持以元信息命名文件，如`%(title)s.%(ext)s`
+* --playlist-start、end
+* 缓存大小是自动调整的
+* -s：dry-run
+* --add-metadata
+* -i：下载列表时跳过出错的；-w强制不覆盖文件
 
-```
-find -type f | xargs sed -i '1s/^\xEF\xBB\xBF//' # 全部去掉BOM；注意隐藏文件夹
-'6i Contents' # 在文件的第6行插入指定内容
-'s/aaa/bbb/' # 替换文本
-sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8行是删除2-5行前的第8行，而不是变化后的
-```
+## 文本处理
+
+* wc：-l按行统计，-w按空白分隔的单词统计
+* tr old new：替换stdin的内容但功能更多，如`tr 'a-z' 'A-Z'`能把小写的都换成大写的
+* cut：-c2,5-8取第2和5到8个字符的内容；-d默认为制表符，-f指定取第几个区域
+
+### awk
+
+* awk 'BEGIN {commands} condition /pattern/{commands} END {commands}' file，其中模式支持正则
+* condition支持常见运算符，等于用=，正则匹配用~，正则不匹配用!~。pattern为正则匹配$0
+* 变量
+  * 使用时必不能放在双引号内否则不会扩展
+  * `$0`为当期行，无参时也为它，`$1`为第一项
+  * NF：本行字段个数
+  * 自定义变量可在大括号内直接赋值，支持C风格数组
+  * -v从命令行传递参数
+* 流程控制（大括号中）
+  * if、while、break、continue：与C相同
+  * for(变量 in 数组)，也支持与C相同的但不同声明变量类型
+* print
+  * 输出字符串字面量必须放在双引号内，相邻的自动合并
+  * 逗号会扩展为OFS变量的值，默认为空格
+  * 会自动换行
+* `-F:`指定行内分隔符为冒号；如果为分号，要加引号包裹。相当于设定FS变量
+* 函数
+  * gsub(x,y,z)：在z中以x为模式正则替换为y，z默认用$0
+  * length：无参调用时默认用$0
+  * index(str1, str2)：str2在str1中的位置，从1开始，不存在时为0
+  * substr(str, from , len)：from从1开始
+  * split(str, A, p)：把str按正则模式p分隔，结果保存在A数组中，返回项数
+  * 自定义函数：function关键字。一般在 .awk 文件中，用-f执行脚本，从BEGIN{}为入口
+
+### grep
+
+* grep option pattern filename，也支持从stdin读取
+* 没必要用普通的grep，egrep对正则的支持更标准，引号中的大括号无需再转义，fgrep完全按本身匹配，-P使用Perl的规则
+* 当文件有多个时会在每一行前面打印出匹配到内容的文件名，用-h隐藏；当文件只有一个时，用-H强制显示
+* -l：仅输出匹配到的所在的文件名，与xargs配合时一般加-Z以NUL分隔输出
+* -o：只显示匹配到的内容而非那一整行
+* -c：统计每个文件内匹配到了多少次
+* -n：顺便输出行号
+* -r：递归搜索，适用于filename是个文件夹
+* -i：忽略大小写
+* -C2：还输出匹配到了的那行的前后两行
+* -q：静默，返回值0为找到了，1为无匹配，2为文件不存在
+* -v：反向(invert)，输出不匹配的
+* -w：单词，相当于前后加了\b
+* --：使得之后以横杠开头的参数不看作选项
+* 还有个ugrep貌似速度很快，但是社区不够好，也不稳定
+
+#### ripgrep(rg)
+
+* 模式默认为正则
+* 默认递归搜索CWD下所有文件，但排除点开头文件和gitignore，-uu不忽略
+* -t指定后缀，-z搜索压缩包
+* -E指定编码，默认搜GBK的会乱码
+* --replace替换内容
+* -c -i -l -w -v -C：与grep相同
+
+### sed
+
+* 选项
+  * -i：指定了文件名时，直接修改文件内容，而非输出
+  * -e：指示后一个参数为指令而非文件，同时用多个指令时使用。如`sed -e '2,5d' -e '8d'`删除2至5行和第8行，其中那个第8行是删除2-5行前的
+  * -r：使正则支持扩展字符，否则用+等字符时需要加反斜杠
+* 命令
+  * 命令前可加行号，从1开始。如果不加则对每一行都应用
+  * a：新增，如 5axxx 在第5行后新增xxx，即xxx在第6行
+  * i：插入，如 5ixxx 将xxx插入为第5行，原第5行变为第6行
+  * c：替换
+  * d：删除，如 /aaa/d 删除所有匹配到了aaa的行，/aaa/,+5d 从匹配到了aaa的行开始再删除后面的5行，1~2d删除奇数行
+  * s：替换，如 s/aaa/bbb/g 把所有的aaa都替换为bbb，用`\1`引用匹配组
+  * p：通常加-n使得不默认每一行都输出，如 /aaa/p 输出aaa的那一行
+  * n：获取下一行，如 /aaa/{n;s/bbb/ccc} 把aaa下一行的bbb换成ccc
+  * w：保存，如 /aaa/w data.txt
+* 还支持“保持空间”用于储存数据
+
+## 磁盘管理
+
+* smartctl：查看硬盘smart信息，在smartmontools中
+* fdisk -l：显示磁盘信息；cfdisk：命令行中的图形化的分区工具
+* mkfs.ext4 /dev/xxx：格式化分区。若用xfs需先安装xfsprogs。fstransform：转换文件系统
+* du -sh [filename]：显示目录的占用空间；dust：新版du
+* df -h：显示挂载点的总大小、已用空间、剩余空间
+* dd if=源iso of=/dev/xxx bs=4M status=progress：刻录，需sudo
+* fsck：检测文件系统错误
+* mount | column -t：显示挂载分区状态
+* lsblk：列出块设备。除了RAM外，以标准的树状输出格式，整齐地显示块设备。-l参数为列表；lsusb：显示usb设备
+* sshfs：基于ssh的文件系统，能挂载远程文件夹，不自带
 
 ## 持续运行
 
@@ -272,6 +363,31 @@ sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8�
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
+
+### crontab
+
+* crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}`
+* crontab -e：编辑；-r：删除
+* 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
+* systemctl list-timers（systemd-timer）
+* https://crontab.guru/
+* https://zhuanlan.zhihu.com/p/58719487
+
+每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
+
+分布式的：cronsun，国人开发的。
+
+### tmux
+
+* 新建会话：tmux new -s <sessio_name>
+* ctrl b + c：新窗口，ctrl b + p：切换到上一个窗口，ctrl b + n：下一个窗口；ctrl b + s：列出并切换窗口
+* ctrl b + %：竖分屏，ctrl b + "：横分屏，ctrl b + 方向键：切换panel
+* https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt
+* https://zhuanlan.zhihu.com/p/27915505
+* https://github.com/gpakosz/.tmux
+* https://github.com/tmux-python/tmuxp
+* https://pityonline.gitbooks.io/tmux-productive-mouse-free-development_zh/content/index.html
+* https://louiszhai.github.io/2017/09/30/tmux/
 
 ## systemd
 
@@ -292,46 +408,6 @@ sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8�
 * journalctl：管理日志，取代syslog
 * crond 也被 systemd 的 timer 单元取代
 
-## nmap
-
-* nmap -T4 -s[scan method] -p[portrange] targetip
-* ip范围可以用-和/和逗号；端口范围可以用-和逗号，且可在前面加U:和T:表示UDP和TCP
-* 默认扫描TOP1000的端口，-F扫TOP100的；-r不打乱端口顺序
-* -T0-5为扫描时序，越高速度越快约容易被封；-A为进攻性(Aggressive)扫描，会完整全面地扫描
-* 列表扫描(-sL)：仅将指定的目标的IP列举出来
-* 主机发现(-sn)：默认会发ICMP和80和443，只要有一个回复就说明在线，局域网内是ARP；-Pn跳过主机发现，将所有指定的主机视作开启的
-* 端口扫描：，-sS/sT/sA/sW/sM/sN/sF/sX分别为TCP SYN/Connect()/ACK/Window/Maimon/Null/FIN/Xmas，后三种比较隐蔽，为秘密扫描方式；-sU使用UDP
-* 服务与版本侦测(-sV)：用于确定目标主机开放端口上运行的具体的应用程序及版本信息，--version-light使用轻量侦测，--version-all尝试使用所有的probes进行侦测；
-* 操作系统扫描(-O)：--osscan-guess大胆猜测系统类型，准确性会下降不少，结果变多
-* 指定后面的项目会把前面的也都进行一遍；扫描方式可以同时使用多个，如果什么都不加应该就是SYN，也有一种说法是会用四种方式
-* 规避技巧：-S伪造源IP，--spoof-mac伪造mac，--data-length随机填充数据到指定长度，--badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙
-
-## youtube-dl
-
-* -F：列出可用格式；-f使用指定格式，可指定数字或类型，下载多个用逗号，斜杠为fallback，默认是`bestvideo+bestaudio/best`即很可能分别下好后合并
-* --download-archive archive.txt：下载列表时保存已下过的，恢复更快，可用于会更新的列表
-* --write-sub --sub-lang zh；--write-auto-sub(仅u2b)，--skip-download仅下载字幕
-* -x：把视频转成音频；--audio-quality 9，默认5
-* -o：支持以元信息命名文件，如`%(title)s.%(ext)s`
-* --playlist-start、end
-* 缓存大小是自动调整的
-* -s：dry-run
-* --add-metadata
-* -i：下载列表时跳过出错的；-w强制不覆盖文件
-* `urlopen error EOF occurred in violation of protocol`：可以试试用http和`--prefer-insecure`(仅u2b)，但实际仍会出现；还可试试`--external-downloader curl`但不清楚ps的编码会不会有问题，反正速度肯定是降低了的，而且好像视频还不生效？只有音频生效
-
-## tmux
-
-* 新建会话：tmux new -s <sessio_name>
-* ctrl b + c：新窗口，ctrl b + p：切换到上一个窗口，ctrl b + n：下一个窗口；ctrl b + s：列出并切换窗口
-* ctrl b + %：竖分屏，ctrl b + "：横分屏，ctrl b + 方向键：切换panel
-* https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt
-* https://zhuanlan.zhihu.com/p/27915505
-* https://github.com/gpakosz/.tmux
-* https://github.com/tmux-python/tmuxp
-* https://pityonline.gitbooks.io/tmux-productive-mouse-free-development_zh/content/index.html
-* https://louiszhai.github.io/2017/09/30/tmux/
-
 ## 参考
 
 * https://www.cnblogs.com/manong--/p/8012324.html
@@ -341,10 +417,13 @@ sed -e '2,5d' -e '8d' file.txt # 删除2至5行和第8行，关键是那个第8�
 
 ### TODO
 
-* supervisor(python)、PM2 (for node.js)
-* killall、pkill、kill -9
+* killall、pkill、kill -9、pgrep
 * nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395
 * https://www.oschina.net/translate/useful-linux-commands-for-newbies
 * https://einverne.github.io/categories.html#每天学习一个命令
 * https://github.com/trimstray/the-book-of-secret-knowledge
-* https://github.com/junegunn/fzf
+* IPTraf-ng：监控网络流量
+* https://github.com/denisidoro/navi
+* fzf https://zhuanlan.zhihu.com/p/91873965 https://github.com/junegunn/fzf https://einverne.github.io/post/2019/08/fzf-usage.html
+* nc/ncat
+* iface：查看网卡信息
