@@ -118,7 +118,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
   * 辅音延长（相同辅音只发一次）：life force, fish shop, black coffee bad dog, good day, with this；但fish stick, wasn't there不算
 * 异化
   * /s/+/t,k,p,tr/会变成对应的不送气音：steam, stand, stick, sky, school, spring, special, mistake
-  * 美音的r化：car, four；不过如果有两个r时第一个不变：surprise, particular, governor
+  * 美音的r化：car, four；surprise, particular, governor
 * 加音，词尾元音+词首元音
   * /w/: do it, who is, too often, go on
   * /j/: I am, she asked, hurry up, worry about, see it

@@ -228,7 +228,11 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 能检测代码中的空引用、资源泄露、线程安全
 * 可用Actions和Docker映像，但好像无法在Win下运行
 
-## NGen
+## .NET Framework
+
+* `Your project does not reference ".NETFramework,Version=v4.7.2" framework. Add a reference to ".NETFramework,Version=v4.7.2" in the "TargetFrameworks" property of your project file and then re-run NuGet restore.`：不要混用Core和FX的生成，删除bin和obj即可
+
+### NGen
 
 * C:\Windows\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
 * ngen install xxx.exe；ngen display xxx

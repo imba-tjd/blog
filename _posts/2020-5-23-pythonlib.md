@@ -508,6 +508,7 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * 传字符串给data是设置body，不要传字符串给json；data还支持file-like-obj且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
 * post支持files={'filefield': file-like-obj-bin}，requests-toolbelt提供了更多功能
 * RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
+* 自动gzip解码
 
 ```py
 r: Response = s.get(url,params={k:v})、post(url,data/json = {k:v}/str)、put/delete/head/options
@@ -538,21 +539,19 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib3
 
-* 线程安全
-* 自动gzip解码，requests也是
-* urllib3.PoolManager().request('GET',url)，只能下到bytes，要自己手动解码`r.data.decode('u8')`
-* 头：PM()和request()的headers参数都是在默认头上添加，无论设为None还是{}都这样，且此时pool.headers是{}；request()的是完全替换PM的
-* request_encode_xxx()的method必须大写，request()可小写
-* params接受的字典不需要dict[str, str]，会自动处理
-* post时构建查询参数：urllib.parse.urlencode(dict)
-* 上传文件：不支持file-like-obj，fields={'filefield':('filename', filestr)}，二进制内容设置body和Content-Type
+* urllib3.PoolManager().request('GET',url); r.data.decode()
+* request_encode_body('POST',url,{body},encode_multipart=False)
+* Headers：UA默认为python-urllib3/1.26.8，无keep-alive。PM和request()的headers参数都是在默认头上添加，且默认pool.headers是{}；request()若设定headers参数会完全替换pool.headers
+* params接受的字典类型不必为dict[str, str]，会自动处理
+* 上传文件：fields={'filefield':('filename', filestr)}，二进制内容设置body和Content-Type，不支持file-like-obj
+* 自动gzip解码，但默认AE是identity
 
 ### urllib
 
-* 自带，但urlopen默认不支持keepalive，无法大量使用
+* 自带，但urlopen默认不支持keep-alive，无法大量使用
 * http.client更加底层
-* User-Agent默认为Python-urllib/3.9
-* POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')
+* UA默认为Python-urllib/3.9
+* POST x-www-form-urlencoded内容：给urlopen传data=parse.urlencode(dict).encode('ascii')
 
 ```py
 req = urllib.request.Request(url, [method])
@@ -569,7 +568,7 @@ parts.netloc域名
 
 ### 其它HTTP库
 
-* httpx的api与requests差不多，且支持异步、h2、brotli。长连接用httpx.Client()；底层用的是同作者的httpcore
+* httpx的api与requests差不多，且支持异步、h2、brotli；长连接用httpx.Client()；默认不自动30x跳转。底层用的是同作者的httpcore
 * requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
 * httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
 * faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
