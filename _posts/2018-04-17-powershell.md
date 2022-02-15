@@ -131,7 +131,7 @@ category: windows
 * New-Variable varname -Value ...。变量名无需加$，-Option可指定readonly和constant，前者被赋值后不可修改但仍可被删除且可被-Force赋值；用这种方式在同作用域内在多次声明同名变量会报错
 * Measure-Command -Expression {...}：测量运行时间
 * Start-Job -ScriptBlock {...} ; $JobResponse = Get-Job | Receive-Job
-* Compress-Archive
+* Compress-Archive、Expand-Archive
 * Enter-PSSession -ComputerName RemoteComputer; Exit-PSSession
 
 ### meta
