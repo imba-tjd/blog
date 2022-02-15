@@ -103,20 +103,26 @@ title: Linux命令
 * unrar：是rar官方的，但在non-free中
 * upx --lzma
 * zless：查看压缩文件内容
+* lzip：处理 .lz，仅使用LZMA非2
+* lz4：压缩率比zip低但压缩速度非常快
 
 #### tar
 
-* 压缩：tar czf jpg.tar.gz *.jpg（c为压缩，z为tar.gz，f必须是最后一个参数，后跟压缩包名）
-* 解压：tar xf abc.tar.gz（x为解压缩；类型现在都可以自动识别了；最后可跟路径来只解压指定的部分文件；文件名用-为从stdin读取）
-* 其他主选项：t查看内容，r追加，u更新；这仨和c和x只能选其中一个
-* 其它参数：C指定解压目录，v显示详细信息，j代表tar.bz2，-J/--xz代表xz
+* 压缩：tar caf jpg.tar.gz *.jpg。c为压缩，a为自动按后缀选择压缩格式，f指定压缩包名，必须是最后一个参数
+* 解压：tar xf abc.tar.gz。x为解压，类型现在都可自动根据后缀识别；最后可跟路径来只解压部分文件
+* 其他主选项：t查看内容，r追加，u更新；它们与c和x只能选其中一个
+* 其它参数：C指定解压目录，v显示详细信息，z代表tar.gz，j代表tar.bz2，-J/--xz代表xz
+* 现在Windows也自带了，但只支持gzip
 
 #### xz
 
-* 不做把多个文件打包成一个文件的工作
-* 流压缩：cat a.txt | xz -9e > a.txt.xz；注意源文件名不会保留，解压后的名字就是去掉.xz的部分；不加文件名或文件名是-就是这种模式
-* 分别压缩多个文件：xz -9e files；默认压缩完了就把源文件删了，-k可以保留
-* 解压：xz -d file.xz；加-c可以写到stdout中；也可用unxz，就是xz的软链接，相当于-d
+* 压缩：xz -9e data.txt，会生成data.txt.gz
+* 流压缩：cat data.txt | xz -9e > data.txt.xz
+* 解压：xz -d file，用-c输出到stdout，自带软连接unxz相当于-d，xzcat相当于-dc
+* 默认压缩完了会删除源文件，指定-k保留
+* 源文件名不会保留，解压文件后的名字就是去掉.xz的部分
+* 不做把多个文件打包成一个文件的工作，可指定多个文件但只是分别压缩
+* 实际算法为LZMA2和未压缩混合
 
 ## 网络
 
