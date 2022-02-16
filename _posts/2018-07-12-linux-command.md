@@ -159,6 +159,7 @@ title: Linux命令
 * 规避技巧：-S伪造源IP，--spoof-mac伪造mac，--data-length随机填充数据到指定长度，--badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙
 * TODO: https://nmap.org/man/zh/   nmap -sP -PR：ARP搜索？
 * nping --tcp -p 443 addr：V6要用`--tcp-connect -6`，--tcp效果很差，连回显都没有，注意addr无需也不能用中括号因为端口单独指定；这样V6虽然有回显了但少了很多信息，如果想看seq win mss只能用--tcp -e interface --source-ip --source-mac --dest-mac
+* https://securitytrails.com/blog/nmap-cheat-sheet
 
 ### mtr
 

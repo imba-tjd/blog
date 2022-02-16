@@ -404,7 +404,7 @@ else:
 ### 相关项目
 
 * https://www.zyte.com 官方平台，所有的Tools都是收费的，只能用Scrapy Cloud，数据最多保留四个月
-* Gerapy 调度管理系统，基于Scrapyd Django
+* Gerapy 调度管理系统，基于Scrapyd Django，感觉没什么用
 * https://github.com/Python3WebSpider/ProxyPool 定时抓取免费代理网站的代理池，需要Docker或Python+Redis
 * scrapy-redis 分布式爬虫
 * https://github.com/scrapinghub/splash
@@ -910,6 +910,62 @@ response = Response(content)
 await response(scope, receive, send)
 ```
 
+### Django
+
+* MTV框架：Model-Template-View
+* manage.py与django-admin做的事一样，只是manage.py还设定了settings的位置。当使用单一项目只有一个设置时，用manage.py更方便
+* 创建项目：django-admin startproject mysite .
+* 运行：python manage.py runserver，会自动重载
+* 创建应用：manage.py startapp news
+* 创建数据库：manage.py makemigrations; migrate。查看会执行什么sql语句：sqlmigrate news 0001
+* 交互式命令行：manage.py shell
+* 创建管理员账号：manage.py createsuperuser
+* 准备部署：manage.py check --deploy
+* https://www.liujiangblog.com/course/django/
+
+```py
+# news/model.py
+from django.db import models
+class Article(models.Model):
+    name = models.CharField(max_length=10)
+    text = models.TextField()
+# news/admin.py 管理面板
+from django.contrib import admin
+from . import models
+admin.site.register(models.Article)
+# news/views.py
+from django.shortcuts import get_object_or_404, render
+def index(request):
+    return django.http.HttpResponse("Hello, world. You're at the polls index.")
+    # HttpResponseRedirect(reverse('链接名', args=(xxx.id,)))
+def year_archive(request, year): # POST的数据在req.POST字典里
+    a_list = Article.objects.filter(pub_date__year=year)
+    context = {'year': year, 'article_list': a_list}
+    # o = get_object_or_404(Person, pk=art_id) # 如果不存在则自动返回404
+    return render(request, 'news/year_archive.html', context) # 会去渲染mysite/news/templates/news/year_archive.html
+# news/urls.py
+from django.urls import path
+from . import views
+urlpatterns = [path('', views.index, name='index')]
+# path('articles/<int:year>/', views.year_archive) # 会调用news.views.year_archive(request, year=2005)
+# mysite/urls.py
+from django.urls import include, path
+urlpatterns = [
+    path('news/', include('news.urls')), # 用于引用其它urls
+    path('admin/', admin.site.urls), # 应总是使用include()，admin是唯一例外
+]
+# mysite/settings.py
+INSTALLED_APPS = ['news.apps.NewsConfig']
+# 使用model
+p = Article(name=xxx); p.save()
+Article.objects.all()/get(id=1/name__startswith=xxx/name__contains=xxx)/filter()
+```
+
+#### 模板
+
+* url语句：读取urlpatterns中的name，并在行内传参构建url，避免硬编码
+* load static和static语句：以每个应用下的static文件夹作为基础路径获得静态文件的路径，其中推荐再写一遍应用名。部署时推荐设置STATIC_ROOT，运行manage.py collectstatic就会把所有应用的静态文件都复制到那个文件夹中
+
 ## ORM和数据库
 
 * SQLite和Python DB-API见主笔记
@@ -1276,6 +1332,7 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
   * 宏：类似于函数
 * `{{ ... }}`表达式
   * 变量可用a.b代替a['b']
+  * 引用静态文件路径：`src="{{ url_for('static', filename='js/index.js') }}"`
 * `{# ... #}`注释
 * filter：变量后加|
   * default：当变量未定义时使用此函数提供的值，第二个参数允许变量评估为False时也使用
