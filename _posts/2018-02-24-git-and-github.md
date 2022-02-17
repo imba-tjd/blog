@@ -395,6 +395,23 @@ collapsable content
 * https://www.git-tower.com
 * https://www.syntevo.com/smartgit/
 
+## SourceGraph
+
+* 直接搜索是字面量，不跨行
+* 默认大小写不敏感，用case:yes启用
+* `(a AND b)` 搜索b在a的右边的文本，相当于`a.*b`
+* `(a OR b)` 能指定多个条件，搜文本就是a和b存在一个就行
+* repo:user/xxx、`^github\.com/user/.*`
+* lang:c
+* -file:.*/testing 排除文件(路径)
+* type:commit 查看提交中的改动
+* type:diff select:commit.diff.removed 搜索移除的内容
+* content:"..." 搜索文件内容，当于普通语法冲突时需用这个，如搜`http://`
+* repo:contains.file(\.py) 仅当repo含有指定文件时才搜这个repo
+* type:symbo 搜索成员
+* 考虑屏蔽js.sentry-cdn.com因为太慢了
+* 精确代码智能感知：Go、TS/JS、C/C++、Java，需要上传LSIF数据
+
 ## 参考
 
 * https://rogerdudler.github.io/git-guide/index.zh.html
