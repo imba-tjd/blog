@@ -105,20 +105,22 @@ title: Linux命令
 * zless：查看压缩文件内容
 * lzip：处理 .lz，仅使用LZMA非2
 * lz4：压缩率比zip低但压缩速度非常快
+* zstd：速度不如lz4但也不错，--ultra -22
+* brotli：默认已使用最高压缩级别，根据测试，平均不如zstd，仅在单线程下br好一点
 
 #### tar
 
 * 压缩：tar caf jpg.tar.gz *.jpg。c为压缩，a为自动按后缀选择压缩格式，f指定压缩包名，必须是最后一个参数
 * 解压：tar xf abc.tar.gz。x为解压，类型现在都可自动根据后缀识别；最后可跟路径来只解压部分文件
 * 其他主选项：t查看内容，r追加，u更新；它们与c和x只能选其中一个
-* 其它参数：C指定解压目录，v显示详细信息，z代表tar.gz，j代表tar.bz2，-J/--xz代表xz
+* 其它参数：C指定解压目录，v显示详细信息，z代表tar.gz，j代表tar.bz2，-J/--xz代表xz，-I手动指定压缩或解压程序且能设定参数
 * 现在Windows也自带了，但只支持gzip
 
 #### xz
 
 * 压缩：xz -9e data.txt，会生成data.txt.gz
 * 流压缩：cat data.txt | xz -9e > data.txt.xz
-* 解压：xz -d file，用-c输出到stdout，自带软连接unxz相当于-d，xzcat相当于-dc
+* 解压：xz -d file，用-c输出到stdout；自带软连接unxz相当于-d，xzcat相当于-dc，其他压缩程序一般也支持这类
 * 默认压缩完了会删除源文件，指定-k保留
 * 源文件名不会保留，解压文件后的名字就是去掉.xz的部分
 * 不做把多个文件打包成一个文件的工作，可指定多个文件但只是分别压缩
