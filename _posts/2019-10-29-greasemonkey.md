@@ -72,4 +72,4 @@ title: 油猴
 ## 参考
 
 * https://wiki.greasespot.net
-* TODO: https://github.com/FirefoxBar/userscript 学习其他人是怎么写的
+* TODO: https://github.com/FirefoxBar/userscript https://github.com/hoothin/UserScripts 学习其他人是怎么写的
