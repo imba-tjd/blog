@@ -118,7 +118,7 @@ category: windows
 
 > https://ss64.com/ps/
 
-* Invoke-WebRequest(iwr)：下载网页，当不需要处理DOM时加-UseBasicParsing可以不通过ie解析提高速度，Content属性获取内容
+* Invoke-WebRequest(iwr)：下载网页，结果的Content属性获取内容，`Headers.'xxx'`获取头
 * Get-ChildItem(gci, ls)：获取文件夹内容，-r递归
 * Invoke-Expression(iex)：调用字符串代表的命令，iex "$args"可直接带参数地执行传过来的命令；而`&`把后面的字符串仅解析成命令本身，在字符串外才可以跟那个命令的参数；比如要执行的程序文件名带空格，只能用&，iex和直接输没区别；如果命令本身又在引号里，就需要`iex "& $command"`，直接用&会把引号当作命令的一部分
 * Get-Random：随机获取对象数组中的一个元素

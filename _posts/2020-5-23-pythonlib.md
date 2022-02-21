@@ -938,11 +938,12 @@ from django.shortcuts import get_object_or_404, render
 def index(request):
     return django.http.HttpResponse("Hello, world. You're at the polls index.")
     # HttpResponseRedirect(reverse('链接名', args=(xxx.id,)))
-def year_archive(request, year): # POST的数据在req.POST字典里
+def year_archive(request, year):
     a_list = Article.objects.filter(pub_date__year=year)
     context = {'year': year, 'article_list': a_list}
     # o = get_object_or_404(Person, pk=art_id) # 如果不存在则自动返回404
     return render(request, 'news/year_archive.html', context) # 会去渲染mysite/news/templates/news/year_archive.html
+request：method如"POST"、POST字典
 # news/urls.py
 from django.urls import path
 from . import views
@@ -965,6 +966,7 @@ Article.objects.all()/get(id=1/name__startswith=xxx/name__contains=xxx)/filter()
 
 * url语句：读取urlpatterns中的name，并在行内传参构建url，避免硬编码
 * load static和static语句：以每个应用下的static文件夹作为基础路径获得静态文件的路径，其中推荐再写一遍应用名。部署时推荐设置STATIC_ROOT，运行manage.py collectstatic就会把所有应用的静态文件都复制到那个文件夹中
+* csrf_token：放在form里
 
 ## ORM和数据库
 
@@ -1227,6 +1229,7 @@ if __name__ == "__main__":
 * 如果是自动生成的行名，第0列不为行名
 * TODO: 如何按两列之差排序；df1['new_col'] = df2.col会报A value is trying to be set on a copy of a slice from a DataFrame
 * pandas-bokeh：简单做出交互图
+* 自带plot()
 
 ```py
 import pandas as pd
