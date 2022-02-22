@@ -1097,7 +1097,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
 * Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-Ofast --link-args=xxx
 * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
-* 与C++交互：pybind11；另一种封装C的库：cffi，目标是不学新的DSL；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
+* 与C++交互：pybind11；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
 * 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
@@ -1175,6 +1175,28 @@ cdef string s = b'Hello world!'
 $pybase = $(python -c "print(__import__('sys').base_prefix+'\\')");
 gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 # 生成可执行文件，仍依赖整个Py环境：先用cython --embed，再用gcc -municode且不能有-shared，好像可以不用-D_UNICODE和UNICODE
+```
+
+## cffi
+
+```py
+from cffi import FFI
+ffibuilder = FFI()
+ffibuilder.cdef('int echo(int a);') #
+# API编译模式，会生成_echo_cffi.c再编译成py模块
+ffibuilder.set_source('模块名如_echo_cffi', '#include "echo.h"', libraries=['dll/so名无后缀'], sources=['echo.c']) # 第二个参数是C意义上的使用库时的实现；libraries是要链接的库，如Linux下一般要加'm'；如果连库都还没编译，也可以指定sources
+if __name__ == '__main__': ffibuilder.compile(verbose=True)
+setup_requires=['cffi']; cffi_modules=["echo_build:ffibuilder"] # 不清楚运行时需不需要cffi，教程里写了
+from _echo_cffi import ffi, echo
+# ABI模式动态加载
+lib = ffi.dlopen(None) # None为加载标准库，但在Win上会失败；加载其它dll用ctypes.util.find_library("foo")否则要加后缀；仍必须cdef
+# ffi.verify() 废弃了
+
+# 运行时创建C类型
+a = ffi.new('int[10]') # 相当于int a[10]
+s = ffi.new('char[]', b'hello') # 相当于char s[] = "hello"，可配合二进制模式下的f.readinto
+st = ffi.new('St*', {'p': 1}) # 定义结构体，如果内部又有指针，要把子对象加到全局的weakref.WeakKeyDictionary()中
+ffi.cast("int", 2)
 ```
 
 ## numba
@@ -1426,7 +1448,7 @@ print(template.render(the="variables", go="here"))
 
 ## TODO
 
-* PyTest https://realpython.com/learning-paths/test-your-python-apps/
+* PyTest https://realpython.com/learning-paths/test-your-python-apps/ https://zhuanlan.zhihu.com/p/385619511
 * PyNaCl https://github.com/pyca/cryptography pyOpenSSL pycryptodome
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
@@ -1464,3 +1486,5 @@ print(template.render(the="variables", go="here"))
 * pyinstrument：使用简单的profile工具
 * multibuild：用于产生多平台的wheel
 * birdseye：调试工具，与pysnooper是同类的
+* https://github.com/JaidedAI/EasyOCR
+* wrapt：方便写装饰器，自动处理方法

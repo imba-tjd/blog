@@ -178,3 +178,4 @@ prog3 : prog3.o sort.o utils.o
 * https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/
 * CMake: https://zhuanlan.zhihu.com/p/361123818
 * https://github.com/rui314/mold
+* https://zhuanlan.zhihu.com/p/163287897 九图记住Makefile
