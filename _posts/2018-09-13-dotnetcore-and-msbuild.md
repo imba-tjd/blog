@@ -256,7 +256,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ```
 ItemGroup:
 <Folder Include="datafiles\" />
-	<None Update="datafiles\datafile.db">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  <None Update="datafiles\datafile.db">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
          </None>
 ```
