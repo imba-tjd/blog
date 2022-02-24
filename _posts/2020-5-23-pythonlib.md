@@ -1182,9 +1182,9 @@ gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 ```py
 from cffi import FFI
 ffibuilder = FFI()
-ffibuilder.cdef('int echo(int a);') #
+ffibuilder.cdef('int echo(int a);') # 要在py中用的函数
 # API编译模式，会生成_echo_cffi.c再编译成py模块
-ffibuilder.set_source('模块名如_echo_cffi', '#include "echo.h"', libraries=['dll/so名无后缀'], sources=['echo.c']) # 第二个参数是C意义上的使用库时的实现；libraries是要链接的库，如Linux下一般要加'm'；如果连库都还没编译，也可以指定sources
+ffibuilder.set_source('模块名如_echo_cffi', '#include "echo.h"', libraries=['dll/so无后缀'], sources=['echo.c']) # 第二个参数是C意义上的使用库时的实现；libraries是要链接的库，如Linux下一般要加数学库'm'，位数要和Py的一样；如果连库都还没编译，也可以指定sources
 if __name__ == '__main__': ffibuilder.compile(verbose=True)
 setup_requires=['cffi']; cffi_modules=["echo_build:ffibuilder"] # 不清楚运行时需不需要cffi，教程里写了
 from _echo_cffi import ffi, echo
