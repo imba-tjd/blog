@@ -196,6 +196,7 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * phpMyAdmin
 * DataGrip：收费
 * SequelPro/Ace：仅Mac
+* https://github.com/beekeeper-studio/beekeeper-studio/
 
 ---
 
