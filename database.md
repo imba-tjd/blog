@@ -195,6 +195,7 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * https://www.devart.com/free-products.html：其实不用注册，企业版试用过后自动变为Express版
 * phpMyAdmin
 * DataGrip：收费
+* SequelPro/Ace：仅Mac
 
 ---
 
