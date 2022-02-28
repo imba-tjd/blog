@@ -365,14 +365,9 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 服务端：-s [-u]
 * 客户端：-c <serverip> -P 5多线程 -b 100M -t 60
 
-## 参考
-
-* https://zhuanlan.zhihu.com/p/101601709
-
-### TODO
+## TODO
 
 * unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691
-* zstd
 * https://github.com/iovisor/bcc
 * https://github.com/robertdavidgraham/masscan
 * airflow 任务调度
@@ -381,3 +376,5 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * tasksel：用于安装一组软件
 * arping：能检查ip是否重复。arp-scan。ntopng：网络的top，web界面。addrwatch
 * rustdesk：远程桌面
+* https://github.com/Cyan4973/xxHash
+* cloc、boyter/scc：分析repo由哪些语言组成
