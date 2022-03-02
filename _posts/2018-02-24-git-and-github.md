@@ -118,7 +118,7 @@ title: Git/GitHub笔记
 * [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)：`git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`；加--all修改所有的分支，prune empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败；如果文件路径里有空格，把外层改成双引号，路径用单引号
 * 彻底重命名且不会丢失历史：`git filter-branch -f --tree-filter 'git mv -k 原文件名 新文件名' --prune-empty HEAD`；-k忽略文件不存在时报错失败；会修改本分支所有提交；https://stackoverflow.com/questions/3142419 给了一个用index-filter的示例；如果要移动到之前不存在的文件夹中，命令要加`mkdir -p xxx;`
 * git clone --depth=1指的不是只clone根文件夹，而是不clone之前的记录，当前提交还是完整的
-* git diff：比较local和staged之间的内容，如果没有任何add，就与git diff HEAD一样了。git diff --cached/--staged比较的是add了的与HEAD之间的差别。默认会把修改了的内容都显示出来，用--stat可以只显示文件和变化行数，用于获取比status更多的信息
+* git diff：比较local和staged之间的内容，如果没有任何add，就与git diff HEAD一样了。git diff --cached/--staged比较的是add了的与HEAD之间的差别。默认会把修改了的内容都显示出来，用--stat只显示文件和变化行数，用于获取比status更多的信息
 * git diff master [patch]：比较当前分支/patch与master/目标分支的差别。可以重定向到.patch中，用git apply恢复
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
 * git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录

@@ -247,6 +247,12 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 如果源文件没有EntryPoint自动视为库生成dll，函数要指定`[UnmanagedCallersOnly(EntryPoint="xxx")]`，之后从C#中调用必须用P/Invoke，可选内嵌进最终exe
 * 仅x64，不支持csproj
 
+## 混淆和反混淆
+
+* https://github.com/XenocodeRCE/neo-ConfuserEx
+* https://github.com/de4dot/de4dot
+* https://github.com/SychicBoy/NetReactorSlayer
+
 ## 参考
 
 * https://zhuanlan.zhihu.com/p/35979897
