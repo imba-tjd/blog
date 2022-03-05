@@ -981,7 +981,6 @@ Article.objects.all()/get(id=1/name__startswith=xxx/name__contains=xxx)/filter()
 * https://github.com/encode/orm：基于SQLAlchemy core的查询、databases的异步、typesystem的类型验证，但很不活跃
 * ponyorm、tortoise-orm
 * tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
-* edgedb：自创DML的关系型数据库，基于pg
 * mashumaro：基于dataclass的序列化库，不够成熟
 * psycopg2：PG的adapter
 
@@ -989,7 +988,7 @@ Article.objects.all()/get(id=1/name__startswith=xxx/name__contains=xxx)/filter()
 
 * pymysql：纯Py，当用gevent或者PyPy时可以用
 * mysql-connector-python：纯Py，Oracle官方实现，性能貌似比pymysql还要差；https://dev.mysql.com/doc/connector-python/en/connector-python-coding.html https://dev.mysql.com/doc/x-devapi-userguide/en/devapi-connection-concepts.html https://dev.mysql.com/doc/dev/connector-python/8.0/tutorials/connection_pooling.html
-* mysqlclient-python：带有C扩展，性能最好
+* mysqlclient：带有C扩展，性能最好
 
 ### peewee
 
@@ -1055,6 +1054,7 @@ z['huey']; z[:'mickey']; z[-2:]; z[-2:, True] # 分别为取/赋、比mickey小�
 * 编码好像不需要改，从2000开始字符串就是用的Unicode储存
 * 本来Access的like用?表示一个字符，*表示0或多个字符，#表示一个数字；但本模块要用_和%
 * 不支持命名参数查询
+* pypyodbc：纯Py实现，无需安装驱动，连接有函数只用指定文件名很方便；当初兼容pyodbc，但后来长时间不积极维护已经变得不那么兼容了
 
 ```py
 import pyodbc

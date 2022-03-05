@@ -139,7 +139,7 @@ OnPostDeleteAsync: await _context.Customers.FindAsync(id); if ... Remove ...
 * 事务默认隔离级别为可序列化，设置`Cache=Shared`再更改事务隔离级别才允许读取未提交内容
 * 支持cnn.BackupDatabase()，目前只有阻塞的
 * 默认启用了WAL
-* System.Data.SQLite并不是内置库，也不是微软出的
+* System.Data.SQLite并不是内置库，也不是微软出的。如果要用，用.Core的包，与普通版相比没有Linq和EF6
 
 ```c#
 // 排序规则默认支持 RTRIM忽略尾随空格、NOCASE英文字符不区分大小写、BINARY二进制比较 三种。可自定义支持Unicode的排序：

@@ -278,8 +278,8 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 
 ### awk
 
-* awk 'BEGIN {commands} condition /pattern/{commands} END {commands}' file，其中模式支持正则
-* condition支持常见运算符，等于用=，正则匹配用~，正则不匹配用!~。pattern为正则匹配$0
+* awk 'BEGIN {commands} condition /pattern/ {commands} END {commands}' file，其中模式支持正则
+* condition支持变量与常见运算符，等于用=，正则匹配用`~`，正则不匹配用`!~`。pattern为正则匹配过滤$0
 * 变量
   * 使用时必不能放在双引号内否则不会扩展
   * `$0`为当期行，无参时也为它，`$1`为第一项
@@ -308,7 +308,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * 没必要用普通的grep，egrep对正则的支持更标准，引号中的大括号无需再转义，fgrep完全按本身匹配，-P使用Perl的规则
 * 当文件有多个时会在每一行前面打印出匹配到内容的文件名，用-h隐藏；当文件只有一个时，用-H强制显示
 * -l：仅输出匹配到的所在的文件名，与xargs配合时一般加-Z以NUL分隔输出
-* -o：只显示匹配到的内容而非那一整行
+* -o：只显示匹配到的内容而非那一整行；但仅仅是第零组，似乎没有办法输出捕获组
 * -c：统计每个文件内匹配到了多少次
 * -n：顺便输出行号
 * -r：递归搜索，适用于filename是个文件夹
@@ -326,7 +326,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * 默认递归搜索CWD下所有文件，但排除点开头文件和gitignore，-uu不忽略
 * -t指定后缀，-z搜索压缩包
 * -E指定编码，默认搜GBK的会乱码
-* --replace替换内容
+* -r/--replace替换内容，-or '$1'能得到取第一个捕获组的效果
 * -c -i -l -w -v -C：与grep相同
 
 ### sed

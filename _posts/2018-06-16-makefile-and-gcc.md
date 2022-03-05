@@ -158,7 +158,7 @@ prog3 : prog3.o sort.o utils.o
 * https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3
 * https://nuwen.net/mingw.html 目前最新11.2
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
-* https://osdn.net/projects/mingw/releases/ MinGW32，官网都挂了
+* https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了
 
 ## 参考
 
