@@ -12,7 +12,7 @@ title: SQL
 
 * “表达式”：+-*/、括号、常数、列名、标量子查询、聚合函数、CASE；一般可用在SELECT、WHERE、HAVING中
 * WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
-* 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)
+* 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)、RANDOM()
 
 ### CASE
 
@@ -23,7 +23,7 @@ title: SQL
 ```sql
 SELECT co1
 , CASE col1
-    WHEN 'A' THEN 'it's a'
+    WHEN 'A' THEN 'it is a'
     ELSE 'other' -- 不写相当于ELSE NULL
 END AS col2
 FROM ...
@@ -68,7 +68,7 @@ group by A;
 * 经过计算后的内容一般要用AS命名
 * DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；会把NULL算作一个值；PG支持DISTINCT ON(col1)
 * 选取前n条：SQLite和MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
-* SELECT * INTO tb2 FROM ...：目标表不能已存在，会自动创建；最好只在MSSQL中作为不支持CREATE TABLE AS的替代
+* SELECT * INTO tb2：目标表不能已存在，会自动创建；最好只在MSSQL中作为不支持CREATE TABLE AS的替代
 * FROM的可以是子查询且此处**必须**命名，此时可以有多列
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
 
@@ -85,13 +85,13 @@ group by A;
 ### WHERE
 
 * 等于用`=`，标准的不等于为`<>`
-* NOT、AND、OR：与一般的编程语言一样；但SQLite和MySQL还支持`col1 = 1 OR 2`这种类似Py的写法
+* NOT、AND、OR：与一般的编程语言一样；SQLite和MySQL还支持`col1 = 1 OR 2`这种类似Py的写法
 * IS NULL、IS NOT NULL；MySQL和SQLite对于非空和BOOL还支持类似Py的写法
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
 * IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR；`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
-* [NOT] LIKE：默认不区分大小写，PG除外。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`；SQLite支持GLOB且区分大小写
+* [NOT] LIKE：默认不区分大小写，PG除外。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
-* EXISTS、NOT EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意null也算存在
+* [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意null也算存在
 * 拼接的时候常加`WHERE 1=1`，方便之后加AND，但其实用1就好了
 
 ### GROUP BY
@@ -131,10 +131,10 @@ INSERT INTO tb1 (
     col1, col2  -- 可选，但如果省略，则必须每个值都要有，即使允许NULL也不行
 ) VALUES (
     col1_val, col2_val
-), (col1_val2, col2_val2) -- 多行数据
+), (col1_val2, col2_val2) -- 多条数据
 
-INSERT INTO tb1 -- tb1必须已存在，否则就用CREATE TABLE AS
-SELECT * FROM ... -- ORDERBY无意义
+INSERT INTO tb1 -- tb1必须已存在，否则要用CREATE TABLE AS；ORDERBY无意义
+SELECT * FROM
 ```
 
 ### UPDATE
@@ -186,14 +186,18 @@ DELETE
 ### TABLE
 
 * 临时表：MSSQL表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除；MySQL和SQLite CREATE TEMPORARY TABLE AS SELECT，SQLite还可简写为TEMP
-* 自增：MSSQL为identity[(from, step)]，MySQL为AUTO_INCREMENT和表级的AUTO_INCREMENT_OFFSET/INCREMENT；SQLite为AUTOINCREMENT，但其实整数主键插入NULL就会自动自增，相当于取最大值加1，当删除了最后的行再插入就会出现用过的值，前者保证不重用，但一般不需要，甚至其实没必要定义整数主键，会自动用。自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了
 * 唯一约束：MSSQL不允许有多个NULL，但其它数据库允许，只对非NULL的不允许有多个
+* 自增
+  * MSSQL：IDENTITY、IDENTITY(from, step)
+  * MySQL：AUTO_INCREMENT和表级的AUTO_INCREMENT_OFFSET/INCREMENT
+  * SQLite：AUTOINCREMENT。整数主键插入NULL也会自增。两者有一点区别，后者是取最大值+1，如果删除了最后的行再插入就会出现用过的值。其实也可以不定义主键
+  * 自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了，SQlite也改不了
 
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
     col1 type PRIMARY KEY,
     col2 type NOT NULL DEFAULT n, -- 默认值只有插入时才会使用，ALTER TABLE添加有默认值的列会发现全是NULL
-    col3 type FOREIGN KEY REFERENCES tb2(col1), -- tb2.col1必须为主键；MSSQL和Oracle和SQL标准能定义在这里
+    col3 type FOREIGN KEY REFERENCES tb2(col1), -- tb2.col1必须为主键；标准、MSSQL、Oracle能定义在这里
     -- 表约束
     index ndx1(col2 [desc]),
     FOREIGN KEY (col3) REFERENCES tb2(col1) [ON UPDATE/DELETE CASCADE/RESTRICT/SET NULL], -- 被引用行更新/删除时引用行也（/禁止）更新删除
@@ -205,20 +209,20 @@ DROP TABLE [IF EXISTS] tb1; -- 都可用
 
 -- 修改表名（MSSQL除外）
 ALTER TABLE tb1 RENAME TO tb2
--- 添加列，注意不需要加括号；只有MSSQL不支持写成ADD COLUMN；MySQL支持AFTER col1指定在某一列后添加，否则和其余的都在最后添加
+-- 添加列，注意不需要加括号；只有MSSQL不支持写成ADD COLUMN；MySQL支持AFTER col1指定在某一列后添加
 ALTER TABLE tb1 ADD col3 type, 表约束
 -- 重命名列（MSSQL除外）
 ALTER TABLE tb1 RENAME COLUMN col1 TO col2
--- SQLite的ALTER TABLE只支持以上三项
 -- 删除列
 ALTER TABLE tb1 DROP COLUMN col1
+-- SQLite的ALTER TABLE只支持以上几项，且删除列具有一些限制，如被索引了或者引用了就不能删
 
 -- 修改列类型和约束，如果列中已有数据会尝试转换，但各数据库容忍程度不同
 ALTER TABLE tb1 ALTER COLUMN col1 type [NOT NULL] -- MSSQL, Oracle，只有非空约束可以在这里改；PG真的要加TYPE
 ALTER TABLE tb1 MODIFY col1 ... -- MySQL，可改任何约束；还有一种CHANGE语句，也能用来修改列名，但若不修改则要写两遍原列名
 
 -- 添加约束，如果已有数据不符合会失败；修改约束都要先DROP再ADD
-ALTER TABLE tb1 ADD [CONSTRAINT cons1] UNIQUE/PRIMARY KEY/FOREIGN KEY/CHECK(col1) -- 除PG外通用，cons1只是命名
+ALTER TABLE tb1 ADD [CONSTRAINT cons1] UNIQUE/PRIMARY KEY/FOREIGN KEY/CHECK(col1) -- 通用，PG除外，cons1只是命名
 ALTER TABLE tb1 ADD DEFAULT n FOR col1 -- MSSQL，CREATE DEFAULT弃用了
 ALTER TABLE tb1 ALTER COLUMN col1 SET NOT NULL/DEFAULT n -- MySQL, PG
 
@@ -229,7 +233,7 @@ ALTER INDEX ALL ON tb1 REBUILD/REORGANIZE -- MSSQL，前者更彻底但会上锁
 REINDEX tb1 -- SQLite
 -- 删除索引
 DROP INDEX ndx1 ON tb1
--- 唯一筛选索引：一个队只能有一个队长，只当is_team_leader为真时才对team_id有唯一约束
+-- 唯一筛选索引(部分索引)：一个队只能有一个队长，只当is_team_leader为真时才对team_id有唯一约束
 -- 不能对team_id或者is_team_leader进行唯一约束因为有多个普通队员有同样的team_id
 CREATE UNIQUE INDEX team_leader ON person(team_id) WHERE is_team_leader;
 ```
@@ -255,7 +259,7 @@ AS SELECT ...
 * MSSQL：SAVE TRANSACTION
 * COMMIT、ROLLBACK
 * 其实所有的数据库在连上时就自动开启事务了，只是Oracle默认必须手动提交才生效，MSSQL遇到GO生效，有的默认一句就提交一次
-* SQLite: SAVEPOINT、RELEASE
+* SQLite: SAVEPOINT、RELEASE、BEGIN IMMEDIATE/EXCLUSIVE
 
 ### 存储过程
 
@@ -301,7 +305,6 @@ AS SELECT/INSERT ...
 
 * 在删除角色之前必须删除该角色的成员；如果角色有用安全对象，必须首先转移这些安全对象的所有权
 
-
 ```sql
 CREATE ROLE r1 [*AUTHORIZATION*]
 
@@ -318,9 +321,13 @@ no audit all on *TableName*
 grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, user2
 ```
 
-## 其它
+## 在线测试
 
-* 在线测试：https://dbfiddle.uk 有点问题，有时语法不支持也不会报错；https://www.db-fiddle.com js的cdn打开太慢；http://sqlfiddle.com/ 不新；https://sqliteonline.com/ 感觉比较好
+* https://dbfiddle.uk 有点问题，有时语法不支持也不会报错
+* https://www.db-fiddle.com js的cdn打开太慢
+* http://sqlfiddle.com/ 不新
+* https://sqliteonline.com/ 感觉比较好
+* https://demo.questdb.io/ 兼容PG
 
 ## 参考
 
@@ -328,7 +335,9 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 
 ### TODO
 
+* https://www.sqlite.org/lang.html https://www.sqlite.org/lang_aggfunc.html
 * https://www.sqlite.org/windowfunctions.html
 * https://www.sqlite.org/gencol.html
 * 唯一约束是否会自动创建唯一索引？
 * http://www.sqlintern.com/jamie
+* 删除存在外键引用的值或列时怎么办
