@@ -13,10 +13,12 @@ title: SQL Server
 * 启用SQL Server Browser服务和UDP 1434端口，再在防火墙中允许Sqlservr.exe入站，则可用实例名访问且可用动态端口；否则无法用实例名访问命名实例（本地计算机名除外，但包括本地ip），但可用静态端口访问
 * 如果安装时选择了区分大小写的排序规则，则登录名也将区分大小写
 * 实例默认路径：C:\Program Files\Microsoft SQL Server\MSSQL14.MyInstance\
-* 修改SQL的身份验证模式：`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.SQLEXPRESS\MSSQLServer`节点下有个LoginMode的键，把值从1（代表Windows验证模式）修改为2（代表混合验证模式）即可。如果这里没有，到Wow6432Node下面去看看有没有
+* 修改SQL的身份验证模式：`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.SQLEXPRESS\MSSQLServer`节点下有个LoginMode的键，把值从1（代表Windows验证模式）修改为2（代表混合验证模式）即可
 
 命令行工具
 ----------
+
+* DBCC
 
 ### [sqlcmd](https://docs.microsoft.com/zh-cn/sql/tools/sqlcmd-utility)
 
@@ -35,13 +37,6 @@ title: SQL Server
 * [:]EXIT[ (statement) ]：把语句的结果作为sqlcmd的返回值
 * :Connect：连接到另一个实例同时关闭当前连接
 * 环境变量：SQLCMDSERVER、SQLCMDUSER、SQLCMDPASSWORD
-* 其他：https://docs.microsoft.com/zh-cn/sql/tools/sqlcmd-utility
-
-### [mssql-cli](https://github.com/dbcli/mssql-cli)
-
-* pip install mssql-cli
-
-### DBCC
 
 Transact-SQL
 ------------
