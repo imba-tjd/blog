@@ -188,7 +188,7 @@ cnn.GetAll<Student>();
 
 ## 其它项目
 
-* [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重
+* [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重。Wiki有内容
 * SSDT：https://www.youtube.com/watch?v=ijDcHGxyqE4
 * SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但有人说已经比前者更好了
 * Linq to SQL：已经不维护了，且只支持SQL Server
@@ -300,3 +300,4 @@ TODO。用于类与类之间的映射，或者数据库模型与实体之间的�
 
 * https://www.entityframeworktutorial.net/
 * https://www.youtube.com/watch?v=qkJ9keBmQWo
+* https://www.devart.com/dotconnect/ ADO.NET Provider，可以玩玩看

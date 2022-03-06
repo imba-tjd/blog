@@ -982,13 +982,26 @@ Article.objects.all()/get(id=1/name__startswith=xxx/name__contains=xxx)/filter()
 * ponyorm、tortoise-orm
 * tinydb：储存数据到json中，用的并不是sql，看作增强版的dict吧，纯Py
 * mashumaro：基于dataclass的序列化库，不够成熟
-* psycopg2：PG的adapter
 
 ### MySQL
 
 * pymysql：纯Py，当用gevent或者PyPy时可以用
-* mysql-connector-python：纯Py，Oracle官方实现，性能貌似比pymysql还要差；https://dev.mysql.com/doc/connector-python/en/connector-python-coding.html https://dev.mysql.com/doc/x-devapi-userguide/en/devapi-connection-concepts.html https://dev.mysql.com/doc/dev/connector-python/8.0/tutorials/connection_pooling.html
+* mysql-connector-python：Oracle官方实现，之前是纯py，性能貌似比pymysql还要差；现在默认启用C扩展；https://dev.mysql.com/doc/connector-python/en/connector-python-coding.html https://dev.mysql.com/doc/x-devapi-userguide/en/devapi-connection-concepts.html https://dev.mysql.com/doc/dev/connector-python/8.0/tutorials/connection_pooling.html https://dev.mysql.com/doc/dev/connector-python/8.0/
 * mysqlclient：带有C扩展，性能最好
+
+### Psycopg
+
+* pip install psycopg[binary,pool]。binary是必须的，除非系统中装了libpq5
+* 参数化查询：%s，命名参数：%(id)s。一般都用%s就行，强制二进制用%b。两个%%转义出一个。不能用于表名或字段名，因为绑定在服务端处理，表名要用psycopg.sql.SQL(...).format()在客户端处理。还不支持IN %s，可用=ANY(%s)代替
+* 将结果作为字典：连接时或创建游标时指定row_factory=psycopg.rows.dict_row或namedtuple_row。还可以指定class_row(dataclass类)自动创建实例
+* 支持异步和连接池
+* with con是用来关闭连接的，与2和sqlite3不同，后俩是关闭事务，当然前者也会自动完成事务。3可用with conn.transaction()来开启事务块
+
+```py
+import psycopg # 名字就叫这个而非psycopg3
+with psycopg.connect("dbname=xxx user=xxx") as con:
+    for record in con.execute('select * from tb1 where id = %s', (xxx,)): ...
+```
 
 ### peewee
 
@@ -1246,7 +1259,7 @@ if __name__ == "__main__":
 ## pandas
 
 * 大部分运算都是非原地的，且可指定inplace=True
-* axis=0指行，1指列，但是大部分函数有index和column的命名参数，优先用这个
+* axis=0指行，1指列；许多函数有index和column的命名参数，优先用这个，除非想应用于所有
 * Series具有广播特性：赋单个值就全变成该值，赋list/range/Series就依次改变。与比较运算符计算会产生值都为bool的Series，与另一个Series运算就依次处理，不会变成两列的df。但是不支持'xxx' in S1，要自己用map
 * 一种常见的技巧：sum([True, True, False])计算有多少符合条件的
 * 如果是自动生成的行名，第0列不为行名
@@ -1256,7 +1269,7 @@ if __name__ == "__main__":
 
 ```py
 import pandas as pd
-data = pd.read_csv('data.csv', index_col=0 如果csv中已存有行编号或行名)/excel/json/sql/sql_table/sql_query，编码默认u8；保存用to_xxx()，可指定index=False；指定sep=None可自动检测分隔符
+data = pd.read_csv('data.csv', index_col=0 如果csv中已存有行编号或行名)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8；保存用to_xxx()，可指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符
 pd.DataFrame({'A': [1, 2], 'B': [3, 4]}) # 两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
 pd.DataFrame([[1,3], [2,4]], columns=['A', 'B']) # 另一种创建方式，按行输入数据
 pd.Series([1,3], index=['A','B']) # 一行数据
@@ -1291,6 +1304,9 @@ df.filter(regex='^L')
 df.rename(columns={'old': 'new'}, index=...) # 也可df.index = [...]
 df.dropna()删除包含空值的行，设置how='all'只处理全为空的；fillna(x)用x填充空值，drop_duplicates()删除重复值
 df.drop([xxx]) # 删除行；删列还能用del，且是原地的
+df.set_index(['col1','col2'], verify_integrity=True)
+df.stack().rename_axis
+df.index.set_levels(frame.index.levels[-1].astype(int), level=-1)
 
 df.groupby(['A']).B.max() # 按A分组后把对应范围的B聚合，产生以A为index的Series
 # groupby多个列时，会产生MultiIndex，一般用reset_index()去掉命名变成编号

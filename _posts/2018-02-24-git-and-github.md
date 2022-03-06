@@ -115,7 +115,12 @@ title: Git/GitHub笔记
 * git reflog：查看本地所有变动过的记录，包括不在分支上的；注意clone下来的用此命令只能看到一条clone的记录，远端删除后再clone无法用它恢复；
 * git log branch1...branch2：显示branch2比branch1多了哪些提交
 * git whatchanged xxx --since='2 weeks ago'：查看某文件的修改历史
-* [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)：`git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`；加--all修改所有的分支，prune empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败；如果文件路径里有空格，把外层改成双引号，路径用单引号
+* [彻底删除文件](https://www.cnblogs.com/shines77/p/3460274.html)
+  * `git filter-branch -f --index-filter 'git rm -r --cached --ignore-unmatch 文件路径' --prune-empty HEAD`
+  * 加--all修改所有的分支，--prune-empty会去掉删除文件后没有任何更改的提交，不加-f在不加-d时会直接失败，`--tag name filter cat --`会不更改tag的名字，-d指定临时操作目录，ignore-unmatch忽略文件不存在时报错失败
+  * 如果文件路径里有空格，把外层改成双引号，路径用单引号
+  * 专门用于清理大文件的工具：https://rtyley.github.io/bfg-repo-cleaner/
+  * 另一种替代filter-branch的工具：https://github.com/newren/git-filter-repo
 * 彻底重命名且不会丢失历史：`git filter-branch -f --tree-filter 'git mv -k 原文件名 新文件名' --prune-empty HEAD`；-k忽略文件不存在时报错失败；会修改本分支所有提交；https://stackoverflow.com/questions/3142419 给了一个用index-filter的示例；如果要移动到之前不存在的文件夹中，命令要加`mkdir -p xxx;`
 * git clone --depth=1指的不是只clone根文件夹，而是不clone之前的记录，当前提交还是完整的
 * git diff：比较local和staged之间的内容，如果没有任何add，就与git diff HEAD一样了。git diff --cached/--staged比较的是add了的与HEAD之间的差别。默认会把修改了的内容都显示出来，用--stat只显示文件和变化行数，用于获取比status更多的信息
@@ -123,7 +128,6 @@ title: Git/GitHub笔记
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
 * git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录
 * git bundle create repo.bundle HEAD/master可以把当前分支（可同时指定多个分支）整个打包成一个二进制文件，之后路径可以直接当作仓库fetch和clone
-* 现在好像出了个替代filter-branch的工具：https://github.com/newren/git-filter-repo
 
 ## Pull,Push,Fetch
 
@@ -137,7 +141,7 @@ title: Git/GitHub笔记
 ## 其它git命令
 
 * git checkout HEAD~3表示把HEAD往回移动3次提交，^2用于父提交不止一个的时候移动到分支上。可以链式操作，如git checkout HEAD~3^2
-* git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now --aggressive：手动清理它们
+* git reflog expire --expire-unreachable=now --all显示不在分支上的提交（悬挂提交）；git gc --prune=now --aggressive：手动清理它们，默认时间是两周前
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin），-X只清除ignore的
 * git bisect：以二分的方式找需要的记录，示例https://www.worldhello.net/2016/02/29/git-bisect-on-git.html
 * 在文件夹中添加一个.gitkeep可以上传空文件夹；没有内容的提交：--allow-empty，没有信息的提交：--allow-empty-message

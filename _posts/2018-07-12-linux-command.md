@@ -256,6 +256,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 
 * 自动多线程
 * -i下载文件中列出的url
+* Win版：https://github.com/rockdaboot/wget2/issues/234#issuecomment-968329681 https://www.lumito.net/2020/12/05/released-wget2-1-99-2-for-windows/
 
 ### youtube-dl
 
