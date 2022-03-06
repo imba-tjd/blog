@@ -7,10 +7,11 @@ title: SQL
 * 注释，标准只有单行注释`--`，应该也可用于行尾；应该一般都支持`/* */`，MySQL和SQLite支持`#`
 * 命名：一般不加s，列名小写，表名首字母大写，关键字全大写
 * 写完一句后要打分号
+* 标准规定标识符用双引号
 
 ## 运算
 
-* “表达式”：+-*/、括号、常数、列名、标量子查询、聚合函数、CASE；一般可用在SELECT、WHERE、HAVING中
+* “表达式”：+-*/%、括号、常数、列名、标量子查询、聚合函数、CASE；除号在MySQL中结果一定是浮点数，用DIV才是整除；一般可用在SELECT、WHERE、HAVING中
 * WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
 * 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)、RANDOM()
 
@@ -61,16 +62,18 @@ group by A;
 * 顺序：FROM-WHERE-GROUPBY-HAVING-SELECT-DISTINCT-UNION-ORDERBY-LIMIT
 * 聚合函数，会自动忽略为NULL的：AVG、COUNT、MIN、MAX、SUM
 * COUNT(*)：行数，不忽略NULL
-* 通用表语句，相当于在前面给子查询命个名或相当于一次性视图：WITH q1 AS (子查询) [,q2 AS ...] 正常的SELECT/DELETE ...；使用时还需FROM一遍，不能直接放在WHERE等中
+* WITH通用表语句，相当于在前面给子查询命个名或相当于一次性视图
+  * WITH q1 AS (子查询) [,q2 AS ...] 正常的SELECT/DELETE ... FROM q1
+  * WITH RECURSIVE fib(a,b) AS (VALUES(1,1) UNION ALL SELECT b,a+b FROM fib where b < 100) SELECT a FROM fib; 把查询结果再次代入到查询子句中继续查询
 
 ### SELECT
 
 * 经过计算后的内容一般要用AS命名
 * DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；会把NULL算作一个值；PG支持DISTINCT ON(col1)
 * 选取前n条：SQLite和MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
-* SELECT * INTO tb2：目标表不能已存在，会自动创建；最好只在MSSQL中作为不支持CREATE TABLE AS的替代
 * FROM的可以是子查询且此处**必须**命名，此时可以有多列
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
+* SELECT INTO：目标表不能已存在，会自动创建。最好只在MSSQL中作为不支持CREATE TABLE AS的替代；PG支持，SQLite不支持，MySQL仅支持into变量
 
 ### JOIN
 
@@ -149,16 +152,17 @@ WHERE ...
 
 * 会走事务，会执行触发器
 * InnoDB中DELETE只是标记为已删除
-* 清除所有数据而保留表结构用TRUNCATE TABLE，更快，且能重置自增数；SQLite除外
+* 清除所有数据而保留表结构用TRUNCATE TABLE，更快，且能重置自增数；SQLite没有此语句但清除所有数据时会自动优化
+* MySQL：[LOW_PRIORITY] [QUICK] [IGNORE]
 
 ```sql
 DELETE
 FROM tb1
-WHERE ...
+WHERE ORDERBY LIMIT
 
-DELETE tb1
+DELETE tb1 -- 仅MySQL？存在多表时只删除指定表中的数据。好像MSSQL也可以
 FROM tb1, tb2 -- 老版本的JOIN
-WHERE tb1.id=tb2.id AND ...
+WHERE tb1.id=tb2.id
 ```
 
 ### MERGE(MSSQL)
@@ -192,6 +196,7 @@ DELETE
   * MySQL：AUTO_INCREMENT和表级的AUTO_INCREMENT_OFFSET/INCREMENT
   * SQLite：AUTOINCREMENT。整数主键插入NULL也会自增。两者有一点区别，后者是取最大值+1，如果删除了最后的行再插入就会出现用过的值。其实也可以不定义主键
   * 自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了，SQlite也改不了
+  * PG：id serial PRIMARY KEY
 
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
@@ -199,11 +204,11 @@ CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
     col2 type NOT NULL DEFAULT n, -- 默认值只有插入时才会使用，ALTER TABLE添加有默认值的列会发现全是NULL
     col3 type FOREIGN KEY REFERENCES tb2(col1), -- tb2.col1必须为主键；标准、MSSQL、Oracle能定义在这里
     -- 表约束
-    index ndx1(col2 [desc]),
+    index ndx1(col2 [desc]), -- 索引的顺序应和常用的ORDERBY顺序一致
     FOREIGN KEY (col3) REFERENCES tb2(col1) [ON UPDATE/DELETE CASCADE/RESTRICT/SET NULL], -- 被引用行更新/删除时引用行也（/禁止）更新删除
     [CONSTRAINT cons1] CHECK(col1>0 and col2>0), -- 在多个列上定义约束，如果是单列也可以放在列后；用IN运算符可起到ENUM的效果
 )
-CREATE TABLE tb2 -- MSSQL除外；相比于SELECT INTO更明确，会保留非空约束
+CREATE TABLE tb2 -- MSSQL除外；会保留非空约束
 AS SELECT * FROM tb1;
 DROP TABLE [IF EXISTS] tb1; -- 都可用
 
@@ -227,13 +232,13 @@ ALTER TABLE tb1 ADD DEFAULT n FOR col1 -- MSSQL，CREATE DEFAULT弃用了
 ALTER TABLE tb1 ALTER COLUMN col1 SET NOT NULL/DEFAULT n -- MySQL, PG
 
 -- 创建非聚集索引
-CREATE INDEX ndx1 ON tb1(col1, col2) -- 复合索引，使用时也要按顺序等限制，如单独查询col2不生效
+CREATE [UNIQUE] INDEX ndx1 ON tb1(col1, col2) -- 复合索引，在WHERE等中使用时也要按顺序，如单独查询col2不生效
 -- 重建索引
 ALTER INDEX ALL ON tb1 REBUILD/REORGANIZE -- MSSQL，前者更彻底但会上锁，后者资源消耗小
-REINDEX tb1 -- SQLite
+REINDEX [tb1] -- SQLite
 -- 删除索引
 DROP INDEX ndx1 ON tb1
--- 唯一筛选索引(部分索引)：一个队只能有一个队长，只当is_team_leader为真时才对team_id有唯一约束
+-- 唯一筛选索引：一个队只能有一个队长，只当is_team_leader为真时才对team_id有唯一约束
 -- 不能对team_id或者is_team_leader进行唯一约束因为有多个普通队员有同样的team_id
 CREATE UNIQUE INDEX team_leader ON person(team_id) WHERE is_team_leader;
 ```
@@ -321,23 +326,22 @@ no audit all on *TableName*
 grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, user2
 ```
 
-## 在线测试
-
-* https://dbfiddle.uk 有点问题，有时语法不支持也不会报错
-* https://www.db-fiddle.com js的cdn打开太慢
-* http://sqlfiddle.com/ 不新
-* https://sqliteonline.com/ 感觉比较好
-* https://demo.questdb.io/ 兼容PG
-
 ## 参考
 
 * 《SQL基础教程》
 
 ### TODO
 
-* https://www.sqlite.org/lang.html https://www.sqlite.org/lang_aggfunc.html
-* https://www.sqlite.org/windowfunctions.html
-* https://www.sqlite.org/gencol.html
-* 唯一约束是否会自动创建唯一索引？
-* http://www.sqlintern.com/jamie
+* http://www.sqlintern.com/home_page 一些测试题，做234
+* https://www.sqlite.org/lang.html https://www.sqlite.org/foreignkeys.html https://www.sqlite.org/lang_returning.html https://www.sqlite.org/windowfunctions.html https://www.sqlite.org/gencol.html
 * 删除存在外键引用的值或列时怎么办
+* https://www.db-recruiter.com 7天免费的教程
+* MySQL创建表时支持COMMENT语句
+* 是否支持trailing comma
+* MSSQL可以DISABLE索引
+
+* https://docs.microsoft.com/en-us/sql/t-sql/tutorial-writing-transact-sql-statements
+* http://www.c4learn.com/sql/sql-data-definition-language/
+* https://docs.microsoft.com/zh-cn/sql/relational-databases/tutorial-getting-started-with-the-database-engine
+* https://www.1keydata.com/cn/sql/
+* FF的书签

@@ -1,6 +1,3 @@
-
-OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，数据变化慢，使用人数少。SQL Server内存数据库是BWTree。
-
 ## 数据类型
 
 * 整数
@@ -8,14 +5,20 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * 字符串
 * 日期
 * 类型转换：CAST(原数据 AS 新类型)；CONVERT(原数据, 新类型)
-* 标准规定标识符用双引号
+* 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL可以创造临时表再查看表结构
+* NULL：既不是真也不是假，与其它数运算仍为NULL；只有MSSQL认为不唯一（在UNIQUE列中能出现多次）
 
 ### 字符串
 
 * 第一个字符的索引是1
 * 标准规定使用单引号，两个单引号转义出一个
 * 大小写不敏感，PG除外
-* 拼接：SQLite和PG和Oracle用`||`，MSSQL用`+`，MySQL和MSSQL和PG和Oracle用`CONCAT()`；SQLite和MySQL支持GROUP_CONCAT()，等价于普通编程语言的字符串JOIN
+* 拼接
+  * SQLite和PG和Oracle用`||`
+  * MSSQL用`+`
+  * 都支持CONCAT()
+  * SQLite和MySQL支持GROUP_CONCAT()，MSSQL和PG支持STRING_AGG()，对应普通编程语言的字符串JOIN，其中前者第二个参数可省默认为逗号，有的还支持再排序
+  * SQLite和MySQL中'1.1'+'+1'->2.1，和'a1'这种字符串相加更是有奇怪的行为，不研究
 * 长度：MSSQL用LEN()，其它用LENGTH()。受编码影响，多字节字符慎用；MySQL支持CHAR_LENGTH()
 * 替换：REPLACE(X,Y,Z) 把X里的Y替换成Z
 * 子串
@@ -41,7 +44,6 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
   * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00
   * UNIXEPOCH() Unix时间戳，秒数整数。秒数转日期用datetime(1092941466, 'auto')
 
-
 ### SQLite
 
 * INTEGER、REAL、TEXT、BLOB
@@ -52,7 +54,7 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
   * 插入数据时如果值能转换成那种类型就转换，否则不会报错而是就按值的类型存，这导致一列可以有不同类型
   * 能把其它DBMS的类型名识别为自己的类型，这导致可以往VARCHAR(50)里插入1000长度的字符串
   * 3.37(2021.11)：在定义完表的回小括号后加STRICT能禁用Flexible Typing且不允许不加类型，又引入了ANY类型；ANY在非STRICT表中会优先转换成整数，与不加类型行为不同
-* 整数主键是唯一只能存整数的，实际就是ROWID的别名；非整数主键因为历史原因可以为NULL，最好在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节
+* 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名；非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL，现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
 * 定义表的字符串或WHERE和ORDERBY时可指定COLLATE RTRIM/NOCASE
 
 ### MySQL
@@ -66,26 +68,33 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * BIT(n)：值用`b'111'`表示
 * ENUM(x,y,z)
 * SET：与ENUM类似，相当于位域。字符串自动对应数字，使用时可用数字相加，或一个以逗号分隔多个值的字符串
-* mysql5以后，一个char就代表一个字符，无论中英文
+* MySQL5后，一个char就代表一个字符，无论中英文
 * 标识符使用反引号。也可以用双引号，需SET GLOBAL/SESSION sql_mode= 'ANSI'或'ANSI_QUOTES'或在配置中sql-mode="modes"
-* CAST的时候不能只用INT，必须指明SIGNED
+* CAST时不能只用INT，必须指明SIGNED
 
 ## 理论
 
+* OLTP适合行储存，也即普通的RDBMS。OLAP适合列储存、大数据、数据仓库，用于高层分析，数据变化慢，使用人数少
+
 ### 索引
 
-* 聚集和非聚集默认都是B树，相当于本身就排序好了，因此会影响DML性能，能提高SELECT、WHERE、JOIN的性能；只有内存数据库才支持哈希索引
+* 相当于本身就排序好了，因此会影响DML性能，能提高SELECT、WHERE、JOIN的性能
+* MSSQL和MySQL的InnoDB默认用B+树；PG用B树但支持其它几种策略，关键是它的表结构用堆储存区分两者意义不大；SQLite把两者都称为B树，实际可能是聚集索引用B+树，非聚集索引用B树；Oracle用B树；MongoDB现在的WiredTiger存储引擎用B+树
 * 有大量重复值或者太宽不适合建立索引。区分度：COUNT(DISTINCT col1)/COUNT(*)在80%以上就可以
-* 聚集索引：一个表只能有一个，顺序与表的物理顺序相同，不应频繁修改索引列；自增对插入和密集读很友好
-* 非聚集索引(NONCLUSTERED)：顺序与物理储存顺序不同。MSSQL先把其它列设为聚集索引，再设主键，主键就是非聚集索引了
-* 唯一索引：指数据是唯一的（UNIQUE），不是只能创建一个；等值查询性能高
-* 筛选索引(MSSQL, SQLite)：创建非聚集索引时添加WHERE，维护开销更小，或用于大部分为NULL时索引非空的；如果查询中有AND，创建索引时要用OR
+* 聚集索引：一个表只能有一个，顺序与表的物理顺序相同，不额外占用空间，不应频繁修改索引列；自增对插入和密集读很友好，用UUID容易导致页分裂
+* 非聚集索引(NONCLUSTERED)：顺序与物理储存顺序不同
+  * 可以一次性设置多个列，但在一组AND中使用时要按顺序，不能有间隔，可以只用前面的，不等条件必须在最后
+  * 用到的所有列都在索引中叫覆盖索引，不会查表
+  * SQLite和PG支持把表达式作为索引内容，如ON(a+b)，当查询时出现同样的表达式如WHERE a+b=xxx时就会使用
+  * 有的主键允许用非聚集索引，但研究这个没意义
+* 唯一索引(UNIQUE)：指数据是唯一的，不是只能创建一个；等值查询性能高
+* 筛选索引/部分索引(MySQL除外)：创建非聚集索引时添加WHERE，维护开销更小，或用于大部分为NULL时索引非空的；如果查询时WHERE中有AND，创建索引一般要用OR
 * 包含列的索引(MSSQL)：创建非聚集索引时添加INCLUDE(col1)，适合col1只存在于SELECT而不在WHERE中时，这些列不会排序故开销更小
 * 列存储索引(MSSQL)：适用于频繁使用聚合函数，而行储存适用于表查找；多于100万行时才考虑，适合大量插入、少量更新和删除
-* 堆(MSSQL)：没有聚集索引，SELECT的顺序不确定，适合暂存大量无序插入
+* 堆(MSSQL)：没有聚集索引的表，SELECT的顺序不确定，适合暂存大量无序插入
 * 视图索引：也称虚表
 * 全文索引：搜索引擎的关键技术，每个表只能有一个
-* 非聚集索引可以一次性设置多个列，但在一组AND中使用时要按顺序，不能有间隔，可以只用前面的，不等条件必须在最后；用到的所有列都在索引中叫覆盖索引，不会查表，SQLite还支持把表达式作为索引内容
+* 哈希索引：好像只有内存数据库才支持，而且没法进行范围比较
 
 ### 隔离级别
 
@@ -148,12 +157,11 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 
 ## SQL Server LocalDB
 
-* C:\Program Files\Microsoft SQL Server\130\Tools\Binn\SqlLocalDB.exe
-* 连接地址为`(localdb)\MSSQLLocalDB`
-* 有的命令不加实例名时默认为MSSQLLocalDB，但只在该命令中有效
+* C:\Program Files\Microsoft SQL Server\130\Tools\Binn\SqlLocalDB.exe create、delete、start、stop
+* 有的命令不加实例名时默认为MSSQLLocalDB
 * info列出所有的实例，info加实例名显示一些信息
-* create、delete、start、stop
-* 需指定数据库级别的排序规则：`create/alter database <dbname> COLLATE Chinese_PRC_CI_AS`（中国默认），非localdb还可以加`_UTF8`；只修改此级别不会影响已有的列，还需要ALTER TABLE一下
+* 连接地址：`(localdb)\MSSQLLocalDB`
+* 需指定数据库级别的排序规则：`CREATE/ALTER DATABASE db1 COLLATE Chinese_PRC_CI_AS`，非localdb还支持加`_UTF8`；只修改此级别不会影响已有的列，还需要ALTER TABLE一下
 * https://www.hanselman.com/blog/download-sql-server-express
 
 ## MySQL
@@ -165,6 +173,15 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * DESC tb1：显示表结构
 * show database
 * 定义列时可以加没有FOREIGN KEY的REFERENCE，但它什么都不做，直接忽略
+
+### my.cnf
+
+```conf
+启用慢查询日志，如果执行时间大于3秒则记录
+slow_query_log=1
+slow_query_log_file=/var/log/mysql/log-slow-queries.log
+long_query_time=3
+```
 
 ### CLI
 
@@ -184,12 +201,16 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
   * 默认是serializable
   * 只有启用共享缓存且启用PRAGMA read_uncommitted才会读到另一连接的事务中未commit的数据，此时不会获得读锁，被认为是同一连接，不会被block或者block别人
   * 在回滚模式下，读和写不能并发，每次只有一个连接能操作数据库。WAL下读写可以并发，但多个写不能并发
-  * 读写锁是内部维护的，事物一开始是读锁，当开始写了就获得写锁；可用BEGIN IMMEDIATE提前加写锁
-  * 单个连接之内的操作没有隔离，在一个事物中先修改再查询能看到更改，即使没有提交
+  * 读写锁是内部维护的，事务一开始是读锁，当开始写了就获得写锁；可用BEGIN IMMEDIATE提前加写锁
+  * 单个连接之内的操作没有隔离，在一个事务中先修改再查询能看到更改，即使没有提交
   * 游标读取到一半又在同一个连接中更新数据是未定义的
-  * THREADSAFE=1下，是“线程安全”的，但各种非官方文章仍表明不能重用连接；=2时只要没有两个线程同时使用同一个连接就是安全的，但这限制比1的非官方文章还要强，也许曾经的1是现在的2；=0就是完全只能有一个连接了
-* WAL(3.7, 2010)
-  * 表现为snapshot，开始读取事物后另一连接能并发写，只是读到的是旧数据；如果之后本连接又要写，则会报错，解决办法是回滚或一开始BEGIN IMMEDIATE
+* 线程安全
+  * THREADSAFE=1下，官方说是“线程安全”的；=2时官方说只要没有两个线程同时使用同一个连接就是安全的
+  * 但各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态
+  * =0时官方说“一次只能有一个线程”，但官方CLI用了它，所以应该仍可以多个进程使用同一个数据库文件
+  * 一定不能打开连接，fork()，再在子进程中用原来的连接
+* WAL
+  * 表现为snapshot，开始读取事务后另一连接能并发写，只是读到的是旧数据；如果之后本连接又要写，则会报错，解决办法是回滚或一开始BEGIN IMMEDIATE
   * 每个数据库会生成对应多个文件
   * 对应所有连接，不是单个连接级别，且关闭连接重新打开后还是此模式
   * 不支持NFS
@@ -204,7 +225,7 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * .open data.db：关闭当前文件并打开另一个；.save data.db：保存main数据库
 * .dump/d [tb1]：输出创建表的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
-* 用DQL取得schema元数据：SELECT name, sql FROM sqlite_schema WHERE type='table/index';
+* 用DQL取得schema元数据：SELECT name, sql FROM sqlite_schema WHERE type='table/index'; 版本：SELECT sqlite_version();
 
 ### PRAGMA
 
@@ -215,10 +236,11 @@ OLTP适合行储存；OLAP适合列储存（大数据），用于高层分析，
 * secure_delete = FAST/2 默认为true，删除时会写0。TODO：默认好像是false？只是Py编译的默认开了
 * temp_store = MOMORY/2 让临时表放到内存里，默认用tmp下的临时文件
 * foreign_keys = true 开启外键检查，因为历史原因默认未开启
-* database_list 显示附加了的数据库文件；table_info(tb1) 显示表的列信息，每项一行
+* database_list 显示附加了的数据库文件；table_list 显示存在哪些表；table_info(tb1) 显示表的列信息，每项一行
 * integrity_check quick_check 进行错误检查，前者更完整，后者更快
-* auto_vacuum FULL：默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum才行。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
+* auto_vacuum FULL 默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum才行。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
 * compile_options 显示编译选项
+* PRAGMA mmap_size=xxx字节 能提高IO效率，但发生IO错误时无法捕获，Win下无法VACUUM
 * 用DQL取得元数据：SELECT * from pragma_xxx
 
 ### 编译
@@ -244,10 +266,15 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 
 ### 内置函数
 
-* typeof() 返回表达式的类型
 * likely() unlikely() 给优化器提示大概率为真/假
 * quote() 进行某些转义，如字符串两边加引号
 * format() 类似于printf
+
+## PostgreSQL
+
+* 默认端口5433
+* 命令行客户：psql "host=xxx port=xxx dbname=xxx user=xxx"
+* 具有jsonb类型
 
 ## Access
 
@@ -255,40 +282,49 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * ACE驱动下载：https://www.microsoft.com/zh-cn/download/details.aspx?id=54920
 * OLEDB通过COM调用，比ODBC高层，比ADO低层。感觉没有必要使用
 
-## GUI
-
-* HeidiSQL：Delphi，开源，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，对于大量数据很卡
-* https://gethue.com 开源，提交数很多但Star数很少，Web，有官方搭建的
-* https://dbeaver.io：JAVA，开源，跨平台，Star数多
-* phpMyAdmin：开源，Php+Web
-* https://www.devart.com/free-products.html：不用注册，企业版试用过后自动变为Express版
-* https://github.com/beekeeper-studio/beekeeper-studio/
-* https://sqlitestudio.pl/ 仅SQLite，开源，有中文
-* MySQL WorkBench：官方客户端
-* https://www.beekeeperstudio.io/ 开源，Electron
-* https://github.com/webyog/sqlyog-community 仅MySQL，老牌，贡献者极少
-* https://sqlectron.github.io/ 简洁，属于玩具
-* Microsoft Azure Data Studio：感觉不如直接VSC，反正功能都少
-* DataGrip：JB的，收费
-* Navicat：收费
-* SequelPro/Ace：仅Mac
-
-## 示例数据库
-
-* https://github.com/lerocha/chinook-database
-* https://github.com/jpwhite3/northwind-SQLite3
-* https://github.com/microsoft/sql-server-samples/tree/master/samples/databases
-
-## 工具和其它数据库
+## 工具和其它DBMS
 
 * https://github.com/sqlmapproject/sqlmap 注入
 * https://github.com/PostgREST/postgrest 把PG变成RESTAPI
 * https://clickhouse.com/ OLAP数据库
 * https://github.com/questdb/questdb/blob/master/i18n/README.zh-cn.md 国产，基于PG，JAVA，自带WebUI
-* NoSQLBooster：MongoDB的IDE
 * etcd、Consul
 * edgedb：自创DML的关系型数据库，基于pg
 * https://duckdb.org/ OLAP
+
+### GUI
+
+* HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，有少量的维护功能，对于大量数据很卡
+* https://dbeaver.io：JAVA，Star数多
+* https://www.beekeeperstudio.io/ Electron，有便携版，常见的四种都支持
+* phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
+* MySQL WorkBench：官方客户端，大小也不大
+* https://www.devart.com/free-products.html：闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
+* https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
+* https://sqlitestudio.pl/ C+Qt，仅SQLite，有中文但很多条目还是未翻译
+* https://sqlectron.github.io/ 感觉相比beekeeper唯一优势是有32位，大小都差不多
+* https://gethue.com Py+Web，主要支持一些大数据的数据库，虽然提交数很多贡献者也很多，但Star很少，估计就是公司自己在用
+* Microsoft Azure Data Studio：感觉不如直接VSC，反正功能都少
+* DataGrip：JB的，收费
+* Navicat：收费
+* SequelPro/Ace：仅Mac
+
+### 在线测试
+
+* https://dbfiddle.uk SQLite的语句最好分开写，否则可能显示不出结果，以及有错误也不报
+* https://www.db-fiddle.com js的cdn被封IP了
+* http://sqlfiddle.com/ 不新
+* https://sqliteonline.com/ 感觉比较好
+* https://demo.questdb.io/ 仅兼容PG
+* https://livesql.oracle.com 需要登录
+* https://sandboxsql.com 仅SQLite，但自带三个示例数据库
+
+### 示例数据库
+
+* https://github.com/microsoft/sql-server-samples/tree/master/samples/databases 有四个，都是MSSQL的创建脚本
+* https://github.com/lerocha/chinook-database
+* https://github.com/jpwhite3/northwind-SQLite3
+* https://github.com/harryho/db-samples Northwind的其它数据库版本
 
 ## 教程
 
@@ -306,15 +342,16 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * 查询存在哪些数据库、表，改名
 * 各数据库设置隔离级别的方法
 * explain：查看sql语句的执行计划，通过执行计划来分析索引使用情况
+* select locate('You','LoveYou3000Times')将返回5，select find_in_set('Times','Love,You,3000,Times')将返回4
+* RLIKE：MySQL正则匹配
 
 SQLite
 on conflict定义在约束后可指定不满足时的操作，默认ABORT，终止语句，保留同一事务中之前插入的，不是回滚
 https://www.sqlite.org/json1.html
 with no check：http://blog.csdn.net/vezn_king/article/details/53225126
-https://www.sqlite.org/docs.html 看features
 
 
-MySQL和MSSQL：use db1;
+切换数据库：MySQL和MSSQL：use db1;
 
 日期：https://sqlzoo.net/wiki/DATE_and_TIME_Reference https://www.runoob.com/sql/sql-dates.html https://www.w3school.com.cn/sql/sql_dates.asp
 函数：https://sqlzoo.net/wiki/Functions_Reference
@@ -328,12 +365,13 @@ ISNULL NVL https://www.runoob.com/sql/sql-isnull.html
 
 * MySQL游标：https://zhuanlan.zhihu.com/p/41224077
 * MySQL的select加HOLDLOCK可临时使用Serializable；还有select for update
+MySQL：dayofyear() date_add() date_sub(ts, interval 3 hour) timestampdiff(hour,'2021-01-03 23:00:03','2021-01-03') curdate()
+select weekofyear('2022-01-02');返回52，dayofweek('2022-01-02')返回1
 
 ssh tunnel连接
-
-
-https://www.zhihu.com/question/38815156/answer/2316506766 utf8mb4
 
 https://zhuanlan.zhihu.com/p/429637485 mysql和redis数据一致性问题
 
 https://zhuanlan.zhihu.com/p/329865336 mysql 索引
+
+convert()在各个数据库中的行为好像不同，比如mysql要加signed，MSSQL两个参数的位置是反的
