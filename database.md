@@ -1,12 +1,49 @@
+## 运算
+
+* “表达式”，可用在SELECT、WHERE、HAVING、CHECK等中
+  * +-*/%、括号、常数、列名、标量子查询、聚合函数、CASE
+  * 除号在MySQL中结果一定是浮点数，用DIV才是整除
+  * PG支持用^表示乘方
+* WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
+* 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)、RANDOM()
+* NULL既不是真也不是假，与其它数运算仍为NULL。MySQL PG SQlite允许UNIQUE的列中出现多个NULL，MSSQL不允许。在SELECT DISTINCT时所有数据库的NULL都只能有一个
+
+### CASE
+
+* 可用于分类
+* WHEN里的也可以是一般的带比较运算符的条件表达式，此时可不写CASE后的表达式，THEN里的可以是子查询等表达式
+* 非标准的简化：MySQL有IF函数，Oracle有DECODE函数
+
+```sql
+SELECT col0
+, CASE col1
+    WHEN 'A' THEN 'it is a'
+    ELSE 'other' -- 不写相当于ELSE NULL
+END AS col2
+FROM ...
+
+-- 逻辑中的 x->y “蕴含”。注意x为假时结果为真，不只有x和y都为真时才为真，或者说只有x为真y为假时才为假
+CASE x
+WHEN a
+    THEN CASE y
+    WHEN b
+        THEN 1
+        ELSE 0
+    END
+ELSE 1
+END
+```
+
 ## 数据类型
 
 * 整数
 * 小数
 * 字符串
 * 日期
-* 类型转换：CAST(原数据 AS 新类型)；CONVERT(原数据, 新类型)
+* 类型转换
+  * CAST(原数据 AS 新类型) 标准写法，MySQL必须指明SIGNED
+  * CONVERT()：MySQL第一个参数是数据，第二个参数是类型；MSSQL刚好相反；PG SQLite不支持
 * 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL可以创造临时表再查看表结构
-* NULL：既不是真也不是假，与其它数运算仍为NULL；只有MSSQL认为不唯一（在UNIQUE列中能出现多次）
 
 ### 字符串
 
@@ -14,16 +51,16 @@
 * 标准规定使用单引号，两个单引号转义出一个
 * 大小写不敏感，PG除外
 * 拼接
-  * SQLite和PG和Oracle用`||`
+  * SQLite PG和Oracle用`||`
   * MSSQL用`+`
   * 都支持CONCAT()
-  * SQLite和MySQL支持GROUP_CONCAT()，MSSQL和PG支持STRING_AGG()，对应普通编程语言的字符串JOIN，其中前者第二个参数可省默认为逗号，有的还支持再排序
-  * SQLite和MySQL中'1.1'+'+1'->2.1，和'a1'这种字符串相加更是有奇怪的行为，不研究
+  * SQLite MySQL支持GROUP_CONCAT()，MSSQL PG支持STRING_AGG()，对应普通编程语言的字符串JOIN，其中前者第二个参数可省默认为逗号，有的还支持再排序
+  * SQLite MySQL中'1.1'+'+1'->2.1，与'a1'这种字符串相加更是有奇怪的行为，不研究
 * 长度：MSSQL用LEN()，其它用LENGTH()。受编码影响，多字节字符慎用；MySQL支持CHAR_LENGTH()
 * 替换：REPLACE(X,Y,Z) 把X里的Y替换成Z
 * 子串
   * SUBSTRING(origin, start, len)。老版本SQLite只能用SUBSTR
-  * start可以为负，此时SQLite和MySQL能从后开始索引，而PG和MSSQL相当于len=len-start再仍从头开始
+  * start可以为负，此时SQLite MySQL能从后开始索引，而PG MSSQL相当于len=len-start再仍从头开始
   * 标准、PG、MySQL还支持SUBSTRING(str1 FROM x FOR y)的写法
 * 去除开头和结尾的字符列表：TRIM()、LTRIM()、RTRIM()；标准还支持TRIM('a' FROM 'abc')，SQLite除外。TODO：测试单参数和双参数使用，已知SQLite可以Trim('abc', 'a')也可以Trim(' abc ')
 * LOWER()、UPPER()
@@ -33,7 +70,7 @@
 * 预定义变量，无需引号：CURRENT_DATE、CURRENT_TIME、CURRENT_TIMESTAMP
   * CTS并不是秒数，而是类似于DATETIME
   * MSSQL只支持CTS，可CAST成另两种类型
-  * MySQL和PG的CTS等价于NOW()，SQLite的CTS等价于DATETIME()
+  * MySQL PG的CTS等价于NOW()，SQLite的CTS等价于DATETIME()
 * 提取部分：EXTRACT(YEAR FROM ts)，MSSQL为DATEPART(YEAR, ts)，SQLite不支持
 * 格式化
   * MySQL：DATE_FORMAT(ts, 'format')
@@ -69,8 +106,7 @@
 * ENUM(x,y,z)
 * SET：与ENUM类似，相当于位域。字符串自动对应数字，使用时可用数字相加，或一个以逗号分隔多个值的字符串
 * MySQL5后，一个char就代表一个字符，无论中英文
-* 标识符使用反引号。也可以用双引号，需SET GLOBAL/SESSION sql_mode= 'ANSI'或'ANSI_QUOTES'或在配置中sql-mode="modes"
-* CAST时不能只用INT，必须指明SIGNED
+* 标识符使用反引号。若要用双引号，需SET GLOBAL/SESSION sql_mode='ANSI'或'ANSI_QUOTES'或在配置中sql-mode="ANSI"
 
 ## 理论
 
@@ -79,13 +115,13 @@
 ### 索引
 
 * 相当于本身就排序好了，因此会影响DML性能，能提高SELECT、WHERE、JOIN的性能
-* MSSQL和MySQL的InnoDB默认用B+树；PG用B树但支持其它几种策略，关键是它的表结构用堆储存区分两者意义不大；SQLite把两者都称为B树，实际可能是聚集索引用B+树，非聚集索引用B树；Oracle用B树；MongoDB现在的WiredTiger存储引擎用B+树
+* MSSQL MySQL的InnoDB默认用B+树；PG用B树但支持其它几种策略，关键是它的表结构用堆储存区分两者意义不大；SQLite有两种B树，且都不是传统的，聚集索引用的B+的改版B*树，非聚集索引用B树；Oracle用B树；MongoDB现在的WiredTiger存储引擎用B+树
 * 有大量重复值或者太宽不适合建立索引。区分度：COUNT(DISTINCT col1)/COUNT(*)在80%以上就可以
 * 聚集索引：一个表只能有一个，顺序与表的物理顺序相同，不额外占用空间，不应频繁修改索引列；自增对插入和密集读很友好，用UUID容易导致页分裂
 * 非聚集索引(NONCLUSTERED)：顺序与物理储存顺序不同
   * 可以一次性设置多个列，但在一组AND中使用时要按顺序，不能有间隔，可以只用前面的，不等条件必须在最后
   * 用到的所有列都在索引中叫覆盖索引，不会查表
-  * SQLite和PG支持把表达式作为索引内容，如ON(a+b)，当查询时出现同样的表达式如WHERE a+b=xxx时就会使用
+  * SQLite PG支持把表达式作为索引内容，如ON(a+b)，当查询时出现同样的表达式如WHERE a+b=xxx时就会使用
   * 有的主键允许用非聚集索引，但研究这个没意义
 * 唯一索引(UNIQUE)：指数据是唯一的，不是只能创建一个；等值查询性能高
 * 筛选索引/部分索引(MySQL除外)：创建非聚集索引时添加WHERE，维护开销更小，或用于大部分为NULL时索引非空的；如果查询时WHERE中有AND，创建索引一般要用OR
@@ -194,21 +230,26 @@ long_query_time=3
 * ATTACH DATABASE 'url' AS data
 * URI文件名
   * file:data.db?cache=shared&mode=ro/rw/rwc
-  * 文件名用:memory:或未提供文件名时为内存数据库，但默认仍会在tmp中产生临时文件
+  * 文件名用:memory:为内存数据库，默认仍会在tmp中产生处理临时表的文件；文件名用空的则为临时文件数据库
   * 如果也不会被其它进程改变可用immutable=1
   * cache=shared：多个连接都启用此参数能类似于一个连接，内部再序列化
+* 读写锁和事务
+  * 读写锁是内部维护的，事务一开始是读锁，当开始写了就升级为写锁
+  * 读锁能使得同一时间多个连接并发读取，写锁使得不能读取（WAL下除外）且同一时间只有一个能写整个数据库
+  * 加锁失败可选择自动等待超时，CLI下就是立即失败了
+  * 如果提交时因为另一连接在读取而失败，事务并未取消，可以过一会再提交
+  * BEGIN IMMEDIATE能提前加写锁，但仍是在事务执行时才加锁
+  * BEGIN EXCLUSIVE能在创建事务时就加写锁，在WAL下与IMMEDIATE相同
 * 隔离级别
-  * 默认是serializable
+  * 官方说默认是serializable，但我觉得和一般意义上的不同
   * 只有启用共享缓存且启用PRAGMA read_uncommitted才会读到另一连接的事务中未commit的数据，此时不会获得读锁，被认为是同一连接，不会被block或者block别人
-  * 在回滚模式下，读和写不能并发，每次只有一个连接能操作数据库。WAL下读写可以并发，但多个写不能并发
-  * 读写锁是内部维护的，事务一开始是读锁，当开始写了就获得写锁；可用BEGIN IMMEDIATE提前加写锁
-  * 单个连接之内的操作没有隔离，在一个事务中先修改再查询能看到更改，即使没有提交
-  * 游标读取到一半又在同一个连接中更新数据是未定义的
+  * 单个连接之内的操作没有隔离，在一个事务中先修改再查询能看到更改，即使没有提交 TODO: 如果不能复用连接即一个连接只能有一个游标，那这句话就是废话
+  * 游标读取到一半又在同一个连接中更新数据是未定义的 TODO: 即一个连接是不是只能有一个游标
 * 线程安全
   * THREADSAFE=1下，官方说是“线程安全”的；=2时官方说只要没有两个线程同时使用同一个连接就是安全的
-  * 但各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态
+  * 但各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。TODO: 这比=2的官方说法还要严格，2即使一个连接只有一个游标也是可以的，只要不同时使用就行
   * =0时官方说“一次只能有一个线程”，但官方CLI用了它，所以应该仍可以多个进程使用同一个数据库文件
-  * 一定不能打开连接，fork()，再在子进程中用原来的连接
+  * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
 * WAL
   * 表现为snapshot，开始读取事务后另一连接能并发写，只是读到的是旧数据；如果之后本连接又要写，则会报错，解决办法是回滚或一开始BEGIN IMMEDIATE
   * 每个数据库会生成对应多个文件
@@ -219,7 +260,7 @@ long_query_time=3
 ### CLI
 
 * 一定要用sqlite3进入，否则默认是2；命令行的第三个参数也可以是下列这些命令，一般用.dump；这些命令都不需要加分号，尤其是文件名
-* ctrl+u清除当前行的输入；.exit退出程序；.help显示帮助；.version/.v显示版本和编译器版本；.stats显示当前连接消耗的内存
+* Ctrl+U清除当前行的输入，CMD下是ESC；.exit和Ctrl+C退出程序；.help显示帮助；.version/.v显示版本和编译器版本；.stats显示当前连接消耗的内存
 * .mode/m box/column：更适合人类阅读的展现方式，还能显示列名，但数据太多时反而不利于阅读
 * .databases或da/tables或ta/indexes或in：列出所有数据库/表/索引；.schema/sch [tb1]：显示创建指定表的SQL语句；这些都可以跟LIKE语句的模式匹配
 * .open data.db：关闭当前文件并打开另一个；.save data.db：保存main数据库
@@ -291,6 +332,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * etcd、Consul
 * edgedb：自创DML的关系型数据库，基于pg
 * https://duckdb.org/ OLAP
+* https://github.com/directus/directus node，给数据库创建RESTAPI
 
 ### GUI
 
@@ -299,6 +341,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://www.beekeeperstudio.io/ Electron，有便携版，常见的四种都支持
 * phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
 * MySQL WorkBench：官方客户端，大小也不大
+* https://sqlitebrowser.org/ C++，目标是让普通用户也能用，有中文
 * https://www.devart.com/free-products.html：闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
 * https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
 * https://sqlitestudio.pl/ C+Qt，仅SQLite，有中文但很多条目还是未翻译
@@ -311,7 +354,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 
 ### 在线测试
 
-* https://dbfiddle.uk SQLite的语句最好分开写，否则可能显示不出结果，以及有错误也不报
+* https://dbfiddle.uk 可能出错的语句以及查询语句最好分开写，否则可能显示不出，尤其是SQLite
 * https://www.db-fiddle.com js的cdn被封IP了
 * http://sqlfiddle.com/ 不新
 * https://sqliteonline.com/ 感觉比较好
@@ -373,5 +416,3 @@ ssh tunnel连接
 https://zhuanlan.zhihu.com/p/429637485 mysql和redis数据一致性问题
 
 https://zhuanlan.zhihu.com/p/329865336 mysql 索引
-
-convert()在各个数据库中的行为好像不同，比如mysql要加signed，MSSQL两个参数的位置是反的

@@ -4,73 +4,25 @@ title: SQL
 
 ## 杂项语法
 
-* 注释，标准只有单行注释`--`，应该也可用于行尾；应该一般都支持`/* */`，MySQL和SQLite支持`#`
+* 注释：标准只有单行注释`--`，能用于行尾；实际也支持`/* */`，Oracle除外；MySQL支持`#`
 * 命名：一般不加s，列名小写，表名首字母大写，关键字全大写
 * 写完一句后要打分号
 * 标准规定标识符用双引号
-
-## 运算
-
-* “表达式”：+-*/%、括号、常数、列名、标量子查询、聚合函数、CASE；除号在MySQL中结果一定是浮点数，用DIV才是整除；一般可用在SELECT、WHERE、HAVING中
-* WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
-* 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)、RANDOM()
-
-### CASE
-
-* 是一个表达式，可用于分类，也可用于CHECK中
-* when里的也可以是一般的带比较运算符的条件表达式，此时可不写CASE后的表达式，then里的可以是子查询等表达式
-* 非标准的简化：MySQL有IF函数，Oracle有DECODE函数
-
-```sql
-SELECT co1
-, CASE col1
-    WHEN 'A' THEN 'it is a'
-    ELSE 'other' -- 不写相当于ELSE NULL
-END AS col2
-FROM ...
-
--- 逻辑中的 x->y “蕴含”。注意x为假时结果为真，不只有x和y都为真时才为真
-CASE x
-WHEN a
-    THEN CASE y
-    WHEN b
-        THEN 1
-        ELSE 0
-    END
-ELSE 1
-END
-
--- 行列互换，一维转二维：[(A,B(b1),V(v1)),(A,B(b2),V(v2))] -> [A,b1,b2]，其中A为主键，b1为B的值但变为列，V隐含为表里的数据
-select A,
-max(case B when b1 then v1 else null end) as b1, -- 当是b1时把值设为v1，否则设为0，之后取max就只会取到v1
-max(case B when b2 then v2 else null end) as b2
-from tb
-group by A;
-```
-
-### 集合运算
-
-* 只能在最后使用一次ORDERBY
-* 结构必须相同（名字除外）
-* 位于两个SELECT之间
-* UNION [ALL]：直接附加第二个查询的结果；无ALL会自动剔除重复行，性能也更差
-* INTERSECT：交集。MySQL不支持
-* EXCEPT：差集。MySQL不支持，Oracle为MINUS
 
 ## DQL
 
 * 顺序：FROM-WHERE-GROUPBY-HAVING-SELECT-DISTINCT-UNION-ORDERBY-LIMIT
 * 聚合函数，会自动忽略为NULL的：AVG、COUNT、MIN、MAX、SUM
 * COUNT(*)：行数，不忽略NULL
-* WITH通用表语句，相当于在前面给子查询命个名或相当于一次性视图
+* WITH通用表语句，相当于在前面给子查询命个名或相当于一次性视图，使用时仍要FROM它
   * WITH q1 AS (子查询) [,q2 AS ...] 正常的SELECT/DELETE ... FROM q1
   * WITH RECURSIVE fib(a,b) AS (VALUES(1,1) UNION ALL SELECT b,a+b FROM fib where b < 100) SELECT a FROM fib; 把查询结果再次代入到查询子句中继续查询
 
 ### SELECT
 
-* 经过计算后的内容一般要用AS命名
+* 计算后的内容一般要用AS命名
 * DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；会把NULL算作一个值；PG支持DISTINCT ON(col1)
-* 选取前n条：SQLite和MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
+* 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
 * FROM的可以是子查询且此处**必须**命名，此时可以有多列
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
 * SELECT INTO：目标表不能已存在，会自动创建。最好只在MSSQL中作为不支持CREATE TABLE AS的替代；PG支持，SQLite不支持，MySQL仅支持into变量
@@ -79,55 +31,66 @@ group by A;
 
 * 如果存在同名的列，SELECT中要加表名，可用tb1.*表示第一个表的所有列
 * CROSS JOIN：笛卡尔积，参数只需加表名，无需on；MySQL允许有on但直接忽略
-* INNER JOIN tb2 ON tb1.col1 = tb2.col2：等价于老版本标准中的FROM t1, t2 WHERE ...
+* INNER JOIN tb2 ON tb1.col1 = tb2.col2：等价于老版本标准的FROM t1, t2 WHERE ...
 * LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；SQLite只支持left
-* LEFT JOIN WHERE tb2.id IS NULL可查询仅在左边的，即减去共有部分
-* SELF JOIN：选择来自于相同城市的人、时间间隔
+* LEFT JOIN WHERE tb2.id IS NULL可查询仅存在于左边的，即减去共有部分
+* SELF JOIN：如选择来自于相同城市的人、时间间隔
 * 内连接不会把col1.NULL与col2.NULL看作相等，会忽略
 
 ### WHERE
 
 * 等于用`=`，标准的不等于为`<>`
-* NOT、AND、OR：与一般的编程语言一样；SQLite和MySQL还支持`col1 = 1 OR 2`这种类似Py的写法
-* IS NULL、IS NOT NULL；MySQL和SQLite对于非空和BOOL还支持类似Py的写法
+* NOT、AND、OR：与一般的编程语言一样
+* IS NULL、IS NOT NULL
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
 * IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR；`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
 * [NOT] LIKE：默认不区分大小写，PG除外。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
-* [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意null也算存在
-* 拼接的时候常加`WHERE 1=1`，方便之后加AND，但其实用1就好了
+* [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
+* 拼接的时候常加`WHERE 1=1`，方便之后加AND
+* MySQL SQLite对于非空还支持类似Py的写法，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
 
 ### GROUP BY
 
 * SELECT的列必须也在GROUPBY中，或是聚合函数；用了聚合函数即使没有GROUPBY也不能SELECT普通的列；不能SELECT *
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
-* HAVING的只能是常数、分组的列、聚合函数
+* HAVING的只能是常数、分组的列、聚合函数 TODO: 这是什么意思？
 * SQLite能选择不在GROUPBY中的列，结果是聚合函数那一列的每一行值都相同，不再压缩为一行
 
 ### ORDER BY
 
-* 可以有多个，desc只作用于那一个
+* 可以有多个，DESC只作用于那一个
 * 会破坏GROUP BY的聚集性，除非也按分组的顺序来排序
 * 如果没有分过组，可以使用SELECT中未使用的列
 * 可以使用SELECT中的别名
-* null在asc时在开头
+* NULL在ASC时在开头
 
 ### 窗口函数
 
 * <窗口函数> OVER ([PARTITION BY 列] ORDER BY 列)
-* PARTITION也是一种分组，但不会合并为一行，不同组的窗口函数会“初始化”；此处的ORDERBY后跟的是窗口函数计算顺序的基准，不是结果的排序
-* 专用窗口函数，直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同：RANK（1,1,3）、DENSE_RANK(1,1,2)、ROW_NUMBER(1,2,3)
-* 聚合函数：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。可在ORDERBY后用ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
+* PARTITION也是一种分组，但不是合并为一行，而是算作不同的组（窗口），不同组的窗口函数会“初始化”
+* 此处的ORDERBY后跟的是窗口函数计算顺序的基准，不是结果的排序
+* 专用窗口函数，直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同：RANK - 1,1,3、DENSE_RANK - 1,1,2、ROW_NUMBER - 1,2,3
+* 聚合函数：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。可在ORDERBY后可加ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
 * 只能用在SELECT中
+
+### 集合运算
+
+* UNION [ALL]：直接附加第二个查询的结果；无ALL会自动剔除重复行，性能也更差
+* INTERSECT：交集。MySQL不支持
+* EXCEPT：差集。MySQL不支持，Oracle为MINUS
+* 只能在最后使用一次ORDERBY
+* 结构必须相同（名字除外）
+* 位于两个SELECT之间，中间不用加分号
 
 ## DML
 
-* MySQL：不能在子查询中SELECT一个表，再按此条件进行更新和删除同一个表的记录。解决办法是再加一层SELECT
+* MySQL不能在子查询中SELECT一个表，再按此条件进行更新和删除同一个表的记录。解决办法是再加一层SELECT
 
 ### INSERT
 
-* 数据值支持DEFAULT关键字（SQLite除外），若表未指定则为NULL
+* 数据值支持DEFAULT关键字使用表的定义中的默认值，SQLite除外
 
 ```sql
 INSERT INTO tb1 (
@@ -136,8 +99,16 @@ INSERT INTO tb1 (
     col1_val, col2_val
 ), (col1_val2, col2_val2) -- 多条数据
 
-INSERT INTO tb1 -- tb1必须已存在，否则要用CREATE TABLE AS；ORDERBY无意义
-SELECT * FROM
+INSERT INTO tb1 -- tb1必须已存在，否则应用CREATE TABLE AS
+SELECT * FROM ... -- ORDERBY无意义
+
+-- UPSERT（仅SQLite）指定（由于约束）插入失败时的行为
+INSERT ...
+ON CONFLICT [(col1)] [where ...] DO UPDATE -- 也可以DO NOTHING
+SET ...
+
+-- SQLite，UPDATE也支持
+INSERT OR ABORT/FAIL/IGNORE/REPLACE/ROLLBACK -- 默认ABORT
 ```
 
 ### UPDATE
@@ -181,15 +152,11 @@ WHEN NOT MATCHED BY srctb THEN -- 目标表中存在，源表中不存在
 DELETE
 ```
 
-### UPSERT(SQLite)
-
-* https://www.sqlite.org/lang_upsert.html
-
 ## DDL
 
 ### TABLE
 
-* 临时表：MSSQL表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除；MySQL和SQLite CREATE TEMPORARY TABLE AS SELECT，SQLite还可简写为TEMP
+* 临时表：MSSQL表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除；MySQL和SQLite - CREATE TEMPORARY TABLE AS SELECT，SQLite还可简写为TEMP
 * 唯一约束：MSSQL不允许有多个NULL，但其它数据库允许，只对非NULL的不允许有多个
 * 自增
   * MSSQL：IDENTITY、IDENTITY(from, step)
@@ -232,15 +199,15 @@ ALTER TABLE tb1 ADD DEFAULT n FOR col1 -- MSSQL，CREATE DEFAULT弃用了
 ALTER TABLE tb1 ALTER COLUMN col1 SET NOT NULL/DEFAULT n -- MySQL, PG
 
 -- 创建非聚集索引
-CREATE [UNIQUE] INDEX ndx1 ON tb1(col1, col2) -- 复合索引，在WHERE等中使用时也要按顺序，如单独查询col2不生效
+CREATE [UNIQUE] INDEX [IF NOT EXISTS] ndx1 -- MySQL MSSQL除外
+ON tb1(col1, col2) -- 复合索引，在WHERE等中使用时也要按顺序，如单独查询col2不生效
+WHERE ... -- 部分索引，MySQL Oracle。与UNIQUE结合可达到普通唯一约束做不到的指定条件
 -- 重建索引
 ALTER INDEX ALL ON tb1 REBUILD/REORGANIZE -- MSSQL，前者更彻底但会上锁，后者资源消耗小
 REINDEX [tb1] -- SQLite
 -- 删除索引
-DROP INDEX ndx1 ON tb1
--- 唯一筛选索引：一个队只能有一个队长，只当is_team_leader为真时才对team_id有唯一约束
--- 不能对team_id或者is_team_leader进行唯一约束因为有多个普通队员有同样的team_id
-CREATE UNIQUE INDEX team_leader ON person(team_id) WHERE is_team_leader;
+DROP INDEX [IF EXISTS] ndx1 -- MySQL Oracle除外
+ON tb1 -- MSSQL MySQL一定要有，PG SQLite Oracle一定不能有
 ```
 
 ### VIEW
@@ -258,13 +225,15 @@ AS SELECT ...
 
 ### 事务
 
-* MSSQL、SQLite、PG：BEGIN TRANSACTION
-* MySQL：START TRANSACTION
-* Oracle：无需开始事务的命令
-* MSSQL：SAVE TRANSACTION
+* 开启：MSSQL、SQLite、PG - BEGIN TRANSACTION，MySQL - START TRANSACTION，Oracle无需开启，SQLite还支持简单的BEGIN和END(对应COMMIT)
 * COMMIT、ROLLBACK
-* 其实所有的数据库在连上时就自动开启事务了，只是Oracle默认必须手动提交才生效，MSSQL遇到GO生效，有的默认一句就提交一次
-* SQLite: SAVEPOINT、RELEASE、BEGIN IMMEDIATE/EXCLUSIVE
+* 其实所有的数据库在连上时就自动开启事务了，只是Oracle默认必须手动提交才生效，MSSQL遇到GO生效，SQLite默认一句就提交一次，显式开启事务才不会
+* MSSQL：SAVE TRANSACTION
+* SQLite
+  * SAVEPOINT spname 相当于事务中的事务，必须命名
+  * RELEASE spname 类似于COMMIT，使得不能回滚到指定及之后的点，也可看做把内层的保存点合并到外层，真的事务没有提交，后序也可能回滚；但如果最开始就是用SAVEPOINT开启的事务，则最后一层RELEASE会提交
+  * ROLLBACK TO spname 回滚到指定点
+  * BEGIN IMMEDIATE/EXCLUSIVE：进入事务时就加写锁
 
 ### 存储过程
 

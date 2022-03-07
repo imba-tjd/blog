@@ -168,9 +168,6 @@ Transact-SQL
 * 对象的标准写法是databasename.databaseownername.objectname，默认是当前数据库和登陆的用户，而每个数据库都会有一个叫dbo的schema，相当于全局的吧
 * 清除SSMS登陆的用户名和密码：删除%AppData%\Microsoft\SQL Server Management Studio\18.0\SqlStudio.bin
 * 启用账户：alter login sa enable；修改密码：alter login sa with password='sa'，启用后要重启服务？
-* Select @@ServerName：计算机名
-* 控制Windows服务：用net还是sc?
-* print函数
 * [查看或更改服务器属性](https://docs.microsoft.com/zh-cn/sql/database-engine/configure-windows/view-or-change-server-properties-sql-server)
 * 单用户模式连接，则本地所有用户都可作为sysadmin连接
 * 创建表时，在名称前加#可创建会话临时表，结束时自动销毁；加##可创建全局临时表，没有引用时自动销毁
@@ -215,3 +212,4 @@ WHERE session_id = @@SPID;
 * https://www.cnblogs.com/lyhabc/category/505074.html
 
 
+列出所有的用户表：select * from sys.objects where type = 'U'，V是视图，P是存储过程
