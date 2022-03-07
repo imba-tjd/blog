@@ -55,6 +55,7 @@ title: 浏览器
 * browser.proton.enabled; browser.proton.contextmenus.enabled
 * browser.newtabpage.activity-stream.improvesearch.handoffToAwesomebar：false 在新标签页的搜索引擎栏不要直接输到标签栏里
 * security.tls.enable_0rtt_data
+* browser.preferences.moreFromMozilla 设置中对手机端的推广
 
 #### 页面翻译
 

@@ -109,7 +109,6 @@ title: Git/GitHub笔记
 * git log --graph --oneline --decorate --all：通过 ASCII 艺术的树形结构来展示所有的分支
 * git shortlog -sn：显示各个作者的提交次数
 * git archive -o repo.zip/.tar.gz HEAD：打包
-* git diff --check：检查行尾有没有多余的空白；--name-only --diff-filter=U显示冲突文件列表
 * cat .git/HEAD：显示HEAD的指向
 * git tag [tagname] [hash] 新建tag，-n显示tag及commit信息，-d删除；git push --tags：推送所有标签；删除远端标签：git push origin :refs/tags/v0.9
 * git reflog：查看本地所有变动过的记录，包括不在分支上的；注意clone下来的用此命令只能看到一条clone的记录，远端删除后再clone无法用它恢复；
@@ -123,8 +122,14 @@ title: Git/GitHub笔记
   * 另一种替代filter-branch的工具：https://github.com/newren/git-filter-repo
 * 彻底重命名且不会丢失历史：`git filter-branch -f --tree-filter 'git mv -k 原文件名 新文件名' --prune-empty HEAD`；-k忽略文件不存在时报错失败；会修改本分支所有提交；https://stackoverflow.com/questions/3142419 给了一个用index-filter的示例；如果要移动到之前不存在的文件夹中，命令要加`mkdir -p xxx;`
 * git clone --depth=1指的不是只clone根文件夹，而是不clone之前的记录，当前提交还是完整的
-* git diff：比较local和staged之间的内容，如果没有任何add，就与git diff HEAD一样了。git diff --cached/--staged比较的是add了的与HEAD之间的差别。默认会把修改了的内容都显示出来，用--stat只显示文件和变化行数，用于获取比status更多的信息
-* git diff master [patch]：比较当前分支/patch与master/目标分支的差别。可以重定向到.patch中，用git apply恢复
+* git diff
+  * 无参：比较local和staged之间的内容，即工作区内未提交的内容，但不会显示未跟踪的
+  * --cached/--staged：比较add了的与HEAD
+  * master [patch]：比较 当前分支/patch 与 master/目标分支 的差别
+  * 可以重定向到.patch中，用git apply恢复。Win下必须先chcp 65001
+  * 默认会把修改了的内容都显示出来，用--stat只显示文件和变化行数，用于获取比git status更多的信息
+  * --check：检查行尾有没有多余的空白
+  * --name-only --diff-filter=U显示冲突文件列表
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
 * git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录
 * git bundle create repo.bundle HEAD/master可以把当前分支（可同时指定多个分支）整个打包成一个二进制文件，之后路径可以直接当作仓库fetch和clone
