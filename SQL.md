@@ -14,14 +14,11 @@ title: SQL
 * 顺序：FROM-WHERE-GROUPBY-HAVING-SELECT-DISTINCT-UNION-ORDERBY-LIMIT
 * 聚合函数，会自动忽略为NULL的：AVG、COUNT、MIN、MAX、SUM
 * COUNT(*)：行数，不忽略NULL
-* WITH通用表语句，相当于在前面给子查询命个名或相当于一次性视图，使用时仍要FROM它
-  * WITH q1 AS (子查询) [,q2 AS ...] 正常的SELECT/DELETE ... FROM q1
-  * WITH RECURSIVE fib(a,b) AS (VALUES(1,1) UNION ALL SELECT b,a+b FROM fib where b < 100) SELECT a FROM fib; 把查询结果再次代入到查询子句中继续查询
 
 ### SELECT
 
 * 计算后的内容一般要用AS命名
-* DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；会把NULL算作一个值；PG支持DISTINCT ON(col1)
+* DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；NULL只能出现一次；PG支持DISTINCT ON(col1)
 * 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
 * FROM的可以是子查询且此处**必须**命名，此时可以有多列
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
@@ -43,12 +40,13 @@ title: SQL
 * NOT、AND、OR：与一般的编程语言一样
 * IS NULL、IS NOT NULL
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
-* IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR；`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
+* IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR
 * [NOT] LIKE：默认不区分大小写，PG除外。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
 * 拼接的时候常加`WHERE 1=1`，方便之后加AND
 * MySQL SQLite对于非空还支持类似Py的写法，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
+* NULL不是真也不是假，与其它数运算都是NULL，如`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
 
 ### GROUP BY
 
@@ -56,7 +54,7 @@ title: SQL
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
 * HAVING的只能是常数、分组的列、聚合函数 TODO: 这是什么意思？
-* SQLite能选择不在GROUPBY中的列，结果是聚合函数那一列的每一行值都相同，不再压缩为一行
+* SQLite能选择不在GROUPBY中的列，但没啥意义
 
 ### ORDER BY
 
@@ -74,8 +72,9 @@ title: SQL
 * 专用窗口函数，直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同：RANK - 1,1,3、DENSE_RANK - 1,1,2、ROW_NUMBER - 1,2,3
 * 聚合函数：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。可在ORDERBY后可加ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
 * 只能用在SELECT中
+* TODO: https://www.sqlite.org/windowfunctions.html 另外SELECT中有WINDOW wnd AS wnd-def语句，在GROPUBY
 
-### 集合运算
+### compound集合运算
 
 * UNION [ALL]：直接附加第二个查询的结果；无ALL会自动剔除重复行，性能也更差
 * INTERSECT：交集。MySQL不支持
@@ -84,9 +83,19 @@ title: SQL
 * 结构必须相同（名字除外）
 * 位于两个SELECT之间，中间不用加分号
 
+### WITH通用表语句
+
+* 相当于在前面给子查询命个名或相当于一次性视图，使用时仍要FROM它
+* WITH q1 AS (子查询) [,q2 AS ...] 正常的SELECT/DELETE ... FROM q1
+* WITH RECURSIVE fib(a,b) AS (VALUES(1,1) UNION ALL SELECT b,a+b FROM fib where b < 100) SELECT a FROM fib; 把查询结果再次代入到查询子句中继续查询
+
 ## DML
 
 * MySQL不能在子查询中SELECT一个表，再按此条件进行更新和删除同一个表的记录。解决办法是再加一层SELECT
+* SQLite
+  * INSERT/UPDATE OR ABORT/FAIL/IGNORE/REPLACE/ROLLBACK：定义违反约束时的行为，默认ABORT，是曾经ON CONFLICT的简化，另有REPLACE是INSERT OR REPLACE的简化
+  * RETURNING *：在DML语句的结尾加类似于SELECT的语句，能返回本次改变了的行
+  * 能开启选项在UPDATE和DELETE中支持LIMIT和ORDERBY
 
 ### INSERT
 
@@ -102,21 +111,27 @@ INSERT INTO tb1 (
 INSERT INTO tb1 -- tb1必须已存在，否则应用CREATE TABLE AS
 SELECT * FROM ... -- ORDERBY无意义
 
--- UPSERT（仅SQLite）指定（由于约束）插入失败时的行为
+-- UPSERT，SQLite，指定（由于约束）插入失败时的行为
 INSERT ...
 ON CONFLICT [(col1)] [where ...] DO UPDATE -- 也可以DO NOTHING
 SET ...
-
--- SQLite，UPDATE也支持
-INSERT OR ABORT/FAIL/IGNORE/REPLACE/ROLLBACK -- 默认ABORT
 ```
 
 ### UPDATE
 
+* TODO: 测试MSSQL和MySQL对于(c1,c2)=(v1,v2)的支持情况。测试PG的UPDATE FROM
+
 ```sql
 UPDATE tb1
-SET col1 = val1, col2 = val2 -- PG支持(c1,c2)=(v1,v2)
+SET col1 = col1 + 1, -- 此处的col1仅为那个列在当前行的值，不是指一整列
+col2 = val2 -- SQLite PG支持(c1,c2)=(v1,v2)
+[FROM (SELECT ...) AS val2] -- SQLite3.30(2020.8)，还需在WHERE中tb1.id=tb2.id；MSSQL也支持但需要在FROM中再写一次tb1；其实相当于一次JOIN
 WHERE ...
+
+-- MySQL的UPDATE FROM
+UPDATE tb1 JOIN
+(SELECT ...) USING (id)
+SET ...
 ```
 
 ### DELETE
@@ -156,14 +171,18 @@ DELETE
 
 ### TABLE
 
-* 临时表：MSSQL表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除；MySQL和SQLite - CREATE TEMPORARY TABLE AS SELECT，SQLite还可简写为TEMP
-* 唯一约束：MSSQL不允许有多个NULL，但其它数据库允许，只对非NULL的不允许有多个
+* 临时表
+  * MSSQL：表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除
+  * MySQL SQLite PG：CREATE TEMPORARY TABLE；SQLite PG还可简写为TEMP
+  * TODO: 不同连接对临时表的可见性，已知SQLite不同连接是不可见的
 * 自增
   * MSSQL：IDENTITY、IDENTITY(from, step)
   * MySQL：AUTO_INCREMENT和表级的AUTO_INCREMENT_OFFSET/INCREMENT
   * SQLite：AUTOINCREMENT。整数主键插入NULL也会自增。两者有一点区别，后者是取最大值+1，如果删除了最后的行再插入就会出现用过的值。其实也可以不定义主键
   * 自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了，SQlite也改不了
   * PG：id serial PRIMARY KEY
+* 对于UNIQUE的列，其它数据库都允许存在多个NULL，MSSQL不允许
+* 只有MSSQL支持trailing comma
 
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
@@ -204,7 +223,7 @@ ON tb1(col1, col2) -- 复合索引，在WHERE等中使用时也要按顺序，�
 WHERE ... -- 部分索引，MySQL Oracle。与UNIQUE结合可达到普通唯一约束做不到的指定条件
 -- 重建索引
 ALTER INDEX ALL ON tb1 REBUILD/REORGANIZE -- MSSQL，前者更彻底但会上锁，后者资源消耗小
-REINDEX [tb1] -- SQLite
+REINDEX [tb1] -- SQLite，只在collation顺序变化或部分索引含有函数且函数内容变化后使用
 -- 删除索引
 DROP INDEX [IF EXISTS] ndx1 -- MySQL Oracle除外
 ON tb1 -- MSSQL MySQL一定要有，PG SQLite Oracle一定不能有
@@ -219,6 +238,8 @@ ON tb1 -- MSSQL MySQL一定要有，PG SQLite Oracle一定不能有
 ```sql
 CREATE VIEW viewname
 AS SELECT ...
+
+DROP VIEW [IF EXISTS]
 ```
 
 ## TCL
@@ -266,6 +287,8 @@ AS SELECT/INSERT ...
 * DML：Table|View for/instead of {insert, update, delete} as ...
 * DDL：all server|database for {create, alter, drop, ...} as ...
 * https://www.runoob.com/sqlite/sqlite-trigger.html
+* DROP TRIGGER [IF EXISTS] tn；关联的表删除时自动删除；SQLite一定没有on tb
+* 查看update和delete在创建触发器中的Restrictions
 
 ### Rule(MSSQL)
 
@@ -295,6 +318,20 @@ no audit all on *TableName*
 grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, user2
 ```
 
+## JSON
+
+### SQLite
+
+* 从3.38(2022.2)开始内建，提供了JSON类型
+* 参数为*json*的函数，能解析字符串为内部的json对象，一般作为第一个参数；内部对象在最后输出的时候为TEXT；不应用它检验是否合法，应在WHERE中用json_valid()
+* 参数为*value*的函数，若传字符串，即使对应有效的json，也不会解析。如json_object('k','[1,2]')为{"k":"[1,2]"}而非"k":[1,2]，json_array(1,'2')为[1,'2']。出现在“构造函数”和作为“值”语义的参数
+* path：以$开头的字符串，后跟.X或[N]。表达数组长度用#，可+-运算，支持负索引
+* ->和->>运算符：*json*->*path*，前者解析为内部对象，后者取出为SQL类型；另外path对于取单层还支持简写为不加$的'X'和N。如`'[1,2]'->'$'`与json('[1,2]')效果一样，`'[1,2]'->>'1'`是INTEGER的2而非TEXT，->>'$'相当于转换为字符串
+* json_set(json,path,value[,path,value]) json_replace() json_insert()：set就是一般的赋值，不存在时会创建；replace仅覆盖，不存在时不会创建；insert插入到某个位置，原位置的对象后移，不会覆盖；数组插入#位置相当于append
+* json_patch(json,json) json_remove() json_type()：略
+* json_quote()：将可能不合理的字符串转换为json能接受的字符串，因为各种*json*参数包括->会去解析字符串；如果合法或者已是内部对象，就什么也不做
+* json_each() json_tree()：遍历，用在FROM中，返回同函数名的表，key对于数组是索引 value type atom类似于值但对于数组和对象是空 fullkey路径
+
 ## 参考
 
 * 《SQL基础教程》
@@ -302,11 +339,9 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 ### TODO
 
 * http://www.sqlintern.com/home_page 一些测试题，做234
-* https://www.sqlite.org/lang.html https://www.sqlite.org/foreignkeys.html https://www.sqlite.org/lang_returning.html https://www.sqlite.org/windowfunctions.html https://www.sqlite.org/gencol.html
 * 删除存在外键引用的值或列时怎么办
 * https://www.db-recruiter.com 7天免费的教程
 * MySQL创建表时支持COMMENT语句
-* 是否支持trailing comma
 * MSSQL可以DISABLE索引
 
 * https://docs.microsoft.com/en-us/sql/t-sql/tutorial-writing-transact-sql-statements

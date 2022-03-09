@@ -6,7 +6,6 @@
   * PG支持用^表示乘方
 * WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
 * 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)、RANDOM()
-* NULL既不是真也不是假，与其它数运算仍为NULL。MySQL PG SQlite允许UNIQUE的列中出现多个NULL，MSSQL不允许。在SELECT DISTINCT时所有数据库的NULL都只能有一个
 
 ### CASE
 
@@ -227,33 +226,33 @@ long_query_time=3
 ## SQLite
 
 * 没有GRANT和INVOKE、不支持输出参数
+* 一个文件就是一个database，没有create database语句。一个连接可以打开多个文件
 * ATTACH DATABASE 'url' AS data
 * URI文件名
   * file:data.db?cache=shared&mode=ro/rw/rwc
   * 文件名用:memory:为内存数据库，默认仍会在tmp中产生处理临时表的文件；文件名用空的则为临时文件数据库
   * 如果也不会被其它进程改变可用immutable=1
   * cache=shared：多个连接都启用此参数能类似于一个连接，内部再序列化
+  * 打开已存在的数据库时小心别打错字，否则就自动创建了一个新的，或者mode不用rwc就能避免
 * 读写锁和事务
-  * 读写锁是内部维护的，事务一开始是读锁，当开始写了就升级为写锁
+  * 读写锁是内部维护的，事务一开始是读锁，当开始写了就升级为写锁。但可能因为有人一直在读而加锁失败（写锁的请求并不更优先；WAL下除外），此时事务并未取消，可以再次提交
   * 读锁能使得同一时间多个连接并发读取，写锁使得不能读取（WAL下除外）且同一时间只有一个能写整个数据库
-  * 加锁失败可选择自动等待超时，CLI下就是立即失败了
-  * 如果提交时因为另一连接在读取而失败，事务并未取消，可以过一会再提交
+  * 加锁失败可选择自动等待一段时间，CLI能用.timeout设定
   * BEGIN IMMEDIATE能提前加写锁，但仍是在事务执行时才加锁
   * BEGIN EXCLUSIVE能在创建事务时就加写锁，在WAL下与IMMEDIATE相同
 * 隔离级别
-  * 官方说默认是serializable，但我觉得和一般意义上的不同
+  * 非WAL下为serializable，读写到的肯定都是最新的
   * 只有启用共享缓存且启用PRAGMA read_uncommitted才会读到另一连接的事务中未commit的数据，此时不会获得读锁，被认为是同一连接，不会被block或者block别人
-  * 单个连接之内的操作没有隔离，在一个事务中先修改再查询能看到更改，即使没有提交 TODO: 如果不能复用连接即一个连接只能有一个游标，那这句话就是废话
-  * 游标读取到一半又在同一个连接中更新数据是未定义的 TODO: 即一个连接是不是只能有一个游标
-* 线程安全
+  * 一个连接可以有多个游标，它们之间没有隔离也没有锁。一个游标读取到一半又有另一个游标更新数据是未定义的
+* 并发和线程安全
   * THREADSAFE=1下，官方说是“线程安全”的；=2时官方说只要没有两个线程同时使用同一个连接就是安全的
-  * 但各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。TODO: 这比=2的官方说法还要严格，2即使一个连接只有一个游标也是可以的，只要不同时使用就行
-  * =0时官方说“一次只能有一个线程”，但官方CLI用了它，所以应该仍可以多个进程使用同一个数据库文件
+  * 各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。我认为不是这样，只要不写入，=1下单个连接同时使用多个游标是没问题的
+  * =0时官方说“一次只能有一个线程”，但官方CLI就是=0，所以应该仍可以多个进程使用同一个数据库文件
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
 * WAL
-  * 表现为snapshot，开始读取事务后另一连接能并发写，只是读到的是旧数据；如果之后本连接又要写，则会报错，解决办法是回滚或一开始BEGIN IMMEDIATE
-  * 每个数据库会生成对应多个文件
-  * 对应所有连接，不是单个连接级别，且关闭连接重新打开后还是此模式
+  * 隔离性表现为snapshot，开始读取事务后另一连接能并发写，只是读到的是旧数据；如果之后本连接又要写，则会报错，因为数据不是最新的，解决办法是本次回滚或一开始BEGIN IMMEDIATE。释放完本连接所有读锁后再读到的是新数据，或者新连接读到的也是新数据；如果本连接有多指针宏观上一直读没停过，就一直是旧数据
+  * 每个数据库会生成对应多个文件，正常退出后会删除
+  * 对应数据库级别或者所有连接，不是单个连接级别，且是持久的，关闭连接重新打开后还是此模式
   * 不支持NFS
 * rqlite：Go实现的分布式关系数据库，使用SQLite作为储存，三大系统都支持，还提供了多种语言的binding。相比之下dqlite的生态就差得多
 
@@ -262,8 +261,8 @@ long_query_time=3
 * 一定要用sqlite3进入，否则默认是2；命令行的第三个参数也可以是下列这些命令，一般用.dump；这些命令都不需要加分号，尤其是文件名
 * Ctrl+U清除当前行的输入，CMD下是ESC；.exit和Ctrl+C退出程序；.help显示帮助；.version/.v显示版本和编译器版本；.stats显示当前连接消耗的内存
 * .mode/m box/column：更适合人类阅读的展现方式，还能显示列名，但数据太多时反而不利于阅读
-* .databases或da/tables或ta/indexes或in：列出所有数据库/表/索引；.schema/sch [tb1]：显示创建指定表的SQL语句；这些都可以跟LIKE语句的模式匹配
-* .open data.db：关闭当前文件并打开另一个；.save data.db：保存main数据库
+* .databases或da/tables或ta/indexes或in：列出所有数据库/表/索引；.schema/sch [tb1]：显示创建指定表的SQL语句；.dbinfo能看到有多少个表索引视图，其他信息用处不大；这些都可以跟LIKE语句的模式匹配
+* .open data.db：关闭当前文件并打开另一个；.backup/.save data.db：另存main数据库
 * .dump/d [tb1]：输出创建表的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
 * 用DQL取得schema元数据：SELECT name, sql FROM sqlite_schema WHERE type='table/index'; 版本：SELECT sqlite_version();
@@ -272,17 +271,17 @@ long_query_time=3
 
 * 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错
 * optimize 推荐关闭连接时使用，或长时间连接每隔几小时用一次，用于内部优化查询性能
-* journal_mode = WAL 对于非内存数据库使用此项可以提高性能；WAL是持久的
-* synchronous = NORMAL/1 对于WAL模式时是此项更好，默认是FULL/2
-* secure_delete = FAST/2 默认为true，删除时会写0。TODO：默认好像是false？只是Py编译的默认开了
+* journal_mode = DELETE/TRUNCATE/PERSIST/WAL/MEMORY。默认DELETE完成事务后就删除日志，TRUNCATE不删除日志文件只是清空，PERSIST在日志头部写零；这三种性能依次少量提升，非持久，下次连接还要设置，这日志不在临时文件夹而是在数据库同级目录；MEMORY不安全但也算能用，OFF无法ROLLBACK无意义
+* synchronous = 默认是FULL/2，切换成WAL会自动改为NORMAL/1
+* secure_delete = FAST/2 默认为off，开启后删除时会写0
 * temp_store = MOMORY/2 让临时表放到内存里，默认用tmp下的临时文件
 * foreign_keys = true 开启外键检查，因为历史原因默认未开启
-* database_list 显示附加了的数据库文件；table_list 显示存在哪些表；table_info(tb1) 显示表的列信息，每项一行
-* integrity_check quick_check 进行错误检查，前者更完整，后者更快
+* database_list 显示附加了的数据库文件；table_list 显示存在哪些表(3.37,2021.11)；table_info(tb1) 显示表的列信息，每项一行
+* integrity_check quick_check 进行错误和约束检查，前者更完整，后者更快
 * auto_vacuum FULL 默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum才行。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
 * compile_options 显示编译选项
 * PRAGMA mmap_size=xxx字节 能提高IO效率，但发生IO错误时无法捕获，Win下无法VACUUM
-* 用DQL取得元数据：SELECT * from pragma_xxx
+* 用DQL取得元数据：SELECT * FROM pragma_xxx
 
 ### 编译
 
@@ -298,7 +297,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 -DSQLITE_UNTESTABLE \
 -DSQLITE_USE_ALLOCA \
 -DSQLITE_WIN32_MALLOC \
--DSQLITE_DEFAULT_MEMSTATUS=0 \
+-DSQLITE_DEFAULT_MEMSTATUS=0 \  # 会禁用.dbinfo和.stats
 -DSQLITE_DQS=0 \  # 禁用双引号表示字符串
 -DSQLITE_MAX_EXPR_DEPTH=0 \
 -DSQLITE_TEMP_STORE=2 \
@@ -389,10 +388,11 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * RLIKE：MySQL正则匹配
 
 SQLite
-on conflict定义在约束后可指定不满足时的操作，默认ABORT，终止语句，保留同一事务中之前插入的，不是回滚
-https://www.sqlite.org/json1.html
+https://www.sqlite.org/foreignkeys.html https://www.sqlite.org/gencol.html
+https://www.sqlite.org/lang_createtable.html https://www.sqlite.org/lang_createview.html https://www.sqlite.org/lang_createvtab.html https://www.sqlite.org/lang_createtrigger.html
 with no check：http://blog.csdn.net/vezn_king/article/details/53225126
-
+on conflict定义在约束后可指定不满足时的操作，默认ABORT，终止语句，保留同一事务中之前插入的，不是回滚 https://www.sqlite.org/lang_conflict.html
+explain和优化：https://www.sqlite.org/eqp.html https://www.sqlite.org/optoverview.html
 
 切换数据库：MySQL和MSSQL：use db1;
 
