@@ -21,6 +21,7 @@ title: SQL
 * DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；NULL只能出现一次；PG支持DISTINCT ON(col1)
 * 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
 * FROM的可以是子查询且此处**必须**命名，此时可以有多列
+  * PG MSSQL表达式临时表：FROM (VALUES (1,'a'),(2,'b')) AS tmp (a,b)
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
 * SELECT INTO：目标表不能已存在，会自动创建。最好只在MSSQL中作为不支持CREATE TABLE AS的替代；PG支持，SQLite不支持，MySQL仅支持into变量
 
@@ -38,15 +39,14 @@ title: SQL
 
 * 等于用`=`，标准的不等于为`<>`
 * NOT、AND、OR：与一般的编程语言一样
-* IS NULL、IS NOT NULL
+* IS NULL、IS NOT NULL：只有这个能判断。col = NULL和col != NULL或任何其它运算，结果都为NULL，用在WHERE中就恒假
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
-* IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR
+* IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
 * [NOT] LIKE：默认不区分大小写，PG除外。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
 * 拼接的时候常加`WHERE 1=1`，方便之后加AND
 * MySQL SQLite对于非空还支持类似Py的写法，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
-* NULL不是真也不是假，与其它数运算都是NULL，如`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
 
 ### GROUP BY
 
@@ -55,6 +55,7 @@ title: SQL
 * 会把NULL算作一组
 * HAVING的只能是常数、分组的列、聚合函数 TODO: 这是什么意思？
 * SQLite能选择不在GROUPBY中的列，但没啥意义
+* SQLite：BY的可以是表达式 TODO: 测试
 
 ### ORDER BY
 
@@ -62,7 +63,7 @@ title: SQL
 * 会破坏GROUP BY的聚集性，除非也按分组的顺序来排序
 * 如果没有分过组，可以使用SELECT中未使用的列
 * 可以使用SELECT中的别名
-* NULL在ASC时在开头
+* NULL在ASC时的位置：MySQL MSSQL在开头，PG SQLite在末尾
 
 ### 窗口函数
 
@@ -72,7 +73,8 @@ title: SQL
 * 专用窗口函数，直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同：RANK - 1,1,3、DENSE_RANK - 1,1,2、ROW_NUMBER - 1,2,3
 * 聚合函数：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。可在ORDERBY后可加ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
 * 只能用在SELECT中
-* TODO: https://www.sqlite.org/windowfunctions.html 另外SELECT中有WINDOW wnd AS wnd-def语句，在GROPUBY
+* TODO: https://www.sqlite.org/windowfunctions.html 另外SELECT中有WINDOW wnd AS wnd-def语句，在GROPUBY后
+* https://zhuanlan.zhihu.com/p/60226935
 
 ### compound集合运算
 
@@ -99,11 +101,11 @@ title: SQL
 
 ### INSERT
 
-* 数据值支持DEFAULT关键字使用表的定义中的默认值，SQLite除外
+* 默认值：插入NULL不会使用，支持DEFAULT关键字来使用，SQLite除外
 
 ```sql
 INSERT INTO tb1 (
-    col1, col2  -- 可选，但如果省略，则必须每个值都要有，即使允许NULL也不行
+    col1, col2  -- 可选，但如果省略，则必须每个值都要有
 ) VALUES (
     col1_val, col2_val
 ), (col1_val2, col2_val2) -- 多条数据
@@ -119,13 +121,11 @@ SET ...
 
 ### UPDATE
 
-* TODO: 测试MSSQL和MySQL对于(c1,c2)=(v1,v2)的支持情况。测试PG的UPDATE FROM
-
 ```sql
 UPDATE tb1
 SET col1 = col1 + 1, -- 此处的col1仅为那个列在当前行的值，不是指一整列
-col2 = val2 -- SQLite PG支持(c1,c2)=(v1,v2)
-[FROM (SELECT ...) AS val2] -- SQLite3.30(2020.8)，还需在WHERE中tb1.id=tb2.id；MSSQL也支持但需要在FROM中再写一次tb1；其实相当于一次JOIN
+col2 = val2 -- 仅SQLite PG支持(c1,c2)=(v1,v2)
+[FROM (SELECT ...) AS val2] -- PG SQLite3.30(2020.8)，还需在WHERE中tb1.id=tb2.id；MSSQL也支持但需要在FROM中再写一次tb1；其实相当于一次JOIN
 WHERE ...
 
 -- MySQL的UPDATE FROM
@@ -171,6 +171,7 @@ DELETE
 
 ### TABLE
 
+* 只有MSSQL支持trailing comma
 * 临时表
   * MSSQL：表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除
   * MySQL SQLite PG：CREATE TEMPORARY TABLE；SQLite PG还可简写为TEMP
@@ -181,17 +182,27 @@ DELETE
   * SQLite：AUTOINCREMENT。整数主键插入NULL也会自增。两者有一点区别，后者是取最大值+1，如果删除了最后的行再插入就会出现用过的值。其实也可以不定义主键
   * 自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了，SQlite也改不了
   * PG：id serial PRIMARY KEY
-* 对于UNIQUE的列，其它数据库都允许存在多个NULL，MSSQL不允许
-* 只有MSSQL支持trailing comma
+* UNIQUE的列，其它数据库都允许存在多个NULL，MSSQL不允许
+* 默认值：ALTER TABLE新添加有默认值的列，已存在的行的那一列，MySQL PG SQLite为那个默认值，MSSQL为NULL，再加NOT NULL则为默认值
+* 外键
+  * 假设B(b)引用A(a)，A称为ParentTable，a称为ParentKey，B称为Child，A是外键refer to的，B是外键apply to的
+  * a必须为主键或UNIQUE，Oracle下必须是唯一约束不能是唯一索引
+  * b的值必须存在于a中否则插入失败，但b也可以为NULL
+  * a无法修改或删除对应存在于b中的值，但若不存在，则可以删除；推荐给b加索引，因为内部实际上做了SELECT
+  * MySQL SQlite支持ON UPDATE/DELETE CASCADE/SET NULL/SET DEFAULT使得a更新/删除时对应更新/删除b或设为NULL或默认值（仍需满足） TODO: 测试PG和MSSQL
+  * SQLite
+    * 定义时加上DEFERRABLE INITIALLY DEFERRED或用PRAGMA defer_foreign_keys=on能使得检查推迟到提交时
+    * 定义表时允许引用A中不存在的列甚至不存在的表，就好像未开启外键约束一样
+    * 支持FOREIGN KEY (a,b) REFERENCES (c,d)
 
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
     col1 type PRIMARY KEY,
-    col2 type NOT NULL DEFAULT n, -- 默认值只有插入时才会使用，ALTER TABLE添加有默认值的列会发现全是NULL
-    col3 type FOREIGN KEY REFERENCES tb2(col1), -- tb2.col1必须为主键；标准、MSSQL、Oracle能定义在这里
+    col2 type NOT NULL DEFAULT n UNIQUE,
+    col3 type REFERENCES tb2(col1), -- MySQL能写在此处却无效
     -- 表约束
-    index ndx1(col2 [desc]), -- 索引的顺序应和常用的ORDERBY顺序一致
-    FOREIGN KEY (col3) REFERENCES tb2(col1) [ON UPDATE/DELETE CASCADE/RESTRICT/SET NULL], -- 被引用行更新/删除时引用行也（/禁止）更新删除
+    INDEX/UNIQUE ndx1(col2 [desc], col3), -- 索引的顺序应和常用的ORDERBY顺序一致
+    FOREIGN KEY (col3) REFERENCES tb2(col1),
     [CONSTRAINT cons1] CHECK(col1>0 and col2>0), -- 在多个列上定义约束，如果是单列也可以放在列后；用IN运算符可起到ENUM的效果
 )
 CREATE TABLE tb2 -- MSSQL除外；会保留非空约束
@@ -206,7 +217,7 @@ ALTER TABLE tb1 ADD col3 type, 表约束
 ALTER TABLE tb1 RENAME COLUMN col1 TO col2
 -- 删除列
 ALTER TABLE tb1 DROP COLUMN col1
--- SQLite的ALTER TABLE只支持以上几项，且删除列具有一些限制，如被索引了或者引用了就不能删
+-- SQLite的ALTER TABLE只支持以上几项，且删除列具有一些限制，如存在索引或被约束和视图引用了就不能删
 
 -- 修改列类型和约束，如果列中已有数据会尝试转换，但各数据库容忍程度不同
 ALTER TABLE tb1 ALTER COLUMN col1 type [NOT NULL] -- MSSQL, Oracle，只有非空约束可以在这里改；PG真的要加TYPE
@@ -227,20 +238,31 @@ REINDEX [tb1] -- SQLite，只在collation顺序变化或部分索引含有函数
 -- 删除索引
 DROP INDEX [IF EXISTS] ndx1 -- MySQL Oracle除外
 ON tb1 -- MSSQL MySQL一定要有，PG SQLite Oracle一定不能有
+
+-- 生成列(SQLite 3.31,2020.1)，只读，值来自于表达式和标量函数。能有除默认值以外的约束，不能是主键，只能使用本行的列，可以使用另一个生成列但不能循环或自我引用，不能直接使用ROWID
+d INT AS (a*abs(b)) -- 每读此行就计算一次
+e TEXT AS (substr(c,b,b+1)) STORED -- 插入此行时计算唯一一次，无法用ALTER TABLE添加
 ```
 
 ### VIEW
 
-* 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句，不能使用ORDERBY，每次使用都会重新查询？
-* 只能进行有限程度的更新，会转换成对基本表的更新。有GROUPBY或有DISTINCT时无法更新，只FROM了一张表可以更新
-* SQLite：支持temp view，不能修改
+* 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句
+* MSSQL：不支持ORDERBY，不支持SELECT中用表达式。只能进行有限程度的更新，会转换成对基本表的更新。有GROUPBY或有DISTINCT时无法更新，只FROM了一张表可以更新
+* SQLite：支持TEMP；不支持直接修改但能通过定义INSTEAD OF触发器修改
+* MySQL：不支持TEMP VIEW
+* TODO: 每次使用都会重新查询？索引？
 
 ```sql
-CREATE VIEW viewname
+CREATE VIEW [IF NOT EXISTS] viewname
+[(col1, col2)] -- 如果不定义列名，SELECT的就必须全都用AS，否则万一修改了难以保证一致性。TODO: 已知SQLite支持，测试其他是否支持
 AS SELECT ...
 
 DROP VIEW [IF EXISTS]
 ```
+
+### DATABASE
+
+TODO: https://docs.microsoft.com/zh-cn/sql/relational-databases/databases/create-a-database
 
 ## TCL
 
@@ -258,7 +280,7 @@ DROP VIEW [IF EXISTS]
 
 ### 存储过程
 
-* 与DBMS密切相关，移植性差
+* 与DBMS密切相关，移植性差，SQLite不支持
 * 不适合需求经常变的，因为表会变，就要改所有对应的存储过程
 * 难横向扩展，只能纵向扩展
 * 没有日志
@@ -282,6 +304,12 @@ AS SELECT/INSERT ...
 * 下列语句不能创建触发器：create/alter/drop/load/restore database、disk init/resize、load/restore log、reconfigure
 * 每个触发器有两个特殊的表：inserted和deleted，数据插入和删除的时候会复制一份到表中，update触发器同时使用者两个
 * 比如保证学生往选课表里添加记录时，学号必须存在于学生基本信息表里
+
+```
+CREATE TRIGGER tg AFTER DELETE ON tb1 BEGIN
+<DML> UPDATE child SET trackartist = 0 WHERE trackartist = old.artistid;
+END;
+```
 
 * create/alter/drop/enable/disable trigger TriggerName on
 * DML：Table|View for/instead of {insert, update, delete} as ...
@@ -332,20 +360,10 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 * json_quote()：将可能不合理的字符串转换为json能接受的字符串，因为各种*json*参数包括->会去解析字符串；如果合法或者已是内部对象，就什么也不做
 * json_each() json_tree()：遍历，用在FROM中，返回同函数名的表，key对于数组是索引 value type atom类似于值但对于数组和对象是空 fullkey路径
 
-## 参考
+## TODO
 
-* 《SQL基础教程》
+http://www.sqlintern.com/home_page 一些测试题，做234
 
-### TODO
-
-* http://www.sqlintern.com/home_page 一些测试题，做234
-* 删除存在外键引用的值或列时怎么办
-* https://www.db-recruiter.com 7天免费的教程
-* MySQL创建表时支持COMMENT语句
-* MSSQL可以DISABLE索引
-
-* https://docs.microsoft.com/en-us/sql/t-sql/tutorial-writing-transact-sql-statements
-* http://www.c4learn.com/sql/sql-data-definition-language/
-* https://docs.microsoft.com/zh-cn/sql/relational-databases/tutorial-getting-started-with-the-database-engine
-* https://www.1keydata.com/cn/sql/
-* FF的书签
+https://www.sqlite.org/lang_createtable.html https://www.sqlite.org/lang_createtrigger.html
+on conflict定义在约束后可指定不满足时的操作，默认ABORT，终止语句，保留同一事务中之前插入的，不是回滚 https://www.sqlite.org/lang_conflict.html
+explain和优化：https://www.sqlite.org/eqp.html https://www.sqlite.org/optoverview.html

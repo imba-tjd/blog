@@ -2,7 +2,6 @@ SQL
 https://www.liaoxuefeng.com/wiki/1177760294764384/1179611020917408
 https://www.runoob.com/mysql
 https://www.w3school.com.cn/sql/sql_top.asp
-http://hedengcheng.com/?p=771
 https://docs.nextcloud.com/server/16/admin_manual/configuration_database/mysql_4byte_support.html
 https://docs.microsoft.com/zh-cn/sql/relational-databases/collations/write-international-transact-sql-statements
 

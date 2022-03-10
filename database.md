@@ -5,7 +5,7 @@
   * 除号在MySQL中结果一定是浮点数，用DIV才是整除
   * PG支持用^表示乘方
 * WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
-* 通用函数：ABS、ROUND、COALESCE(返回第一个不为NULL的参数)、RANDOM()
+* 通用函数：ABS()、ROUND()、COALESCE(返回第一个不为NULL的参数)、RANDOM()
 
 ### CASE
 
@@ -61,8 +61,10 @@ END
   * SUBSTRING(origin, start, len)。老版本SQLite只能用SUBSTR
   * start可以为负，此时SQLite MySQL能从后开始索引，而PG MSSQL相当于len=len-start再仍从头开始
   * 标准、PG、MySQL还支持SUBSTRING(str1 FROM x FOR y)的写法
-* 去除开头和结尾的字符列表：TRIM()、LTRIM()、RTRIM()；标准还支持TRIM('a' FROM 'abc')，SQLite除外。TODO：测试单参数和双参数使用，已知SQLite可以Trim('abc', 'a')也可以Trim(' abc ')
+* TRIM()、LTRIM()、RTRIM()，SQLite PG支持第二个参数指定字符列表；标准支持TRIM([LEADING/TRAILING] 'a' FROM 'abc')，SQLite除外，MySQL不看做字符列表而是字符串
 * LOWER()、UPPER()
+* COLLATE
+  * SQLite：BINARY默认 NOCASE RTRIM去除尾随空格。可用在定义TABLE时，或SELECT中WHERE ORDERBY列名后
 
 ### 日期和时间
 
@@ -269,9 +271,9 @@ long_query_time=3
 
 ### PRAGMA
 
-* 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错
+* 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错；几乎所有设置都限于连接非持久，下次连接还要设置
 * optimize 推荐关闭连接时使用，或长时间连接每隔几小时用一次，用于内部优化查询性能
-* journal_mode = DELETE/TRUNCATE/PERSIST/WAL/MEMORY。默认DELETE完成事务后就删除日志，TRUNCATE不删除日志文件只是清空，PERSIST在日志头部写零；这三种性能依次少量提升，非持久，下次连接还要设置，这日志不在临时文件夹而是在数据库同级目录；MEMORY不安全但也算能用，OFF无法ROLLBACK无意义
+* journal_mode = DELETE/TRUNCATE/PERSIST/WAL/MEMORY。默认DELETE完成事务后就删除日志，TRUNCATE不删除日志文件只是清空，PERSIST在日志头部写零；这三种性能依次少量提升，这日志不在临时文件夹而是在数据库同级目录；MEMORY不安全但也算能用，OFF无法ROLLBACK无意义
 * synchronous = 默认是FULL/2，切换成WAL会自动改为NORMAL/1
 * secure_delete = FAST/2 默认为off，开启后删除时会写0
 * temp_store = MOMORY/2 让临时表放到内存里，默认用tmp下的临时文件
@@ -332,6 +334,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * edgedb：自创DML的关系型数据库，基于pg
 * https://duckdb.org/ OLAP
 * https://github.com/directus/directus node，给数据库创建RESTAPI
+* https://github.com/milvus-io/milvus/ 国产向量搜索引擎
 
 ### GUI
 
@@ -375,26 +378,25 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://www.guru99.com/sqlite-tutorial.html
 * https://dba.stackexchange.com
 * https://roadmap.sh/postgresql-dba
+* https://www.db-recruiter.com 7天免费
 
 ---
 
 ## TODO
 
 * 创建登录用户
-* 查询存在哪些数据库、表，改名
+* 查询存在哪些数据库、表，数据库改名
 * 各数据库设置隔离级别的方法
-* explain：查看sql语句的执行计划，通过执行计划来分析索引使用情况
-* select locate('You','LoveYou3000Times')将返回5，select find_in_set('Times','Love,You,3000,Times')将返回4
-* RLIKE：MySQL正则匹配
+* 删除存在外键引用的值或列时怎么办
+* https://docs.microsoft.com/zh-cn/sql/relational-databases/tutorial-getting-started-with-the-database-engine https://docs.microsoft.com/zh-cn/sql/t-sql/tutorial-writing-transact-sql-statements
+* https://www.1keydata.com/cn/sql/
 
-SQLite
-https://www.sqlite.org/foreignkeys.html https://www.sqlite.org/gencol.html
-https://www.sqlite.org/lang_createtable.html https://www.sqlite.org/lang_createview.html https://www.sqlite.org/lang_createvtab.html https://www.sqlite.org/lang_createtrigger.html
-with no check：http://blog.csdn.net/vezn_king/article/details/53225126
-on conflict定义在约束后可指定不满足时的操作，默认ABORT，终止语句，保留同一事务中之前插入的，不是回滚 https://www.sqlite.org/lang_conflict.html
-explain和优化：https://www.sqlite.org/eqp.html https://www.sqlite.org/optoverview.html
+### 未整理
 
+```
 切换数据库：MySQL和MSSQL：use db1;
+
+with no check：http://blog.csdn.net/vezn_king/article/details/53225126
 
 日期：https://sqlzoo.net/wiki/DATE_and_TIME_Reference https://www.runoob.com/sql/sql-dates.html https://www.w3school.com.cn/sql/sql_dates.asp
 函数：https://sqlzoo.net/wiki/Functions_Reference
@@ -406,13 +408,23 @@ ISNULL NVL https://www.runoob.com/sql/sql-isnull.html
 
 查看隔离级别：DBCC USEROPTIONS；修改隔离级别：SET TRANSACTION ISOLATION LEVEL ...，每个数据库都要分别设置
 
-* MySQL游标：https://zhuanlan.zhihu.com/p/41224077
-* MySQL的select加HOLDLOCK可临时使用Serializable；还有select for update
+MySQL游标：https://zhuanlan.zhihu.com/p/41224077
+MySQL的select加HOLDLOCK可临时使用Serializable；还有select for update
 MySQL：dayofyear() date_add() date_sub(ts, interval 3 hour) timestampdiff(hour,'2021-01-03 23:00:03','2021-01-03') curdate()
 select weekofyear('2022-01-02');返回52，dayofweek('2022-01-02')返回1
 
 ssh tunnel连接
 
 https://zhuanlan.zhihu.com/p/429637485 mysql和redis数据一致性问题
-
 https://zhuanlan.zhihu.com/p/329865336 mysql 索引
+
+select locate('You','LoveYou3000Times')将返回5，select find_in_set('Times','Love,You,3000,Times')将返回4
+RLIKE：MySQL正则匹配
+
+MySQL创建表时支持COMMENT语句
+MSSQL可以DISABLE索引
+
+MySQL：insert ignore，replace into，insert on duplicate key update
+
+https://zhuanlan.zhihu.com/p/71232689 1000行MySQL学习笔记
+```
