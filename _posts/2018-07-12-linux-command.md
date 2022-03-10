@@ -104,8 +104,8 @@ title: Linux命令
 * upx --lzma
 * zless：查看压缩文件内容
 * lzip：处理 .lz，仅使用LZMA非2
-* lz4：压缩率比zip低但压缩速度非常快
-* zstd：速度不如lz4但也不错，--ultra -22
+* lz4：压缩率比zip低，默认级别为-1，解压速度非常快，用--best会大幅减慢压缩速度且压缩率一般但解压速度不变
+* zstd：速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0
 * brotli：默认已使用最高压缩级别，根据测试，平均不如zstd，仅在单线程下br好一点
 
 #### tar
