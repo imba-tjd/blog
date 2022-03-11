@@ -17,10 +17,10 @@ title: SQL
 
 ### SELECT
 
-* 计算后的内容一般要用AS命名
+* 计算后的内容一般要用AS命名，此关键字可省但一般不省；FROM的也可用AS命名，一般省
 * DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；NULL只能出现一次；PG支持DISTINCT ON(col1)
 * 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
-* FROM的可以是子查询且此处**必须**命名，此时可以有多列
+* FROM的可以是子查询且此处必须命名，此时可以有多列
   * PG MSSQL表达式临时表：FROM (VALUES (1,'a'),(2,'b')) AS tmp (a,b)
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
 * SELECT INTO：目标表不能已存在，会自动创建。最好只在MSSQL中作为不支持CREATE TABLE AS的替代；PG支持，SQLite不支持，MySQL仅支持into变量
@@ -30,7 +30,7 @@ title: SQL
 * 如果存在同名的列，SELECT中要加表名，可用tb1.*表示第一个表的所有列
 * CROSS JOIN：笛卡尔积，参数只需加表名，无需on；MySQL允许有on但直接忽略
 * INNER JOIN tb2 ON tb1.col1 = tb2.col2：等价于老版本标准的FROM t1, t2 WHERE ...
-* LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；SQLite只支持left
+* LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；SQLite只支持LEFT；LEFT时一般把小表放到左边
 * LEFT JOIN WHERE tb2.id IS NULL可查询仅存在于左边的，即减去共有部分
 * SELF JOIN：如选择来自于相同城市的人、时间间隔
 * 内连接不会把col1.NULL与col2.NULL看作相等，会忽略
@@ -47,13 +47,14 @@ title: SQL
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
 * 拼接的时候常加`WHERE 1=1`，方便之后加AND
 * MySQL SQLite对于非空还支持类似Py的写法，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
+* 大于等于 比 大于 更优化
 
 ### GROUP BY
 
 * SELECT的列必须也在GROUPBY中，或是聚合函数；用了聚合函数即使没有GROUPBY也不能SELECT普通的列；不能SELECT *
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
-* HAVING的只能是常数、分组的列、聚合函数 TODO: 这是什么意思？
+* HAVING的只能是常数、分组的列、聚合函数，即与分了组后的SELECT一样
 * SQLite能选择不在GROUPBY中的列，但没啥意义
 * SQLite：BY的可以是表达式 TODO: 测试
 
@@ -76,7 +77,7 @@ title: SQL
 * TODO: https://www.sqlite.org/windowfunctions.html 另外SELECT中有WINDOW wnd AS wnd-def语句，在GROPUBY后
 * https://zhuanlan.zhihu.com/p/60226935
 
-### compound集合运算
+### Compound集合运算
 
 * UNION [ALL]：直接附加第二个查询的结果；无ALL会自动剔除重复行，性能也更差
 * INTERSECT：交集。MySQL不支持
@@ -172,6 +173,7 @@ DELETE
 ### TABLE
 
 * 只有MSSQL支持trailing comma
+* MSSQL不支持所有的IF NOT EXISTS
 * 临时表
   * MSSQL：表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除
   * MySQL SQLite PG：CREATE TEMPORARY TABLE；SQLite PG还可简写为TEMP
@@ -191,9 +193,11 @@ DELETE
   * a无法修改或删除对应存在于b中的值，但若不存在，则可以删除；推荐给b加索引，因为内部实际上做了SELECT
   * MySQL SQlite支持ON UPDATE/DELETE CASCADE/SET NULL/SET DEFAULT使得a更新/删除时对应更新/删除b或设为NULL或默认值（仍需满足） TODO: 测试PG和MSSQL
   * SQLite
+    * 默认未开启外键检查，PRAGMA foreign_keys=on;开启
     * 定义时加上DEFERRABLE INITIALLY DEFERRED或用PRAGMA defer_foreign_keys=on能使得检查推迟到提交时
     * 定义表时允许引用A中不存在的列甚至不存在的表，就好像未开启外键约束一样
     * 支持FOREIGN KEY (a,b) REFERENCES (c,d)
+* SQLite支持在某些约束后定义ON CONFLICT ROLLBACK/ABORT/FAIL/IGNORE/REPLACE，默认是ABORT即终止语句但保留当前事务，如果没有“活动事务”则相当于ROLLBACK，FAIL相当于在本句之前提交掉，IGNORE相当于本句不存在会继续执行后面的
 
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
@@ -201,13 +205,13 @@ CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
     col2 type NOT NULL DEFAULT n UNIQUE,
     col3 type REFERENCES tb2(col1), -- MySQL能写在此处却无效
     -- 表约束
-    INDEX/UNIQUE ndx1(col2 [desc], col3), -- 索引的顺序应和常用的ORDERBY顺序一致
+    INDEX/UNIQUE ndx1(col2 [desc], col3), -- 索引的顺序应和常用的ORDERBY顺序一致，主键也支持指定顺序
     FOREIGN KEY (col3) REFERENCES tb2(col1),
     [CONSTRAINT cons1] CHECK(col1>0 and col2>0), -- 在多个列上定义约束，如果是单列也可以放在列后；用IN运算符可起到ENUM的效果
 )
-CREATE TABLE tb2 -- MSSQL除外；会保留非空约束
+DROP TABLE [IF EXISTS] tb1; -- 如果被外键引用了则无法直接删除 TODO: 怎么强删
+CREATE TABLE tb2 -- MSSQL除外；SQLite不保留主键和约束
 AS SELECT * FROM tb1;
-DROP TABLE [IF EXISTS] tb1; -- 都可用
 
 -- 修改表名（MSSQL除外）
 ALTER TABLE tb1 RENAME TO tb2
@@ -260,10 +264,6 @@ AS SELECT ...
 DROP VIEW [IF EXISTS]
 ```
 
-### DATABASE
-
-TODO: https://docs.microsoft.com/zh-cn/sql/relational-databases/databases/create-a-database
-
 ## TCL
 
 ### 事务
@@ -286,6 +286,7 @@ TODO: https://docs.microsoft.com/zh-cn/sql/relational-databases/databases/create
 * 没有日志
 * 适合处理场景固定的复杂事务，不要求并发性
 * 能消除不必要的网络IO，适合做集合运算
+* 调试困难
 * 建议只用来存数据，不要写业务逻辑
 
 ```
@@ -314,7 +315,7 @@ END;
 * create/alter/drop/enable/disable trigger TriggerName on
 * DML：Table|View for/instead of {insert, update, delete} as ...
 * DDL：all server|database for {create, alter, drop, ...} as ...
-* https://www.runoob.com/sqlite/sqlite-trigger.html
+* https://www.runoob.com/sqlite/sqlite-trigger.html https://www.sqlite.org/lang_createtrigger.html
 * DROP TRIGGER [IF EXISTS] tn；关联的表删除时自动删除；SQLite一定没有on tb
 * 查看update和delete在创建触发器中的Restrictions
 
@@ -362,8 +363,11 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 
 ## TODO
 
-http://www.sqlintern.com/home_page 一些测试题，做234
+sqlite decimal，对应NUM？
+怎么dump一个表
 
-https://www.sqlite.org/lang_createtable.html https://www.sqlite.org/lang_createtrigger.html
-on conflict定义在约束后可指定不满足时的操作，默认ABORT，终止语句，保留同一事务中之前插入的，不是回滚 https://www.sqlite.org/lang_conflict.html
 explain和优化：https://www.sqlite.org/eqp.html https://www.sqlite.org/optoverview.html
+
+动手练习题
+https://zhuanlan.zhihu.com/p/75219053
+http://www.sqlintern.com/home_page 做234
