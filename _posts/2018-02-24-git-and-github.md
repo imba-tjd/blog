@@ -14,14 +14,14 @@ title: Git/GitHub笔记
 ## Branch
 
 * git checkout [-f] dev：检出到远端分支时HEAD会变成分离状态。发生冲突且不想要当前时-f放弃当前内容，或用--merge/-m相当于stash-pop
-* git checkout [-b/B] dev [from]：[新建并]切换分支，from可填远端分支或用相同名字，会自动跟踪相当于push -u。-B一般要加from，相当于先branch -f，用于把未提交的改为基于另一个位置
+* git checkout [-b] dev [from]：[新建并]切换分支。若本地的远端存在唯一的名字，则不加-b和from也可以创建和自动跟踪；-B相当于覆盖已存在的分支；-t指定要跟踪的上游分支
 * git checkout -：切换到上一个分支
 * git branch [-avv]：无参显示本地，r仅显示remote，a显示所有，v额外显示最后一次commit信息，vv显示对应的远端分支
 * git branch -d/D dev：删除分支
 * git branch [-f] dev [refspec]：新建分支。或者如果分支已存在，用-f可把指定分支强制移动到当前[/指定]位置
 * git branch -m [old] dev：重命名当前[/指定]分支；重命名远端的只能先删除
-* 清理在远端删除了的分支：见remote部分
-* 删除远端分支：git push origin --delete dev或git push origin :dev
+* 清理在网页端删除了的分支：见remote部分
+* 删除网页端分支：git push origin --delete dev或git push origin :dev
 * 把当前内容建立为一个没有历史的分支：git checkout --orphan new；但注意原来commit了的内容会自动stage，注意gitignore
 * 可用git switch [-c]替代git checkout [-b]，需手动指定-d才能进入分离模式
 
@@ -50,7 +50,7 @@ title: Git/GitHub笔记
 
 * git remote add/remove/set-url origin server_url
 * git remote show origin：显示一些基本信息，包括url和分支和跟踪情况
-* git remote prune origin：清理在远端删除了的分支，但本地分支只会显示未发布，不会主动删除；还可用fetch -p或remote update -p
+* git remote prune origin：清理在网页端删除了的分支，但本地分支只会显示未发布，不会主动删除；还可用fetch -p或remote update -p，但所有这些都不会删除本地的remotes/远端记录，好像没有内置命令一键删除，可以用`npx git-removed-branches --prune`
 * git branch [-u] origin/master [foo]：让foo[/当前分支]跟踪**远端**的master分支，如果不用-b新建时指定而是之后修改就要这样；也可在config中修改
 
 ## 撤销更改
@@ -153,7 +153,7 @@ title: Git/GitHub笔记
 * git rebase --rebase-merges/-r、rebase --preserve-merges/-p：没看懂
 * git help -g：显示一些内置的教程，git help -a：显示所有的git命令
 * git update-ref -d HEAD：把所有的改动都放回local并清空所有的commit
-* git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支
+* git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支，无参使用显示所有分支和tag，包括远端的
 * git worktree add -B gh-pages public upstream/gh-pages：在当前分支的一个文件夹中checkout另一个分支
 * git rev-list --all | xargs git fgrep "xxx"：搜索所有历史中指定文字出现地点。git log -S/-G搜索指定内容在哪个提交中变动
 
@@ -443,5 +443,4 @@ collapsable content
 * https://git.wiki.kernel.org/index.php/GitHosting
 * Git Hooks https://github.com/typicode/husky
 * git fetch --deepen有啥区别，如何unshallow指定数量的提交
-* git switch --trace origin/master：当本地没有master分支但有origin/master时，创建并跟踪。好像checkout是自动的？
 * git grep

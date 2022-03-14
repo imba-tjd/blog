@@ -127,3 +127,5 @@ RGBColor FromRainbow(Rainbow colorBand) => colorBand switch{ //变量名加switc
     _             => throw new ArgumentException("invalid enum value", nameof(colorBand)),
 };
 ```
+
+https://zhuanlan.zhihu.com/p/475688767

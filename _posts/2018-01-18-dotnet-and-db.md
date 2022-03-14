@@ -129,27 +129,6 @@ OnPostDeleteAsync: await _context.Customers.FindAsync(id); if ... Remove ...
 * 3.0之后，删除主体时会立刻删除依赖实体，之前SaveChanges时才会操作
 * FromSqlRaw、ExecuteSqlRaw、FromSqlInterpolated、ExecuteSqlInterpolated，以及两个Async方法可以手动执行SQL语句，不过需要少用，因为这还是和数据库强耦合的
 
-## Microsoft.Data.Sqlite
-
-* 能通过cnn.CreateFunction()方便地创建自定义函数，因为那些实际上是用当前的编程语言执行的
-* cmd.CommandTimeout默认30秒
-* 参数的DbType只有Sqlite的原生四种
-* 不要用Async方法，不支持
-* 连接字符串：`"DataSource=db.sqlite/:memory:;Mode=ReadWriteCreate（默）/ReadWrite/ReadOnly"`，SqliteConnectionStringBuilder略；不加参数会创建临时磁盘数据库，在连接关闭时删除；路径为相对CWD的；还支持url但应该是只读的；默认如果文件不存在会自动创建但无法自创文件夹
-* 事务默认隔离级别为可序列化，设置`Cache=Shared`再更改事务隔离级别才允许读取未提交内容
-* 支持cnn.BackupDatabase()，目前只有阻塞的
-* 默认启用了WAL
-* System.Data.SQLite并不是内置库，也不是微软出的。如果要用，用.Core的包，与普通版相比没有Linq和EF6
-
-```c#
-// 排序规则默认支持 RTRIM忽略尾随空格、NOCASE英文字符不区分大小写、BINARY二进制比较 三种。可自定义支持Unicode的排序：
-cnn.CreateCollation("NOCASE", (x, y) => string.Compare(x, y, ignoreCase: true));
-```
-
-## [Microsoft.Data.SqlClient](https://docs.microsoft.com/zh-cn/sql/connect/ado-net/sql)
-
-TODO。取代System.Data.SqlClient。
-
 ## [Dapper](https://github.com/StackExchange/Dapper)
 
 * https://www.youtube.com/watch?v=QVkpzuiiVtw SQL Transactions in C# using Dapper
@@ -166,7 +145,7 @@ IEnumerable<Person> = cnn.Query<Person>("SELECT ... name = @Name", new { Name = 
 
 // 插入等
 List<Person> people = ...;
-cnn.Execute("INSERT INTO people(name, phone) VALUES (@Name, @Phone)", people); // 自动插入多个
+cnn.Execute("INSERT INTO people(name, phone) VALUES (@Name, @Phone)", people); // 自动插入多个，参数前缀必须用@
 cnn.Execute("dbo.People_Insert @Name, @Phone", people); // 储存过程自动识别，也可指定commandType位置参数；输出参数要用动态参数
 
 // 查询语句含有多个SQL语句
@@ -186,22 +165,11 @@ cnn.Get<Student>(1) // 根据主键查找数据
 cnn.GetAll<Student>();
 ```
 
-## 其它项目
-
-* [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重。Wiki有内容
-* SSDT：https://www.youtube.com/watch?v=ijDcHGxyqE4
-* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但有人说已经比前者更好了
-* Linq to SQL：已经不维护了，且只支持SQL Server
-
 ## ADO.NET
 
-* IDb前缀是通用接口，各个数据库也有自己的实现
-  * Connection
-  * Command
-  * DataReader：类似于数据源Stream
-* 连接模式：读取：数据库——Connection——Command——DataReader——页面。写入：页面——Command——Connection——数据库
-* 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。但是感觉不如用EF
+* IDb前缀是通用接口，各个数据库也有自己的实现：Connection、Command、DataReader（类似于数据源Stream）
 * 连接字符串的DataSource支持魔值`|DataDirectory|`，winform下表示bin/debug等
+* DbProviderFactory：允许在多个数据库Provider之间切换，基本就是IDb接口的应用
 
 ```c#
 string cnnstr = System.Configuration.ConfigurationManager.ConnectionStrings["连接字符串名称"].connectionString;
@@ -209,64 +177,57 @@ using var cnn = new SqliteConnection(cnnstr);
 cnn.Open(); // 没Open时也可以创建Command，读取数据就必须Open了
 
 using var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
-
 cmd.CommandText ="INSERT INTO user (name) VALUES (@name)";
 cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，这诡异的写法居然没问题。一般还是给AddWithValue的返回值赋一个变量再进一步设置
-var param=cmd.CreateParameter(); param.ParameterName="@name"; param.Value=name; param.Direction=ParameterDirection.Input; param.Size = 30; cmd.Parameters.Add(param); // 正常写法
 
-cmd.ExecuteNonQuery(); // 执行Insert、Update和Delete，返回被影响的行数
-using var reader = cmd.ExecuteReader(); // 执行Select，返回SqlDataReader对象
-ExecuteScalar() // 以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令，无值时为null
+cmd.ExecuteNonQuery(); // 执行DML，返回被影响的行数
+cmd.ExecuteScalar().ToString(); // 以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令，无值时为null
 
+var reader = cmd.ExecuteReader(); // 执行Select，一般没必要dispose()
 while (reader.Read()) { // 读完时返回false
-    string name = reader.GetString(0); // 把第一列当作string读取
+    string name = reader.GetString(0)/GetFieldValue<string>(0);
     int length = reader.GetInt32(1);
+    object[] line = new object[reader.FieldCount]; reader.GetValues(line);
+    reader[ndx/key]; // object类型
 }
 
-using var tran = cnn.BeginTransaction(); // ADO.NET事务，不是数据库事务
-cmd.Transaction = tran;
+using var tran = cnn.BeginTransaction();
+// 创建cmd，最好不要提前创建
 tran.Commit()/Rollback();
 ```
 
 ### IDbConnection
 
-* 具体的构造函数接受具体的ConnectionStringBuilder设置好属性后用ConnectionString获取连接字符串，也可用https://www.connectionstrings.com
-* ConnectionString：可获取或设置
+* ConnectionStringBuilder：设置好属性后用ConnectionString获取连接字符串，也可用https://www.connectionstrings.com
+* ConnectionString：获取设置连接字符串，一般在Connection的构造函数中设置
 * ConnectionTimeOut：0为无限，超时抛异常
 * Database：数据库名称
 * State：Open、Connecting、Closed等
 * IDb的没有DataSource属性
 * ChangeDatabase()
-* CreateCommand()、BeginTransaction()
-* 还有个DbProviderFactory用于从app.config中获得DbConnection，不过没什么必要
 
 ### IDbCommand
 
 * CommandText：获取或设置要执行的SQL命令/储存过程/数据表名称
-* CommandType：Text（默认）、StoredProcedure、TableDirect。Sqlite只支持Text
+* CommandType：Text（默认，SQLite只支持它）、StoredProcedure、TableDirect
 * Parameters：SQL命令参数集合
-* CommandTimeout
 * Cancel()
 
 ### IDataReader
 
 * 一个向前只读的记录指针
-* FieldCount：一行数据中的字段数
-* HasRows：是否包含数据，一般只在最初的时候使用
 * GetSchemaTable()：获得元数据
 * NextResult()：如果CommandText有多条SQL语句（批处理），此函数会继续执行下一条，指向下一个结果集，之后自己继续用Read()；Dispose时会自动执行完
-* GetValue(index)：返回当前行指定索引列的值，object类型，与直接对reader取索引一样；也可用GetInt32、GetString等方法，有的还有`GetFieldValue<T>()`
-* GetName(index)：获得列名；GetOrdinal()：根据列名返回它的索引
-* GetValues(object[])：会把当前行所有数据保存到一个数组里。可以根据FieldCount设定数组长度
-* GetDataTypeName(index)：输入列索引，返回该列的类型名；SqliteDataReader有`GetFieldType()`返回Type对象
-* IsDBNull(index)：输入当前行的列索引，判断是否为空。TODO: DBNull怎么用
+* GetName(index)：获得列名；GetOrdinal()：根据列名返回它的列数
+* GetDataTypeName(index)：输入列数，返回该列的类型名；转换成IDataRecord后有GetFieldType()返回Type对象
 
 ### DataSet
+
+* 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。DataAdapter能写回数据库，感觉不如直接用EF了，MS的SQLite不支持
 
 ```c#
 var adapter = new SqlDataAdapter(sqlstr, cnn);
 var ds = new DataSet();
-ds.Locale = CultureInfo.InvariantCulture;
 adapter.Fill(ds, "Customers");
 DataTable orders = ds.Tables["SalesOrderHeader"];
 var query = from order in orders
@@ -276,17 +237,35 @@ var query = from order in orders
         SalesOrderNumber = order.Field<string>("SalesOrderNumber")
     };
 foreach (var onlineOrder in query)
-    WriteLine("Order ID: {0} Order number: {1}",
-        onlineOrder.SalesOrderID, onlineOrder.SalesOrderNumber);
+    WriteLine("Order ID: {0}", onlineOrder.SalesOrderID);
 dataGridView1.DataSource = dt.DefaultView;
 ```
 
-## [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)
+### [Microsoft.Data.Sqlite](https://docs.microsoft.com/zh-cn/dotnet/standard/data/sqlite)
 
-TODO。用于类与类之间的映射，或者数据库模型与实体之间的映射
+* 支持cnn.CreateFunction()注册由C#实现的能在SQL语句中使用的自定义函数
+* con.DefaultTimeout默认30秒，设为0会永远等待
+* 参数的DbType只有Sqlite的原生四种
+* 不支持Async方法
+* 连接字符串：`URI=file:db.sqlite`，这种情况下路径分隔符必须用斜杠
+* EFCore上的默认启用了WAL
+* 只支持命名参数，可用`: @ $`作为前缀
+* 大型Blob有专门的方法读写，目前不学
+* Win10自带winsqlite3.dll，目前版本3.34，可安装Microsoft.Data.Sqlite.Core和SQLitePCLRaw.bundle_winsqlite3来使用
+* System.Data.SQLite并不是内置库，也不是微软出的，但是是SQLite官方出的。如果要用，用.Core的包，与普通版相比没有Linq和EF6
 
-* https://zhuanlan.zhihu.com/p/89550593
-* https://zhuanlan.zhihu.com/p/136602715
+### [Microsoft.Data.SqlClient](https://docs.microsoft.com/zh-cn/sql/connect/ado-net/sql)
+
+* 取代System.Data.SqlClient
+
+## 其它项目
+
+* [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重。Wiki有内容
+* SSDT：https://www.youtube.com/watch?v=ijDcHGxyqE4
+* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但有人说已经比前者更好了
+* Linq to SQL：已经不维护了，且只支持SQL Server
+* [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)：用于类与类之间的映射，或者数据库模型与实体之间的映射。https://zhuanlan.zhihu.com/p/89550593 https://zhuanlan.zhihu.com/p/136602715
+* mysql-connector-net：官方ADO驱动，支持X协议
 
 ## 参考
 
