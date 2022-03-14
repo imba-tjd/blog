@@ -195,7 +195,7 @@ DELETE
   * SQLite
     * 默认未开启外键检查，PRAGMA foreign_keys=on;开启
     * 定义时加上DEFERRABLE INITIALLY DEFERRED或用PRAGMA defer_foreign_keys=on能使得检查推迟到提交时
-    * 定义表时允许引用A中不存在的列甚至不存在的表，就好像未开启外键约束一样
+    * 定义表时允许引用A中不存在的列甚至不存在的表，就好像未开启外键约束一样，只在插入删除时检查
     * 支持FOREIGN KEY (a,b) REFERENCES (c,d)
 * SQLite支持在某些约束后定义ON CONFLICT ROLLBACK/ABORT/FAIL/IGNORE/REPLACE，默认是ABORT即终止语句但保留当前事务，如果没有“活动事务”则相当于ROLLBACK，FAIL相当于在本句之前提交掉，IGNORE相当于本句不存在会继续执行后面的
 
@@ -268,15 +268,25 @@ DROP VIEW [IF EXISTS]
 
 ### 事务
 
-* 开启：MSSQL、SQLite、PG - BEGIN TRANSACTION，MySQL - START TRANSACTION，Oracle无需开启，SQLite还支持简单的BEGIN和END(对应COMMIT)
-* COMMIT、ROLLBACK
-* 其实所有的数据库在连上时就自动开启事务了，只是Oracle默认必须手动提交才生效，MSSQL遇到GO生效，SQLite默认一句就提交一次，显式开启事务才不会
-* MSSQL：SAVE TRANSACTION
+* 开启
+  * SQLite PG BEGIN：BEGIN和END(对应COMMIT)
+  * MSSQL：BEGIN TRAN
+  * MSSQL、SQLite、PG：BEGIN TRANSACTION
+  * MySQL：START TRANSACTION
+  * Oracle无需开启，相当于一开始就开启了，必须手动提交才生效
+  * COMMIT、ROLLBACK
+  * 其余数据库在不显式开启事务时默认一句就提交一次
+  * MSSQL在关闭自动提交后也变得像Oracle一样了，另外两个GO之间的代码会先编译一遍，如果有错误则不会执行
 * SQLite
   * SAVEPOINT spname 相当于事务中的事务，必须命名
   * RELEASE spname 类似于COMMIT，使得不能回滚到指定及之后的点，也可看做把内层的保存点合并到外层，真的事务没有提交，后序也可能回滚；但如果最开始就是用SAVEPOINT开启的事务，则最后一层RELEASE会提交
   * ROLLBACK TO spname 回滚到指定点
   * BEGIN IMMEDIATE/EXCLUSIVE：进入事务时就加写锁
+* MSSQL
+  * 设置隔离级别：SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;，处在连接级别
+  * 启用快照隔离：ALTER DATABASE db1 SET ALLOW_SNAPSHOT_ISOLATION/READ_COMMITTED_SNAPSHOT ON
+  * 悲观锁：SELECT * FROM xxx WITH (UPDLOCK)
+  * 默认情况下会一直等待，不会超时，除非设置LOCK_TIMEOUT
 
 ### 存储过程
 
@@ -363,11 +373,9 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 
 ## TODO
 
-sqlite decimal，对应NUM？
-怎么dump一个表
-
-explain和优化：https://www.sqlite.org/eqp.html https://www.sqlite.org/optoverview.html
-
 动手练习题
 https://zhuanlan.zhihu.com/p/75219053
 http://www.sqlintern.com/home_page 做234
+
+SQLite：NUMERIC的affinity在非strict下几乎和integer一样，仅在cast时有区别，decimal会对应它，stric下不可用
+https://www.sqlite.org/optoverview.html

@@ -152,21 +152,21 @@ END
 * LIKE '%xxx'
 * 列类型与操作数类型不同，包括字符集不同
 * 使用函数。这种情况需要建立基于函数的索引
-* IS [NOT] NULL。索引不会储存空值
+* IS [NOT] NULL。索引不会储存空值。但SQLite说可以用
 * 对列进行加减乘除运算
 * 复合索引没有按最左匹配原则
-* 复合索引a>1 and b=2，a可以走索引二分，但a没有唯一确定，b无法走索引
+* 复合索引a>1 and b=2，a可以走索引二分，但a没有唯一确定，b无法走索引；要尽量前面的判断相等，最后才能用不想等
 * 选择的列太多。避免SELECT*
 * OR了不在索引里的列
-* IN太多。看能不能换成BETWEEN
+* IN太多，少量的其实和=是一样的。看能不能换成BETWEEN
 
 ### 隔离级别、并发、数据不一致性
 
 * ACID
-  * 原子性(Atomicity)不会改一半
-  * 一致性(Consistency)其它三个的目标，另一种说法是并发执行的事务最后的结果应与某种顺序串行执行相同
-  * 隔离性(Isolation)事务之间互相看不见，乐观锁和悲观锁
-  * 持久性(Durability)出问题后不丢数据
+  * 原子性(Atomicity)要么都执行要么都不执行
+  * 一致性(Consistency)其它三个的目标
+  * 隔离性(Isolation)事务之间互相看不见，不会以另一事务修改了一半的状态为基础
+  * 持久性(Durability)出问题后也不丢数据
 * 脏写
   * 某事务a=b=1，另一事务a=b=2，但最后结果a!=b
   * 解决办法：加写锁
@@ -174,7 +174,7 @@ END
 * 污读/脏读(Dirty Reads)
   * 先写后读，某事务更新了数据但还未提交，另一事务读取，能读取到这些内容，但前者进行了回滚或又写了新的，则后者读到了“从未存在”（未提交）的数据
   * 解决办法：要读/写的时候在需要的行上加读/写锁，其中读锁读过了需要的行以后就释放，写锁直到事务完成才释放，使得写了未提交时无法读
-  * 解决后隔离级别为*Read Committed*读已提交，可避免脏读，但不可重读。Oracle MSSSQL默认
+  * 解决后隔离级别为*Read Committed*读已提交，可避免脏读，但不可重读。Oracle MSSQL PG默认
 * 不可重读(Nonrepeatable Reads)
   * 先读后写，某事务读取某行，另一事务更新或删除了该行并提交，前一事务再次读取同一行，则两次结果不一样
   * 更新丢失/写丢失：两事务读入后都进行写入，则后写覆盖前写。没有脏写因为前写已提交才有后写，没有脏读因为前写了之后根本就没有读
@@ -182,12 +182,12 @@ END
   * 解决办法：读锁也直到事务完成才释放，使得另一事务必须等读完后才能写
   * 解决后隔离级别为*Repeatable Read*可重复读，会出现幻读，不会出现读偏写偏更新丢失
     * 分布式事务无法实现RR以上的隔离级别
-    * MySQL默认RR，但又用了MVCC，也用了间隙锁，能减少幻读
+    * MySQL默认RR，但又用了MVCC多版本并发控制，也用了间隙锁，能减少幻读
 * 幻读(Phantoms)
-  * 某事务读取某些行，另一事务插入了前一事务**条件范围内**的行，前一事务再次读取，则结果不一样。其实跟不可重读一样
+  * 某事务读取某些行，另一事务插入了前一事务**条件范围内**的行，前一事务再次读取，则结果不一样。其实跟不可重读一样，只是之前只给选中的行加锁，这次给WHERE条件加锁
   * 解决办法：与上一隔离级别相比，对整个表加锁或者对条件范围加锁(间隙锁)，因为新增的行在第一次读的时候不存在，无法对行加锁
   * 解决后隔离级别为*Serializable*
-* *Snapshot*快照隔离或MVCC多版本并发控制
+* *Snapshot*快照隔离
   * 另一种解决可重读的方向。不基于锁，另一事务可以写，前一事务可以读，只是会读到旧内容，不会幻读
   * 若按表版本控制，则没有和序列化不一致的问题，只要写时不是最新的就失败；若按行版本，会出现“幻读的写入版”，如果插入了条件内的行，老行的版本没变，但已经不是最新的了。如果不进行版本控制，那确实仍然不会出现最基本的不可重读问题；如果按按列值进行版本控制，也能防止更新丢失
   * 写偏(Write Skew)：某事务读取A列，另一事务读取B列，前一事务写入B列，后一事务写入A列。我不明白为什么有文章说会出现写偏，除非没有按行而是按列值版本控制
@@ -196,8 +196,12 @@ END
   * 一次加锁法，但扩大了封锁范围
   * 顺序加锁法，对可能产生死锁的对象规定加锁顺序
   * 都不太适合数据库，降低了并发度
-* 乐观锁：加一个更新时间/hash/Version列，读取的时候读入，写的时候检查是否一致，或者写的时候把读的过滤条件也补上，就会重新过滤一遍
+  * MSSQL能自动检测，如果发现了死锁，就终止一个
+* 乐观锁：加一个更新时间/Hash/Version列，读取的时候读入，写的时候检查是否一致；快照隔离一半用的就是它
 * 日志：redolog记录提交了但没写入磁盘的数据，undolog记录未提交的数据。出现故障时，检查点之前完成的事务无须操作，仍在进行的事务回滚，反向扫描日志；检查点之后、发生故障前执行完成的事务前滚/重做，正向扫描日志
+* SQLite单纯BEGIN是没有加任何锁的，其他连接提交了能看到，开始SELECT了才会加锁。PG不同，BEGIN了，其他提交了看不到
+* PG：默认RC下就已经能重读了，好像也不存在幻读，读写也能并发，都跟快照差不多了，写入时如果存在任意未提交的就会报错；RR下能并发写，在提交时非最新版报错，感觉就等于快照了
+* MSSQL：默认RC下非常标准，脏读就是会阻塞的，也会出现不可重读和幻读。RR下的行为非常怪，另一事务可以写，未提交时读取的事务会阻塞即不会脏读，提交后读取的事务能读到新内容，这不就是完全没有实现吗？难道是因为localdb的问题？
 
 ### 备份还原
 
@@ -223,8 +227,8 @@ END
 
 * 查询服务器属性：select SERVERPROPERTY('collation')
 * 查询数据库属性：select DATABASEPROPERTYEX('Your DB Name','collation')
-* SET LANGUAGE 'Simplified Chinese'可更改datetime和货币的表示方式
-* ALTER DATABASE <dbname> SET COMPATIBILITY_LEVEL = 150;
+* 更改会话语言：SET LANGUAGE 'Simplified Chinese'可更改datetime和货币的表示方式，以及报错信息
+* 升级大版本后，已存在的数据库的版本不会自动升级，需要修改它们的COMPATIBILITY_LEVEL
 * select @@version;
 * GO命令：不是T-SQL语句，而是用于分隔sql文件的标记，有些语句要在第一行执行就要再在前面用GO。后面不能跟分号，可以跟数字表示执行上一段多少遍
 * exec sp_rename 'a', 'b'：重命名表、索引、列等对象；db用renamedb
@@ -235,15 +239,17 @@ END
 * CREATE DATABASE db1 ON/LOG ON filespec；ALTER DATABASE db1 ADD/MODIFY/REMOVE FILE/LOG FILE filespec
 * sp_helptext：显示定义对象的SQL语句
 * ALTER SERVER CONFIGURATION SET MEMORY_OPTIMIZED TEMPDB_METADATA = ON;对TempDB启用内存中OLTP
+* ALTER DATABASE ... SET DELAYED_DURABILITY = FORCED：延迟事务持续性，IO太重又可容忍丢失部分数据可以启用；若设为ALLOWED就必须每次事务手动控制
 
 ## SQL Server LocalDB
 
-* C:\Program Files\Microsoft SQL Server\130\Tools\Binn\SqlLocalDB.exe create、delete、start、stop
-* 有的命令不加实例名时默认为MSSQLLocalDB
-* info列出所有的实例，info加实例名显示一些信息
+* C:\Program Files\Microsoft SQL Server\150\Tools\Binn\SqlLocalDB.exe create/delete/start/stop 实例名，不加时默认为MSSQLLocalDB
+* info无参使用列出所有的实例，info加实例名显示命名管道等信息，有可能客户端要去掉np前缀
+* 如果启动失败，考虑删除重建，有可能是用了老版本的数据库
 * 连接地址：`(localdb)\MSSQLLocalDB`
 * 需指定数据库级别的排序规则：`CREATE/ALTER DATABASE db1 COLLATE Chinese_PRC_CI_AS`；不会影响已有的列，还需要ALTER TABLE一下
-* https://www.hanselman.com/blog/download-sql-server-express
+* 下载地址：https://www.hanselman.com/blog/download-sql-server-express
+* 数据库文件和日志在`%LocalAppData%\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB`
 
 ## MySQL
 
@@ -359,8 +365,10 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 ## PostgreSQL
 
 * 默认端口5433
-* 命令行客户：psql "host=xxx port=xxx dbname=xxx user=xxx"
+* 命令行：psql "host=xxx port=xxx dbname=xxx user=xxx"
 * 具有jsonb类型
+* Linux下安装：https://www.postgresql.org/download/linux/debian/ 仅客户端为postgresql-client
+* Win下客户端可用pipx install pgcli
 
 ## Access
 
@@ -382,11 +390,12 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 
 ### GUI
 
-* HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，有少量的维护功能，对于大量数据很卡
+* HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，有少量的维护功能，对于大量数据很卡，对MSSQL的脚本不太兼容
 * https://dbeaver.io：JAVA，Star数多
 * https://www.beekeeperstudio.io/ Electron，有便携版，常见的四种都支持
 * phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
 * MySQL WorkBench：官方客户端，大小也不大
+* pgAdmin：官方客户端，163MB
 * https://sqlitebrowser.org/ C++，目标是让普通用户也能用，有中文
 * https://www.devart.com/free-products.html：闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
 * https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
