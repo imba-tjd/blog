@@ -176,3 +176,7 @@ isoStore.Remove()
 
 string[] d = Environment.GetLogicalDrives();
 DriveInfo[] di = DriveInfo.GetDrives();
+
+把对象看作二进制数组
+var span = MemoryMarshal.CreateSpan(ref t, 1);
+var bytes = MemoryMarshal.Cast<T, byte>(span);
