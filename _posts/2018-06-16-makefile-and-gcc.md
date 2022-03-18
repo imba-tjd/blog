@@ -151,12 +151,12 @@ prog3 : prog3.o sort.o utils.o
 
 ## MinGW
 
-* https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer
+* https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer，有ucrt
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，因为内部用了bzip2，env文件控制自动添加PATH
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
-* https://github.com/Guyutongxue/mingw-release
+* https://github.com/niXman/mingw-builds-binaries
 * https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3
-* https://nuwen.net/mingw.html 目前最新11.2
+* https://nuwen.net/mingw.html
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了
 
