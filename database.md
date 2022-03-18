@@ -95,6 +95,7 @@ END
   * 3.37(2021.11)：在定义完表的回小括号后加STRICT能禁用Flexible Typing且不允许不加类型，又引入了ANY类型；ANY在非STRICT表中会优先转换成整数，与不加类型行为不同
 * 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名；非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL，现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
 * 定义表的字符串或WHERE和ORDERBY时可指定COLLATE RTRIM/NOCASE
+* STRICTh和WITHOUT ROWID若要同时指定，加逗号
 
 ### MySQL
 
@@ -242,7 +243,7 @@ END
 * ALTER SERVER CONFIGURATION SET MEMORY_OPTIMIZED TEMPDB_METADATA = ON;对TempDB启用内存中OLTP
 * ALTER DATABASE ... SET DELAYED_DURABILITY = FORCED：延迟事务持续性，IO太重又可容忍丢失部分数据可以启用；若设为ALLOWED就必须每次事务手动控制
 
-## SQL Server LocalDB
+### LocalDB
 
 * C:\Program Files\Microsoft SQL Server\150\Tools\Binn\SqlLocalDB.exe create/delete/start/stop 实例名，不加时默认为MSSQLLocalDB
 * info无参使用列出所有的实例，info加实例名显示命名管道等信息，有可能客户端要去掉np前缀
@@ -251,6 +252,10 @@ END
 * 需指定数据库级别的排序规则：`CREATE/ALTER DATABASE db1 COLLATE Chinese_PRC_CI_AS`；不会影响已有的列，还需要ALTER TABLE一下
 * 下载地址：https://www.hanselman.com/blog/download-sql-server-express
 * 数据库文件和日志在`%LocalAppData%\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB`
+
+### Azure SQL Edge
+
+* 仅Linux，同样使用MSSQL引擎，可用Docker拉取，需求内存1GB，磁盘10GB
 
 ## MySQL
 
@@ -281,12 +286,14 @@ long_query_time=3
 * 没有GRANT和INVOKE、不支持输出参数
 * 一个文件就是一个database，没有create database语句。一个连接可以打开多个文件
 * ATTACH DATABASE 'url' AS data
+* Linux下默认的权限是都能读但只有创建者能写
 * URI文件名
   * file:data.db?cache=shared&mode=ro/rw/rwc
   * 文件名用:memory:为内存数据库，默认仍会在tmp中产生处理临时表的文件；文件名用空的则为临时文件数据库
   * 如果也不会被其它进程改变可用immutable=1
-  * cache=shared：多个连接都启用此参数能类似于一个连接，内部再序列化
+  * cache=shared：单进程多连接都启用此参数能类似于一个连接减少资源占用，内部再自动序列化，感觉可以无脑开
   * 打开已存在的数据库时小心别打错字，否则就自动创建了一个新的，或者mode不用rwc就能避免
+  * psow=1：假定断电时文件系统不会写入超过范围的数据
 * 读写锁和事务
   * 事务一开始，单纯的BEGIN是没有加锁的。开始读取了会加SHARED锁，允许有多个，能同一时间多个连接并发读取
   * 当遇到了DML语句，会给整个数据库文件加RESERVED锁，只允许有一个，然后写日志。此时仍可以正常读，也允许新连接读，读不到未提交的，因为新内容在日志里，不在文件里
@@ -299,8 +306,8 @@ long_query_time=3
   * 一个连接可以有多个游标，它们之间没有隔离也没有锁。一个游标读取到一半又有另一个游标更新数据是未定义的
 * 并发和线程安全
   * THREADSAFE=1下，官方说是“线程安全”的；=2时官方说只要没有两个线程同时使用同一个连接就是安全的
-  * 各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。我认为不是这样，只要不写入，=1下单个连接同时使用多个游标是没问题的
-  * =0时官方说“一次只能有一个线程”，但官方CLI就是=0，所以应该仍可以多个进程使用同一个数据库文件
+  * 各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。我认为不是这样，=1下单个连接可以同时使用多个游标，只是没有隔离
+  * =0时不应用在多线程程序中，官方CLI就是=0，所以应该仍可以多个进程使用同一个数据库文件
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
 * WAL
   * 隔离性表现为Snapshot，开始读取事务后另一连接能并发写且能提交，本连接始终读到的是旧数据；如果之后本连接又要写，则会报错，因为数据不是最新的，解决办法是一开始BEGIN IMMEDIATE。释放完本连接所有读锁后再读到的是新数据，或者新连接读到的也是新数据
@@ -341,26 +348,29 @@ long_query_time=3
 ```bash
 #gcc sqlite3.c -o sqlite3.dll -shared -lpthread  # 编译dll
 gcc sqlite3.c shell.c -o sqlite3.exe \
--Os -mtune=native \
+-Os -mtune=native -Wl,--as-needed -Wl,--strip-all \
 -DNDEBUG \
+-DSQLITE_ENABLE_ATOMIC_WRITE \
 -DSQLITE_LIKE_DOESNT_MATCH_BLOBS \
 -DSQLITE_OMIT_DECLTYPE \
 -DSQLITE_OMIT_DEPRECATED \
--DSQLITE_OMIT_LOAD_EXTENSION \  # 不指定此项则必须-ldl -lm
+-DSQLITE_OMIT_LOAD_EXTENSION \  # 不指定此项则要加-ldl -lm
 -DSQLITE_UNTESTABLE \
 -DSQLITE_USE_ALLOCA \
 -DSQLITE_WIN32_MALLOC \
 -DSQLITE_DEFAULT_FOREIGN_KEYS \
+-DSQLITE_DEFAULT_AUTOVACUUM \
 -DSQLITE_DEFAULT_MEMSTATUS=0 \  # 会禁用.dbinfo和.stats
 -DSQLITE_DQS=0 \  # 禁用双引号表示字符串
 -DSQLITE_MAX_EXPR_DEPTH=0 \
+-DSQLITE_POWERSAFE_OVERWRITE \
 -DSQLITE_TEMP_STORE=2 \
--DSQLITE_THREADSAFE=0  # 编译dll时不加，shell必定是单线程所以加
+-DSQLITE_THREADSAFE=0  # 编译dll时不加
 ```
 
 ### 内置函数
 
-* likely() unlikely() 给优化器提示大概率为真/假
+* likely() unlikely() 给优化器提示大概率为真/假，默认WHERE中没有索引的大概率为真
 * quote() 进行某些转义，如字符串两边加引号
 * format() 类似于printf
 

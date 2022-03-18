@@ -370,12 +370,3 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 * json_patch(json,json) json_remove() json_type()：略
 * json_quote()：将可能不合理的字符串转换为json能接受的字符串，因为各种*json*参数包括->会去解析字符串；如果合法或者已是内部对象，就什么也不做
 * json_each() json_tree()：遍历，用在FROM中，返回同函数名的表，key对于数组是索引 value type atom类似于值但对于数组和对象是空 fullkey路径
-
-## TODO
-
-动手练习题
-https://zhuanlan.zhihu.com/p/75219053
-http://www.sqlintern.com/home_page 做234
-
-SQLite：NUMERIC的affinity在非strict下几乎和integer一样，仅在cast时有区别，decimal会对应它，stric下不可用
-https://www.sqlite.org/optoverview.html
