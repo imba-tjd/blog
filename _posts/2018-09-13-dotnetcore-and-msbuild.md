@@ -13,8 +13,6 @@ category: dotnet
 
 ## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
-* CoreRT必须要装VC
-* dotnet msbuild /pp | code -：查看完整生成的csproj
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -91,6 +89,8 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 * FDD和FDE依赖框架的部署，前者运行必须用dotnet xxx.dll，3.0默认后者，能生成.exe但实际程序仍是dll；要么不指定rid，要么指定rid且加--self-contained=false
 * --roll-forward LatestMajor：使用最新runtime跑老应用。也可指定DOTNET_ROLL_FORWARD环境变量，用于某个非自己开发的程序没更新
 * 设置COREHOST_TRACE=1环境变量可详细显示编译过程
+* 修改显示语言：DOTNET_CLI_UI_LANGUAGE
+* dotnet msbuild /pp | code -：查看完整生成的csproj
 
 ### 全局工具
 
@@ -231,6 +231,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ## .NET Framework
 
 * `Your project does not reference ".NETFramework,Version=v4.7.2" framework. Add a reference to ".NETFramework,Version=v4.7.2" in the "TargetFrameworks" property of your project file and then re-run NuGet restore.`：不要混用Core和FX的生成，删除bin和obj即可
+* 获得已安装的版本：`reg query "HKLM\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /v version`
 
 ### NGen
 
