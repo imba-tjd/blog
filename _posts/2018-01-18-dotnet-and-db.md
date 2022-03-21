@@ -43,15 +43,17 @@ class MyDBContext : DBContext {
 }
 
 // appsettings.json
-"ConnectionStrings": { // 对于sqlite，只要指定名字就好，数据库会自动创建
-    "CustomerContext": "Data Source=Customers.db"
+"ConnectionStrings": {
+    "CustomerContext": "DataSource=Customers.db"
 }
 
 // Startup
-services.AddDbContext<CustomerDbContext>(op=>op.UseInMemoryDatabase("name"));
-op=>op.UseSqlite(Configuration.GetConnectionString("CustomerContext");
 // 还可在ctor中注入IWebHostEnvironment，用env.IsDevelopment()在开发环境和生产环境用不同的数据库
 // 用AddDbContextPool可重用DbContext
+var connectionString = builder.Configuration.GetConnectionString("CustomerContext");
+builder.Services.AddDbContext<CustomerDbContext>(op => op.UseSqlServer(connectionString)/UseInMemoryDatabase("name"));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+if (app.Environment.IsDevelopment()) app.UseMigrationsEndPoint();
 
 // Data/CustomerDbContext.cs
 using Microsoft.EntityFrameworkCore;
@@ -131,38 +133,25 @@ OnPostDeleteAsync: await _context.Customers.FindAsync(id); if ... Remove ...
 
 ## [Dapper](https://github.com/StackExchange/Dapper)
 
-* https://www.youtube.com/watch?v=QVkpzuiiVtw SQL Transactions in C# using Dapper
-* 扩展了IDbConnection和IDataReader，因此连接部分和普通的ADO.NET没区别
-* 数据库字段不区分大小写；查询参数必须和匿名对象名称相同，选取结果的名称也必须和映射类相同，否则参数需用DynamicParameters，选取结果在SQL语句中用as
-* 支持Ansi字符串（varchar），用new DbString；`reader.GetRowParser<T>(typeof(class))`支持同一列不同类型的读取；`new DataTable().Load(reader)`
-* Sqlite测试：当连接未打开时，创建表不报错，插入时才报错。当select xxx忘写from时，报的错是`no such column xxx`
-* DapperAOT，还在早期
+* 给IDbConnection加了几个扩展方法，完全兼容和基于ADO
+* 支持把单次查询映射到多个对象上，见文档的Multi Mapping
+* 字符串默认期待unicode的，如果用varchar需要额外处理，比较麻烦不记录
+* DapperAOT：还在早期，且很久没更新了
+* Dapper.SqlBuilder：类似于Linq的方法，但只是用于生成SQL字符串，还不如自己手写
+* Dapper.Contrib：又给connection添加了几个扩展方法，但看起来也就Insert()和Update()稍微有一点用，Get只支持按id搜索，要不就GetAll了，还可能需要给类加Attributes
+* Dapper.Rainbow：需要继承抽象类，表面上类似于ORM不用写SQL，但添加的方法太少，估计必须加载所有数据
+* FastCrud：第三方基于Dapper，类似于Linq的语法
 
 ```c#
-// 强类型查询，这样做Model类无需任何注释绑定；如果类中存在数据库没有的字段，会保留默认值，不会抛异常
-IEnumerable<Person> = cnn.Query<Person>("SELECT ... name = @Name", new { Name = name }); // 还可 in @Names, new {Names=new[] {...,}}
-// 还有QueryFirst[OrDefault]()和QuerySingle()；不加<T>返回的是dynamic，差不多是SELECT出来的匿名对象数组，必要时需强转；还支持{=XXX}的bool和数字字面量替换；Query还支持多个泛型参数，见文档的Multi Mapping
+// SELECT：Model无需任何处理，字段名称必须和SELECT的相同，必要时SQL中用AS指定，未SELECT到的类中的属性会为默认值
+IEnumerable<Person> people = cnn.Query<Person>("SELECT ... name = @Name", new { Name = name });
+var people2 = cnn.Query(...).AsList(); // 不加<T>返回Dynamic，类似于SELECT出来的匿名对象的数组，AsList()不会额外分配一遍
+// 还有QueryFirst[OrDefault]()和QuerySingle()
+// 参数：前缀必须用@，但对于数字和bool也支持{=xxx}且效率更高；支持in运算符：in @Names, new {Names=new[] {...}}
 
-// 插入等
+// DML，还支持存储过程
 List<Person> people = ...;
-cnn.Execute("INSERT INTO people(name, phone) VALUES (@Name, @Phone)", people); // 自动插入多个，参数前缀必须用@
-cnn.Execute("dbo.People_Insert @Name, @Phone", people); // 储存过程自动识别，也可指定commandType位置参数；输出参数要用动态参数
-
-// 查询语句含有多个SQL语句
-using (var multi = cnn.QueryMultiple(sql)) {
-    var invoice = multi.Read<Invoice>().First();
-    var invoiceItems = multi.Read<InvoiceItem>().AsList(); // 与ToList相比不会重新分配空间
-}
-
-// Dapper.Contrib和.Contrib.Extensions。就只有这一点东西，没法根据普通字段查询
-[Table("students")] // 表名与类名相同可不加
-public class Student{
-    [Key] public int Id {get; set;} // 用于自增字段，名称完全等于Id也可不加，使用Insert()会忽略对象的值；非自增用ExplicitKey
-    // [Write(false)]、[Computed]
-}
-cnn.Insert(stus) // 插入一或多条数据，表要自己建好；Update、Delete、DeleteAll略
-cnn.Get<Student>(1) // 根据主键查找数据
-cnn.GetAll<Student>();
+cnn.Execute("INSERT INTO people(name, phone) VALUES (@Name, @Phone)", people); // 传集合自动插入多个
 ```
 
 ## ADO.NET
@@ -239,6 +228,11 @@ var query = from order in orders
 foreach (var onlineOrder in query)
     WriteLine("Order ID: {0}", onlineOrder.SalesOrderID);
 dataGridView1.DataSource = dt.DefaultView;
+
+// 不使用Adapter，但仍表现为“内存表”，功能复杂
+new DataTable().Load(reader);
+for(int i=0;i<tb.Rows.Count;i++)
+    tb.Rows[i]["Col1"]
 ```
 
 ### [Microsoft.Data.Sqlite](https://docs.microsoft.com/zh-cn/dotnet/standard/data/sqlite)
