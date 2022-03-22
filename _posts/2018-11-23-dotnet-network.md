@@ -160,6 +160,5 @@ string content = reader.ReadToEnd();
 ## 其它
 
 * var client = new System.Net.WebClient(); client.DownloadString()、DownloadFile()
-* IIS Express：https://zhuanlan.zhihu.com/p/64424475 ；"C:\Program Files (x86)\IIS Express\iisexpress.exe" /path:C:\MyWeb /port:8000
 * 代理：https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/accessing-the-internet-through-a-proxy
 * https://github.com/tmenier/Flurl 依赖Newtonsoft.Json

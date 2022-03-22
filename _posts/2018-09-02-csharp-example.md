@@ -17,6 +17,7 @@ System.Diagnostics.Process.Start("explorer.exe /n," + Environment.GetFolderPath(
 * System.Windows.Forms.Application.ExecutablePath，与MainModule.FileName一样；还有个Application.StartupPath，与CWD一样
 * System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName
 * AppContext.BaseDirectory和AppDomain.CurrentDomain.BaseDirectory：目录，含有末尾反斜杠
+* .NET6：Environment.ProcessPath
 
 设置环境变量
 ------------

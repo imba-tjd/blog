@@ -2,6 +2,21 @@
 title: C#库
 ---
 
+## Newtonsoft.Json
+
+```c#
+using
+JsonConvert.SerializeObject(obj [,Formatting.Indented]); // 支持基元类型、IEnumerable、IDictionary
+JsonConvert.DeserializeObject<OBJ>(str);
+
+using JsonWriter writer = new JsonTextWriter(sw);
+var serializer = new JsonSerializer() {NullValueHandling = NullValueHandling.Ignore};
+serializer.Serialize(writer, obj);
+
+JObject.Parse(str); 之后当作dict用，其实一般用SerializeObject<dynamic>()
+JObject.FromObject(匿名对象)
+```
+
 
 ## 第三方库
 

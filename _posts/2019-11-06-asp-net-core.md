@@ -75,7 +75,7 @@ var config = new ConfigurationBuilder() // 手动指定要加载的数据源
     .Build();
 
 config.GetValue<int>("Key", defaultVal); // 直接用索引器只会返回字符串
-config.GetSection("KeyPath"); // 返回子节，永远不会返回null，如果找不到会返回{}，或用.Exists()判断是否存在
+config.GetSection("KeyPath"); // 返回子节，永远不会返回null，如果找不到会返回{}，或用.Exists()判断是否存在，或用GetRequiredSection()则不存在时抛异常
 config.GetChildren(); // 返回IEnumerable<IConfigurationSection>
 ```
 
@@ -180,6 +180,7 @@ public string Message { get; set; }
 * model：提供Model属性用于访问传递到视图的模型
 * View Component：属于高级用法，PartialView不能添加业务逻辑，Controller无法到处复用
 * @helper在3中无法使用了
+* 启用运行时编译，与watch run不兼容，仅限View层，编辑后刷新能重新编译：安装Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包，services.AddRazorPages().AddRazorRuntimeCompilation()或者在launchSettings中加"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES":"Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
 
 ### Razor Page
 
@@ -278,7 +279,7 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * [FromBody]等：用在函数形参上，推断绑定源，这样参数可以直接是自定义的类，有时不加也行
 * 返回值是Task IActionResult T，return可以直接返回对象，会自动序列化成JSON
 * 创建带有验证的WebApi：https://www.youtube.com/watch?v=_LdiqQ13NBo；官方文档用的是IdentityServer4
-* 默认输入和输出的都是JSON(Content-Type: application/json)，可以用AddControllers().AddXmlDataContractSerializerFormatters();添加XML的支持；收到不支持的Accept: xxx可以在AddControllers的选项里用ReturnHttpNotAcceptable=true，则会返回406 Not Acceptable
+* 默认输入和输出的都是JSON(Content-Type: application/json)；在AddControllers的选项里用ReturnHttpNotAcceptable=true，对不支持的返回406 Not Acceptable
 
 ### Minimal API
 

@@ -411,6 +411,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * systemctl daemon-reload
 * systemctl hibernate（休眠）、hybrid-sleep（交互式休眠）、rescue（进入单用户救援状态）
 * chkservice：交互式管理服务的程序 https://zhuanlan.zhihu.com/p/35264613
+* machinectl：取代su，polkit取代sudo
 
 ### 其它
 
