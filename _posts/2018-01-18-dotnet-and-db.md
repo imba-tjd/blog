@@ -241,12 +241,17 @@ for(int i=0;i<tb.Rows.Count;i++)
 * con.DefaultTimeout默认30秒，设为0会永远等待
 * 参数的DbType只有Sqlite的原生四种
 * 不支持Async方法
-* 连接字符串：`URI=file:db.sqlite`，这种情况下路径分隔符必须用斜杠
+* 连接字符串：`URI=file:db.sqlite`，这种情况下路径分隔符必须用斜杠；要不就也用`DataSource=...`
 * EFCore上的默认启用了WAL
 * 只支持命名参数，可用`: @ $`作为前缀
 * 大型Blob有专门的方法读写，目前不学
 * Win10自带winsqlite3.dll，目前版本3.34，可安装Microsoft.Data.Sqlite.Core和SQLitePCLRaw.bundle_winsqlite3来使用
-* System.Data.SQLite并不是内置库，也不是微软出的，但是是SQLite官方出的。如果要用，用.Core的包，与普通版相比没有Linq和EF6
+
+### System.Data.SQLite
+
+* 不是内置库，不是微软出的，是SQLite官方出的
+* 一般用.Core的包，与普通版相比没有Linq和EF6
+* 无参构造函数无法使用
 
 ### [Microsoft.Data.SqlClient](https://docs.microsoft.com/zh-cn/sql/connect/ado-net/sql)
 
@@ -260,6 +265,7 @@ for(int i=0;i<tb.Rows.Count;i++)
 * Linq to SQL：已经不维护了，且只支持SQL Server
 * [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)：用于类与类之间的映射，或者数据库模型与实体之间的映射。https://zhuanlan.zhihu.com/p/89550593 https://zhuanlan.zhihu.com/p/136602715
 * mysql-connector-net：官方ADO驱动，支持X协议
+* [sqlite-net](https://github.com/praeclarum/sqlite-net)：不遵循ADO规范，更易用也更专用，内置简单ORM。也依赖SQLitePCLRaw，但不支持winsqlite3
 
 ## 参考
 
