@@ -60,7 +60,6 @@ var result = await client.PostAsync("https://www.xxxx.com/login", content);
 * 修改UA：`Add("User-Agent", "...");`或`UserAgent.ParseAdd`，默认不存在
 * ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" }
 * TryGetValues可以获取它的值
-* Connection.ParseAdd("keep-alive"); TODO: 难道默认没有？
 
 ## 给网址进行编码
 

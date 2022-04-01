@@ -482,19 +482,16 @@ p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
 
 ## Requests
 
-### Session
-
-* 能连接复用以及保留cookie
-* 即使使用了会话，方法级别的参数也不会保留
+* Session能连接复用以及保留cookie
+* 即使使用了Session，方法级别的参数也不会保留
 * 非线程安全，toolbelt提供了简单的多线程
 
 ```py
-s = requests.session() # with或s.close()能关闭所有连接(urllib3.PoolManager)，但之后仍可以继续使用，又会自动创建。一般用于出现异常时及时释放资源
-s.request = functools.partial(s.request, timeout=3) # 连接超时时间，可为小数，默认无穷大，不加会一直等；直接赋值只影响connect超时时间，可传递元组，第二个参数控制下载超时；Session级别的只能这样设置，是故意的
+s = requests.session() # with或s.close()能关闭所有连接，但之后仍可以继续使用，又会自动创建。一般用于出现异常时及时释放资源
+s.request = functools.partial(s.request, timeout=3) # 设置超时时间，不加会一直等，Session级别的只能这样做；同urllib3也可传递元组，第一个参数控制连接超时，第二个参数控制下载
 allow_redirects=True; max_redirects=30 #【默】最后结果是200不是3xx；head默认不跟踪
-verify=True #【默】，也可为自定义CA文件路径；cert参数是客户端验证的证书
-proxies={"http": "http://10.10.1.10:1080", "https": "http://10.10.1.10:1080"} # 默认会检测环境变量HTTP_PROXY，不直接支持socks
-headers={'User-Agent':'python-requests/2.23.0','Accept-Encoding':'gzip','Connection':'keep-alive'}) #【基本默】大小写不敏感的dict
+proxies={"http": "http://10.10.10.10:1080", "https": "http://xxx"} # 默认会检测环境变量HTTP_PROXY，不直接支持socks
+headers={'User-Agent':'python-requests/2.23.0','Accept-Encoding':'gzip','Connection':'keep-alive'} #【基本默】大小写不敏感的dict
 auth=('user', 'pass') # Authorization头，如果不放到session里，重定向时会自动去掉
 cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict。另有requests.utils.add_dict_to_cookiejar(cj, cookie_dict)、cookiejar_from_dict、dict_from_cookiejar几个函数；有可能第一次能用dict，之后就要用它们了，不能直接update
 ```
@@ -507,15 +504,14 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * 传字符串给data是设置body，不要传字符串给json；data还支持file-like-obj且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
 * post支持files={'filefield': file-like-obj-bin}，requests-toolbelt提供了更多功能
 * RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
-* 自动gzip解码
 
 ```py
 r: Response = s.get(url,params={k:v})、post(url,data/json = {k:v}/str)、put/delete/head/options
-r.raise_for_status(), r.status_code # 200，== requests.codes.ok
+r.raise_for_status(), r.status_code, r.ok # 后两项分别为200和True
 r.json() # 即使解码成功也不一定意味着请求成功，因为有时服务器会在失败时也返回json
 r.text # 根据encoding解码的HTTP内容字符串
 r.encoding # 可赋值，一般在它等于'ISO-8859-1'时赋r.apparent_encoding
-r.content # 二进制，但会自动解码gzip，适用于图片等
+r.content # 二进制，但仍会自动解码gzip，适用于图片等
 r.url, r.history # 前者包含查询参数，后者为重定向响应列表
 r.headers # 响应头部，可用r.request.headers访问请求头部
 
@@ -538,37 +534,42 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib3
 
-* urllib3.PoolManager().request('GET',url); r.data.decode()
-* request_encode_body('POST',url,{body},encode_multipart=False)
-* Headers：UA默认为python-urllib3/1.26.8，无keep-alive。PM和request()的headers参数都是在默认头上添加，且默认pool.headers是{}；request()若设定headers参数会完全替换pool.headers
-* params接受的字典类型不必为dict[str, str]，会自动处理
-* 上传文件：fields={'filefield':('filename', filestr)}，二进制内容设置body和Content-Type，不支持file-like-obj
-* 自动gzip解码，但默认AE是identity
+* urllib3.request('GET',url,fields={'k':'v'}); r.data.decode()
+* POST和PUT：fields自动编码为body，类型默认为multipart。上传文件：fields={'filefield':('filename', str/bytes [,"text/plain"])}。上传二进制内容：设置body参数和Content-Type
+* Headers：UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
+* 支持自动gzip解码，但默认AE是identity
+* 默认重试3次，重定向3次，timeout无限
+* 流式处理，可看错io.BytesIO：preload_content=False; resp.read(4); resp.release_conn()
+* PoolManager：管理ConnectionPool，默认最大10个池
+* ConnectionPool：一个域名对应一个，默认maxsize=1只长连接一个，更多的能连接但不会保留长连接，设置block=True可阻止更多连接，这俩参数也能在PM的构造函数中使用。一般用connection_from_url()创建，pool.request(这里的url部分可以是相对路径)
 
 ### urllib
 
-* 自带，但urlopen默认不支持keep-alive，无法大量使用
+* 自带，但urlopen明确不支持keep-alive，无法大量使用
 * http.client更加底层
 * UA默认为Python-urllib/3.9
-* POST x-www-form-urlencoded内容：给urlopen传data=parse.urlencode(dict).encode('ascii')
+* POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
+* 似乎没有办法做出浏览器的URL编码的方式：把空格编码为%20，把中文用UTF8编码后每个加上%，其余的特殊字符不变。urllib3 requests不会对URL自动编码
 
 ```py
 req = urllib.request.Request(url, [method])
 req.add_header('k', 'v')/req.headers |= {'k':'v'}
 with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
-html = rsp.read().decode()
+text = rsp.read().decode()
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.info().get_content_charset()
 
-url = 'xxx?k=' + urllib.parse.quote(xxx, 'u8') # 有unquote
-parts = urllib.parse.urlparse(url) # 修改后可unparse
-parts.netloc域名
+urllib.parse：
+quote() 用于编码?k=v中的v，会编码所有特殊字符除了斜杠；逆过程为unquote()；还有quote_plus()会把空格编码为+而非%20
+parts = urlparse(url) 解析成六部分的命名元组，如parts.netloc域名，修改后可unparse
+parse_qs(被urlencode的数据) -> dict
+urljoin() 处理相对路径
 ```
 
 ### 其它HTTP库
 
 * httpx的api与requests差不多，且支持异步、h2、brotli；长连接用httpx.Client()；默认不自动30x跳转。底层用的是同作者的httpcore
-* requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，.render()自动用chrome请求ajax，第一次用会下载
+* requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，render()自动用chrome请求ajax，第一次用会下载驱动
 * httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
 * faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
 * h11：底层库，和http.client同级别
@@ -695,7 +696,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * ?加命令：显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
 * ?加带*的对象名：显示匹配的对象名；其实是psearch命令
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出(_)输进终端中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
-* load_ext autoreload; autoreload 2修改源文件后会自动重载，autoreload 1修改被aimport a,b的文件后自动重载；对C模块无效
+* load_ext autoreload; autoreload 2修改源文件后会自动重载，autoreload 1修改通过aimport a,b的文件后自动重载；对C模块无效
 
 ### 配置
 

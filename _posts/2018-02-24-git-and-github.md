@@ -371,8 +371,7 @@ collapsable content
 
 ## readme渲染顺序
 
-* readme.md -> readme -> readme.txt
-* index、index.md、index.html是没用的
+* index.html > readme.md > readme > readme.txt
 
 ## Gist
 

@@ -113,7 +113,7 @@ title: Linux命令
 * 压缩：tar caf jpg.tar.gz *.jpg。c为压缩，a为自动按后缀选择压缩格式，f指定压缩包名，必须是最后一个参数
 * 解压：tar xf abc.tar.gz。x为解压，类型现在都可自动根据后缀识别；最后可跟路径来只解压部分文件
 * 其他主选项：t查看内容，r追加，u更新；它们与c和x只能选其中一个
-* 其它参数：C指定解压目录，v显示详细信息，z代表tar.gz，j代表tar.bz2，-J/--xz代表xz，-I手动指定压缩或解压程序且能设定参数
+* 其它参数：C指定解压目录必须已存在，v显示详细信息，z代表tar.gz，j代表tar.bz2，-J/--xz代表xz，-I手动指定压缩或解压程序且能设定参数
 * 现在Windows也自带了，但只支持gzip
 
 #### xz
@@ -218,7 +218,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * -k忽略证书错误
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
-* url通配：`[1-10]`、`[01-10]`、`[1-10:2]`、`[a-z]`、`{asdf,zxcv}`，-g禁用这一行为；在-o的文件名中可用`#1`对应通配变量
+* url通配：`[1-10]`、`[01-10]`、`[1-10:2]`、`[a-z]`、`{asdf,zxcv}`，-g禁用这一行为；别用bash的展开，因为某些选项如-O只针对随后的一个；在-o的文件名中可用`#1`对应通配变量
 * -K opt.txt：从文件中读取命令行选项，一行一个可不带横杠，井号注释，也想指定url必须用`url`；默认会寻找`~/.curlrc`，Win下是~及exe所在目录下的`_curlrc`
 * -#显示进度条，在-O或者重定向输出时默认会有
 * -J：与-O同时使用时会从Content-Disposition中读取文件名，小心覆盖，不会url解码
@@ -255,7 +255,13 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 ### wget2
 
 * 自动多线程
+* -O指定要保存的文件名，默认会用url的最后一部分
+* -c断点续传
+* --progress=bar进度条
 * -i下载文件中列出的url
+* --spider：只检测文件是否存在
+* -b：转入后台下载，日志输出到wget-log文件中
+* -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
 * Win版：https://github.com/rockdaboot/wget2/issues/234#issuecomment-968329681 https://www.lumito.net/2020/12/05/released-wget2-1-99-2-for-windows/
 
 ### youtube-dl
