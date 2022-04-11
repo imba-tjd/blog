@@ -160,6 +160,13 @@ prog3 : prog3.o sort.o utils.o
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了
 
+## [TCC](https://download.savannah.gnu.org/releases/tinycc/)
+
+* -run 直接运行，支持-从stdin中读取
+* -b 进行边界检查，隐含-g
+* 支持C99
+* 不支持-O
+
 ## 参考
 
 * https://blog.csdn.net/haoel/article/details/2886

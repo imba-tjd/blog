@@ -8,20 +8,6 @@ category: dotnet
 * 默认情况下，“最小线程数量”与CPU的线程数相同。如果需求的线程数量少于这个数，会直接开线程；如果大于，会等待1秒看看有没有已有的空出来，然后才开
 * 设ThreadPoolTaskScheduler的CreateOptions为LongRunning会直接开
 
-## 计时器
-
-### System.Threading.Timer
-
-```c#
-Timer( TimerCallBack callback, object state, uint dueTime, uint period);
-void TimerCallback( object state);
-```
-
-* 当计时器到期后，系统会从线程池中的线程上开启一个回调方法，并传入state参数
-* dueTime是第一次到期之前的时间；如果被设置为Timeout.Ifinite则计时器不会开始，设为0，回调函数会被立即调用
-* period是两次调用回调函数之间的间隔，如果设置为Timeout.Ifinite则回调在被首次调用后不会被再次调用
-* state可以为null
-
 ## 互斥与同步机制
 
 总共要解决三个问题：原子性、有序性、可见性（读到的一定是最后一次写入的，不会缓存到寄存器里）

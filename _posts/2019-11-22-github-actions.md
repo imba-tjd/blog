@@ -173,3 +173,4 @@ zope.interface (4.3.2)
 * mxschmitt/action-tmate
 * nektos/act
 * actions/github-script
+* crazy-max/ghaction-github-pages

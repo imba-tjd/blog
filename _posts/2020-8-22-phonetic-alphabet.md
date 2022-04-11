@@ -166,6 +166,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * asked：/ɑːskt/或非正式/ɑːst/
 * tongue：/tʌŋ/
 * wander /wɒndə/，wonder /wʌndə/
+* anxiety /æŋˈzaɪəti/
 
 ## 同词异义异音
 

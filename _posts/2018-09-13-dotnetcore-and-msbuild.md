@@ -249,17 +249,23 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 如果源文件没有EntryPoint自动视为库生成dll，函数要指定`[UnmanagedCallersOnly(EntryPoint="xxx")]`，之后从C#中调用必须用P/Invoke，可选内嵌进最终exe
 * 仅x64，不支持csproj
 
+## 反编译
+
+* ILSpy：SharpDevelop开发者出的，还有VS扩展
+* dnSpy：用了VS Shell，更美观，好像还能调试，但是Archive了。现在有dnSpyEx的Fork
+* dotPeek：JB的，免费
+* https://www.telerik.com/products/decompiler.aspx：Telerik的，开源免费但有一段时间不更新了，只有在线安装包
+
 ## 混淆和反混淆
 
 * https://github.com/XenocodeRCE/neo-ConfuserEx
 * https://github.com/de4dot/de4dot
 * https://github.com/SychicBoy/NetReactorSlayer
+* https://github.com/obfuscar/obfuscar
 
-## 参考
+## TODO
 
 * https://zhuanlan.zhihu.com/p/35979897
-
-### TODO
 
 ```
 ItemGroup:
