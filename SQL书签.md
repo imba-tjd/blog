@@ -19,6 +19,7 @@ MySQL的万字总结 https://zhuanlan.zhihu.com/p/104811487
 my.cnf配置文件详解以及Linux下的使用 http://c.biancheng.net/view/7618.html
 免费教程《图解SQL面试题》 https://zhuanlan.zhihu.com/p/152233908
 MySQL死锁 https://juejin.cn/post/6844904121758138382 https://juejin.cn/post/6844903923459817479
+https://github.com/Snailclimb/JavaGuide#数据库
 
 https://www.zhihu.com/people/thinkle13/posts
 https://www.zhihu.com/people/wei-ha-75/posts
