@@ -921,7 +921,7 @@ await response(scope, receive, send)
 * 交互式命令行：manage.py shell
 * 创建管理员账号：manage.py createsuperuser
 * 准备部署：manage.py check --deploy
-* https://www.liujiangblog.com/course/django/
+* https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/
 * 第三方中间件：WhiteNoise压缩静态文件
 
 ```py
