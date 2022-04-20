@@ -202,6 +202,7 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 * 网站目录：/var/www/html/
 * 操作服务：service apache2/httpd/apachectl start/stop/restart
 * 检查配置文件有没有语法错误：apachectl -t或apache2/httpd -t，但它们好像不同
+* Win版：https://www.apachelounge.com/download/ https://www.apachehaus.com/cgi-bin/download.plx
 
 ### 虚拟主机
 

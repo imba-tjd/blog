@@ -311,7 +311,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 
 ### grep
 
-* grep option pattern filename，也支持从stdin读取
+* grep option pattern filename，不提供filename时从stdin读取，无法指定文件夹
 * 没必要用普通的grep，egrep对正则的支持更标准，引号中的大括号无需再转义，fgrep完全按本身匹配，-P使用Perl的规则
 * 当文件有多个时会在每一行前面打印出匹配到内容的文件名，用-h隐藏；当文件只有一个时，用-H强制显示
 * -l：仅输出匹配到的所在的文件名，与xargs配合时一般加-Z以NUL分隔输出
@@ -330,7 +330,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 #### ripgrep(rg)
 
 * 模式默认为正则
-* 默认递归搜索CWD下所有文件，但排除点开头文件和gitignore，-uu不忽略
+* 文件名可指定目录，不指定时默认递归搜索CWD（grep默认等待用户输入stdin），且默认排除点开头文件和gitignore，-uu不忽略
 * -t指定后缀，-z搜索压缩包
 * -E指定编码，默认搜GBK的会乱码
 * -r/--replace替换内容，-or '$1'能得到取第一个捕获组的效果
