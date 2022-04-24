@@ -1508,3 +1508,4 @@ print(template.render(the="variables", go="here"))
 * birdseye：调试工具，与pysnooper是同类的
 * https://github.com/JaidedAI/EasyOCR
 * wrapt：方便写装饰器，自动处理方法
+* https://github.com/Z4nzu/hackingtool

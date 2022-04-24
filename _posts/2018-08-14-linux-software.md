@@ -44,37 +44,24 @@ category: linux
 ### Debian阿里源
 
 ```
-# src是获取源代码时用的，不必要
-# 如果只是从测试源中安装某一个软件，可用apt -t testing install xxx；好像backports默认就是只有这样才能装的
-deb https://mirrors.aliyun.com/debian bullseye main non-free contrib
-deb https://mirrors.aliyun.com/debian-security bullseye-security main non-free contrib
-deb https://mirrors.aliyun.com/debian bullseye-updates main non-free contrib
-deb https://mirrors.aliyun.com/debian bullseye-backports main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian stretch main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian-security stretch/updates main
-# deb-src https://mirrors.aliyun.com/debian stretch-updates main non-free contrib
-# deb-src https://mirrors.aliyun.com/debian stretch-backports main non-free contrib
-
-# testing
+# 使用stable可避免手动更新代号
 deb https://mirrors.aliyun.com/debian testing main contrib non-free
 deb https://mirrors.aliyun.com/debian testing-updates main contrib non-free
 deb https://mirrors.aliyun.com/debian-security testing-security main contrib non-free
 #deb https://mirrors.aliyun.com/debian testing-backports main contrib non-free
+# 如果只是从测试源中安装某一个软件，可用apt -t testing install xxx；好像backports默认就是只有这样才能装的
+# deb-src https://mirrors.aliyun.com/debian testing main non-free contrib # 获取源代码时用的，不必要
 ```
 
 ### Ubuntu
 
-发行版命名根据首字母，目前测试版是hirsute
+发行版命名根据首字母。
 
 ```
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-updates main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-security main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-updates main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-security main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
 ```
 
 ### 其它源
@@ -196,18 +183,21 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 * gnome-tweak
 * 桌面版debian删除不用的程序：apt autoremove libreoffice* thunderbird smplayer smtube (不知有无mpv和vlc*和mplayer，有可能是smtube的依赖)
 
-## Apache
+## Apache2
 
-* 配置文件：/etc/apache2/apache2.conf（Debian系）、/etc/httpd/conf/httpd.conf（RH系）；里面显示端口配置在/etc/apache2/ports.conf
+* 配置文件
+  * Debian /etc/apache2/apache2.conf，端口配置 /etc/apache2/ports.conf
+  * RH和Win /etc/httpd/conf/httpd.conf
 * 网站目录：/var/www/html/
-* 操作服务：service apache2/httpd/apachectl start/stop/restart
+* 操作服务：service apache2/httpd/apachectl start/stop/restart。httpd.exe -k install
 * 检查配置文件有没有语法错误：apachectl -t或apache2/httpd -t，但它们好像不同
 * Win版：https://www.apachelounge.com/download/ https://www.apachehaus.com/cgi-bin/download.plx
+* `make_sock: could not bind to address`：端口已被占用
 
 ### 虚拟主机
 
-1. Apache1需要去掉`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和`Include conf/extra/httpd-vhosts.conf`前的井号。Apache2不是这样。把sites-available下的文件软链接到sites-enable下即可启用，mods同理。ssl默认是不启用的。
-2. Apache1修改conf/extra/httpd-vhosts.conf，Apache2直接改sites-available里的文件。
+1. 取消注释`LoadModule vhost_alias_module modules/mod_vhost_alias.so`和`Include conf/extra/httpd-vhosts.conf`。Debian把sites-available下的文件软链接到sites-enable下即可启用，mods同理。ssl默认是不启用的
+2. 修改conf/extra/httpd-vhosts.conf。Debian改sites-available里的文件
 3. 修改虚拟主机文件
 
 ```

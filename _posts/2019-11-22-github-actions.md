@@ -94,6 +94,23 @@ ${{ github.workspace }}
 * `action.yml`定义元数据
 * 输入的变量在环境中用$INPUT_MY_NAME获取
 
+## cache
+
+* 各个语言缓存依赖的例子：https://github.com/actions/cache/blob/main/examples.md
+
+```yaml
+- uses: actions/cache@master
+  id: cache
+  with:
+    path: |
+      .cache
+      <glob patterns>
+    key: ${{ runner.os }}-${{ hashFiles('文件名') }}
+
+- if: steps.cache.outputs.cache-hit != 'true'
+  run: <创建缓存>
+```
+
 ## 环境
 
 * 软件环境：https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md gcc是9.3，clang是10
