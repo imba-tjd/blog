@@ -125,6 +125,7 @@ ${{ github.workspace }}
 * 默认3.8但有3.9和2.7
 * 需要pip3 install wheel；曾经有不要给pip升级的经验
 * 需要PATH=$PATH:~/.local/bin，注意不同step应该是不共享的。或者可以试试python3 -m
+* setup-python支持设置`cache: pip`缓存全局依赖，默认将requirements.txt作为缓存的key，但又能够解析它使得不锁版本时装最新的，感觉不锁时意义不大
 
 ```
 asn1crypto (0.24.0)

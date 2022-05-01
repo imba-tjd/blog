@@ -4,7 +4,7 @@ title: 第三方 Python 库
 
 ## 环境和打包
 
-* 预编译的Win下的包：https://www.lfd.uci.edu/~gohlke/pythonlibs/
+* 预编译的Win下的包：https://www.lfd.uci.edu/~gohlke/pythonlibs/。可以用pipwin search/install/download pkg安装，但它自身依赖有点多，可考虑装到pipx里仅下载，会在$HOME/.pipwin下创建缓存
 
 ### requirements.txt
 
@@ -91,6 +91,7 @@ except ImportError:
 * 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
 * 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
 * --global-option "-a" --install-option "-b"相当于setup.py -a install -b
+* --no-build-isolation：目前版本的pip在构建时会自动创建虚拟环境，导致即使系统中存在满足依赖的包也不会去使用，此参数禁用这一行为
 
 ```py
 # __init__.py；必须有此文件才能自动发现
@@ -661,25 +662,24 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 ## IPython
 
 * `In[]`和`Out[]`数组记录了每一次的输入和输出；最后三次输出保存在`_`,`__`,`___`中，Out[n]也等价于`_n`
-* 退出用Ctrl+D，python在Win下用的是Ctrl+Z；支持Ctrl+r的与bash类似的历史搜索
+* 退出用Ctrl+D，python在Win下用的是Ctrl+Z；支持Ctrl+R的类似bash的历史搜索
 * 传递参数给文件或模块要用`--`，否则会被认为是传给ipython自己；而python不对`--`特别对待
-* 用pipx装的时候记得加`--system-site-packages`，且不要在里面的pip更新系统包
-* 交互式输出对象默认使用pprint，可以用%pprint关闭；在语句后加上分号会不显示交互式输出结果（不显示Out）
-* 普通代码中用`IPython.embed()`进入IPython环境，但只能手动交互，并不是之后的代码就由IPython自动执行了，也不会读取设置，好处是修改了全局变量等退出到原有Python环境中时能保留；start_ipython()是普通的启动IPython的方法，会读取设置
+* 交互式输出对象默认使用pprint
+* 普通代码中用IPython.embed()进入IPython环境，但只是进入REPL，也不会读取设置，但对当前会话做的修改等返回到原有Python会话中时能保留；start_ipython()是普通的启动IPython的方法，会读取设置
 * 自动括号和引号：`/fun 1 -> fun(1)`，`/fun 1,2 -> fun(1,2)`；`,fun a b` -> `fun('a','b')`；`;fun a b` -> `fun('a b')`
-* 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode可以专门进入测试模式
-* exit()的行为和python不一致，代码中应用sys.exit()
-* `get_ipython()`不为None就是在ipython中
+* 默认输入时自动忽略`>>>`和`...`，用于方便输入含有交互式提示符号的语句；doctest_mode专门进入测试模式
+* 能直接使用exit()
+* get_ipython()不为None就是在ipython中
 * ctrl+space不是自动完成，而是进入选择模式，受emacs的影响
 
 ### [魔法命令](https://ipython.readthedocs.io/en/latest/interactive/magics.html)
 
-* 单个%是行魔法，回车就执行，默认开启了%automagic，无歧义时不加%也行；两个%%是cell魔法，会提示`...`允许多行输入，无法省略百分号
+* 单个%是行魔法，回车就执行，默认开启了%automagic，使得无歧义时不加%也能执行命令；两个%%是cell魔法
 * 命令的结果可以赋值给Python变量，此时无法省略%；命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`到shell
-* quickref：显示所有魔法命令的简要参考；lsmagic：显示所有支持的魔法命令；?加魔法命令：显示指定命令的参考
+* quickref：显示所有命令的简要参考；lsmagic：显示所有支持的命令；?加命令：显示指定命令的参考
 * timeit：统计语句运行的时间，自动多次运行取最好的5次结果，-n指定运行次数，有%%；单次运行是time；prun显示每个语句的执行时间，有%%
 * who：显示定义了的所有变量，后可跟筛选的变量类型，whos信息更丰富，who_ls返回列表
-* run test.py/ipynb：运行脚本，-i可以继承当前会话的变量，-d启动调试，-t计时，-p启动Profiler，-m调用模块（参数仍要--）
+* run test.py/ipynb：-i继承当前会话的变量，-d启动调试，-t计时，-p启动Profiler，-m调用模块（参数仍要--）
 * debug：在刚刚出现过异常后使用，能进入ipdb检视刚才的异常栈；当然也可以一开始就用，设置断点；支持%%，接下来输入代码就可以debug
 * edit：启动编辑器来输入交互式代码，关闭后会传到cli里；VSC会自动加一个\n，没啥好办法
 * store：持久化储存变量，store -r恢复
@@ -692,7 +692,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * pycat：语法高亮地显示文件
 * bookmark、pwd、pushd、popd、dhist、ls、cd：与路径有关的一些操作。不能用!cd因为那些程序执行完就终止了
 * env：显示或设置环境变量
-* !xxx执行shell命令，等价于system()，但Win下默认是CMD，且可能有编码问题；!!：捕获输出，看起来!赋给变量也是一样的，返回列表一行一条
+* !xxx：执行shell命令，等价于system()，但Win下默认是CMD，且可能有编码问题；!!：捕获输出，看起来!赋给变量也是一样的，返回列表一行一条
 * ?加命令：显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
 * ?加带*的对象名：显示匹配的对象名；其实是psearch命令
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出(_)输进终端中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
@@ -702,7 +702,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 
 * ipython profile create [profilename]：创建`~/.ipython/profile_default/ipython_config.py`
 * 在`profile_default/startup/`中的.py或.ipy会自动执行，命名可以`10-xxx.py`这样含有优先级
-* config加不含c.的设置项可以动态读取和设置值
+* config命令加不含c.的设置项可以动态读取和设置值
 
 ```py
 c.TerminalInteractiveShell.confirm_exit = False
@@ -710,7 +710,7 @@ c.TerminalInteractiveShell.editor = 'code -w'
 c.InlineBackend.figure_format = 'svg' # 矢量图；或用retina表示高像素
 
 # 未更改的设置
-c.InteractiveShell.autocall = 0 # 启动自动括号，设为1时是智能模式，2是完全模式
+c.InteractiveShell.autocall = 0 # 自动括号，设为1时是智能模式，2是完全模式
 c.InteractiveShell.logstart = False # 启用后会保存会话，下次就会恢复；但默认是overwrite模式？
 c.InteractiveShell.pdb = False # 控制是否出现异常时自动进入ipdb，可用%pdb开关
 c.InteractiveShellApp.exec_files/.exec_lines/.extensions = [] # IPython启动时要执行的文件/代码/IPython扩展（load_ext）
@@ -730,15 +730,15 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## jupyter
 
-* pip install jupyter; jupyter notebook --no-browser --allow-root
-* 会往`%AppData%\jupyter`里写东西，但在商店的Python里会装到沙盘里
+* pip install notebook 目前7正在开发，安装时加--pre，仍会装上jupyterlab。不要直接装jupyter否则依赖太多。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了
+* jupyter notebook --no-browser; jupyer run xxx.ipynb
+* 会往`%AppData%\jupyter`里写东西，但在商店版Python里会装到隔离区里
 * Docker映像：https://jupyter-docker-stacks.readthedocs.io/
 * %%html、%%js、%%bash：将cell的内容渲染成HTML输出、运行JS/bash；IPython.display.IFrame/Image/Vedio/Audio能指定网址或路径嵌入内容，但这些是从本地发起的请求而不是服务器，width一般设为"100%"，HTML/Javascript/JSON能运行相应内容，FileLinks('.')类似于tree且会生成可点击的链接
-* %matplotlib notebook
 
 ### 配置
 
-* jupyter notebook --generate-config 在 ~/.jupyter/jupyter_notebook_config.py 下生成默认配置
+* jupyter notebook --generate-config 在 ~/.jupyter/jupyter_notebook_config.py 下生成默认配置。jupyter server也有此命令
 * c.NotebookApp.notebook_dir：启动目录（好像也是运行时的根目录）
 * c.NotebookApp.open_browser = False
 * c.NotebookApp.ip = '*'
@@ -769,7 +769,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ### Binder
 
-* https://mybinder.org/v2/gh/<user>/<repo>/HEAD?urlpath=nteract
+* `https://mybinder.org/v2/gh/<user>/<repo>/HEAD?urlpath=nteract`
 * repo2docker构建时自动处理requirements.txt apt.txt postBuild（只会运行一次的脚本） start（相当于EntryPoint） runtime.txt（指定Python-3.9）；或只处理Dockerfile
 
 ## Conda
@@ -1262,89 +1262,135 @@ if __name__ == "__main__":
 * 大部分运算都是非原地的，且可指定inplace=True
 * axis=0指行，1指列；许多函数有index和column的命名参数，优先用这个，除非想应用于所有
 * Series具有广播特性：赋单个值就全变成该值，赋list/range/Series就依次改变。与比较运算符计算会产生值都为bool的Series，与另一个Series运算就依次处理，不会变成两列的df。但是不支持'xxx' in S1，要自己用map。长度不可变
-* 一种常见的技巧：sum([True, True, False])计算有多少符合条件的
 * 如果是自动生成的行名，第0列不为行名
 * TODO: 如何按两列之差排序；df1['new_col'] = df2.col会报A value is trying to be set on a copy of a slice from a DataFrame；at和iat
 * pandas-bokeh：简单做出交互图
-* 自带plot()
 * modin：目的是作为pd的原地替代库，速度更快资源消耗更小。类似的库还有swifter pandarallel Dask Ray Vaex
 
 ```py
 import pandas as pd
 data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8
 to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符
-pd.DataFrame({'A': [1, 2], 'B': [3, 4]}) # 两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
-pd.DataFrame([[1,3], [2,4]], columns=['A', 'B']) # 另一种创建方式，按行输入数据
-pd.Series([1,3], index=['A','B']) # 一行数据，AB是列名；但也可看作一列数据，AB是行id
-pd.Series([1,2], name='A') # 一列数据，A是列名，行id自动编号
+pd.DataFrame({'A': [1, 2], 'B': [3, 4]})  两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
+pd.DataFrame([[1,3], [2,4]], columns=['A', 'B'])  另一种创建方式，按行输入数据
+pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id
+pd.Series([1,2], name='A')  一列数据，A是列名，行id自动编号
+columns=pd.MultiIndex.from_product([['one', 'two'], ['first', 'second']])  产生one下的两个和two下的两个，使用时用.loc[:, ('one', 'second')]
 df.columns/index
 df.shape行列数
-df.head(n=5)/tail() # 显示最开始/后面的几行
-df.describe() # 以8*n的表格显示各列的count、平均值、最大最小值等
-df.info() # 显示所有列的名称类型占用空间
+df.head(n=5)/tail()  显示最开始/后面的几行
+df.describe()  以8*n的表格显示各列的count、平均值、最大最小值等，只显示数字列
+df.info()  显示所有列的名称类型占用空间
 
-df.A/df['A'] # 获取一列，保留行名，再用[]能取出指定行的值；后一种方式适用于列名含空格
-df.[['A','B']] # 获取多列，仍为DataFrame，不能用小括号
-df[0:2]/[1:] # 获取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使只有一行
-df.iloc[0]/[:, 0]/[(0,1), 0] # 第一个索引是行范围，用:就是选择所有行，第二个索引是选择列；单索引时类型为Series，且index变为原columns的内容因此可用.A
-df.loc 类似于iloc，但loc[0:10]为闭区间，实际主要用于基于名称的范围选择：loc['A':'C']代替loc['A','B','C']
-df[(data.A == 'xxx') & (data.B > 10)] # 数据in用.isin()；逻辑或用|，使用比较运算符时一定要加括号
+df.A/df['A']  获取一列，保留行名，再用[]能取出指定行的值；后一种方式适用于列名含空格
+df.[['A','B']]  获取多列，仍为DataFrame，不能用小括号
+df[0:2]/[1:]  获取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使只有一行
+df.iloc[0]/[1:3, 0]/[:, 0]/[(0,1,2), 0]  第一个索引是行范围，用:就是选择所有行，第二个索引是选择列；单索引时类型为Series，且index变为原columns的内容因此可用.A
+df.loc  类似于iloc，第一个索引仍是行，但loc[0:10]为闭区间，实际主要用于基于名称的范围选择，或支持非数字的index范围：loc['A':'C']代替loc['A','B','C']
+df.A == 'xxx'  广播运算，返回一个全为True/False的长度相同的Series，能再支持.any()和sum()计算有多少符合条件的；也能直接用在df上，聚合后是以列名为index的Series
+df.loc[(data.A == 'xxx') & (data.B > 10)] 逻辑或用|，一定要加括号，可不用loc。也支持其它类似的运算，如A.isin([x,y])、A.notnull()等
+df.A + df.B;  df.A - df.B.mean();  df.A = Iterable对象
 
-df1.append(df2) # 合并行
-pd.merge([df1, df2], on='key') # 合并列
+df1.append(df2)  合并行
+pd.merge([df1, df2], on='key')  合并列
 df1.join(df2, on='key')
-pd.concat([rows1, rows2]) # 合并行，设置axis=1可变为合并列
+pd.concat([rows1, rows2])  合并行，设定axis=1变为合并列
 
-df.A.value_counts() # 计算某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序
-df.sort_values(by = 'A') # 默认ascending=True，by可以是[]；还有sort_index()在groupby后可能用到
-df.A.str.xxx  # 把数据看作字符串使用对应的函数；splite()有个expand=True
+df.A.value_counts()  计算某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序
+df.sort_values(by = 'A')  默认ascending=True，by可以是[]；还有sort_index()在groupby后可能用到
+df.A.str.xxx  把数据看作字符串广播使用对应的函数；splite()有个expand=True
 df.A.unique()、isnull()/notnull()、max()、idxmax()返回最大值的index常见于loc中以获取那一行
 df.A.map(lambda)
-df.apply(lambda row: ..., axis=1) # 用于整个df，默认按列，设定axis=1后就是按行处理，类型是Series，用.A可获取列的值。df.applymap处理单个元素
-df.agg([max, min]) # 对每一列都调用对应的函数，产生以max和min为index的聚合结果；Series也适用
+df.apply(lambda row: ..., axis=1)  用于整个df，默认按列，设定axis=1后按行，类型是Series，用.A可获取列的值。df.applymap处理单个元素
+df.agg([max, min])  对每一列都调用对应的函数，产生以max和min为index的聚合结果；Series也适用
 
 df.filter(regex='^L')
-df.rename(columns={'old': 'new'}, index=...) # 也可df.index = [...]
-df.dropna()删除包含空值的行，设置how='all'只处理全为空的；fillna(x)用x填充空值，drop_duplicates()删除重复值
-df.drop([xxx]) # 删除行；删列还能用del或axis=1，且是原地的
+df.rename(columns={'old': 'new'}, index=...)  也可df.index = [...]
+df.dropna() 删除包含空值的行，设置how='all'只处理全为空的；fillna(x) 用x填充空值，drop_duplicates() 删除重复值
+df.drop([xxx])  删除行；删列还能用del或axis=1，且是原地的
 df.set_index(['col1','col2'], verify_integrity=True)
 df.stack().rename_axis
 df.index.set_levels(frame.index.levels[-1].astype(int), level=-1)
 
-df.groupby(['A']).B.max() # 按A分组后把对应范围的B聚合，产生以A为index的Series
-# groupby多个列时，会产生MultiIndex，一般用reset_index()去掉命名变成编号
-# groupby后的结果可看作含有df的Series，可.apply(lambda df: ...)，但必须返回一行或一个值，即需要聚合
-df.pivot_table(index=col1,columns=col2,values=[col3,col4],aggfunc=max) # 数据透视表，以col1为行，col2为列，取col3和col4的最大值
+df.groupby(['A']).B.max()  按A分组后把对应范围的B聚合，产生以A为index的Series
+groupby多个列时，会产生MultiIndex，一般用reset_index()去掉命名变成编号
+groupby后的结果可看作含有df的Series，可.apply(lambda df: ...)，但必须返回一行或一个值，即需要聚合
+df.pivot_table(index=col1,columns=col2,values=[col3,col4],aggfunc=max)  数据透视表，以col1为行，col2为列，取col3和col4的最大值
+
+pd.set_option("display.max.columns", None)  列过多时不隐藏
+df.plot(x='xxx',y=[...])  默认是折线图，plot.pie()画其它图。还要开%matplotlib inline
+```
+
+## matplotlib
+
+* line折线图，hist直方图，pie饼图，scatter散点图，bar柱状图。柱状图和直方图的区别：柱状图的x轴是分类，不同类可以随意交换；而直方图的x轴是数据的范围，且矩形条之间没有间隙
+
+```py
+%matplotlib inline
+import matplotlib.pyplot as plt
+
+plt.plot([xpoints], [ypoints], label='折线名')
+plt.title()
+plt.ylabel('Y轴名称'); plt.xlabel()
+plt.rcParams['font.sans-serif']=['SimHei'] # 解决不显示中文
+plt.show() # 终端里也能用，但会显示在窗口中
+plt.savefig('img.svg') # 格式自动根据文件名的后缀设置
+
+fig, ax = plt.subplots() # 在一个figure中绘制多个图
 ```
 
 ## scikit-learn
 
-* 树的层数太浅会导致underfitting，无论是训练还是验证都具有较大误差；层数太多会导致overfitting，能非常好的匹配训练，但验证却有很大误差；应处于中间，一种控制方法是创建model时设定max_leaf_nodes
-* xgboost.XGBRegressor貌似是最好的决策树，但实测不调任何参数时与rf不相上下
-* https://scikit-learn.org.cn/
+* https://scikit-learn.org.cn/lists/8.html https://scikit-learn.org.cn/lists/2.html https://sklearn.apachecn.org。https://zhuanlan.zhihu.com/p/88729124 https://zhuanlan.zhihu.com/p/103136609 https://zhuanlan.zhihu.com/p/99618155 https://zhuanlan.zhihu.com/p/29649128 https://zhuanlan.zhihu.com/p/190049765
+* 树的层数太浅会导致underfitting，无论是训练还是验证都具有较大误差；层数太多会导致overfitting，能非常好的匹配训练，但验证却有很大误差；应处于中间，一种控制方法是创建model时设定max_leaf_nodes，另一种仅解决of的方法是指定regularization
+* 损失函数：衡量模型的预测值与sample真实值的区别，一般就是相减再平方
+* 另一种评判好坏的方法：bias(偏差)和variance(方差)，两者形成4种组合。高bias为离目标远，低bias为离目标近，高variance为分散，低variance为集中。低bias+高variance为overfitting，高bias+低variance为underfitting
+* 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
+* 决策树：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错
+* auto-sklearn：自动调超参数，是sklearn的原地替代
+* 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X).transform(X)
+* pipeline：把pre-processors和estimators连起来自动依次使用
+* sklearn.tree.DecisionTreeRegressor：需要调参
+* 其他库：yellowbrick图形化，mlxtend工具类，dtreeviz可视化，scikit-optimize，m2cgen把模型转换为其它语言，featuretools，Sacred能保存各种参数用于复现
 
 ```py
-y = data.Price # 选择一个列作为预测目标
-X = data[['col1','col2']] # 选择一些列作为“features”
+y = data.Price # 选择一个列作为预测目标target。小数则为回归，整数或其它离散量则为分类，无监督学习不需要
+X = data[['col1','col2']] # 选择一些列作为“features”。也支持用普通list，如[[1,2,3],[4,5,6]]表示2个sample，3个feature
 
-from sklearn.model_selection import train_test_split # 把源数据分成训练的和验证的两部分
-train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=1)
+from sklearn.model_selection import train_test_split # 把源数据分成训练的和验证的两部分，此处测试的占10%
+train_X, val_X, train_y, val_y = train_test_split(X, y, test_size=0.1, random_state=0)
 
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换
-dt_model = DecisionTreeRegressor(random_state=1) # 设定random_state使得每次运行结果一样
+from sklearn.ensemble import RandomForestRegressor/RandomForestClassifier # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换普通决策树
+dt_model = RandomForestRegressor(random_state=0) # 设定random_state使得每次运行结果一样
 dt_model.fit(train_X, train_y) # 填充数据
 val_predicted_prices = dt_model.predict(val_X) # 预测结果，类型是numpy.ndarray
 
-from sklearn.metrics import mean_absolute_error # MAE平均绝对误差，等于avg(abs(预测值-真实值))
+from sklearn.metrics import mean_absolute_error, accuracy_score # MAE平均绝对误差，等于avg(abs(预测值-真实值))
 mean_absolute_error(val_y, val_predicted_prices)
 
-from sklearn.impute import SimpleImputer # 填充空值的一种方法
-my_imputer = SimpleImputer()
-imputed_X_train = pd.DataFrame(my_imputer.fit_transform(X_train))
-imputed_X_valid = pd.DataFrame(my_imputer.transform(X_valid))
-imputed_X_train.columns = X_train.columns # Imputation removed column names; put them back
-imputed_X_valid.columns = X_valid.columns
+from sklearn.impute import SimpleImputer # 填充空值，用已有的数据模拟，当空值较少时可以使用，如果较多，应drop那一列
+imputed_X_train = pd.DataFrame(imputer.fit_transform(X_train))
+imputed_X_valid = pd.DataFrame(imputer.transform(X_valid))
+imputed_X_train.columns = X_train.columns; imputed_X_valid.columns = X_valid.columns # Imputation会移除列名，此操作加回去
+
+pd.get_dummies(data) # 自动把数据中非整数的离散值变成整数
+data.select_dtypes(exclude=['object']) # 直接去掉非数字列
+object_cols = [col for col in X_train.columns if X_train[col].dtype == "object"] # 提取非数字列的列名
+from sklearn.preprocessing import OrdinalEncoder # 也是把非数字编码为数字，但可能存在X_train和X_valid里有不同值的情形，此时要drop掉差异部分，太复杂略。还有一种OneHotEncoder用起来太复杂了
+label_X_train[object_cols] = ordinal_encoder.fit_transform(X_train[object_cols])
+label_X_valid[object_cols] = ordinal_encoder.transform(X_valid[object_cols])
+
+from sklearn.datasets import load_iris # 内置了一些数据集，小型的自带，大型的使用时会联网下
+X, y = load_iris(return_X_y=True)
+
+from sklearn.model_selection import RandomizedSearchCV # 自动调整超参数
+param_distributions = {'n_estimators': randint(1, 5), 'max_depth': randint(5, 10)}
+search = RandomizedSearchCV(estimator=RandomForestRegressor(random_state=0),n_iter=5,param_distributions=param_distributions,random_state=0)
+search.fit(X_train, y_train)
+search.best_params_
+
+from sklearn.linear_model import LogisticRegression, LinearRegression
+Input contains NaN, infinity or a value too large：存在空值
 ```
 
 ## BigQuery
