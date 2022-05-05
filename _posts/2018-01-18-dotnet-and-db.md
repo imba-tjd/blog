@@ -198,7 +198,7 @@ tran.Commit()/Rollback();
 ### IDbCommand
 
 * CommandText：获取或设置要执行的SQL命令/储存过程/数据表名称
-* CommandType：Text（默认，SQLite只支持它）、StoredProcedure、TableDirect
+* CommandType：Text（默认，SQLite只支持它）、StoredProcedure（使用时CommandText设为SP名，再添加参数即可，就像函数调用一样）、TableDirect
 * Parameters：SQL命令参数集合
 * Cancel()
 

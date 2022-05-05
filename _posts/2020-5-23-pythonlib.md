@@ -1216,9 +1216,10 @@ ffi.cast("int", 2)
 
 ## numba
 
-* 依赖numpy，不能加速pandas，适合大量循环数学计算，需要一个较大的运行时依赖
+* 依赖numpy，适合大量循环数学计算，需要一个较大的运行时依赖
 * @njit强制nopython模式
 * parallel=True多线程执行，fastmath=True启用精度较低但更快的浮点运算，cache=True启用硬盘缓存
+* 可以加速pandas，pd的某些函数用参数engine='numba'
 
 ## pyside6
 
@@ -1263,14 +1264,13 @@ if __name__ == "__main__":
 * axis=0指行，1指列；许多函数有index和column的命名参数，优先用这个，除非想应用于所有
 * Series具有广播特性：赋单个值就全变成该值，赋list/range/Series就依次改变。与比较运算符计算会产生值都为bool的Series，与另一个Series运算就依次处理，不会变成两列的df。但是不支持'xxx' in S1，要自己用map。长度不可变
 * 如果是自动生成的行名，第0列不为行名
-* TODO: 如何按两列之差排序；df1['new_col'] = df2.col会报A value is trying to be set on a copy of a slice from a DataFrame；at和iat
 * pandas-bokeh：简单做出交互图
 * modin：目的是作为pd的原地替代库，速度更快资源消耗更小。类似的库还有swifter pandarallel Dask Ray Vaex
 
 ```py
 import pandas as pd
-data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8
-to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符
+data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8，支持网络url
+df.to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符
 pd.DataFrame({'A': [1, 2], 'B': [3, 4]})  两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
 pd.DataFrame([[1,3], [2,4]], columns=['A', 'B'])  另一种创建方式，按行输入数据
 pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id
@@ -1290,11 +1290,13 @@ df.loc  类似于iloc，第一个索引仍是行，但loc[0:10]为闭区间，�
 df.A == 'xxx'  广播运算，返回一个全为True/False的长度相同的Series，能再支持.any()和sum()计算有多少符合条件的；也能直接用在df上，聚合后是以列名为index的Series
 df.loc[(data.A == 'xxx') & (data.B > 10)] 逻辑或用|，一定要加括号，可不用loc。也支持其它类似的运算，如A.isin([x,y])、A.notnull()等
 df.A + df.B;  df.A - df.B.mean();  df.A = Iterable对象
+df.at/iat：取单个值性能更高
 
 df1.append(df2)  合并行
 pd.merge([df1, df2], on='key')  合并列
 df1.join(df2, on='key')
 pd.concat([rows1, rows2])  合并行，设定axis=1变为合并列
+df.assign(new_col=df.A+df.B)  添加列
 
 df.A.value_counts()  计算某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序
 df.sort_values(by = 'A')  默认ascending=True，by可以是[]；还有sort_index()在groupby后可能用到
@@ -1319,6 +1321,8 @@ df.pivot_table(index=col1,columns=col2,values=[col3,col4],aggfunc=max)  数据�
 
 pd.set_option("display.max.columns", None)  列过多时不隐藏
 df.plot(x='xxx',y=[...])  默认是折线图，plot.pie()画其它图。还要开%matplotlib inline
+pd.to_numeric
+A.str好像对本来是int的会报错
 ```
 
 ## matplotlib
@@ -1346,11 +1350,12 @@ fig, ax = plt.subplots() # 在一个figure中绘制多个图
 * 损失函数：衡量模型的预测值与sample真实值的区别，一般就是相减再平方
 * 另一种评判好坏的方法：bias(偏差)和variance(方差)，两者形成4种组合。高bias为离目标远，低bias为离目标近，高variance为分散，低variance为集中。低bias+高variance为overfitting，高bias+低variance为underfitting
 * 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
-* 决策树：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错
+* 决策树：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错。这类模型(GBDT)不需要归一化
 * auto-sklearn：自动调超参数，是sklearn的原地替代
 * 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X).transform(X)
 * pipeline：把pre-processors和estimators连起来自动依次使用
 * sklearn.tree.DecisionTreeRegressor：需要调参
+* 部署：pickle、joblib.dump第三方二进制序列化库、treelite编译决策树的库
 * 其他库：yellowbrick图形化，mlxtend工具类，dtreeviz可视化，scikit-optimize，m2cgen把模型转换为其它语言，featuretools，Sacred能保存各种参数用于复现
 
 ```py
@@ -1546,7 +1551,7 @@ print(template.render(the="variables", go="here"))
 * mkdocs mkdocs-material
 * ansible
 * Wagtail：基于Django的CMS
-* Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器；pyodide 编译到WA
+* Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器；pyodide 编译到WA；PyScript 在html中引入一个script就能用
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium
 * pyinstrument：使用简单的profile工具
@@ -1555,3 +1560,4 @@ print(template.render(the="variables", go="here"))
 * https://github.com/JaidedAI/EasyOCR
 * wrapt：方便写装饰器，自动处理方法
 * https://github.com/Z4nzu/hackingtool
+* joblib：有三个功能，一是透明硬盘缓存，二是并行计算，三是快速二进制序列化
