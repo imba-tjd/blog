@@ -42,7 +42,7 @@ title: SQL
 * IS NULL、IS NOT NULL：只有这个能判断。col = NULL和col != NULL或任何其它运算，结果都为NULL，用在WHERE中就恒假
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
 * IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
-* [NOT] LIKE：默认不区分大小写，PG除外。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
+* [NOT] LIKE：默认不区分大小写，PG除外用ilike不区分。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
 * 拼接的时候常加`WHERE 1=1`，方便之后加AND
