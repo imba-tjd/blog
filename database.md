@@ -245,10 +245,10 @@ END
 
 ### LocalDB
 
-* C:\Program Files\Microsoft SQL Server\150\Tools\Binn\SqlLocalDB.exe create/delete/start/stop 实例名，不加时默认为MSSQLLocalDB
+* C:\Program Files\Microsoft SQL Server\150\Tools\Binn\SqlLocalDB.exe create/delete/start/stop 实例名，不加时或为点默认为MSSQLLocalDB
 * info无参使用列出所有的实例，info加实例名显示命名管道等信息，有可能客户端要去掉np前缀
 * 如果启动失败，考虑删除重建，有可能是用了老版本的数据库
-* 连接地址：`(localdb)\MSSQLLocalDB`
+* 连接字符串：`Server=(localdb)\\.;Integrated Security=true`。如果点不支持就换成MSSQLLocalDB或其它实例名；IntegratedSecurity好像不加也行
 * 需指定数据库级别的排序规则：`CREATE/ALTER DATABASE db1 COLLATE Chinese_PRC_CI_AS`；不会影响已有的列，还需要ALTER TABLE一下
 * 下载地址：https://www.hanselman.com/blog/download-sql-server-express
 * 数据库文件和日志在`%LocalAppData%\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB`
