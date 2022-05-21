@@ -202,7 +202,7 @@ DELETE
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
     col1 type PRIMARY KEY,
-    col2 type NOT NULL DEFAULT n UNIQUE,
+    col2 type NOT NULL DEFAULT n UNIQUE, -- default加括号(表达式或函数)
     col3 type REFERENCES tb2(col1), -- MySQL能写在此处却无效
     -- 表约束
     INDEX/UNIQUE ndx1(col2 [desc], col3), -- 索引的顺序应和常用的ORDERBY顺序一致，主键也支持指定顺序
@@ -369,4 +369,5 @@ grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, u
 * json_set(json,path,value[,path,value]) json_replace() json_insert()：set就是一般的赋值，不存在时会创建；replace仅覆盖，不存在时不会创建；insert插入到某个位置，原位置的对象后移，不会覆盖；数组插入#位置相当于append
 * json_patch(json,json) json_remove() json_type()：略
 * json_quote()：将可能不合理的字符串转换为json能接受的字符串，因为各种*json*参数包括->会去解析字符串；如果合法或者已是内部对象，就什么也不做
-* json_each() json_tree()：遍历，用在FROM中，返回同函数名的表，key对于数组是索引 value type atom类似于值但对于数组和对象是空 fullkey路径
+* 遍历：json_each() json_tree()，用在FROM中，返回同函数名的表，key对于数组是索引 value type atom类似于值但对于数组和对象是空 fullkey路径
+* 聚合函数：json_group_array() json_group_object()
