@@ -261,7 +261,7 @@ for(int i=0;i<tb.Rows.Count;i++)
 
 * [LINQ to DB](https://linq2db.github.io/)：比dapper的star少很多，但contributor有一半，而且仍然活着，所以也还可以看看。比Dapper重。Wiki有内容
 * SSDT：https://www.youtube.com/watch?v=ijDcHGxyqE4
-* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点，产生时间不长，但有人说已经比前者更好了
+* SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点
 * Linq to SQL：已经不维护了，且只支持SQL Server
 * [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)：用于类与类之间的映射，或者数据库模型与实体之间的映射。https://zhuanlan.zhihu.com/p/89550593 https://zhuanlan.zhihu.com/p/136602715
 * mysql-connector-net：官方ADO驱动，支持X协议

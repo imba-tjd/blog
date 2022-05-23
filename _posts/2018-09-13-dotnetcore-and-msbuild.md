@@ -32,7 +32,7 @@ DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdb
 Prefer32Bit：默认false，但VS模板默认true
 ImplicitUsings：true 自动添加System Generic IO Linq Http Tasks的引用
 
-LangVersion：latest/preview
+LangVersion：latest/preview # 目标框架是net472时可加上
 AllowUnsafeBlocks：true # 启用后才能写unsafe块，不是默认全局unsafe
 OutputPath：Bin/ # 最好加上目录分隔符
 CheckForOverflowUnderflow：true # 溢出时抛异常
@@ -59,6 +59,7 @@ ApplicationManifest：app.manifest # 好像会自动使用
   <PackageReference Include="Newtonsoft.Json" Version="12.*" />
   <ProjectReference Include="..\xxx\xxx.csproj" />
   <Reference Hintpath="xxx.dll" />
+  <Reference Include="System.Net.Http" /> # 目标框架是net472时可加上
 </ItemGroup>
 
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">

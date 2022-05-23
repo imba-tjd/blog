@@ -88,8 +88,8 @@ title: Git/GitHub笔记
 * core.symlinks true：默认是启用的，但不知为何VS附带的Git把它设为了false
 * 性能
   * core.fscache true：仅Win有效，缓存status
-  * core.fsyncObjectFiles：设为false表示交给操作系统flush数据，对于现代文件系统没必要设为true但好像默认是它，batch在NTFS下安全性应和true相当，但目前VS附带的Git版本不够，要2.34
-  * core.usebuiltinfsmonitor true：Win和Mac有效，启用后好像会产生守护进程
+  * core.fsyncObjectFiles：设为false表示交给操作系统flush数据，对于现代文件系统没必要设为true但好像默认是它，batch在NTFS下安全性应和true相当
+  * core.fsmonitor true：Win和Mac有效，启用后好像会产生守护进程
   * feature.manyFiles true：相当于修改另外两项设置，遇到大量文件时有一些优化
 
 ### 查看diff信息的工具

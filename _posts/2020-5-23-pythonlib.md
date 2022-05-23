@@ -486,6 +486,7 @@ p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
 * Session能连接复用以及保留cookie
 * 即使使用了Session，方法级别的参数也不会保留
 * 非线程安全，toolbelt提供了简单的多线程
+* requests-cache库：透明持久化缓存，支持多种后端
 
 ```py
 s = requests.session() # with或s.close()能关闭所有连接，但之后仍可以继续使用，又会自动创建。一般用于出现异常时及时释放资源
@@ -1059,16 +1060,19 @@ z['huey']; z[:'mickey']; z[-2:]; z[-2:, True] # 分别为取/赋、比mickey小�
 
 ### pyodbc
 
-* Win自带mdb的32位Jet驱动，2007改成了accdb格式，2010有支持它的ACE驱动但需要单独下，最新的为2016，或者装Office
-* 驱动的32/64位必须与Py对应，且若系统中有Office也要对应
-* pyodbc.drivers()列出所有可用驱动
+* 驱动
+  * Access：Win自带mdb的32位Jet驱动。2007及之后的accdb格式需要单独下ACE驱动，最新的为2016，或者装Office
+  * MSSQL：Win11自带32位和64位的SQLServer2000和2012驱动，没啥用，估计LocalDB都连不上
+  * 另一种选择是装ODBC驱动，还有Linux和macOS的版本
+  * Access驱动的32/64位必须与Py对应，且若系统中有Office也要对应
+  * 列出所有可用驱动：pyodbc.drivers()。或开始菜单搜索odbc
 * autocommit默认为False，但只是cursor层级没有，cnn层级是有的，connect的时候打开，cnn.commit时提交，with connect也会提交
 * cur.fetchval()：非标准API，适合返回单一值，等于fetchone判断不为None再取0
 * row可直接按名称访问列
 * 编码好像不需要改，从2000开始字符串就是用的Unicode储存
 * 本来Access的like用?表示一个字符，*表示0或多个字符，#表示一个数字；但本模块要用_和%
 * 不支持命名参数查询
-* pypyodbc：纯Py实现，无需安装驱动，连接有函数只用指定文件名很方便；当初兼容pyodbc，但后来长时间不积极维护已经变得不那么兼容了
+* pypyodbc：纯Py实现，能直接用win_create_mdb()和win_connect_mdb()指定文件名连接，默认自动使用系统的驱动；当初兼容pyodbc，但后来长时间不积极维护已经变得不那么兼容了；支持2.6导致完全没有type hint
 
 ```py
 import pyodbc
@@ -1270,7 +1274,7 @@ if __name__ == "__main__":
 ```py
 import pandas as pd
 data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8，支持网络url
-df.to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符
+df.to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符，指定compression='gzip'可保存为gz读取时自动识别
 pd.DataFrame({'A': [1, 2], 'B': [3, 4]})  两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
 pd.DataFrame([[1,3], [2,4]], columns=['A', 'B'])  另一种创建方式，按行输入数据
 pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id
@@ -1561,3 +1565,4 @@ print(template.render(the="variables", go="here"))
 * wrapt：方便写装饰器，自动处理方法
 * https://github.com/Z4nzu/hackingtool
 * joblib：有三个功能，一是透明硬盘缓存，二是并行计算，三是快速二进制序列化
+* pyupgrade：自动把老版本语法更新到新版本，但条目不多
