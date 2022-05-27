@@ -1064,7 +1064,7 @@ z['huey']; z[:'mickey']; z[-2:]; z[-2:, True] # 分别为取/赋、比mickey小�
   * Access：Win自带mdb的32位Jet驱动。2007及之后的accdb格式需要单独下ACE驱动，最新的为2016，或者装Office
   * MSSQL：Win11自带32位和64位的SQLServer2000和2012驱动，没啥用，估计LocalDB都连不上
   * 另一种选择是装ODBC驱动，还有Linux和macOS的版本
-  * Access驱动的32/64位必须与Py对应，且若系统中有Office也要对应
+  * Access驱动的32/64位必须与Py对应，且若系统中有Office也要对应，不同位的Access创建的mdb也无法混用
   * 列出所有可用驱动：pyodbc.drivers()。或开始菜单搜索odbc
 * autocommit默认为False，但只是cursor层级没有，cnn层级是有的，connect的时候打开，cnn.commit时提交，with connect也会提交
 * cur.fetchval()：非标准API，适合返回单一值，等于fetchone判断不为None再取0
