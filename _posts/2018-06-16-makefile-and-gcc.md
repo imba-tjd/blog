@@ -157,8 +157,9 @@ prog3 : prog3.o sort.o utils.o
 * https://github.com/niXman/mingw-builds-binaries
 * https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3
 * https://nuwen.net/mingw.html
-* __MINGW64_VERSION_MAJOR定义了它自己的版本
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了
+* https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
+* __MINGW64_VERSION_MAJOR定义了它自己的版本
 
 ## [TCC](https://download.savannah.gnu.org/releases/tinycc/)
 
