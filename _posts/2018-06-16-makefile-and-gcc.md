@@ -144,12 +144,14 @@ prog3 : prog3.o sort.o utils.o
 #pragma GCC diagnostic pop
 ```
 
-## Clang
+## 编译器
+
+### Clang
 
 * 安装：https://apt.llvm.org/
 * Win: https://github.com/mstorsjo/llvm-mingw 有ucrt，但支持太多的target导致可执行文件有点多
 
-## MinGW
+### MinGW
 
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer，有ucrt
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，因为内部用了bzip2，env文件控制自动添加PATH
@@ -161,12 +163,16 @@ prog3 : prog3.o sort.o utils.o
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
 
-## [TCC](https://download.savannah.gnu.org/releases/tinycc/)
+### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
 
 * -run 直接运行，支持-从stdin中读取
 * -b 进行边界检查，隐含-g
 * 支持C99
 * 不支持-O
+
+### 其他
+
+* https://github.com/swig/cccl 把Unix编译器参数转换为cl的参数（cl的wrapper）
 
 ## 参考
 

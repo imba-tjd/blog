@@ -24,6 +24,7 @@ title: Linux命令
 * logrotate：切割日志的程序
 * nroff -man manpage.1：显示man格式的.1文件
 * broot：新版tree
+* time xxx：计算运行xxx的用时
 
 ## xargs
 
@@ -199,10 +200,6 @@ ip link
 * Local Address指的就是本机，但它既可以是Listen的，也可以是发出的；Perr Address就是“另一端”
 * 监听地址为*的就是双栈，`[::]`就只是V6
 
-## 下载和传输文件
-
-aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文件，需要服务端
-
 ### curl
 
 * 安装时会装上openssl；支持http2、ftp等多种协议；一次可请求多个URL且会复用，某些选项要多次指定，--next可把接下来的选项都指定为下一个URL的
@@ -243,44 +240,10 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
 * -3可以（通过本机）在两个服务器之间传文件
 * src如果以`/`结尾，就是传输文件夹里的内容，不是传输一个文件夹；不以斜杠结尾再加`-r`就能传输一个文件夹
 
-### rsync
-
-* rsync -avzP src dest：a保留文件所有属性且递归，z启用压缩，P断点续传且显示每个文件的进度，v详细模式但在P下只会再多显示一点总结信息
-* -H保留硬链接，-u只更新变化了的（文件存在于dest且mtime更新），-n是dry run，--delete删除dest中所有不在src中的文件，-c用校验和而不是时间和大小判断是否不同会大量消耗资源，-vvvv显示debug级别的信息
-* 设置--inplace和--append后好像是增量同步；有限速功能避免把服务器带宽占满（scp也有）；Host::/path用的是rsync协议，运行daemon时可以类似ftp提供文件出去，可以设置只读和IP黑白名单；不提供dest等价于运行ll，此时-h才有用；-R的作用：`-rR /var/./log/nginx /tmp`将会创建/tmp/log/nginx；-S发送稀疏文件时使用
-* 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
-* 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
-* TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps https://zhuanlan.zhihu.com/p/331838860
-
-### wget2
-
-* 自动多线程
-* -O指定要保存的文件名，默认会用url的最后一部分
-* -c断点续传
-* --progress=bar进度条
-* -i下载文件中列出的url
-* --spider：只检测文件是否存在
-* -b：转入后台下载，日志输出到wget-log文件中
-* -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
-* Win版：https://github.com/rockdaboot/wget2/issues/234#issuecomment-968329681 https://www.lumito.net/2020/12/05/released-wget2-1-99-2-for-windows/
-
-### youtube-dl
-
-* -F：列出可用格式；-f使用指定格式，可指定数字或类型，一般手动指定-f best
-* --download-archive archive.txt：下载列表时保存已下过的，恢复更快，可用于会更新的列表
-* --write-sub --sub-lang zh；--write-auto-sub(仅u2b)，--skip-download仅下载字幕
-* -x：把视频转成音频；--audio-quality 9，默认5
-* -o：支持以元信息命名文件，如`%(title)s.%(ext)s`
-* --playlist-start、end
-* 缓存大小是自动调整的
-* -s：dry-run
-* --add-metadata
-* -i：下载列表时跳过出错的；-w强制不覆盖文件
-
 ## 文本处理
 
 * wc：-l按行统计，-w按空白分隔的单词统计
-* tr old new：替换stdin的内容但功能更多，如`tr 'a-z' 'A-Z'`能把小写的都换成大写的
+* tr old new：替换stdin的内容但功能更多，如`tr 'a-z' 'A-Z'`能把小写的都换成大写的，-d删除匹配的。但字符集用的是POSIX风格，不支持正则字符集
 * cut：-c2,5-8取第2和5到8个字符的内容；-d默认为制表符，-f指定取第几个区域
 
 ### awk
@@ -344,6 +307,7 @@ aria2、axel、httpie放到软件的文章里去了。TODO: croc GO，传输文�
   * -r：使正则支持扩展字符，否则用+等字符时需要加反斜杠
 * 命令
   * 命令前可加行号，从1开始。如果不加则对每一行都应用
+  * 以下的斜杠也可对应换为其他符号，如内容中存在 `http://` 时一般可用下划线
   * a：新增，如 5axxx 在第5行后新增xxx，即xxx在第6行
   * i：插入，如 5ixxx 将xxx插入为第5行，原第5行变为第6行
   * c：替换

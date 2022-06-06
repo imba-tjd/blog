@@ -438,7 +438,7 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * 有时文本节点不会直接为str，这样能判断是不是tail文本，以及找回父节点
 * lxml.objectify：像操作Python对象一样操作XML。不能与etree混用，不能用于HTML
 * html5parser：把html5lib作为lxml的后端构建etree，用法直接把它传给fromstring的参数即可；还有个soupparser但BS又会用内置的html.parser，所以没有任何意义
-* Python自带xml.etree.ElementTree
+* Python自带xml.etree.ElementTree。不要用cElementTree，废弃了
 * lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
 
 ```py

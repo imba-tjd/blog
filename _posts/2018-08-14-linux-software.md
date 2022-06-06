@@ -261,7 +261,9 @@ order deny,allow
 * 卸载：sudo perl  /usr/bin/vmware-uninstall-tools.pl
 * 收缩硬盘大小：sudo vmware-toolbox-cmd disk shrink /
 
-## MEGAcmd
+## 下载和传输文件
+
+### MEGAcmd
 
 * dpkg -i https://mega.nz/linux/MEGAsync/Debian_10.0/amd64/megacmd-Debian_10.0_amd64.deb
 * 支持交互式命令mega-cmd以及一大堆脚本式命令mega-*，都会自动启动mega-cmd-server；login登录，会话信息保存在home中；默认不开启HTTPS，用https on开启
@@ -270,52 +272,98 @@ order deny,allow
 * help列出所有命令，--help和-vvv略；sync本地和云端同步，backup本地定时备份到云端且可保存历史版本，webdav支持文件夹或stream文件，whoami -l显示所有的会话
 * Windows版不会自动添加PATH，且经过测试创建软链接无法使用，可以添加PS的alias，$env:LOCALAPPDATA\MEGAcmd\MEGAcmdShell.exe，不需要用脚本式的bat
 
-## rclone
+### rclone
 
 * curl https://rclone.org/install.sh | sudo bash
 * rclone config, n, 22(onedrive)
 * (mkdir;) rclone mount onedrive: /www/wwwroot/your_ip/onedrive --allow-other --allow-non-empty --vfs-cache-mode writes &
 * https://github.com/rclone/rclone https://zhuanlan.zhihu.com/p/104480400
 
-## axel多线程下载
+### axel多线程下载
 
 * -n指定线程数，默认4
-* -o指定输出文件名，如果目标已经存在，会检查是否存在.st状态文件，如果存在就断点续传，不存在就报错
-* 在不指定-o时会自动选择文件名，自动断点续传；如果存在同名文件会自动添加.0后缀，不会覆盖，-c指定此种情况时跳过
+* -o指定输出文件名，不指定时若目标已存在会自动重命名加.0
+* 自动断点续传，根据.st状态文件
 * -q静默模式
-* 支持环境变量设置代理，支持设置UA和其它头
+* 支持HTTP_PROXY等环境变量，支持设置UA和其它头
 * 可同时指定多个url，但不是同时下载多个文件；只会依次使用，连接失败时才换下一个，只要有一个下载成功就结束
 
-## [aria2](https://aria2.github.io/manual/en/html/aria2c.html)
+### [aria2](https://aria2.github.io/manual/en/html/aria2c.html)
 
-* 支持BT和磁力，不支持ed2k，不支持HTTP2，不支持UPnP。感觉唯一的用处就是离线下载，或者放在路由器上
-* UI：https://github.com/ziahamza/webui-aria2 https://github.com/mayswind/AriaNg https://aria2c.com/
-* 命令行：-o 保存的文件名，相对路径为相对dir；--all-proxy=xxx设置代理，无简写方式
-* 开启RPC：--enable-rpc，默认监听双栈localhost:6800
+* 支持BT和磁力，不支持ed2k，不支持HTTP2，不支持UPnP
+* 支持HTTP_PROXY等环境变量
+* 支持断点续传，只要原本未完成的文件是用aria2下的，再次下相同的URI就自动断点续传，因为会创建同名的.aria2控制文件；若要续传其他软件未完成的顺序下载，加-c
 
 ```conf
 # 注释支持单行，但不支持行尾，此处为笔记就不管了
 # 配置文件放到~/.config/aria2/aria2.conf中
-# 其他人的配置：https://github.com/P3TERX/aria2.conf http://aria2c.com/usage.html
-daemon=true # Win下无效，WSL有效
-enable-rpc=true
-#rpc-allow-origin-all=true # 设置Access-Control-Allow-Origin:*，用于跨域
+# 其他人的配置：https://github.com/P3TERX/aria2.conf
 
-dir=xxx # 下载目录，命令行中用-d
-log=xxx
-log-level=notice # 默认debug
-console-log-level=warn # 默认notice
-max-connection-per-server=4 # 默认1；命令行中用-x4
-#continue=true # 用于没有状态文件时的断点续传，例如其它程序下了一半；有状态文件时是自动的
-input-file=xxx/aria2.session # 原本是用于从文件中读取多个下载链接
-save-session=xxx/aria2.session # 任务记录
-save-session-interval=60
-force-save=true # 好像是保留已完成的任务，用于做种
+# 下载
+# 默认超时60秒，重试5次，缓存16MB，存在同名文件自动重命名加数字
+max-connection-per-server=5 # 可理解为多线程，默认1，命令行中用-x5。还有个max-concurrent-downloads是同时下载多任务，默认5不用改
+file-allocation=falloc # 当使用ext4 btrfs xfs NTFS时此项最好，但需要管理员权限
+min-split-size=20M # 【默】进行多线程的最小块，此处只有文件大于40M才会启用两个线程，命令行中用-k
+# BT
+# 当下载的文件是.torrent时，自动开始BT任务
 bt-enable-lpd=true
-bt-tracker=xxx,xxx
+enable-peer-exchange=true
+bt-save-metadata=true # 保存磁力链接元数据为种子文件
+bt-tracker=https://cdn.staticaly.com/gh/XIU2/TrackersListCollection/master/best_aria2.txt
+
+# 运行为服务
+daemon=true # Win无效，WSL有效
+dir=xxx # 默认下载目录，不设置时为CWD，命令行中用-d
+log=aria2.log # 默认不记录日志
+log-level=notice # debug【默】, info, notice【console-log-level默】, warn, error
+save-session=aria2.session # 未完成及出错的任务记录，支持.gz后缀自动压缩
+save-session-interval=60 # 默认只在退出时保存一次记录
+input-file=aria2.session # 原本用于从文件中读取多个下载链接，命令行中用-i且支持-表示stdin，此处用于运行后自动读取恢复记录
+# RPC，默认监听双栈localhost:6800
+# UI：https://github.com/ziahamza/webui-aria2 https://github.com/mayswind/AriaNg https://aria2c.com/
+enable-rpc=true
+rpc-allow-origin-all=true # RPC的响应头添加Access-Control-Allow-Origin:*
+rpc-listen-all=true # 默认只允许本地回环访问
 ```
 
-## httpie
+### wget2
+
+* 自动多线程
+* -O指定要保存的文件名，不加时默认用URL最后的部分。支持`-q -O-`输出到stdou
+* -c断点续传
+* -nv只显示错误信息和最基本的信息。默认就启用了verbose，会显示进度条
+* -i下载文件中列出的url
+* --spider：只检测目标是否存在，可与-i配合批量检测书签
+* -b：转入后台下载，日志输出到wget-log文件中
+* -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
+* Win版：现在作者已经在Release里发Win的二进制了 https://www.lumito.net/2020/12/05/released-wget2-1-99-2-for-windows/ https://github.com/ibook86/wget2-windows。MSYS2的包直接下二进制无法运行
+
+### youtube-dl
+
+* -F：列出可用格式；-f使用指定格式，可指定数字或类型，一般手动指定-f best
+* --download-archive archive.txt：下载列表时保存已下过的，恢复更快，可用于会更新的播放列表
+* 字幕：--write-sub --sub-lang zh --all-subs，--write-auto-sub --embed-subs，--skip-download仅下载字幕
+* 把视频转成音频：-x；--audio-quality 9，默认5
+* 保存的文件名，支持元信息：-o `%(title)s.%(ext)s`，默认含有id
+* --playlist-start、end
+* 缓存大小是自动调整的
+* -s：dry-run
+* --add-metadata
+* -i：下载列表时跳过出错的；-w强制不覆盖文件
+* -a links.txt/-
+* 多线程下载单个视频：--external-downloader aria2c --external-downloader-args -x5
+* 只下载播放列表里所有的链接：`youtube-dl -j --flat-playlist '播放列表链接' | jq -r '.id' | sed 's_^_https://youtu.be/_' > links.txt`
+
+### rsync
+
+* rsync -avzP src dest：a保留文件所有属性且递归，z启用压缩，P断点续传且显示每个文件的进度，v详细模式但在P下只会再多显示一点总结信息
+* -H保留硬链接，-u只更新变化了的（文件存在于dest且mtime更新），-n是dry run，--delete删除dest中所有不在src中的文件，-c用校验和而不是时间和大小判断是否不同会大量消耗资源，-vvvv显示debug级别的信息
+* 设置--inplace和--append后好像是增量同步；有限速功能避免把服务器带宽占满（scp也有）；Host::/path用的是rsync协议，运行daemon时可以类似ftp提供文件出去，可以设置只读和IP黑白名单；不提供dest等价于运行ll，此时-h才有用；-R的作用：`-rR /var/./log/nginx /tmp`将会创建/tmp/log/nginx；-S发送稀疏文件时使用
+* 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
+* 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
+* TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps https://zhuanlan.zhihu.com/p/331838860
+
+### httpie
 
 ```cmd
 http :8080 # 相当于localhost:8080，只用一个单独的冒号相当于80
@@ -369,3 +417,5 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * rustdesk：远程桌面
 * https://github.com/Cyan4973/xxHash
 * cloc、boyter/scc：分析repo由哪些语言组成
+* croc GO，传输文件，需要服务端
+* https://github.com/Code-Hex/pget 类wget，目前还不够完善
