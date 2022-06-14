@@ -204,14 +204,20 @@ ip link
 
 * 安装时会装上openssl；支持http2、ftp等多种协议；一次可请求多个URL且会复用，某些选项要多次指定，--next可把接下来的选项都指定为下一个URL的
 * 默认显示body，-I用HEAD请求，-i顺便显示Header，`-D –`不限方法只显示头，-X手动指定HTTP请求类型
-* -o或者>写入文件，-O使用网站提供的名字；多URL时要多次指定，或者后者可改用--remote-name-all
-* -A指定用户代理；-H可指定所有Header，用"key: value"，但每个要分开指定
+* -o或>写入文件，-O使用URL的最后一部分作为名字，多URL时用--remote-name-all
+* -A指定UA；-H可指定所有Header，用"key: value"，但每个要分开指定
 * -x使用proxy（正代），默认端口1080，例外是https时是443
 * `-C -`断点续传
-* -e/--referer提供referer
+* -e指定referer
 * -s安静模式，不显示进度条；-sS安静模式下仍显示错误
 * -L跟随30x跳转
-* -d 'para1=val1&para2=val2'使用POST方式请求，类型默认是`x-www-form-urlencoded`，也可多次使用-d；`-d @file`是从文件中读取，一行一个；`--data-raw @file`避免识别成文件，就是真正的`@`；`--data-urlencode`自动对值做一次URL编码，像有空格时可用，但key没有编码，如果想要，再在key前面加一个等号；-F的类型是`multipart/form-data`
+* body
+  * -d 'k1=v1&k2=v2' -d p3=v3 使用POST方式请求，类型为 x-www-form-urlencoded
+  * -d @file 从file文件中读取，一行一个。支持-表示stdin
+  * --data-raw @符号也作为普通字符串，不作为读取文件名的标志
+  * --data-urlencode 自动对v做URL编码，但key不变。k=@f从文件中读取v并编码
+  * -F k=@f 类型指定为 multipart/form-data
+  * --json 只是设置一些头，不更改或验证内容
 * -k忽略证书错误
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md

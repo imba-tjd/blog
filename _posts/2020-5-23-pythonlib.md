@@ -560,6 +560,7 @@ with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私
 text = rsp.read().decode()
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.info().get_content_charset()
+urllib.request.urlretrieve(url, outfilename) # 直接下载为文件
 
 urllib.parse：
 quote() 用于编码?k=v中的v，会编码所有特殊字符除了斜杠；逆过程为unquote()；还有quote_plus()会把空格编码为+而非%20
