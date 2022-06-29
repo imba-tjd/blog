@@ -160,8 +160,8 @@ category: windows
 一旦用了这些管道，就无法进一步处理了，也必须放到最后。默认会自动加Out-Default，等于ft/fl|oh。
 
 * ConvertTo-Html: 将 Microsoft .NET Framework 对象转换为可在 Web 浏览器中显示的 HTML
-* Export/Import-Clixml: 创建对象的基于 XML 的表示形式并将其存储在文件中
-* Export/Import-Csv: 将 Microsoft .NET Framework 对象转换为一系列以逗号分隔的、长度可变的 (CSV) 字符串，并将这些字符串保存到一个 CSV 文件中
+* Export/Import-Clixml: 序列化为xml文件
+* Export/Import-Csv: 序列化为CSV文件
 * Format-List(fl): 将输出的格式设置为属性列表，其中每个属性均各占一行显示。适合属性类型不同的情况。未知对象属性大于4个时会采用；fl *会显示所有属性
 * Format-Table(ft): 将输出的格式设置为表，适合用于显示键值对，后可跟KeyName和对每一项的计算（比如/1KB）；-Autosize(auto) -Wrap：强制显示所有内容，如果不用，过长的字符串会显示...，这是因为PS是流模式，下一条命令的长度未知；如果要手动指定宽度和对齐方式等，每个键需要传一个哈希表给Property属性：`@{expression="KeyName"; width=40;label="Header"; alignment="center"}`；有一个-GroupBy参数可以在保持表格的情况下分组
 * Format-Wide: 将对象的格式设置为只能显示每个对象的一个属性的宽表，样式类似于bash默认的ls

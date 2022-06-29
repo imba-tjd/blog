@@ -539,7 +539,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * urllib3.request('GET',url,fields={'k':'v'}); r.data.decode()
 * POST和PUT：fields自动编码为body，类型默认为multipart。上传文件：fields={'filefield':('filename', str/bytes [,"text/plain"])}。上传二进制内容：设置body参数和Content-Type
 * Headers：UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
-* 支持自动gzip解码，但默认AE是identity
+* 支持自动gzip解码，但默认AE是identity，且Content-Length是解压前的
 * 默认重试3次，重定向3次，timeout无限
 * 流式处理，可看错io.BytesIO：preload_content=False; resp.read(4); resp.release_conn()
 * PoolManager：管理ConnectionPool，默认最大10个池
