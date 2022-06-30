@@ -492,4 +492,6 @@ ISNULL NVL https://www.runoob.com/sql/sql-isnull.html
 查看隔离级别：DBCC USEROPTIONS；修改隔离级别：SET TRANSACTION ISOLATION LEVEL ...，每个数据库都要分别设置
 
 https://zhuanlan.zhihu.com/p/429637485 mysql和redis数据一致性问题
+
+Citus：分布式PG
 ```
