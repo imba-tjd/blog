@@ -63,7 +63,7 @@ title: Linux命令
 * ln：参数意义与cp相同，-P硬链接（默认？），-s软链接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软链接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
 * shred：粉碎文件
 * FILE=$(mktemp)：在/tmp下创建临时文件并获得文件名
-* iconv -f gbk -t utf-8 source-file -o target-file
+* iconv -f gbk -t utf-8 source-file或省略表示stdin -o target-file
 * less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 * split -b 50m huge_file分隔文件，合并用cat
 
@@ -234,7 +234,7 @@ ip link
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 * 不自带“下载文件中的所有链接”的功能，可用`xargs -n 1 curl -O < urls.txt`，不要按每一行手动运行因为那样无法利用keepalive
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
-* Win版：https://curl.se/windows/
+* Win版：https://curl.se/windows/ 内容如果是U8，显示出来会乱码
 
 ### scp
 
