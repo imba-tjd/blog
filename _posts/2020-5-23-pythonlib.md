@@ -544,6 +544,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * 流式处理，可看错io.BytesIO：preload_content=False; resp.read(4); resp.release_conn()
 * PoolManager：管理ConnectionPool，默认最大10个池
 * ConnectionPool：一个域名对应一个，默认maxsize=1只长连接一个，更多的能连接但不会保留长连接，设置block=True可阻止更多连接，这俩参数也能在PM的构造函数中使用。一般用connection_from_url()创建，pool.request(这里的url部分可以是相对路径)
+* 不会自动使用HTTP_PROXY
 
 ### urllib
 
@@ -552,11 +553,11 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * UA默认为Python-urllib/3.9
 * POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
 * 似乎没有办法做出浏览器的URL编码的方式：把空格编码为%20，把中文用UTF8编码后每个加上%，其余的特殊字符不变。urllib3 requests不会对URL自动编码
+* 自动使用HTTP_PROXY
 
 ```py
-req = urllib.request.Request(url, [method])
-req.add_header('k', 'v')/req.headers |= {'k':'v'}
-with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
+req = urllib.request.Request(url, headers={...})
+with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse。TODO: timeout
 text = rsp.read().decode()
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.info().get_content_charset()
@@ -873,7 +874,7 @@ def myfile(_):
 * --uds指定unix socket，--workers多线程
 * --log-level默认info，没有简单的指定日志文件的方法；客户端不会收到traceback
 * 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
-* scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)
+* scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)，没有原始uri
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
 * 默认是http的，如果用https访问，会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
 * 只支持HTTP1.1，直接基于asyncio。hypercorn支持HTTP/2，Daphne依赖twisted
@@ -1528,11 +1529,9 @@ print(template.render(the="variables", go="here"))
 * PyNaCl https://github.com/pyca/cryptography pyOpenSSL pycryptodome
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
-* pytagcloud 中文分词 生成标签云 https://zhuanlan.zhihu.com/p/20432734
-* https://github.com/mitmproxy/mitmproxy
 * https://github.com/gevent/gevent https://www.gevent.org/
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
-* https://github.com/serge-sans-paille/pythran 不支持类 https://github.com/numba/numba
+* https://github.com/serge-sans-paille/pythran AOT，不支持类
 * https://github.com/mahmoud/boltons 纯Py utils大集合，不过社区贡献并不太多
 * https://github.com/rthalley/dnspython
 * https://github.com/scrapinghub/splash 具有HTTP API的轻型浏览器js渲染引擎
