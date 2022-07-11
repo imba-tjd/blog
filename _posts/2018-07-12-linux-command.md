@@ -234,7 +234,7 @@ ip link
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 * 不自带“下载文件中的所有链接”的功能，可用`xargs -n 1 curl -O < urls.txt`，不要按每一行手动运行因为那样无法利用keepalive
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
-* Win版：https://curl.se/windows/ 内容如果是U8，显示出来会乱码
+* Win版：https://curl.se/windows/ Win10最初自带的7.55.1往控制台输出U8网页时会乱码
 
 ### scp
 

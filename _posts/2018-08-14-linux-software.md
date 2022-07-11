@@ -285,13 +285,13 @@ order deny,allow
 * -o指定输出文件名，不指定时若目标已存在会自动重命名加.0
 * 自动断点续传，根据.st状态文件
 * -q静默模式
-* 支持HTTP_PROXY等环境变量，支持设置UA和其它头
+* 支持HTTP_PROXY，支持设置UA和其它头
 * 可同时指定多个url，但不是同时下载多个文件；只会依次使用，连接失败时才换下一个，只要有一个下载成功就结束
 
 ### [aria2](https://aria2.github.io/manual/en/html/aria2c.html)
 
 * 支持BT和磁力，不支持ed2k，不支持HTTP2，不支持UPnP
-* 支持HTTP_PROXY等环境变量
+* 支持HTTP_PROXY
 * 支持断点续传，只要原本未完成的文件是用aria2下的，再次下相同的URI就自动断点续传，因为会创建同名的.aria2控制文件；若要续传其他软件未完成的顺序下载，加-c
 
 ```conf
@@ -403,6 +403,13 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 
 * 服务端：-s [-u]
 * 客户端：-c <serverip> -P 5多线程 -b 100M -t 60
+
+## VNC和RDP
+
+* https://uvnc.com/
+* https://github.com/TigerVNC/tigervnc
+* https://www.tightvnc.com/
+* https://remmina.org/
 
 ## TODO
 

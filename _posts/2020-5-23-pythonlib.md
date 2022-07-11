@@ -492,7 +492,7 @@ p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
 s = requests.session() # with或s.close()能关闭所有连接，但之后仍可以继续使用，又会自动创建。一般用于出现异常时及时释放资源
 s.request = functools.partial(s.request, timeout=3) # 设置超时时间，不加会一直等，Session级别的只能这样做；同urllib3也可传递元组，第一个参数控制连接超时，第二个参数控制下载
 allow_redirects=True; max_redirects=30 #【默】最后结果是200不是3xx；head默认不跟踪
-proxies={"http": "http://10.10.10.10:1080", "https": "http://xxx"} # 默认会检测环境变量HTTP_PROXY，不直接支持socks
+proxies={"http": "http://10.10.10.10:1080", "https": "http://xxx"} # 默认支持HTTP_PROXY，不直接支持socks
 headers={'User-Agent':'python-requests/2.23.0','Accept-Encoding':'gzip','Connection':'keep-alive'} #【基本默】大小写不敏感的dict
 auth=('user', 'pass') # Authorization头，如果不放到session里，重定向时会自动去掉
 cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict。另有requests.utils.add_dict_to_cookiejar(cj, cookie_dict)、cookiejar_from_dict、dict_from_cookiejar几个函数；有可能第一次能用dict，之后就要用它们了，不能直接update
@@ -540,7 +540,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * POST和PUT：fields自动编码为body，类型默认为multipart。上传文件：fields={'filefield':('filename', str/bytes [,"text/plain"])}。上传二进制内容：设置body参数和Content-Type
 * Headers：UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
 * 支持自动gzip解码，但默认AE是identity，且Content-Length是解压前的
-* 默认重试3次，重定向3次，timeout无限
+* 默认retries=3，重定向3次，timeout无限
 * 流式处理，可看错io.BytesIO：preload_content=False; resp.read(4); resp.release_conn()
 * PoolManager：管理ConnectionPool，默认最大10个池
 * ConnectionPool：一个域名对应一个，默认maxsize=1只长连接一个，更多的能连接但不会保留长连接，设置block=True可阻止更多连接，这俩参数也能在PM的构造函数中使用。一般用connection_from_url()创建，pool.request(这里的url部分可以是相对路径)
@@ -553,7 +553,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * UA默认为Python-urllib/3.9
 * POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
 * 似乎没有办法做出浏览器的URL编码的方式：把空格编码为%20，把中文用UTF8编码后每个加上%，其余的特殊字符不变。urllib3 requests不会对URL自动编码
-* 自动使用HTTP_PROXY
+* 支持HTTP_PROXY
 
 ```py
 req = urllib.request.Request(url, headers={...})
