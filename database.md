@@ -403,13 +403,13 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 ### GUI
 
 * HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，有少量的维护功能，对于大量数据很卡，对MSSQL的脚本不太兼容
-* https://dbeaver.io：JAVA，Star数多
+* https://dbeaver.io JAVA，Star数多
 * https://www.beekeeperstudio.io/ Electron，有便携版，常见的四种都支持
 * phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
 * MySQL WorkBench：官方客户端，大小也不大
 * pgAdmin：官方客户端，163MB
 * https://sqlitebrowser.org/ C++，目标是让普通用户也能用，有中文
-* https://www.devart.com/free-products.html：闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
+* https://www.devart.com/free-products.html 闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
 * https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
 * https://sqlitestudio.pl/ C+Qt，仅SQLite，有中文但很多条目还是未翻译
 * https://sqlectron.github.io/ 感觉相比beekeeper唯一优势是有32位，大小都差不多
@@ -418,6 +418,9 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * DataGrip：JB的，收费
 * Navicat：收费
 * SequelPro/Ace：仅Mac
+* https://squirrel-sql.sourceforge.io/ JAVA，活着，只release JAR包
+* https://www.oracle.com/database/sqldeveloper/ 官方客户端，需要登录才能下。还有个instant client不是GUI
+* https://dbgate.org/ Electron，常见的都支持，但Star和贡献者较少，感觉不太靠谱
 
 ### 在线测试
 
