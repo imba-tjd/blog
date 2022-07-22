@@ -30,7 +30,7 @@ title: SQL
 * 如果存在同名的列，SELECT中要加表名，可用tb1.*表示第一个表的所有列
 * CROSS JOIN：笛卡尔积，参数只需加表名，无需on；MySQL允许有on但直接忽略
 * INNER JOIN tb2 ON tb1.col1 = tb2.col2：等价于老版本标准的FROM t1, t2 WHERE ...
-* LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；SQLite只支持LEFT；LEFT时一般把小表放到左边
+* LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；SQLite3.38之前只支持LEFT；LEFT时一般把小表放到左边
 * LEFT JOIN WHERE tb2.id IS NULL可查询仅存在于左边的，即减去共有部分
 * SELF JOIN：如选择来自于相同城市的人、时间间隔
 * 内连接不会把col1.NULL与col2.NULL看作相等，会忽略
