@@ -404,10 +404,9 @@ else:
 ### 相关项目
 
 * https://www.zyte.com 官方平台，所有的Tools都是收费的，只能用Scrapy Cloud，数据最多保留四个月
-* Gerapy 调度管理系统，基于Scrapyd Django，感觉没什么用
 * https://github.com/Python3WebSpider/ProxyPool 定时抓取免费代理网站的代理池，需要Docker或Python+Redis
 * scrapy-redis 分布式爬虫
-* https://github.com/scrapinghub/splash
+* https://github.com/scrapinghub/splash 浏览器渲染服务
 
 ### Parsel
 
@@ -438,43 +437,47 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * 有时文本节点不会直接为str，这样能判断是不是tail文本，以及找回父节点
 * lxml.objectify：像操作Python对象一样操作XML。不能与etree混用，不能用于HTML
 * html5parser：把html5lib作为lxml的后端构建etree，用法直接把它传给fromstring的参数即可；还有个soupparser但BS又会用内置的html.parser，所以没有任何意义
-* Python自带xml.etree.ElementTree。不要用cElementTree，废弃了
+* etree对应Python自带的xml.etree.ElementTree，API基本相同。不要用cElementTree，废弃了
 * lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
 
 ```py
 from lxml import etree, html
 
-root = etree.Element('root') # 可看作list，支持append，取索引和区间，for in遍历，len()，list()；无子元素不会被认为是False
-root.tag # root
-root.append(etree.Element('child1', CustomAttribute='hello')) # XML支持属性
-c = root[0]; c.getparent()/getprevious()/getnext(); c.attrib所有属性的dict; c.text='world'; c.tail某个元素后面的文本
-etree.tostring(root) # pretty_print=True格式化
-root.iter() # 按SAX风格遍历所有节点；for in只会遍历直接子节点
+root = etree.Element('root') # 支持取索引和区间，for遍历直接子节点，len()，list()。不带子节点的节点，原版是Falsy但说会在未来改变，lxml不是Falsy
+root.append(etree.Element('child1', attrib={})) # 效率更高的函数是c=etree.SubElement(root, 'child1')
+c = root[0]; c.tag元素名即child1; c.attrib所有属性的dict; c.text='world'; c.tail某个元素后面的文本
+c.getparent()/getprevious()/getnext() # 原版没有
+etree.tostring(root, encoding="unicode") # 此处的encoding是避免编码为字节；pretty_print=True格式化
+root.iter() # 递归遍历所有子节点，可选指定tag名
+root.index(c) # c在root中的位置，原版没有
 
-etree.parse('filename'/file-like-obj) # 返回tree，用.getroot()获得document root；子元素用.getroottree()获得tree
+etree.parse('filename'/file-like-obj) # 返回tree，用.getroot()获得根Element；子元素用.getroottree()获得tree
 etree.fromstring('xml literal') # 返回Element，基本相当于etree.XML()
 etree.dump(root) # 格式化输出到sysout，应仅用于调试；没有html.dump
-etree.xmlfile() # 用于创建xml文件，类似于open()
+etree.xmlfile() # 类似于open()，用于流式创建xml，原版没有
+ET.canonicalize('xml literal', out=file-like-obj) # 以低自由度的方式写入文件，更规范
+tree.write('filename', encoding="unicode") # 还有method='html'
 
 html.fromstring() # 尝试同时处理document和fragment
 html.document_fromstring() # 有一定处理不完整内容的能力，如没有html和body元素时会添加，会把style放到head中，基本相当于etree.HTML()
 html.fragment_fromstring() # 必须是单个元素，fragments_fromstring()
 
-tree.getpath(e) # 根据tree和e返回xpath
-doc.body.xpath() # 一般返回[Element]或[str]
-p = etree.XPath(...); p(root) # 把xpath编译成可调用的函数
+tree/elem.find() findall() findtext() iterfind() # 原版也支持的XPath，一般优先考虑，只用于filter因此不支持text()等特性
+doc.body.xpath() # 一般返回[Element]或[str]，原版没有
+tree.getpath(e) # 根据tree和e返回xpath。还有个getelementpath()优点是不需要额外的前缀声明，没看懂
+p = etree.XPath(...); p(root) # 把XPath编译成可调用的函数
 ```
 
 ### Xpath
 
-* 有层次，像e.xpath(`div`)只会选取e节点的直接子div，相当于`./div`；`*`选择当前元素所有子元素节点，`*/div`选取孙子节点，node()等于*加文本节点str，测试没有注释
-* 能回溯到父元素，`..`为父节点。以`/`开头会从根开始搜索，与当前节点的层次无关
+* 有层次，如e.xpath(`div`)只会选取e节点的直接子div，相当于`./div`；`*`选择当前节点所有子节点，`*/div`选取孙子节点，node()等于*加文本节点str，测试没有注释
+* 能回溯到父节点，`..`为父节点。以`/`开头会从根开始搜索，与当前节点的层次无关。原版最多只支持回溯到当前节点，再..会返回None
 * traversal递归下降：`//`从根开始，`.//div`从当前节点下开始，`a//b`从当前节点下的a开始
 * 过滤属性：`[@attr]`、`[@attr="val"]`引号不可省、`//*[@id="xxx"]`按id选择、`[@*]`存在任何属性都行；获得属性的值：`./@attr`、`.//@attr`
-* 当前节点不含子节点的文本：`text()`，含子节点：`string()`；结果为一个字符串且保留空格，大概就是去掉所有尖括号的内容
+* 当前节点不含子节点的文本：`text()`，含子节点：`string()`；结果为一个字符串且保留空格，大概就是去掉所有尖括号的内容；一般用//text()获取各个子节点文本的列表
 * 取索引：`[n]`，n从1开始。最后一个用`[last()]`，倒数第二个用`[last()-1]`，前两个用`[position()<3]`，与递归一起用一般加括号`(//div)[1]`，否则就相当于:first-child了
 * 并集运算符，不重复：`//a | //div`、`(a|div)/span`，但不支持`a/(div|span)`，即要用只能从最外层开始
-* 子元素筛选：`div[a]`存在a子元素的div元素，`div[not(a)]`不存在a子元素的div元素
+* 子元素筛选，只支持直接子元素：`div[a]`存在a子元素的div元素，`div[not(a)]`不存在a子元素的div元素，`[a]`存在a子元素的子元素
 * 中括号其实是比较一般的条件过滤，可与一些函数结合使用：`[contains(text(), "123") and/or starts-with(@attr, "val")]`
 * Axes(轴)语法：加`xxx::`，改变冒号后的意义，不必用在pattern最开头。如`attribute::lang`选取当前节点的lang属性，`ancestor::div`选取当前节点的div祖先。默认是child轴
 * 还可进行计算：`+-* div mod >= !=`，也有一大堆函数，包括正则命名空间。但一般来说不用，因为不知道实现情况如何

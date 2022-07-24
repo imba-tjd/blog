@@ -329,7 +329,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 ### wget2
 
 * 自动多线程
-* -O指定要保存的文件名，不加时默认用URL最后的部分。支持`-q -O-`输出到stdou
+* -O指定要保存的文件名，不加时默认用URL最后的部分。支持`-q -O-`输出到stdout
 * -c断点续传
 * -nv只显示错误信息和最基本的信息。默认就启用了verbose，会显示进度条
 * -i下载文件中列出的url
@@ -406,10 +406,11 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 
 ## VNC和RDP
 
+* https://www.tightvnc.com/ 使用简单，仅Win
+* https://github.com/TigerVNC/tigervnc Tight的fork
+* https://turbovnc.org/ Tight的fork，想在画面速度上更快，比Tight大很多，且无Win下的服务端
 * https://uvnc.com/
-* https://github.com/TigerVNC/tigervnc
-* https://www.tightvnc.com/
-* https://remmina.org/
+* https://remmina.org/ 不支持Win
 
 ## TODO
 
