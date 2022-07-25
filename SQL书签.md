@@ -26,6 +26,8 @@ https://www.zhihu.com/people/wei-ha-75/posts
 
 数据库基础知识复习 https://blog.csdn.net/yutianzuijin/article/details/12243751
 
+https://modern-sql.com/
+
 打不开：
 https://www.sqlservertutorial.net/
 https://www.sqlitetutorial.net/
