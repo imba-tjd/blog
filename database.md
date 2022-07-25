@@ -498,3 +498,20 @@ https://zhuanlan.zhihu.com/p/429637485 mysql和redis数据一致性问题
 
 Citus：分布式PG
 ```
+
+access和MSSQL的语法区别：
+2、日期字段表示方式：ACCESS表示为：#2022-07-16#  ，SQL Server表示为：“2022-07-16”
+
+3、多表操作时update语句的区别
+（1）SQL SERVER中更新多表的UPDATE语句:UPDATE Tab1 SET a.Name = b.Name FROM Tab1 a,Tab2 b WHERE a.ID = b.ID;
+（2）同样功能的SQL语句在ACCESS中应该是：UPDATE Tab1 a,Tab2 b SET a.Name = b.Name WHERE a.ID = b.ID;即:ACCESS中的UPDATE语句没有FROM子句,所有引用的表都列在UPDATE关键字后。更新单表时：都为：UPDATE table1 set ab=‘12‘,cd=444 where ....
+
+4、delete语句中的区别
+（1）ACCESS中删除时用：delete * from table1 where a>2 ，即只要把select 语句里的select 换成delete就可以了。
+（2）SQL Server中则为: delete from table1 where a>2 ，即没有*号。
+5、as 后面的计算字段区别
+（1）ACCESS中可以这样：select a,sum(num) as kc_num,kc_num*num as all_kc_num 即可以把AS后的字段当作一个数据库字段参与计算。
+（2）SQL Server中则为：select a,sum(num) as kc_num,sum(num)*num as all_kc_num 即不可以把AS后的字段当作一个数据库字段参与计算。
+6、[.]与[!]的区别
+（1）ACCESS中多表联合查询时：select tab1!a as tab1a,tab2!b tab2b from tab1,tab2 ,中间的AS可以不要。
+（2）SQL Server中则：select tab1.a as tab1a,tab2.b tab2b from tab1,tab2 ,中间的AS可以不要。
