@@ -388,6 +388,10 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * ACE驱动下载：https://www.microsoft.com/zh-cn/download/details.aspx?id=54920
 * OLEDB通过COM调用，比ODBC高层，比ADO低层。感觉没有必要使用
 
+## Oracle
+
+* 免费版：https://www.oracle.com/database/technologies/appdev/xe.html
+
 ## 工具和其它DBMS
 
 * https://github.com/sqlmapproject/sqlmap 注入
