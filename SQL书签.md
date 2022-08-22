@@ -28,6 +28,8 @@ https://www.zhihu.com/people/wei-ha-75/posts
 
 https://modern-sql.com/
 
+https://www.crunchydata.com/developers/tutorials PG Playground
+
 打不开：
 https://www.sqlservertutorial.net/
 https://www.sqlitetutorial.net/
