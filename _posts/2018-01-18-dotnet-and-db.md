@@ -187,13 +187,17 @@ tran.Commit()/Rollback();
 
 ### IDbConnection
 
-* ConnectionStringBuilder：设置好属性后用ConnectionString获取连接字符串，也可用https://www.connectionstrings.com
+* ConnectionStringBuilder：设置好属性后用ConnectionString获取组合后的连接字符串
 * ConnectionString：获取设置连接字符串，一般在Connection的构造函数中设置
 * ConnectionTimeOut：0为无限，超时抛异常
 * Database：数据库名称
 * State：Open、Connecting、Closed等
 * IDb的没有DataSource属性
 * ChangeDatabase()
+* 连接字符串
+  * https://www.connectionstrings.com
+  * Server和Data Source同义，Database和Initial Catalog同义
+  * OLEDB需要设置Provider，ODBC需要设置Driver和DBQ
 
 ### IDbCommand
 
@@ -256,6 +260,11 @@ for(int i=0;i<tb.Rows.Count;i++)
 ### [Microsoft.Data.SqlClient](https://docs.microsoft.com/zh-cn/sql/connect/ado-net/sql)
 
 * 取代System.Data.SqlClient
+
+## Oracle
+
+* FX用Oracle.ManagedDataAccess包，Core用.Core包，还有VS和VSC的扩展。最好不要用System.Data.OracleClient，它也只能在装了Oracle实例的环境中用
+* 连接字符串：Server=xxx;User Id=xxx;Password=xxx
 
 ## 其它项目
 

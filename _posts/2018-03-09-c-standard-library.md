@@ -131,4 +131,3 @@ wtypes.h和WCHAR是Windows的头文件。
 
 * asprintf：非标准库，好像也不是posix，是GNU的
 * itoa：非标准库，可以把数字转换成字符串，可指定进制
-* 库函数大全：http://c.biancheng.net/ref/

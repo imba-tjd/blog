@@ -437,17 +437,18 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * 有时文本节点不会直接为str，这样能判断是不是tail文本，以及找回父节点
 * lxml.objectify：像操作Python对象一样操作XML。不能与etree混用，不能用于HTML
 * html5parser：把html5lib作为lxml的后端构建etree，用法直接把它传给fromstring的参数即可；还有个soupparser但BS又会用内置的html.parser，所以没有任何意义
-* etree对应Python自带的xml.etree.ElementTree，API基本相同。不要用cElementTree，废弃了
+* etree对应自带的xml.etree.ElementTree，API基本相同。不要用cElementTree，废弃了
+* 自带的html.parser并不能正常使用。只有html.unescape()有点用
 * lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
 
 ```py
 from lxml import etree, html
 
-root = etree.Element('root') # 支持取索引和区间，for遍历直接子节点，len()，list()。不带子节点的节点，原版是Falsy但说会在未来改变，lxml不是Falsy
+root = etree.Element('root') # 支持取索引和区间，for遍历直接子节点，len()，list()；也支持[]取属性。不带子节点的节点，原版是Falsy但说会在未来改变，lxml不是Falsy
 root.append(etree.Element('child1', attrib={})) # 效率更高的函数是c=etree.SubElement(root, 'child1')
 c = root[0]; c.tag元素名即child1; c.attrib所有属性的dict; c.text='world'; c.tail某个元素后面的文本
 c.getparent()/getprevious()/getnext() # 原版没有
-etree.tostring(root, encoding="unicode") # 此处的encoding是避免编码为字节；pretty_print=True格式化
+etree.tostring(root, encoding="unicode") # 此处的encoding是避免编码为实体；pretty_print=True格式化
 root.iter() # 递归遍历所有子节点，可选指定tag名
 root.index(c) # c在root中的位置，原版没有
 
@@ -561,7 +562,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 ```py
 req = urllib.request.Request(url, headers={...})
 with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse。TODO: timeout
-text = rsp.read().decode()
+text = resp.read().decode(); resp.getcode()
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.info().get_content_charset()
 urllib.request.urlretrieve(url, outfilename) # 直接下载为文件
@@ -1507,7 +1508,14 @@ print(template.render(the="variables", go="here"))
 * watchdog：用于监测文件变化
 * attrs：dataclasses的增强版；pydantic也类似，主要支持数据验证
 * r1chardj0n3s/parse：f-string的反向，可以捕获到命名字典里，parse完整匹配，search只要求p是str的一部分且是非贪婪的但有BUG(#41)，findall直接返回列表结果也是非贪婪的
-* lexer/parser：https://github.com/lark-parser/lark (扩展的EBNF，功能最多性能好) https://github.com/pyparsing/pyparsing (纯Py语句，自底向上) https://github.com/erikrose/parsimonious (简化了的EBNF，性能好) https://github.com/dabeaz/sly (源于lex/yacc虽为3.6更新了但仍很麻烦，lexer和parser分开) https://github.com/neogeny/TatSu (EBNF，3.8，star很少)；FSM：https://github.com/pytransitions/transitions；支持命令的DSL（感觉不如直接写Py）：https://github.com/textX/textX
+* lexer/parser
+  * https://github.com/lark-parser/lark 扩展的EBNF，功能最多性能好
+  * https://github.com/pyparsing/pyparsing 纯Py语句，自底向上
+  * https://github.com/textX/textX DSL
+  * https://github.com/erikrose/parsimonious  简化了的EBNF，性能好。有几年没维护，2022年又有人接手了，提交数不多
+  * https://github.com/neogeny/TatSu EBNF，3.8，star很少
+  * https://github.com/pytransitions/transitions FSM
+  * https://github.com/dabeaz/sly 源于lex和yacc，很不活跃，不学
 * pretty_errors：精简stacktrace，可全局安装
 * uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高

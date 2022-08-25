@@ -151,22 +151,24 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 
 ## 不符合发音规律的
 
-* island
-* sword
-* sean：/ʃɔ:n/
-* iron：r不发音；iran：/ɪˈrɑːn/注意重音
-* Chicago：/ʃ/，和chef一样，不是/tʃ/
-* months，实际上读/ts/；clothes，实际上读/z/和close一样；pizza/piːtsə/，其中的t变为停顿
-* February：音标确实是/februəri/，但是听上去却有/j/的音；或者说现在的人一般不读它第一个r
-* machine - mechanical - mechanism
-* interesting：第一个e就跟没有一样
-* receipt：p不发音，/rɪˈsiːt/
-* suite：/swiːt/
-* journal：/dʒɜːnl/
+* anxiety /æŋˈzaɪəti/
 * asked：/ɑːskt/或非正式/ɑːst/
+* biscuit /bɪskɪt/
+* Chicago：/ʃ/，和chef一样，不是/tʃ/
+* February：音标确实是/februəri/，但是听上去却有/j/的音；或者说现在的人一般不读它第一个r
+* fortune /fɔːtʃuːn/，fortunate /fɔːtʃənət/
+* interesting：第一个e就跟没有一样
+* iron：r不发音；iran：/ɪˈrɑːn/注意重音
+* island
+* journal：/dʒɜːnl/
+* machine - mechanical - mechanism
+* months，实际上读/ts/；clothes，实际上读/z/和close一样；pizza/piːtsə/，其中的t变为停顿
+* receipt：p不发音，/rɪˈsiːt/
+* sean：/ʃɔ:n/
+* suite：/swiːt/
+* sword
 * tongue：/tʌŋ/
 * wander /wɒndə/，wonder /wʌndə/
-* anxiety /æŋˈzaɪəti/
 
 ## 同词异义异音
 

@@ -102,6 +102,7 @@ prog3 : prog3.o sort.o utils.o
 * -###为dry-run，能显示具体编译用到的命令
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
 * -fuse-ld=gold比普通的ld快，MinGW不自带
+* -s：去掉符号信息
 
 ### 编译步骤
 
