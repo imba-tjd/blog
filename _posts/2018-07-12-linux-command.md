@@ -131,7 +131,7 @@ title: Linux命令
 
 ### dig
 
-* 在dnsutils包中
+* 在dnsutils包中，依赖一些bind9的东西
 * `dig @dns.googlehosts.org www.baidu.com`
 * +vc：查询时使用tcp（不一定支持）
 * +short：只显示ip（但可能有多个）
@@ -145,32 +145,62 @@ title: Linux命令
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
 * ->>HEADER<<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
 * 查询EDNS状态：`dig edns-client-sub.net -t TXT @8.8.8.8`
-* 另外还有kdig（knot-utils）和host命令
+* host命令：默认只显示answer，第二个参数可指定服务器。-t指定请求的记录类型，-a效果和dig差不多
+* kdig(knot-utils)：功能更多一点，支持DoT(+tls)但不支持DoH。zdns：快速查询大量记录。dnsenum：爆破子域名。doggo：Go写的多彩的解析器，支持Win
 
 ### nmap
 
-* nmap -s[scan method] -p[portrange] targetip
-* ip范围可以用-和/和逗号；端口范围可以用-和逗号，且可在前面加U:和T:表示UDP和TCP
-* 默认扫描TOP1000的端口，-F扫TOP100的；-r不打乱端口顺序
-* -T0-6：扫描时序，越高速度越快，一般用T4；-A为进攻性(Aggressive)扫描，会完整全面地扫描
-* -sL：仅列出解析指定范围后的IP
-* 主机发现(-sn)：默认会发ICMP和80和443，只要有一个回复就说明在线，局域网内是ARP；-Pn跳过主机发现，将所有指定的主机视作开启的
-* 端口扫描：-sS/sT/sA/sW/sM/sN/sF/sX分别为TCP SYN/Connect()/ACK/Window/Maimon/Null/FIN/Xmas，后三种比较隐蔽；-sU为UDP
-* 服务与版本侦测(-sV)：用于确定目标主机开放端口上运行的具体的应用程序及版本信息，--version-light使用轻量侦测，--version-all尝试使用所有的probes进行侦测
-* 操作系统扫描：-O
-* 指定后面的项目会把前面的也都进行一遍；扫描方式可以同时使用多个，如果什么都不加应该就是SYN，也有一种说法是会用四种方式
-* 规避技巧：-S伪造源IP，--spoof-mac伪造mac，--data-length随机填充数据到指定长度，--badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙
-* TODO: https://nmap.org/man/zh/   nmap -sP -PR：ARP搜索？
-* nping --tcp -p 443 addr：V6要用`--tcp-connect -6`，--tcp效果很差，连回显都没有，注意addr无需也不能用中括号因为端口单独指定；这样V6虽然有回显了但少了很多信息，如果想看seq win mss只能用--tcp -e interface --source-ip --source-mac --dest-mac
-* https://securitytrails.com/blog/nmap-cheat-sheet
+* nmap -s[scan method] -p[port range] target
+* 目标范围
+  * IP范围可以用-和/和逗号和星号，其中-和,在每一分段都能用，单纯的-与星号一样
+  * 端口范围可以用-和逗号，且可在前面加U:和T:表示UDP和TCP
+  * 默认扫描TOP1000的端口，-F扫TOP100的
+  * 从文件中读取目标：-iL
+  * 启用IPV6扫描：-6
+* 模式
+  * 主机发现
+    * 在正式扫描前会发ICMP和80和443，只要有一个回复就说明在线。如果不在线，就不进行后续高强度扫描
+    * 不进行后续的端口扫描：-sn。不进行主机发现，都视为在线：-Pn。其它发现方式略
+    * 如果在线则显示：Nmap scan report for xxx; Host is up (xxxs latency)
+    * ARP：文档里提到了-PR，但实测局域网内默认强制使用ARP（需root），非局域网IP强制无法使用
+  * 端口扫描
+    * -sS/sT/sA/sW/sM/sN/sF/sX分别为TCP SYN/Connect()/ACK/Window/Maimon/Null/FIN/Xmas。后三种比较隐蔽，但不支持Win因为某些系统不完全遵循某个RFC
+    * 默认是SYN，但非root使用默认Connect()，且好像指定其它模式会静默无效
+    * -sU为UDP。如果没有响应，状态为open|filtered。如果端口关闭了，目标默认会返回ICMP端口不可达，但Linux限制了此消息对一个客户端一秒只能发一次，导致扫描非常慢
+  * 服务与版本侦测-sV：用于确定端口上运行的具体的应用程序及版本信息，--version-all尝试使用所有的探测手段进行侦测
+  * 操作系统扫描：-O
+  * -A：完整扫描，相当于几种模式综合，非常慢
+  * -sL：仅列出待扫描的IP目标，查看指定的IP范围的解析结果
+* -T0-6：扫描时序，越高速度越快，但需要更好的网络环境；默认T3，一般用T4
+* --packet-trace：显示发的包，一般配合-n不进行dns解析否则有一些无关信息
+* script
+  * 保存在安装文件夹的scripts目录下
+  * --script-updatedb
+  * --script-help xxx
+  * --script xxx --script-args xxx
+  * -sC 使用默认的脚本
+  * whois-ip
+  * dns-brute 枚举子域名
+  * auth 检测空密码。brute 爆破某些账户
+* --badsum: 使用错误的checksum来发送数据包，正常情况下应被丢弃，如果收到回复，说明回复来自防火墙。-f使用较小的ip分段，某些时候可使防火墙检测更困难
+* Win版需要安装npcap才能用，一般就用安装包了，不能用绿色版。现在还自带zenmap GUI
+* nping
+  * 仅用于主机发现时更方便，还能即时显示主机的回应。或者能精细化控制Flag
+  * --tcp -p 443。无特权时用--tcp-connect
+  * --arp 好像真的可以发广播
+  * -c 指定次数
+  * echo模式：支持作为客户端和服务端监听某些端口，支持加密
+  * 一定程度上支持IPV6，根据过去的经验，要用`--tcp-connect -6`，addr无需也不能用中括号因为端口单独指定。--tcp没有回显
+* 有空的时候更新一下中文文档：https://github.com/nmap/nmap/blob/master/docs/man-xlate/nmap-man-zh.xml
+* https://nmap.org/book/toc.html 读到3
 
 ### mtr
 
 * 命令行在mtr-tiny包中，图形界面在mtr包中
-* mtr [-6] -rw addr，-rw是终端输出总结结果，-p是输出每条结果，都不用就会进入另一个界面
-* -c是次数
-* 本来-T是TCP，-P指定端口，但不懂为什么未监听的端口也不丢包
-* WSL1需要管理员权限运行控制台，无需sudo，但是速度超级慢，现在好像完全用不了了
+* 默认发ICMP，进入交互式页面，显示每一跳。如果中间丢包多但最后丢包少，那实际就是丢包少
+* -T指定TCP，-u指定UDP，-P指定端口。但感觉不太好用，目标没有监听那个端口时不算作丢包，而是说等待回应
+* 不进入交互式页面：-rw显示最后汇总结果（但不知为何很慢），-p显示每条结果，-c指定次数
+* Win下有Cygwin的版本，不大，但官方不release，而且只支持ICMP。WSL1下需要管理员权限运行控制台，无需sudo
 
 ### iproute2
 

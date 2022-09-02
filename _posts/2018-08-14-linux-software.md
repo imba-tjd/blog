@@ -301,9 +301,11 @@ order deny,allow
 
 # 下载
 # 默认超时60秒，重试5次，缓存16MB，存在同名文件自动重命名加数字
-max-connection-per-server=5 # 可理解为多线程，默认1，命令行中用-x5。还有个max-concurrent-downloads是同时下载多任务，默认5不用改
-file-allocation=falloc # 当使用ext4 btrfs xfs NTFS时此项最好，但需要管理员权限
-min-split-size=20M # 【默】进行多线程的最小块，此处只有文件大于40M才会启用两个线程，命令行中用-k
+max-connection-per-server=5 或-x5 # 单个域名最多几个连接，默认1，一般调这个就行
+split=5 或-s5 #【默】单个任务最多分多少块。文件太大速度又慢的时候可考虑也调这个
+file-allocation=falloc # 当使用ext4 btrfs xfs NTFS时此项最好，但需要管理员权限。否则就用默认值
+min-split-size=20M #【默】进行多线程的最小块，此处只有文件大于40M才会启用两个线程
+#max-concurrent-downloads 或-j 是同时下载多个任务，默认5不用改
 # BT
 # 当下载的文件是.torrent时，自动开始BT任务
 bt-enable-lpd=true
@@ -421,9 +423,10 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * pyload 离线下载
 * supervisor(python)、PM2 (for node.js)
 * tasksel：用于安装一组软件
-* arping：能检查ip是否重复。arp-scan。ntopng：网络的top，web界面。addrwatch
+* https://github.com/royhills/arp-scan。ntopng：网络的top，web界面。addrwatch
 * rustdesk：远程桌面
 * https://github.com/Cyan4973/xxHash
 * cloc、boyter/scc：分析repo由哪些语言组成
 * croc GO，传输文件，需要服务端
 * https://github.com/Code-Hex/pget 类wget，目前还不够完善
+* nessus

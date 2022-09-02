@@ -5,6 +5,7 @@ title: Makefile和gcc
 ## Makefile
 
 * 缩进只能用tab
+* 多线程：`-j"$(nproc 2> /dev/null || sysctl -n hw.ncpu)"`
 
 ```makefile
 include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通配符和变量

@@ -182,10 +182,10 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 ## Submodule
 
 * git clone --recursive --shallow-submodules可以自动拉取子模块；否则用git submodule update --init --recursive --depth=1，其中后者的--recursive用于子模块也用了submodule
-* git submodule add [-b 目标分支] url [文件夹]：主动添加
+* 主动添加到当前目录下：git submodule add [-b 目标分支] --depth=1 url 会自动新建文件夹
 * git submodule update --recursive：相当于cd子模块然后checkout，要加--remote才相当于fetch+checkout
 * git submodule foreach [--recursive]：因为update和clone已经有了recursive，没必要用这个，只有自己想对所有子模块用别的命令时才用
-* 删除submodule：https://stackoverflow.com/questions/1260748；不存在rm命令
+* 删除：https://stackoverflow.com/questions/1260748；不存在rm命令
 * git submodule sync：若`.gitmodules`中的url发生了变化，需要使用此命令把信息更新到`.git/config`中
 * 未读：https://github.github.com/training-kit/downloads/submodule-vs-subtree-cheat-sheet/
 

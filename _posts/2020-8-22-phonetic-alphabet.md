@@ -29,7 +29,7 @@ e  dress head bed let many；KK中写作ɛ
 aɪ eye price high try time；其中a是印刷体
 ɔɪ boy voice noise(/z/) choice
 əʊ boat show know open hope post；KK中写作o，DJ给美音注音用oʊ
-eə fair pair hair care square
+eə fair pair hair/hare care square
 aʊ how now fowl(家禽) allow mouth；其中a是印刷体
 eɪ make face day break plane/plain rain danger；KK中写作e
 
