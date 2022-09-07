@@ -300,7 +300,7 @@ long_query_time=3
   * 当COMMIT时，会加PENDING锁，能阻止新连接读，但无法阻止老连接多游标不间断读。如果一段时间内仍无法加上，就会失败，此时事务并未取消，可以再次提交
   * 当所有的读锁都结束后，就加EXCLUSIVE锁，此时只有本连接能读写
   * BEGIN IMMEDIATE提前加RESERVED锁；BEGIN EXCLUSIVE在WAL下与IMMEDIATE相同
-  * BEGIN CONCURRENT：必须在WAL下，允许多个事务执行此语句后写入，直到commit时加锁（仍只能有一个写者），检查冲突集。写入不同表一定不冲突；写入同一个表，当整数主键离得近时会冲突，隐式主键插入时会严重冲突
+  * BEGIN CONCURRENT：必须在WAL下，允许多个事务执行此语句后写入，直到commit时加锁（仍只能有一个写者），检查冲突集。写入不同表一定不冲突；写入同一个表，当整数主键离得近时会冲突，隐式主键插入时会严重冲突。目前必须从源码的分支编译
 * 隔离级别
   * 非WAL下为serializable，读写到的肯定都是最新的
   * 只有启用共享缓存且启用PRAGMA read_uncommitted才会读到另一连接的事务中未commit的数据，此时不会获得读锁，被认为是同一连接，不会被block或者block别人
@@ -315,7 +315,7 @@ long_query_time=3
   * 每个数据库会生成对应多个文件，正常退出后会删除
   * 对应数据库级别或者所有连接，不是单个连接级别，且是持久的，关闭连接重新打开后还是此模式
   * 不支持NFS
-  * WAL2：需要从此分支源码编译。能避免长时间写入导致日志没有机会清除，实现方式是创建两个日志文件，运行checkpoint时先切换到另一个日志，后续写入就不会使用老日志
+  * WAL2：需从源码分支编译。能避免长时间写入导致日志没有机会清除，实现方式是创建两个日志文件，运行checkpoint时先切换到另一个日志，后续写入就不会使用老日志
 * rqlite：Go实现的分布式关系数据库，使用SQLite作为储存，三大系统都支持，还提供了多种语言的binding。相比之下dqlite的生态就差得多
 * mvsqlite：分布式的SQLite，基于FoundationDB。客户端是drop-in替代，设定LD_PRELOAD注入原版sqlite即可；但服务端部署有点麻烦。它表示rqlite和dqlite是replicated数据库而非分布式的，会把所有数据每台机器上都放一份
 
