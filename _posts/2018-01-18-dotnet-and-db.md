@@ -152,6 +152,10 @@ var people2 = cnn.Query(...).AsList(); // 不加<T>返回Dynamic，类似于SELE
 // DML，还支持存储过程
 List<Person> people = ...;
 cnn.Execute("INSERT INTO people(name, phone) VALUES (@Name, @Phone)", people); // 传集合自动插入多个
+
+var dbParams = new DynamicParameters();
+dbParams.AddDynamicParams(dic);
+db.Query(query, dbParams);
 ```
 
 ## ADO.NET
@@ -196,7 +200,7 @@ tran.Commit()/Rollback();
 * ChangeDatabase()
 * 连接字符串
   * https://www.connectionstrings.com
-  * Server和Data Source同义，Database和Initial Catalog同义
+  * Server和Data Source同义，表示本机可用一个点，Database和Initial Catalog同义
   * OLEDB需要设置Provider，ODBC需要设置Driver和DBQ
 
 ### IDbCommand
@@ -254,7 +258,7 @@ for(int i=0;i<tb.Rows.Count;i++)
 ### System.Data.SQLite
 
 * 不是内置库，不是微软出的，是SQLite官方出的
-* 一般用.Core的包，与普通版相比没有Linq和EF6
+* 一般用.Core的包，与普通版相比没有Linq和EF6。MSIL的包缺少二进制依赖，无法直接使用
 * 无参构造函数无法使用
 
 ### [Microsoft.Data.SqlClient](https://docs.microsoft.com/zh-cn/sql/connect/ado-net/sql)
@@ -275,6 +279,7 @@ for(int i=0;i<tb.Rows.Count;i++)
 * [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)：用于类与类之间的映射，或者数据库模型与实体之间的映射。https://zhuanlan.zhihu.com/p/89550593 https://zhuanlan.zhihu.com/p/136602715
 * mysql-connector-net：官方ADO驱动，支持X协议
 * [sqlite-net](https://github.com/praeclarum/sqlite-net)：不遵循ADO规范，更易用也更专用，内置简单ORM。也依赖SQLitePCLRaw，但不支持winsqlite3
+* https://github.com/CollaboratingPlatypus/PetaPoco 轻量级ORM
 
 ## 参考
 
@@ -289,3 +294,4 @@ for(int i=0;i<tb.Rows.Count;i++)
 * https://www.entityframeworktutorial.net/
 * https://www.youtube.com/watch?v=qkJ9keBmQWo
 * https://www.devart.com/dotconnect/ ADO.NET Provider，可以玩玩看
+* https://www.youtube.com/watch?list=PLLWMQd6PeGY3b89Ni7xsNZddi9wD5Esv2

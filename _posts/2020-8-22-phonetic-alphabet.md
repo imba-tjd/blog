@@ -169,6 +169,7 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 * sword
 * tongue：/tʌŋ/
 * wander /wɒndə/，wonder /wʌndə/
+* vehicle：h不发音
 
 ## 同词异义异音
 

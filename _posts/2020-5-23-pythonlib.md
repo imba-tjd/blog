@@ -92,6 +92,7 @@ except ImportError:
 * 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
 * --global-option "-a" --install-option "-b"相当于setup.py -a install -b
 * --no-build-isolation：目前版本的pip在构建时会自动创建虚拟环境，导致即使系统中存在满足依赖的包也不会去使用，此参数禁用这一行为
+* 当setup.py不存在时，可使用python -m build --sdist生成压缩包，但build这个包不自带
 
 ```py
 # __init__.py；必须有此文件才能自动发现
@@ -146,11 +147,12 @@ project_urls =
 
 [options]
 packages = find: # 还有一种find_namespace:
+package_dir = # 假设包的目录在src下，find:会在指定目录下寻找
+    = src
 install_requires =
     requests;python_version<'3.4' # https://www.python.org/dev/peps/pep-0508/
     pywin32 >= 1.0;platform_system=='Windows' # 还有platform_machine=='x86_64'
 python_requires = >=2.7, !=3.0.*
-include_package_data = True # 将MANIFEST.in的内容打包进bdist，还可指定exclude_package_data优先去除bdist的内容
 scripts =
     bin/script
     scripts/script
@@ -164,12 +166,13 @@ console_scripts = # 还支持gui_scripts，关闭父console还能运行；如果
 [options.extras_require] # pip安装时或entry_points用中括号和逗号才会装上
 tests = tox; pytest # 不明白为什么列表变成分号了但是就是这样，也可分行写
 
+[options]
+include_package_data = True # 不清楚和manifest.in的关系
 [options.packages.find]
 where = src
 include = pkg*
 exclude = tests
-
-[options.package_data] # 不要与include_package_data共用；data_files弃用了，本来也对wheel无效
+[options.package_data] # 更精细化管理，不要与include_package_data共用；data_files弃用了，本来也对wheel无效
 * = *.txt, *.rst
 hello = *.msg
 
@@ -637,13 +640,16 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()，但好像它已经patch过了
 * pywin32-ctypes：用纯Py重新实现的pywin32，但只有一小部分API，且很久没更新了
-* 其它打包项目
-  * PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式能不释放到临时文件夹
-  * cx_freeze：扩展了setup.py，也可用简单的命令行。不支持单文件
-  * Nuitka：编译到C，速度快，可能有兼容性问题，不够成熟。https://zhuanlan.zhihu.com/c_1245860717607686144
-  * shiv：类似于zipapp创建pyz，能打包依赖，不包含解释器，Linux下借助shebang能看起来直接运行，Win下要用`py`
-  * pex：类似于可移植的pip+venv，感觉没必要学
-  * py2exe：Star少，贡献者只有10人，不学
+
+### 其它打包项目
+
+* PyOxidizer：开发处于早期，只支持3.8+，编译，单文件模式能不释放到临时文件夹
+* cx_freeze：扩展了setup.py，也可用简单的命令行。不支持单文件
+* Nuitka：编译到C，速度快，可能有兼容性问题，不够成熟。https://zhuanlan.zhihu.com/c_1245860717607686144
+* shiv：类似于zipapp创建pyz，能打包依赖，不包含解释器，Linux下借助shebang能看起来直接运行，Win下要用`py`
+* pex：类似于可移植的pip+venv，感觉没必要学
+* py2exe：Star少，贡献者只有10人，不学
+* https://docs.beeware.org 一系列项目，能产生msi
 
 ## python-fire
 
@@ -1577,3 +1583,5 @@ print(template.render(the="variables", go="here"))
 * https://github.com/Z4nzu/hackingtool
 * joblib：有三个功能，一是透明硬盘缓存，二是并行计算，三是快速二进制序列化
 * pyupgrade：自动把老版本语法更新到新版本，但条目不多
+* https://hatch.pypa.io/latest/ 包管理
+* https://tox.wiki/en/latest/

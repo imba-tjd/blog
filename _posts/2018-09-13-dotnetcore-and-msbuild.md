@@ -30,7 +30,7 @@ PublishReadyToRunComposite：显著增加体积和编译时间，稍微增加R2R
 InvariantGlobalization：true # 减少Linux下自包含的体积
 DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdbonly，与full等价，在Win下使用专有格式。embedded嵌入文件内部，但直接用csc时不会报行号
 Prefer32Bit：默认false，但VS模板默认true
-ImplicitUsings：true 自动添加System Generic IO Linq Http Tasks的引用
+ImplicitUsings：true 自动添加System Generic IO Linq Http Tasks的引用。启用Winform时还会添加Drawing Forms
 PublishAot：隐式启用且必须启用PublishTrimmed
 
 LangVersion：latest/preview # 目标框架是net472时可加上
@@ -208,12 +208,18 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 国内镜像，VS中使用时要删掉原来的，不知是不是BUG：https://nuget.cdn.azure.cn/v3/index.json
 * `error NU1100: Unable to resolve xxx for 'net6.0'`：删除%AppData%\NuGet\NuGet.Config
 
-## manifest
+## [manifest](https://docs.microsoft.com/windows/win32/sbscs/application-manifests)
 
-* https://docs.microsoft.com/windows/win32/sbscs/application-manifests#ultraHighResolutionScrollingAware
+* 如果程序内的资源没有，也支持放在同一位置下
 * heapType:SegmentHeap 需要2004
 * longPathAware 需要1607
 * activeCodePage:UTF-8 需要1903
+* requestedExecutionLevel
+  * asInvoker：调用者是什么权限就是什么权限，一般Explorer运行就是标准权限
+  * requireAdministrator：在Explorer中双击会弹UAC
+  * highestAvailable：在管理员账户里弹UAC，在标准账户里以受限权限运行
+  * UWP只能以受限权限运行，所以关闭UAC后会都闪退
+* highResolutionScrollingAware：还有一个ultraHigh的，用于触摸板
 
 ## Upgrade Assistant
 
@@ -268,6 +274,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ## TODO
 
 * https://zhuanlan.zhihu.com/p/35979897
+* https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-concepts
 
 ```
 ItemGroup:
