@@ -95,7 +95,7 @@ try {
 
 ### TODO
 
-* System.Threading.SemaphoreSlim：信号量，相比于lock对异步更友好
+* System.Threading.SemaphoreSlim：信号量，异步时用。lock里面不能用await，因为Monitor不能释放不在当前线程获取的锁
 * https://docs.microsoft.com/zh-cn/dotnet/standard/io/common-i-o-tasks
 * https://docs.microsoft.com/zh-cn/dotnet/standard/threading/index
 * https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/index

@@ -201,6 +201,7 @@ title: Linux命令
 * -T指定TCP，-u指定UDP，-P指定端口。但感觉不太好用，目标没有监听那个端口时不算作丢包，而是说等待回应
 * 不进入交互式页面：-rw显示最后汇总结果（但不知为何很慢），-p显示每条结果，-c指定次数
 * Win下有Cygwin的版本，不大，但官方不release，而且只支持ICMP。WSL1下需要管理员权限运行控制台，无需sudo
+* NextTrace：https://zhuanlan.zhihu.com/p/548617816
 
 ### iproute2
 

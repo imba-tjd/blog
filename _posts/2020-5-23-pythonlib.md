@@ -440,7 +440,7 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * 有时文本节点不会直接为str，这样能判断是不是tail文本，以及找回父节点
 * lxml.objectify：像操作Python对象一样操作XML。不能与etree混用，不能用于HTML
 * html5parser：把html5lib作为lxml的后端构建etree，用法直接把它传给fromstring的参数即可；还有个soupparser但BS又会用内置的html.parser，所以没有任何意义
-* etree对应自带的xml.etree.ElementTree，API基本相同。不要用cElementTree，废弃了
+* etree对应自带的xml.etree.ElementTree，API基本相同。不要用cElementTree，废弃了。完全不支持自闭合元素
 * 自带的html.parser并不能正常使用。只有html.unescape()有点用
 * lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
 
@@ -1479,11 +1479,12 @@ print(template.render(the="variables", go="here"))
 * threading.Timer(秒数, fun[,args,kwargs]).start()：自带，非阻塞，只执行一次，不易管理
 * sched：自带，使用麻烦
 * dbader/schedule：every(10).minutes/every().hour.do(fun) 轻量无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
-* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455 官网是CF被移动封IP了
 * rq：使用redis的任务队列，比celery简单
 * huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
 * dramatiq：需用redis或rabbitmq
 * APScheduler：支持定时任务，可用redis。感觉设计比较复杂
+* https://github.com/Miksus/rocketry 定时任务，比较新
 
 ## PDF
 

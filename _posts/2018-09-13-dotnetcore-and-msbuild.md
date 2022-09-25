@@ -93,6 +93,7 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 * 设置COREHOST_TRACE=1环境变量可详细显示编译过程
 * 修改显示语言：DOTNET_CLI_UI_LANGUAGE
 * dotnet msbuild /pp | code -：查看完整生成的csproj
+* .NET7在所有必须指定RID的地方，如果没有手动指定则会隐式使用当前的。包括R2R 自包含 单文件 AOT
 
 ### 全局工具
 
