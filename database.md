@@ -417,6 +417,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * pgAdmin：官方客户端，163MB
 * https://sqlitebrowser.org/ C++，目标是让普通用户也能用，有中文
 * https://www.devart.com/free-products.html 闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
+* https://www.dbvis.com Java，闭源，有免费版
 * https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
 * https://sqlitestudio.pl/ C+Qt，仅SQLite，有中文但很多条目还是未翻译
 * https://sqlectron.github.io/ 感觉相比beekeeper唯一优势是有32位，大小都差不多
