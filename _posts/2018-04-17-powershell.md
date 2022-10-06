@@ -122,6 +122,7 @@ category: windows
 * 标准输入存放在$input数组中
 * 如果使用filter替换function关键字，会变成流模式，每次只需处理$_；也可用begin{}process{}end{}进行处理，关键字可不变
 * $args：所有参数的数组 $PsCmdlet：正在运行的cmdlet或函数 $PSScriptRoot：正在执行的脚本的路径 $MyInvocation
+* 显示函数对象的内容：`(gcm xxx).ScriptBlock`
 
 ## 命令行参数
 
@@ -303,3 +304,5 @@ file:///E:/%E4%B9%A6/Windows%20PowerShell%E5%85%A5%E9%97%A8.pdf 看到33页
 
 通用参数：WhatIf、Confirm、Verbose、Debug、Warn、ErrorAction、ErrorVariable、OutVariable 和 OutBuffer
 -PassThru：在许多Set命令中存在，以便在没有默认输出的情况下返回有关结果的信息
+
+$env:POWERSHELL_UPDATECHECK

@@ -282,6 +282,7 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * 如果仓库原本没有此文件，则可以不提交就忽略自己；如果原本有，则不能不提交就忽略自己
 * VSC的搜索会忽略它匹配到的
 * ~/.gitignore_global
+* 各语言模板：https://github.com/github/gitignore
 
 ### 不忽略 （即要包含）
 
@@ -290,7 +291,7 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * 网上的文章说是从上到下解析？但下面这个例子却是从下到上的解析规则
 * 只有用了忽略，结尾不加*、加*、加**才会不同
 
-```
+```gitignore
 # 排除所有内容，除了foo/bar：（必须这么写）
 /*
 !/foo
@@ -298,6 +299,18 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 !/foo/bar
 # 前两行是因为无法递归生效，必须要包含foo目录
 # 再排除foo下所有文件，再包含bar（这两个也不可以互换）
+```
+
+## gitattributes
+
+* 相同路径的多个属性设置可以写在一行
+* 模板：https://github.com/alexkaratarakis/gitattributes 其中Common的是普遍可用的
+
+```gitattributes
+*.md linguist-detectable # 启用某种语言的检测
+docs/** -linguist-documentation # 默认自动排除/docs等目录下的所有语言。根下的Readme和License也是这样排除的。一个星代表文件，两个代表文件和文件夹
+vendor-dir/** linguist-vendored # 排除某些文件夹，默认自动排除vendors cache .github等
+*.glyphs linguist-language=OpenStep-Property-List # 修改显示名字。无法用来新增语言
 ```
 
 ## 杂项技巧

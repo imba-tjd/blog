@@ -249,7 +249,7 @@ ip link
   * --data-urlencode 自动对v做URL编码，但key不变。k=@f从文件中读取v并编码
   * -F k=@f 类型指定为 multipart/form-data
   * --json 只是设置一些头，不更改或验证内容
-* -k忽略证书错误
+* -k忽略证书错误。--ssl-no-revoke不进行ocsp检查，此检查好像不受--proxy的影响，也可能是WinAPI的缘故
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
 * url通配：`[1-10]`、`[01-10]`、`[1-10:2]`、`[a-z]`、`{asdf,zxcv}`，-g禁用这一行为；别用bash的展开，因为某些选项如-O只针对随后的一个；在-o的文件名中可用`#1`对应通配变量
@@ -265,7 +265,7 @@ ip link
 * 只显示各个阶段消耗的时间，需要请求完毕才会输出：`curl -o /dev/null -s -w %{time_namelookup}::%{time_connect}::%{time_starttransfer}::%{time_total}::%{speed_download}"\n" <url>`
 * 不自带“下载文件中的所有链接”的功能，可用`xargs -n 1 curl -O < urls.txt`，不要按每一行手动运行因为那样无法利用keepalive
 * 其他人做的笔记：https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
-* Win版：https://curl.se/windows/ Win10最初自带的7.55.1往控制台输出U8网页时会乱码
+* Win版：https://curl.se/windows/ Win10最初自带的7.55.1往控制台输出U8网页时会乱码。至少要7.85才支持TLS1.3
 
 ### scp
 

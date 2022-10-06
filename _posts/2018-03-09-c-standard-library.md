@@ -71,6 +71,7 @@ putchar("0123456789ABCDEF"[value%16]);
 * void* memchr(const void* a, int ch, size_t len); // 从a的位置开始查找字符ch第一次出现的位置，并返回指向该位置的指针
 * void* memset(void* a, int ch, size_t len); // 把从a开始的len个字节设置为字符ch，ch只会取8位，不能用于int数组的初始化
 * alloca是非标准函数，memory.h是非标准函数库
+* C23：memccpy找到并复制了c后停止
 
 ### 注意事项
 

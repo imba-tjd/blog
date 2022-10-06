@@ -1213,13 +1213,15 @@ gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 from cffi import FFI
 ffibuilder = FFI() # echo_build.py
 ffibuilder.cdef('int echo(int a);') # 要在py中用的函数，支持某些地方使用三个点生成特殊代码
+
 # API编译模式，会生成_echo_cffi.c再编译成py模块，默认使用Release文件夹存放.o，但用了setup.py就也用build文件夹了
 ffibuilder.set_source('模块名如_echo_cffi', '#include "echo.h"', libraries=['dll/so无后缀'], library_dirs=['.'], include_dirs=['xxx']) # 第二个参数是C意义上的使用库时的实现；libraries是要链接的库，如Linux下一般要加数学库'm'，位数要和Py的一样；如果库都还没编译，也可以指定sources=['echo.c']
 if __name__ == '__main__': ffibuilder.compile(verbose=True)
 setup_requires=['cffi']; cffi_modules=['echo_build:ffibuilder']; install_requires=['cffi'] # 必须有运行时，否则报No module named '_cffi_backend'
 from _echo_cffi import ffi, lib; lib.echo(...) # 这俩对象是固定的
+
 # ABI模式动态加载，无需编译器，仍需cdef
-os.add_dll_directory(os.path.abspath('.')) # Py3.8，不加则只会搜索系统库位置；要不就下一条写绝对路径
+os.add_dll_directory(os.path.abspath('.')) # 不加则只会搜索系统库位置；要不就下一条写绝对路径，不清楚./有没有效
 lib = ffi.dlopen(None或xxx.so/dll) # None为加载标准库但Win不支持，具体库必须加后缀，要不就用ctypes.util.find_library()
 # ffi.verify() 废弃了
 

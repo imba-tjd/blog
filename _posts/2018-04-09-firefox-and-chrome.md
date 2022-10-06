@@ -44,7 +44,7 @@ title: 浏览器
 * security.fileuri.strict_origin_policy：file协议的URI只允许读取同一目录下的文件，默认开启
 * accessibility.typeaheadfind.manual：快速查找，按`/`和`'`时出现，后者仅链接，默认开启
 * privacy.resistFingerprinting：抵抗数字指纹，不过开启后可能产生问题，默认关闭
-* browser.backspace_action：设为2则退格键不会导致网页后退
+* browser.backspace_action：设为2则退格键不会导致网页后退，现在默认就用它了
 * javascript.options.warp true
 * browser.startup.homepage.abouthome_cache.enabled
 * browser.startup.preXulSkeletonUI 好像86默认开启
