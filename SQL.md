@@ -152,7 +152,7 @@ FROM tb1, tb2 -- 老版本的JOIN
 WHERE tb1.id=tb2.id
 ```
 
-### MERGE(MSSQL)
+### MERGE(MSSQL PG15)
 
 * 将INSERT、UPDATE、DELETE合并为一句
 
