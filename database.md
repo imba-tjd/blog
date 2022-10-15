@@ -410,7 +410,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 ### GUI
 
 * HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，有少量的维护功能，对于大量数据很卡，对MSSQL的脚本不太兼容
-* https://dbeaver.io JAVA，Star数多，有中文。驱动等数据下在%AppData%\Roaming\DBeaverData
+* https://dbeaver.io JAVA，Star数多，有中文。驱动等数据下在%AppData%\Roaming\DBeaverData。网页版https://demo.cloudbeaver.io/
 * https://www.beekeeperstudio.io/ Electron，有便携版，常见的四种都支持
 * phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
 * MySQL WorkBench：官方客户端，大小也不大
