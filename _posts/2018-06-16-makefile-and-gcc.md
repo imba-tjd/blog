@@ -176,6 +176,7 @@ prog3 : prog3.o sort.o utils.o
 ### 其他
 
 * https://github.com/swig/cccl 把Unix编译器参数转换为cl的参数（cl的wrapper）
+* https://github.com/rui314/chibicc
 
 ## 参考
 
@@ -196,3 +197,4 @@ prog3 : prog3.o sort.o utils.o
 * CMake: https://zhuanlan.zhihu.com/p/361123818
 * https://github.com/rui314/mold
 * https://zhuanlan.zhihu.com/p/163287897 九图记住Makefile
+* https://github.com/hellogcc/100-gcc-tips/blob/master/src/index.md
