@@ -579,7 +579,14 @@ urljoin() 处理相对路径
 
 ### 其它HTTP库
 
-* httpx的api与requests差不多，且支持异步、h2、brotli；长连接用httpx.Client()；默认不自动30x跳转。底层用的是同作者的httpcore
+* httpx
+  * api与requests差不多，且支持异步、h2、brotli
+  * 长连接用httpx.Client()
+  * 默认不自动30x跳转
+  * cookie在Client上，不能在请求方法上
+  * stream有单独的方法
+  * post二进制用content参数，form用data参数
+  * 底层用的是同作者的httpcore，依赖h11 sniffio anyio certifi
 * requests-html基于bs、pyquery、pyppeteer等构建，超级重，支持asyncio，render()自动用chrome请求ajax，第一次用会下载驱动
 * httplib2：和urllib3差不多级别的API，活跃度不高，可用于Py2
 * faster-than-requests：新，无依赖，速度快，非纯Py，贡献者极少
@@ -936,6 +943,7 @@ await response(scope, receive, send)
 * 准备部署：manage.py check --deploy
 * https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com
 * 第三方中间件：WhiteNoise压缩静态文件
+* REST：django-rest-framework、django-ninja
 
 ```py
 # news/model.py
@@ -1119,59 +1127,82 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
-* 在不需要与C库交互时可用纯Python模式。第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py。也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突。还可以用装饰器声明locals(a=xxx), returns, exceptval, cfunc(等价于cdef), inline, ccall(等价于cpdef)
-* 出现异常时如果pyx源文件存在，会给出错地方，但仅仅是当时临时读取，如果改了没重编译就会对不上；Py_Object的函数调用出错不会在编译期给出
-* 对numpy有一定支持，但应该不如numba
-* pyx默认Python2，3.0后为3
-* pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中。内部没有用cythonize，应该属于弃用用法或会在将来改，总之最好不要用于与C交互
-* setuptools.Extension：创建好后作为cythonize的参数。动态链接（注意*nix上libm默认）、指定编译参数和宏（extra_compile_args）；Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
+* 纯Python模式
+  * 第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py
+  * 也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突
+  * 还可以用装饰器声明locals(a=xxx), returns, exceptval, cfunc(等价于cdef), inline, ccall(等价于cpdef)
 * Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-Ofast --link-args=xxx
 * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
 * 与C++交互：pybind11；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
 * 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
-* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
+
+### 构建
+
+* pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中
+* Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
 
 ```py
 # setup.py
 from Cython.Build import cythonize
 setup(ext_modules=cythonize('**/*.pyx'))
+setuptools.Extension("demo", sources=["demo.pyx"], libraries=["m"], extra_compile_args=额外的编译参数包括-D定义宏)
+
 from mypyc.build import mypycify
-setup(ext_modules=mypycify(['xxx.py'])) # 或用 list(set(glob('*.py'))-{'setup.py','main.py'})；不要自己创建mypycify.py
+setup(ext_modules=mypycify(['xxx.py'])) 或 list(set(glob('*.py'))-{'setup.py','main.py'})，不支持自动递归包含
+
 # CLI
 python setup.py build_ext --inplace # 生成so/pyd且与pyx位于同一位置，能直接import；已有时不会重建，此时可用-f，-j多线程；不支持-a
-cython xxx.pyx -a # 变成c，产生与Py交互的分析。小心文件名写错或忘加后缀时无任何提示
-cythonize -i xxx.pyx # 变成so/pyd，也会产生对应的.c .o .def临时文件。之后就只能import使用，无法从命令行调用了
+cython xxx.pyx -a # 生成c，产生与Py交互的分析。小心文件名写错或忘加后缀时无任何提示
+cythonize -i xxx.pyx # 生成so/pyd，也会产生对应的.c .o .def临时文件。之后就只能import使用，无法从命令行调用了
 mypyc xxx.py --ignore-missing-imports # 很干净，只有so/pyd。默认会递归处理导入了的，如果那条忽略还不够就再加--follow-imports=skip
 
-# 最简单的使用C函数的方式
-int fun(int a) { return a; } # test.c
-# testmod.pyx；必须不能是test.pyx，因为它俩在同一目录，而.pyx会编译成.c，就会冲突
-cdef extern from "test.c":
-    cpdef int fun(int a)
+# 手动编译
+$pybase = $(python -c "print(__import__('sys').base_prefix+'\\')");
+gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
+生成可执行文件，仍依赖整个Py环境：先用cython --embed，再用gcc -municode且不能有-shared，好像可以不用-D_UNICODE和UNICODE
+```
 
-# 基本使用，声明函数、变量和类型；声明变量也可以使用cdef冒号缩进
+### 语法
+
+* 一次性声明多个变量也可以使用cdef冒号缩进
+* 类型强转用尖括号，<T?>好像能进行检查是否能强转
+* TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
+
+```py
 cimport cython
 from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库
 def primes(int nb_primes): ... # def的函数只能在Py侧调用，cdef的只能在pyx中用，cpdef就都能用
 cdef inline int add(int a, int b): return a+b
-cdef int n = 3 # 不要忘记赋初值
-cdef int arr[100] # 不支持VLA
-cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 必须强转，用尖括号；要free，一般放在finally里；<T?>好像能进行检查是否能强转
-cdef object o # python对象，速度较慢
-cdef char* s = "abc" # 对应bytes，若为参数一般要assert s is not NULL
-cdef bint b # 对应Py的bool
-@cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
-@cython.infer_types(True) # 自动推断变量类型
-cython.address()等于&，但好像也支持直接用。cython.operator.dereference()等于*，不能直接用但可用[0]替代
-# 无论是通过结构体变量还是指针，访问结构体成员用.
 
-# 数组和内存视图，无需malloc，无需第三方依赖
+cdef int n = 3 # 不会自动初始化
+cdef int arr[100] # 不支持VLA
+cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般放在finally里
+cdef object o # Py_Object
+cdef char* s = "abc" # 对应bytes。指针可用assert p is not NULL
+cdef bint b # 对应Py的bool
+
+@cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
+@cython.infer_types(True) # 自动推断变量未声明的类型，默认也会以安全方式自动推测一部分
+cython.address()等于&，但好像也支持直接用。cython.operator.dereference()等于*，不能直接用但可用[0]替代
+无论是通过结构体变量还是指针，访问结构体成员用.
+
+# 数组和内存视图
 from cpython cimport array
 import array # 教程如此，实际测试不导入这个也行，也许是用于Py侧的传进来
 cdef array.array a = array.array('i', lst) # 复制一份，仍视为object，能用一些CAPI如resize_smart、extend、zero
 cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；能用with nogil, parallel()；ca[:]=0能把数组全部赋0
 a.data.as_ints # 变为int*，用于调用C API；用as_voidptr变为void*
 cdef int value; for value in values[:count]: ... # 使用for遍历int*；数组转list用.tolist()，视图或int*用列表推导式
+```
+
+### 使用库
+
+```py
+# 最简单的使用C函数的方式
+int fun(int a) { return a; } # test.c
+# testmod.pyx；必须不能是test.pyx，因为它俩在同一目录，而.pyx会编译成.c，就会冲突
+cdef extern from "test.c":
+    cpdef int fun(int a) # 可以不写参数名称，但就无法用命名参数了
 
 # C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数：
 cdef extern from "queue.h":
@@ -1193,18 +1224,15 @@ cdef class Queue:
             cqueue.queue_free(self._c_queue)
 
     cdef extend_ints(self, int* values, size_t count): ... # Py不支持int*，显然不能用cpdef
-    cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明，否则会打印异常并忽略。此函数只能返回int，要一个数表示出现了异常。用?仍能自动分辨-1是不是真的数据，不过还是选一个被有效用到的概率小的数比较好
+    cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明，否则会打印异常并忽略。此语法表示返回值是-1时会自动检查是不是出现了异常，应选一个小概率出现的值作为异常值
     # 支持Callbacks传递函数，但太复杂略
 
 # C++
 %%cython --cplus # distutils: language=c++
 from libcpp.string cimport string
+from libcpp.vector cimport vector
 cdef string s = b'Hello world!'
-
-# 手动编译
-$pybase = $(python -c "print(__import__('sys').base_prefix+'\\')");
-gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
-# 生成可执行文件，仍依赖整个Py环境：先用cython --embed，再用gcc -municode且不能有-shared，好像可以不用-D_UNICODE和UNICODE
+cdef vector[int] v; v.reserve(9); v.push_back()
 ```
 
 ## cffi
@@ -1524,7 +1552,7 @@ print(template.render(the="variables", go="here"))
   * https://github.com/erikrose/parsimonious  简化了的EBNF，性能好。有几年没维护，2022年又有人接手了，提交数不多
   * https://github.com/neogeny/TatSu EBNF，3.8，star很少
   * https://github.com/pytransitions/transitions FSM
-  * https://github.com/dabeaz/sly 源于lex和yacc，很不活跃，不学
+  * https://github.com/dabeaz/sly 源于lex和yacc，作者不维护了
 * pretty_errors：精简stacktrace，可全局安装
 * uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高

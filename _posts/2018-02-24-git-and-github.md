@@ -403,8 +403,8 @@ collapsable content
 ## Git客户端
 
 * GitHub Desktop：添加多个repo时，启动后会自动全部fetch，导致电脑很卡
-* TortoiseGit：另有SVN版
-* Sourcetree：原支持SVN
+* TortoiseGit：与右键菜单集成紧密
+* Sourcetree
 * VSC
 * https://github.com/gitextensions/gitextensions 与Windows Explorer集成
 * https://github.com/jesseduffield/lazygit Terminal UI
@@ -412,13 +412,13 @@ collapsable content
 * https://aurees.com/ 不开源
 * https://www.cycligent.com/git-tool 不开源
 
-收费的：
+### 收费的
 
 * https://git-fork.com
 * https://www.gitkraken.com/ 学生包里免费
 * https://www.sublimemerge.com/
 * https://gitblade.com/
-* https://www.git-tower.com
+* https://www.git-tower.com 学生免费。好像也有Free版
 * https://www.syntevo.com/smartgit/
 
 ## SourceGraph
