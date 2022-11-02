@@ -1169,10 +1169,11 @@ gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
 ```py
-cimport cython
-from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库
-def primes(int nb_primes): ... # def的函数只能在Py侧调用，cdef的只能在pyx中用，cpdef就都能用
-cdef inline int add(int a, int b): return a+b
+cimport cython # 导入pyx
+from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库，可在源码的Includes里看到
+def primes(int nb_primes): ... # def的函数只能在Py侧调用，但里面可以调用cdef的；cdef的只能在pyx中用，cpdef就都能用
+cdef inline int add(int a, int b) nogil: return a+b
+预处理指令：DEF、IF、ELIF、ELSE
 
 cdef int n = 3 # 不会自动初始化
 cdef int arr[100] # 不支持VLA
@@ -1180,6 +1181,8 @@ cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般放在fi
 cdef object o # Py_Object
 cdef char* s = "abc" # 对应bytes。指针可用assert p is not NULL
 cdef bint b # 对应Py的bool
+cdef struct S: int n # 之后能用S(123)或cdef S s={'n':123}创建实例。还支持cdef packed struct、cdef enum
+cdef class: # 能在Py侧使用
 
 @cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
 @cython.infer_types(True) # 自动推断变量未声明的类型，默认也会以安全方式自动推测一部分
@@ -1193,6 +1196,7 @@ cdef array.array a = array.array('i', lst) # 复制一份，仍视为object，�
 cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；能用with nogil, parallel()；ca[:]=0能把数组全部赋0
 a.data.as_ints # 变为int*，用于调用C API；用as_voidptr变为void*
 cdef int value; for value in values[:count]: ... # 使用for遍历int*；数组转list用.tolist()，视图或int*用列表推导式
+另外其实也支持直接写cdef list l，还支持dict set bytes
 ```
 
 ### 使用库
@@ -1230,9 +1234,13 @@ cdef class Queue:
 # C++
 %%cython --cplus # distutils: language=c++
 from libcpp.string cimport string
-from libcpp.vector cimport vector
+from libcpp.vector cimport vector # 还有set map，能在返回时自动转换为Py的对应类型
 cdef string s = b'Hello world!'
 cdef vector[int] v; v.reserve(9); v.push_back()
+cdef extern from "xxx.hh" namespace "xxx":
+    cdef cppclass XXX:
+        def __cinit__(): Py的init可能由于子类不主动调用而不执行，此方法一定会执行
+        def __dealloc__(): del xxx
 ```
 
 ## cffi

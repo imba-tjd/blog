@@ -42,7 +42,7 @@ title: Linux命令
 * free -ht：内存信息
 * vmstat：监控系统状况，但对人类很难读，不学
 * ldd --version：能看到glibc版本
-* top：显示进程内存/cpu占用信息，会自动更新；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
+* top：显示进程内存/cpu占用信息，会自动更新，-c显示详细的命令；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍
 
@@ -70,6 +70,7 @@ title: Linux命令
 ### find
 
 * `find path -name '*.txt' -exec wc -l {}\;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件
+* -name仅匹配基本名，不匹配路径
 * -type指定文件类型，f为普通文件，l为链接文件，d为文件夹
 * -not -path：排除目录；默认会搜索隐藏目录，但好像不能递归排除；还有个-prune更快
 * -size +1m：大于1M的文件

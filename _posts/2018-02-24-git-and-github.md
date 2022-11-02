@@ -415,7 +415,7 @@ collapsable content
 ### 收费的
 
 * https://git-fork.com
-* https://www.gitkraken.com/ 学生包里免费
+* https://www.gitkraken.com/ 学生包里Pro免费，也有免费版。VSC的GitLen也是它出的
 * https://www.sublimemerge.com/
 * https://gitblade.com/
 * https://www.git-tower.com 学生免费。好像也有Free版
