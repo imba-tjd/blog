@@ -246,9 +246,10 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ### NGen
 
 * C:\Windows\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
-* ngen install xxx.exe；ngen display xxx
-* ngen update /queue：空闲时更新所有本机映像
+* ngen install/display xxx.exe
+* ngen update
 * 需要管理员权限
+* 本机映像生成在C:\Windows\assembly中
 
 ## bflat
 

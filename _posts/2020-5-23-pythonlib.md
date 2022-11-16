@@ -941,7 +941,7 @@ await response(scope, receive, send)
 * 交互式命令行：manage.py shell
 * 创建管理员账号：manage.py createsuperuser
 * 准备部署：manage.py check --deploy
-* https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com
+* https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com https://realpython.com/learning-paths/django-web-development/
 * 第三方中间件：WhiteNoise压缩静态文件
 * REST：django-rest-framework、django-ninja
 
@@ -1324,7 +1324,7 @@ if __name__ == "__main__":
 ```py
 import pandas as pd
 data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8，支持网络url
-df.to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")；指定sep=None可自动检测分隔符，指定compression='gzip'可保存为gz读取时自动识别
+df.to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")，to_pickle/feather以二进制格式保存；指定sep=None可自动检测分隔符，文件名以gz/xz/zst结尾可自动压缩保存且读取时自动识别
 pd.DataFrame({'A': [1, 2], 'B': [3, 4]})  两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
 pd.DataFrame([[1,3], [2,4]], columns=['A', 'B'])  另一种创建方式，按行输入数据
 pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id

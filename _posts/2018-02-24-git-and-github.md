@@ -86,6 +86,7 @@ title: Git/GitHub笔记
 * pull.rebase true：pull自动-r
 * help.autocorrect true：打错字时自动使用建议的内容
 * core.symlinks true：默认是启用的，但不知为何VS附带的Git把它设为了false
+* core.pager false：某些时候默认会用less
 * 性能
   * core.fscache true：仅Win有效，缓存status
   * core.fsyncObjectFiles：设为false表示交给操作系统flush数据，对于现代文件系统没必要设为true但好像默认是它，batch在NTFS下安全性应和true相当
