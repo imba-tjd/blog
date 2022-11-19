@@ -1275,43 +1275,6 @@ ffi.cast("int", 2)
 * parallel=True多线程执行，fastmath=True启用精度较低但更快的浮点运算，cache=True启用硬盘缓存
 * 可以加速pandas，pd的某些函数用参数engine='numba'
 
-## pyside6
-
-* 现在VSC的lint很有问题
-* Lib/site-packages/PySide6下有designer.exe
-* 教程：https://blog.csdn.net/baidu_36499789/article/details/113835688 https://doc.qt.io/qtforpython/quickstart.html https://github.com/maicss/PyQt5-Chinese-tutorial
-
-```py
-from PySide6 import QtCore, QtWidgets, QtGui
-class MyWidget(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.button = QtWidgets.QPushButton("Click")
-        self.button.clicked.connect(self.magic)
-        self.text = QtWidgets.QLabel("Hello World", alignment=QtCore.Qt.AlignCenter)
-
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
-        self.setLayout(self.layout)
-
-
-    @QtCore.Slot()
-    def magic(self):
-        self.text.setText("hello")
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    # app.setStyle('Fusion')
-
-    widget = MyWidget()
-    widget.resize(800, 600)
-    widget.show()
-
-    sys.exit(app.exec_())
-```
-
 ## pandas
 
 * 大部分运算都是非原地的，且可指定inplace=True
