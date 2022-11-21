@@ -158,12 +158,13 @@ prog3 : prog3.o sort.o utils.o
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer，有ucrt
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，因为内部用了bzip2，env文件控制自动添加PATH
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
-* https://github.com/niXman/mingw-builds-binaries
+* https://github.com/niXman/mingw-builds-binaries https://github.com/RoEdAl/ucrt-mingw-builds
 * https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3
 * https://nuwen.net/mingw.html
-* https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了
+* https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * https://gitee.com/qabeowjbtkwb/mingw-gcc
+* https://musl.cc/
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
 
 ### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
@@ -176,7 +177,8 @@ prog3 : prog3.o sort.o utils.o
 ### 其他
 
 * https://github.com/swig/cccl 把Unix编译器参数转换为cl的参数（cl的wrapper）
-* https://github.com/rui314/chibicc
+* https://github.com/rui314/chibicc 小型C编译器
+* ICC/ICX：https://www.intel.cn/content/www/cn/zh/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp 大小超过1G
 
 ## 参考
 

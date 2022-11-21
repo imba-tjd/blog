@@ -24,7 +24,7 @@ RuntimeIdentifier：win-x64 # https://docs.microsoft.com/zh-cn/dotnet/core/rid-c
 
 PublishSingleFile：true
 IncludeNativeLibrariesForSelfExtract=true；6.0添加了[RequiresAssemblyFiles]和EnableCompressionInSingleFile
-PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到；启用后.NET7的TrimMode默认为full且开启了分析警告
+PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到
 PublishReadyToRun：true # 混合AOT，必须指定RID；提高启动速度，增加体积和编译时间，代码质量不如JIT不过运行后会自动分层编译
 PublishReadyToRunComposite：显著增加体积和编译时间，稍微增加R2R效果。只能在自包含中启用。建议如果启用了分层编译就别开
 InvariantGlobalization：true # 减少Linux下自包含的体积

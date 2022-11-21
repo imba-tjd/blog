@@ -81,6 +81,7 @@ putchar("0123456789ABCDEF"[value%16]);
 * 也要避免`p = realloc(p,2048);`这种写法，本来分配内存失败后原来的数据还是存在的，这样写就找不到了
 * 如果realloc第一个参数为NULL，它的行为就和malloc一样
 * free的参数只能是NULL或从malloc、calloc、realloc返回的指针，不能是指针+-后的结果，因为分配了多少内存是记录在某个偏移的地方的。也不能二次free之前已经释放过的
+* realloc(p,0)未定义
 
 ## 可移植类型：stdint.h和inttypes.h
 
