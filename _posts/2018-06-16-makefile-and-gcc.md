@@ -5,53 +5,59 @@ title: Makefile和gcc
 ## Makefile
 
 * 缩进只能用tab
+* “目标”其实是要生成的文件名，如果存在那个文件且依赖最新，就自动不运行。依赖当有另一个目标时就执行对应的目标，当没有时仍视为文件
+* 变量赋值：=会自动推导最终赋值作为结果，与使用它的位置无关；:=是覆盖式赋值，与一般语言的赋值类似；+=相当于字符串拼接；?=当变量未定义时赋值，已定义时什么也不做
 * 多线程：`-j"$(nproc 2> /dev/null || sysctl -n hw.ncpu)"`
 
 ```makefile
 include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通配符和变量
 
-# 变量定义，可以在命令行中用key="val"重写
-objects = main.o kbd.o command.o display.o \ # 用反斜杠换行，教程错了= =
-    insert.o search.o files.o utils.o
-objects2 := $(wildcard *.o) # 使用wildcard关键字会进行扩展；如果直接用*.o，那就是普通的*.o，（效果应该是在command中当作shell命令会生效，但makefile自动推导无效）
-obj = $(patsubst %.c ,%.o ,$(src)) # 用于从src目录中找到所有.c 结尾的文件，并将其替换为.o文件，并赋值给obj
-
-    @echo 正在编译 # 单独的命令最前面必须使用tab
-    cd /etc; pwd # 不同命令之间独立，如果不用分号而是换行，pwd不会显示cd的结果
-    cd subdir && make # 进入子文件夹make；父makefile定义的变量手动用export命令可以传递到子makefile中，但SHELL和MAKEFLAGS变量会自动传递
+# 变量定义，可在命令行中用key="val"重写，用$()使用
+objects = main.o \ # 用反斜杠换行
+	utils.o
+objects := $(wildcard *.o) # wildcard关键字会进行扩展；如果直接用*.o，那就是普通的*.o，（效果应该是在command中当作shell命令会生效，但makefile自动推导无效）
+obj = $(patsubst %.c ,%.o ,$(src)) # 表示从src目录中找到所有.c，替换为.o，赋值给obj
 
 # 显式规则
-edit : $(objects) # 如果没有指定目标就用第一个目标；使用变量用$()
-    cc -o edit $(objects) # 此处的edit为程序名字
+prog: $(objects) # 如果make时没有指定目标就用第一个目标
+	cc -o prog $(objects)
 
-# 隐式规则，自动推导：.o会自动把.c加入依赖
-main.o : defs.h
-kbd.o : defs.h command.h
-command.o : defs.h command.h
-display.o : defs.h buffer.h
-insert.o : defs.h buffer.h
-search.o : defs.h buffer.h
-files.o : defs.h buffer.h command.h
-utils.o : defs.h
+# 隐式规则自动推导：.o会自动把.c加入依赖
+main.o: defs.h
+files.o: defs.h buffer.h command.h
 
-# 发现.h有很多重复的，另一种隐式推导：
-$(objects) : defs.h
-kbd.o command.o files.o : command.h
-display.o insert.o search.o files.o : buffer.h
+# 多个目标的公共依赖，另一种隐式推导：
+$(objects): defs.h
+command.o files.o: command.h
+search.o files.o: buffer.h
 
-.PHONY : clean cleandiff # 伪目标，不是一个文件，只是一个标签；只有显式使用make clean才会生效
-clean : cleandiff # 伪目标也可以有依赖
-    -rm edit $(objects) # 减号表示出现错误也继续执行
+# 伪目标，不是文件，只是标签；不会因为存在一个叫做clean的文件而认为已是最新不执行，所有依赖总会被执行
+.PHONY: clean cleandiff
+clean: cleandiff
+	-rm prog $(objects) # 减号表示出现错误也继续执行
 cleandiff :
-    rm *.diff
+	rm *.diff
+
+TARGET = hello
+OBJ = lib.o
+CC = gcc
+CFLAGS = -Wall
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^  # $@表示目标，$^表示依赖
+%.o: %.c  # 类似于模式匹配？
+	$(CC) $(CFLAGS) -o $@ -c $<  # $<表示第一个依赖，此处每次只有一个依赖
 
 ifeq (, $(shell which curl))
-    $(error "No curl in $$PATH, please install")
+	$(error "No curl in $$PATH, please install")
 endif
 
 EMPTY:=
 SPACE:=$(EMPTY) $(EMPTY)
 COMMA:=$(EMPTY),$(EMPTY)
+
+	@echo 正在编译 # 单独的命令，也要用tab。@表示不显示命令本身，类似于bat的
+	cd /etc; pwd # 不同命令之间独立，如果不用分号而是换行，又会回到cd前的地方
+	cd subdir && make # 进入子文件夹make；父makefile定义的变量手动用export命令可以传递到子makefile中，但SHELL和MAKEFLAGS变量会自动传递
 ```
 
 ### 文件搜寻
@@ -67,28 +73,22 @@ COMMA:=$(EMPTY),$(EMPTY)
 
 pattern中%表示0或任意字符；路径可以用冒号分隔多个
 
-### 一次生成多个文件
-
-```
-# 伪目标的所有依赖总会被执行
-all : prog1 prog2 prog3
-.PHONY : all
-
-prog1 : prog1.o utils.o
-    cc -o prog1 prog1.o utils.o
-prog2 : prog2.o
-    cc -o prog2 prog2.o
-prog3 : prog3.o sort.o utils.o
-    cc -o prog3 prog3.o sort.o utils.o
-```
-
 ### 多目标、静态模式
 
 如果command相似，可以使用此功能，会进行一些扩展。见《[跟我一起写 Makefile（五）](https://blog.csdn.net/haoel/article/details/2890)》
 
-### 其它
+## CMake
 
-* 自动生成依赖性：太复杂……
+* 文件名用CMakeLists.txt
+* mkdir build; cd build; cmake ..; make; make clean
+
+```cmake
+cmake_minimum_required(VERSION xxx)
+
+project(hello)
+
+add_executable(hello main.cpp utils.cpp)
+```
 
 ## gcc
 

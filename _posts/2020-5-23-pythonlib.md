@@ -441,7 +441,7 @@ css('a').attrib['href'] # 取属性，只取第一个，可用推导式遍历其
 * lxml.objectify：像操作Python对象一样操作XML。不能与etree混用，不能用于HTML
 * html5parser：把html5lib作为lxml的后端构建etree，用法直接把它传给fromstring的参数即可；还有个soupparser但BS又会用内置的html.parser，所以没有任何意义
 * etree对应自带的xml.etree.ElementTree，API基本相同。不要用cElementTree，废弃了。完全不支持自闭合元素
-* 自带的html.parser并不能正常使用。只有html.unescape()有点用
+* 自带的html.parser不能直接使用。只有html.unescape()有点用
 * lxml-stubs：官方维护，虽然准确，但不全；Pylance自带的几乎无类型，但函数全
 
 ```py
@@ -457,7 +457,7 @@ root.index(c) # c在root中的位置，原版没有
 
 etree.parse('filename'/file-like-obj) # 返回tree，用.getroot()获得根Element；子元素用.getroottree()获得tree
 etree.fromstring('xml literal') # 返回Element，基本相当于etree.XML()
-etree.dump(root) # 格式化输出到sysout，应仅用于调试；没有html.dump
+etree.dump(root) # 格式化输出到sysout，应仅用于调试；没有html.dump。原版手动格式化要用xml.dom.minidom.parseString().toprettyxml(indent="  ")
 etree.xmlfile() # 类似于open()，用于流式创建xml，原版没有
 ET.canonicalize('xml literal', out=file-like-obj) # 以低自由度的方式写入文件，更规范
 tree.write('filename', encoding="unicode") # 还有method='html'
@@ -1164,8 +1164,10 @@ gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 
 ### 语法
 
-* 一次性声明多个变量也可以使用cdef冒号缩进
 * 类型强转用尖括号，<T?>好像能进行检查是否能强转
+* 不能用*p对指针解引用，只能用p[0]。访问结构体指针的成员可用点，无需->
+* nogil时不能使用任何Py对象。Py侧函数中可以用with nogil: 调用nogil的函数，否则也能调用但不会释放gil
+* 整除默认用的Py的语义，用`# cython: cdivision=True`或`with cython.cdivision(True)`改成C的语义
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
 ```py
@@ -1175,12 +1177,13 @@ def primes(int nb_primes): ... # def的函数只能在Py侧调用，但里面可
 cdef inline int add(int a, int b) nogil: return a+b
 预处理指令：DEF、IF、ELIF、ELSE
 
-cdef int n = 3 # 不会自动初始化
-cdef int arr[100] # 不支持VLA
-cdef int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般放在finally里
-cdef object o # Py_Object
-cdef char* s = "abc" # 对应bytes。指针可用assert p is not NULL
-cdef bint b # 对应Py的bool
+cdef: # 一次性声明多个变量
+    int n = 3 # 不会自动初始化
+    int arr[100] # 不支持VLA
+    int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般放在finally里
+    object o # Py_Object
+    char* s = "abc" # 对应bytes。指针可用assert p is not NULL
+    bint b # 对应Py的bool
 cdef struct S: int n # 之后能用S(123)或cdef S s={'n':123}创建实例。还支持cdef packed struct、cdef enum
 cdef class: # 能在Py侧使用
 
@@ -1208,7 +1211,7 @@ int fun(int a) { return a; } # test.c
 cdef extern from "test.c":
     cpdef int fun(int a) # 可以不写参数名称，但就无法用命名参数了
 
-# C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数：
+# C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数；宏定义普通地声明变量：
 cdef extern from "queue.h":
     ctypedef struct Queue: pass # 对应typedef struct _Queue Queue;
     Queue* queue_new() # 隐式cdef extern
@@ -1495,7 +1498,8 @@ print(template.render(the="variables", go="here"))
 * pikepdf：偏底层
 * PyMuPDF：功能全面但是GPL
 * pdf2docx：基于PyMuPDF，生成的docx能在一定程度上保留格式
-* 不维护的：PyPDF2 pdfrw pdfminer
+* PyPDF2：曾经不维护了，现在复活了
+* 不维护的：pdfrw pdfminer
 
 ## Streamlit
 

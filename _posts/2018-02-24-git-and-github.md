@@ -283,7 +283,7 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * 如果仓库原本没有此文件，则可以不提交就忽略自己；如果原本有，则不能不提交就忽略自己
 * VSC的搜索会忽略它匹配到的
 * ~/.gitignore_global
-* 各语言模板：https://github.com/github/gitignore
+* 各语言模板：https://github.com/github/gitignore https://gitignore.itranswarp.com/
 
 ### 不忽略 （即要包含）
 

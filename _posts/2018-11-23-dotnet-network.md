@@ -133,6 +133,23 @@ ns.Write(bytes, 0, bytes.Length);
 ns.Close(); client.Close();
 ```
 
+## HTTP Listner
+
+* TODO:测试默认版本，可能是1.1。已知默认会长连接
+
+```c#
+var listener = new HttpListener();
+listener.Prefixes.Add("http://hostname:port/path"); // path可选但必须以/结尾，hostname可用*表示没有其他匹配时匹配上，Win10+FX4.6才支持子域名加*
+listener.Start();
+var ctx = listener.GetContext(); // 阻塞等待
+var req = ctx..Request; var resp = ctx.Response;
+resp.AppendHeader()/AppendCookie()/Abort()/Redirect();
+string responseString = "<HTML><BODY> Hello world!</BODY></HTML>";
+byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+resp.ContentLength64 = buffer.Length;
+resp.Close(buffer, true); // 代替 resp.OutputStream.Write(buffer, 0, buffer.Length);
+```
+
 ## 其它
 
 * 如果 ThreadPool 设置了最大并行数量，一旦超过最大并行数，CLR会先挂起所有线程，然后在排队进行，但是Http是不支持挂起的，就会直接终止

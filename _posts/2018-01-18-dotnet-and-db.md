@@ -220,7 +220,8 @@ tran.Commit()/Rollback();
 
 ### DataSet
 
-* 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后统一写回数据库。数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet、CommandBuilder、DataAdapter等概念。DataAdapter能写回数据库，感觉不如直接用EF了，MS的SQLite不支持
+* 断开模式（ADO.NET独有）：数据库——Connection——DataAdapter——DataSet，然后断开连接。之后的操作都是操作DataSet，完成后通过DataAdapter统一写回数据库。然而DataAdapter和CommandBuilder不是System.Data的，而是System.Data.SqlClient的
+* 数据集DataSet相当于一个内存数据库，有DataTables、DataRow、Linq to DataSet等概念
 
 ```c#
 var adapter = new SqlDataAdapter(sqlstr, cnn);
