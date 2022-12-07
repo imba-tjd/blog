@@ -43,6 +43,7 @@ WarningsAsErrors：$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618 # 几个nulla
 GenerateAssemblyInfo：默认为true。自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明，则还要定义RootNamespace和AssemblyName
 DefineConstants：未看
 AnalysisMode：AllEnabledByDefault启用更多的Lint，但可能太多了，比如public filed都会有警告
+ServerGarbageCollection：默认是false表示工作站类型，会GC更频繁以保持小内存占用。ASP会默认用true
 
 WPF：
 OutputType：WinExe # 存在下一条时设置为exe也可，会自动替换，但不能不设置；有选项关闭自动替换
