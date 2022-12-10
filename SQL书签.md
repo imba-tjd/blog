@@ -2,6 +2,7 @@ SQL
 https://www.liaoxuefeng.com/wiki/1177760294764384/1179611020917408
 https://www.runoob.com/mysql
 https://www.w3school.com.cn/sql/sql_top.asp
+https://sqlfordevs.com/ebook
 
 
 https://segmentfault.com/a/1190000023821451
