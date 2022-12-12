@@ -52,7 +52,7 @@ if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
 * 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
-* `__file__`是当前文件名的绝对路径；命名空间包没有此属性
+* `__file__`是当前文件名的绝对路径(3.9+)；命名空间包没有此属性
 * 直接运行的目标模块是`__main__`，在其它地方也可以import它，且可用它的`__file__`。但注意通过uvicorn等非直接运行时就不能依赖了
 * 没有一种表示“项目根目录”的方法
 * pip uninstall不支持--user，默认就会先卸载user的
