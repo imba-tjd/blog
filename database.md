@@ -242,6 +242,8 @@ END
 * sp_helptext：显示定义对象的SQL语句
 * ALTER SERVER CONFIGURATION SET MEMORY_OPTIMIZED TEMPDB_METADATA = ON;对TempDB启用内存中OLTP
 * ALTER DATABASE ... SET DELAYED_DURABILITY = FORCED：延迟事务持续性，IO太重又可容忍丢失部分数据可以启用；若设为ALLOWED就必须每次事务手动控制
+* Express版单实例限制利用4核、1G多内存、10G储存。但可运行多个实例绕过
+* 版本号：2022对应16.x
 
 ### LocalDB
 
