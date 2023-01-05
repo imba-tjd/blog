@@ -1135,6 +1135,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
 * 与C++交互：pybind11；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
 * 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
+* 详细教程：https://www.cnblogs.com/traditional/tag/Cython/
 
 ### 构建
 
@@ -1164,7 +1165,7 @@ gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 
 ### 语法
 
-* 类型强转用尖括号，<T?>好像能进行检查是否能强转
+* 类型强转用尖括号，<T?>好像能进行检查是否能强转，否则强转失败时还是原值
 * 不能用*p对指针解引用，只能用p[0]。访问结构体指针的成员可用点，无需->
 * nogil时不能使用任何Py对象。Py侧函数中可以用with nogil: 调用nogil的函数，否则也能调用但不会释放gil
 * 整除默认用的Py的语义，用`# cython: cdivision=True`或`with cython.cdivision(True)`改成C的语义
@@ -1174,7 +1175,7 @@ gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
 cimport cython # 导入pyx
 from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库，可在源码的Includes里看到
 def primes(int nb_primes): ... # def的函数只能在Py侧调用，但里面可以调用cdef的；cdef的只能在pyx中用，cpdef就都能用
-cdef inline int add(int a, int b) nogil: return a+b
+cdef inline int add(int a, int b) nogil: return a+b # 返回值若省略则默认为object
 预处理指令：DEF、IF、ELIF、ELSE
 
 cdef: # 一次性声明多个变量
@@ -1187,7 +1188,7 @@ cdef: # 一次性声明多个变量
 cdef struct S: int n # 之后能用S(123)或cdef S s={'n':123}创建实例。还支持cdef packed struct、cdef enum
 cdef class: # 能在Py侧使用
 
-@cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头应用于整个文件
+@cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头#cython: xxx=False 用于整个文件，也可用在with中
 @cython.infer_types(True) # 自动推断变量未声明的类型，默认也会以安全方式自动推测一部分
 cython.address()等于&，但好像也支持直接用。cython.operator.dereference()等于*，不能直接用但可用[0]替代
 无论是通过结构体变量还是指针，访问结构体成员用.
@@ -1196,7 +1197,7 @@ cython.address()等于&，但好像也支持直接用。cython.operator.derefere
 from cpython cimport array
 import array # 教程如此，实际测试不导入这个也行，也许是用于Py侧的传进来
 cdef array.array a = array.array('i', lst) # 复制一份，仍视为object，能用一些CAPI如resize_smart、extend、zero
-cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；能用with nogil, parallel()；ca[:]=0能把数组全部赋0
+cdef int[:] ca = a # 这种类型更适合作为Cython函数的参数，还可加const；[:,::1]表示二维数组且最后一维连续储存；能用with nogil, parallel()；ca[:]=0能把数组全部赋0。实际是memoryview，主要用于访问缓冲区而非创建，不能直接传list
 a.data.as_ints # 变为int*，用于调用C API；用as_voidptr变为void*
 cdef int value; for value in values[:count]: ... # 使用for遍历int*；数组转list用.tolist()，视图或int*用列表推导式
 另外其实也支持直接写cdef list l，还支持dict set bytes
@@ -1232,7 +1233,7 @@ cdef class Queue:
 
     cdef extend_ints(self, int* values, size_t count): ... # Py不支持int*，显然不能用cpdef
     cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明，否则会打印异常并忽略。此语法表示返回值是-1时会自动检查是不是出现了异常，应选一个小概率出现的值作为异常值
-    # 支持Callbacks传递函数，但太复杂略
+    # 支持Callbacks传递函数，但太复杂略。如果可能发生异常要加except*
 
 # C++
 %%cython --cplus # distutils: language=c++
