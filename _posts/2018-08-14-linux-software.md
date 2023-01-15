@@ -401,6 +401,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 合并：-f concat
 * 为Web优化，将元数据放在开头：-movflags faststart
 * 二进制：https://github.com/BtbN/FFmpeg-Builds
+* https://ffmpeg.guide/
 
 ## iperf3
 

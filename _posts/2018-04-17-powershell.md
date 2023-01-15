@@ -134,9 +134,10 @@ category: windows
 ----
 
 * 实例化对象：New-Object 类名 参数；也可以用.net的方式，调用`::new()`
+  * 创建固定长度的byte数组：new-object byte[] 4
 * 添加成员时，对象可用管道传，则不用指定-InputObject(In) $ObjectName；其他参数默认顺序是：MemberType、Name、[Value]，后面可直接跟函数体
 * PSMemberTypes可以是NoteProperty：“随后增加的属性”、ScriptMethod：函数和命令、AliasProperty：另外一个属性的别名、CodeProperty：通过静态的.Net方法返回属性的内容、CodeMethod：映射到静态的.NET方法、Property：真正的属性、Method：真正的方法
-* Get-Member(gm)：查看对象的类型名 属性 方法，必须用管道传给它；-MemberType(me)可指定类型
+* Get-Member(gm)：查看对象的类型名 属性 方法，必须用管道传给它；-MemberType(me)可指定类型。TODO: 好像不能正确显示数组类型
 * 创建对象、继承对象：与C#类似，分别用class关键字和冒号，只不过成员的声明用的PS的语法
 * 在字符串拼接中取对象的属性，要用`$($o.Prop)`，会隐式加引号。如`echo $o.P`有效，但`echo dir/$o.P`就只把$o变为字符串了，且注意不能是`$(dir/$o.P)`
 
@@ -226,9 +227,8 @@ category: windows
 * Write-Host：向控制台写文本，可用字符串插值（双引号内直接用$变量名），或者用类似`"asdf" $_ "asdf"`这样的式子，但空格还是会保留且不可省，除非加括号用字符串的处理方式；与echo(write-output)的区别是echo会把以空格分开的每个参数（当作$args数组？）在单独的一行输出，而它会把每个参数只用一个空格分隔后在一行输出
 * echo不换行：`Write-Host "xxx" -NoNewLine`，但注意如果重定向输出，仍会输出到屏幕上
 * Write-Debug：默认情况下（"SilentlyContinue"）不会往终端输出，$DebugPreference为"stop"时不允许使用此命令，为"Continue"时会显示，为"Inqure"时会显示并询问是否继续
-* $ErrorActionPreference与debug类似，"SilentlyContinue"为隐藏，"Continue"为输出
 * $host.UI.WriteErrorLine，WriteVerboseLine，WriteWarningLine：不受$DebugPreference控制
-* Out-File: 将输出发送到文件，与`>`等效；Core的默认编码是U8，5.1的是U16LE；Add-Content附加到文件
+* Out-File: 将输出发送到文件，与`>`等效；Core的默认编码是U8，5.1的是U16LE；Add-Content附加到文件。不能cat xxx > 同一个xxx，因为是流式的，这样会导致xxx被清空，可以(cat xxx) | out-file xxx，这样就会读取完并关闭文件
 * Out-Null: 与`>$null`等效，删除输出，不将其发送到控制台，但不会删除stderr
 * Out-Printer: 将输出发送到打印机。不一定要真实的打印机，可以用Microsoft Print to PDF这种
 * Out-Host -Paging：分页显示，惰性处理管道内容，经过它之后就变成字符串了。more.exe是非流的
@@ -306,3 +306,4 @@ file:///E:/%E4%B9%A6/Windows%20PowerShell%E5%85%A5%E9%97%A8.pdf 看到33页
 -PassThru：在许多Set命令中存在，以便在没有默认输出的情况下返回有关结果的信息
 
 $env:POWERSHELL_UPDATECHECK
+$ErrorActionPreference：当有cmdlet往stderr里输出信息时如何动作，默认是显示并继续执行。好像没有bash的set-ex的功能(stop on error)

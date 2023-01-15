@@ -58,11 +58,10 @@ if (app.Environment.IsDevelopment()) app.UseMigrationsEndPoint();
 // Data/CustomerDbContext.cs
 using Microsoft.EntityFrameworkCore;
 using RazorPagesContacts.Models;
-namespace RazorPagesContacts.Data {
-    public class CustomerDbContext : DbContext {
-        public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options){ }
-        public DbSet<Customer> Customers { get; set; } // 一个DbSet通常与一个表对应
-
+namespace RazorPagesContacts.Data;
+public class CustomerDbContext : DbContext {
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options){ }
+    public DbSet<Customer> Customers { get; set; } // 一个DbSet通常与一个表对应
 ```
 
 ### Model
@@ -72,24 +71,24 @@ namespace RazorPagesContacts.Data {
 ```c#
 // Models/Customer.cs；与EF在架构上没有直接关系，除非用了标签限制
 using System.ComponentModel.DataAnnotations; //还有个Schema命名空间，不知道区别
-namespace RazorPagesContacts.Models {
-    public class Customer {
-        // 此时可以启用C#8的可空引用类型，迁移时会决定对应的数据库字段是否可空
-        [Key] // 如果是以Id结尾就可以不加；类型也可以是Guid
-        public int Id { get; set; }
+namespace RazorPagesContacts.Models;
+public class Customer {
+    // 此时可以启用C#8的可空引用类型，迁移时会决定对应的数据库字段是否可空
+    [Key] // 如果是以Id结尾就可以不加；类型也可以是Guid
+    public int Id { get; set; }
 
-        [Required, StringLength(10)]
-        public string Name { get; set; }
+    [Required, StringLength(10)]
+    public string Name { get; set; }
 
-        [Display(Name = "Your BirthDate")]
-        [DataType(DataType.Date)] // 还可以是Password、Time、Url等
-        public DateTime BirthDate { get; set; }
+    [Display(Name = "Your BirthDate")]
+    [DataType(DataType.Date)] // 还可以是Password、Time、Url等
+    public DateTime BirthDate { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal Money { get; set; }
+    [Column(TypeName = "decimal(18, 2)"), Range(0.01, 9999.99)]
+    public decimal Money { get; set; }
 
 // [Compare(nameof(Password), ErrorMessage="xxx"] ConfirmPassword
-}}
+}
 ```
 
 ### 使用

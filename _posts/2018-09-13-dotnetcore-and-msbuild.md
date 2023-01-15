@@ -79,6 +79,7 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 
 ## dotnet CLI
 
+* dotnet new list 列出可用的模板
 * dotnet add/remove package xxx；dotnet list package --outdated
 * dotnet add app/app.csproj reference **/*.csproj；dotnet list/remove reference
 * dotnet sln todo.sln add **/*.csproj；dotnet sln remove

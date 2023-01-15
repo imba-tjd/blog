@@ -9,9 +9,10 @@ tags:
 ## 初始化
 
 ```bash
-dotnet new webapp --no-https
+dotnet new razor --no-https
 dotnet dev-certs https --trust/--clean # 安装sni为localhost的证书；Linux下只会生成不会自动安装
 dotnet watch run
+启用隐式引用：Microsoft.AspNetCore.Builder、Hosting、Http、Routing; Microsoft.Extensions.Configuration、DependencyInjection、Hosting、Logging;
 ```
 
 ## Startup
@@ -92,7 +93,7 @@ config.GetChildren(); // 返回IEnumerable<IConfigurationSection>
 * Properties/launchSettings.json
   * 仅用于本地开发，即使手动复制到publish里也没有用
   * dotnet run会使用profiles中第一个"commandName"为"Project"的条目，代表使用Kestrel；用--launch-profile xxx使用指定的配置。VS里运行才使用那个IIS的配置
-* 配置终结点：默认只会监听localhost:5212，可指定`"urls": "http://localhost"`或dotnet run --urls="..."或用Run()的重载，支持设为`*`和`[::]`
+* 配置终结点：默认只会监听localhost:port，其中端口不同版本不同，可指定`"urls": "http://localhost"`或dotnet run --urls="..."或用Run()的重载，支持设为`*`和`[::]`
 * Kestrel对象：能对KestrelServerOptions选项进行设置，包括限制流量、指定绑定的端口
 
 ## 日志
@@ -169,35 +170,35 @@ public string Message { get; set; }
 
 ### Razor
 
-* cshtml，必须以`@page`开头
+* cshtml，第一行必须是`@page`
 * `@using`引用命名空间，`@inject`使用服务，后面类似于构造函数的参数
+* @model：提供Model属性用于访问传递到视图的模型
 * HTML代码中`@表达式`或`@(表达式)`可以使用变量的值，不用加分号。可以是属性，可以调用索引器，可用函数，可用await
 * 如果表达式是字符串，里面的内容会经过HTML编码，显示出来的就是字符串原来的样子；如果想把字符串当作HTML，用HtmlHelper.Raw；非IHtmlContent的表达式会自动ToString
 * 两个@会转义一个，email中的会自动处理；`@* *@`是最优先注释
 * 用`@{}`、`@xxx`开头，中间可以写C#代码，可以声明变量和函数，可以调用函数，可以写C#的注释。关键是里面也可以写HTML和普通的@：函数可以返回void，函数体只有HTML（Core3）；如果编译器无法分辨语言而报错或者不想有空格，可用text标记把HTML括起来，或者用`@:`表示该行后面都是HTML
 * 支持的以@开头的：if（else和else if就不用@了）、switch、for、foreach、while、dowhile、using、try,catch,finally、lock
 * @functions没看懂有什么用。好像是不用就只能写本地函数，用了能用属性和public以及写OnGet，也可用@Functions.xxx调用；不用PM时可用
-* model：提供Model属性用于访问传递到视图的模型
 * View Component：属于高级用法，PartialView不能添加业务逻辑，Controller无法到处复用
 * @helper在3中无法使用了
 * 启用运行时编译，与watch run不兼容，仅限View层，编辑后刷新能重新编译：安装Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包，services.AddRazorPages().AddRazorRuntimeCompilation()或者在launchSettings中加"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES":"Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
 
 ### Razor Page
 
-* 用的MVVM思想
 * https://www.learnrazorpages.com
-* ViewData是个字典，基本上和Model用处差不多，只是是弱类型的；在分布页面的时候需要用到，比如默认在_Layout中获取了`@ViewData['Title']`设置为title
+* ViewData：弱类型字典，在分布页面的时候需要用到，比如默认在_Layout中获取了`@ViewData['Title']`设置为title
 * 直接访问域名的根会使用**Pages**文件夹（不是Page）下的Index；直接访问其它不带后缀的路径，如果存在文件会用文件，否则会用对应文件夹下的Index；如果还不存在，中间件会往下走，如果还没有，就返回空白页面
+* dotnet new page --name Pizza --namespace RazorPagesPizza.Pages --output Pages
 
 ```c#
 .cshtml代码，Page：
 @page "..."//后面可跟路由规则。/或~/开头是以Page开始，否则是相对路径；{id}和{参数名:int}可添加参数，后者是约束，还可以是alpha:minlength(4)；{id?}中的问号表示参数可选，能把?id=xxx变成路径；View中可用RouteData.Values["id"];
 @model IndexModel // 可以是IEnumerable<T>，但不知道怎么用；一个viewmodel可以对应多个view
 
-.cs代码，PageModel：
+.cshtml.cs代码，PageModel：
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-namespace MyWebapp.Pages { // 子文件夹用别的命名空间应该也可以
+namespace MyWebapp.Pages; // 子文件夹用别的命名空间应该也可以
 // 大部分内容都要是public的，依赖注入放在构造函数里
 public class IndexModel : PageModel { // 继承了HttpContext属性
     [BindProperty(SupportGet=true)] public int Id {get;set;} // View中可以用@Model.Id获取或赋值，但只有想修改时才添加BindProperty，默认只在Post时有效；对于Get添加后可以写在OnGet参数中，能直接赋进去；但它在Mvc命名空间下
@@ -208,7 +209,7 @@ public class IndexModel : PageModel { // 继承了HttpContext属性
         ...
         return RedirectToPage("..."); // 什么都不加就是首页
     }
-}}
+}
 
 // 改变路由，具体见：https://docs.microsoft.com/zh-cn/aspnet/core/razor-pages/razor-pages-conventions
 .AddRazorPagesOptions(options => { // 不是RazorOptions
@@ -229,7 +230,7 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * Pages/_ViewStart.cshtml中添加每个Page渲染前运行的语句（分部视图除外），默认只有`@{Layout = "_Layout";}`，在具体Page中可手动设为null或其它的
 * Pages/Shared/_Layout.cshtml中添加大部分的模板，必须使用`@RenderBody()`渲染具体的部分；但又有个IgnoreBody方法，看不懂
 * 区域：在具体Page中写`@section Scripts {...}`，在Layout中写`{@RenderSection("Scripts", required: false)}`，其中Scripts是标识符，required如果不为false，效果是找不到对应区域时报错
-* 分部视图：约定命名为Shared/_XXXPartitial.cshtml，使用@{await HTML.RenderPartialAsync}渲染，此方法无返回值，性能更好
+* 分部视图：约定命名为Shared/_XXXPartitial.cshtml，使用`<partial name="_ValidationScriptsPartial" />`或@{await HTML.RenderPartialAsync()}渲染，优先前者
 
 ### Tag Helper
 
@@ -239,6 +240,10 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * asp-page/asp-controller/asp-action/asp-route-xxx：MVC的
 * asp-href-include
 * 好像是替代htmlhelper的
+* asp-items asp-validation-summary="All"
+* partial
+* `<input asp-for="PageModel.属性">`：自动添加id和name，根据PageModel指定的属性类型自动设置input的类型
+
 
 #### HTML Helper
 
@@ -260,35 +265,46 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 
 ### MVC
 
-* 默认路由为{controller=Home}/{action=Index}/{id?}，代表默认找HomeController的Index方法，Index方法有一个名字叫做id的参数，但问号代表可以不传，则实际会传默认值
-* 建立Controllers文件夹，里面放名字以Controller结尾的类，继承Controller，都放xxx.Controllers命名空间下。文件夹的路径或者是否在子文件夹里不重要。
-* 类里的方法就是Action，方法的返回类型为Task IActionResult，实际可返回View(…)或RedirectToAction(nameof(Index))和Json等
-* View需要和Action的前缀对应，要不就在View()中传参数指定返回的是哪个；控制器和View的数据用ViewBag交互，无intellisense
+* 默认路由为{controller=Home}/{action=Index}/{id?}，代表默认找HomeController的Index方法，Index方法有一个名字叫做id的参数，问号允许不传时用默认值
+* 建立Controllers文件夹，里面放名字以Controller结尾的类，继承Controller，放xxx.Controllers命名空间下。文件夹的路径或者是否在子文件夹里不重要
+* 类里的方法就是Action，方法的返回类型为Task IActionResult，实际可返回View() RedirectToAction(nameof(Index)) Json()等
+* View需和Action的前缀对应；控制器和View的数据用ViewBag交互
 * 也可以用ViewModel，返回View()的时候传对象进去，View中用和Razor Page一样的用法
 * 方法的参数默认是用QueryString查询字符串?key=val传递的，但可在路由规则中写{id?}变成路径；注意名字必须对应
-* 自定义路由，使用[Route("xxx/[controller]")]，其中中括号代表类会以Controller结尾，实际url不需要加这部分，而xxx好像就直接跟在根目录后了；函数也可用这个特性，则是子路由，在控制器下，不会在根目录下
-* WinForm采用事件响应机制，无可避免地难以做到View层和Controller层分离，也就无法真正实现MVC架构
+* WinForm采用事件响应机制，难以做到View层和Controller层分离，也就无法真正实现MVC架构
 
 ### [WebApi](https://docs.microsoft.com/zh-cn/aspnet/core/web-api)
 
 * dotnet new webapi --no-openapi
-* 命名空间使用MVC
-* 类继承ControllerBase，必须使用属性路由[Route("api/[controller]")]，最好再用[ApiController]；不过因为api不应该更改而类名可能更改，可以考虑不用中括号改用绝对路径
-* 方法添加[HttpPost]等特性，不加就是Get，可以加逗号应用多个。方法名不重要，只会路由到控制器，然后看Verb；特性支持路由参数，如[HttpGet("{id}")]，就可以传递到方法的参数；如果方法的重载无法区分，可以用特性的name属性
-* NoContent、Ok、CreatedAtRoute
-* [FromBody]等：用在函数形参上，推断绑定源，这样参数可以直接是自定义的类，有时不加也行
-* 返回值是Task IActionResult T，return可以直接返回对象，会自动序列化成JSON
-* 创建带有验证的WebApi：https://www.youtube.com/watch?v=_LdiqQ13NBo；官方文档用的是IdentityServer4
-* 默认输入和输出的都是JSON(Content-Type: application/json)；在AddControllers的选项里用ReturnHttpNotAcceptable=true，对不支持的返回406 Not Acceptable
+* 命名空间使用Mvc
+* 继承ControllerBase，添加[ApiController]和[Route("api/[controller]")]特性。其中[controller]表示去掉结尾的Controller的类名
+* 方法
+  * 添加[HttpPost]等特性，不加就是Get，可以加逗号应用多个
+  * 方法名不重要，只会路由到控制器，然后看Verb
+  * 特性支持路由参数传递到方法的参数，如[HttpGet("{id}")]
+  * 返回值可以是具体类型，会自动json序列化。可以是IEnumerable。可以是`ActionResult<T>`。
+  * 形参上可加[FromBody]推断绑定源，这样参数可以直接是自定义类，有时不加也行
+* 默认输入和输出的都是JSON(Content-Type: application/json)。在AddControllers的选项里用ReturnHttpNotAcceptable=true 对其它的返回406 Not Acceptable
+* dotnet tool install -g Microsoft.dotnet-httprepl; httprepl localhost:port 之后可以输入ls cd get命令
 
 ### Minimal API
 
 ```c#
+// dotnet new web
 var app = WebApplication.Create(args);
 app.MapGet("/", () => "Hello World!");
-app.MapGet("/{id}", async (int id, TodoDb db) => await db.Todos.FindAsync(id) is Todo todo ? Results.Json(todo) : Results.NotFound()); // TodoDb是个继承了DbContext的类，使用前要AddDbContext<TodoDb>()
+app.MapGet("/{id}", async (int id, DB db) => await db.FindAsync(id) is C c ? Results.Json(c) : Results.NotFound()); // DB是依赖注入的
 app.Run("http://localhost:3000");
 ```
+
+### IActionResult
+
+* 首先现在一般用`ActionResult<T>`，因为IActionResult是非泛型的
+* 作为方法的返回值
+* T可以隐式转换成`ActionResult<T>`
+* 方法可以是Async的，返回值可以再包一层Task
+* 预定义的ActionResult的子类对象：NoContent()用在PUT和DELETE中、Ok()、BadRequest()、NotFound()
+* Created()、CreatedAtRoute()、CreatedAtAction()：表示201资源创建成功。区别：https://ochzhen.com/blog/created-createdataction-createdatroute-methods-explained-aspnet-core
 
 ## Swagger/OpenAPI
 
@@ -312,6 +328,7 @@ if (app.Environment.IsDevelopment()) {
 * 多服务的验证的一般流程：服务器A用私钥签名信息存到cookie里，客户端访问服务器B，B用A的公钥进行验证，这样A和B不需要通信。用Https是没用的
 * 一般只能在一个模块中处理密码，验证通过以后生成一个Token令牌；密码会一直有效，而Token有有效期。这就是JWT
 * `builder.Services.AddDefaultIdentity<IdentityUser>(op => op.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();`
+* 创建带有验证的WebApi：https://www.youtube.com/watch?v=_LdiqQ13NBo；官方文档用的是IdentityServer4，不学
 
 ## TODO
 
