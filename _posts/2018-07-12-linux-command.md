@@ -447,3 +447,4 @@ ip link
 * fzf https://zhuanlan.zhihu.com/p/91873965 https://github.com/junegunn/fzf https://einverne.github.io/post/2019/08/fzf-usage.html
 * nc/ncat
 * iface：查看网卡信息
+* https://github.com/google/cdc-file-transfer

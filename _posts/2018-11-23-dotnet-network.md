@@ -115,6 +115,7 @@ HttpClient一般用单例模式/复用，不要用using，否则会耗尽socket�
 
 ## Socket
 
+* 一个TcpClient只能连接一个远端，不是像HttpClient那样
 * 更底层的Socket类先不学
 * 还有UdpClient，发送接收二合一，Connect()指定默认远程主机方便Send()时不指定
 

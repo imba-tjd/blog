@@ -9,8 +9,8 @@ category: linux
 * 清理已删除但保留配置的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
 * 可以使用apt install ./xxx.deb直接安装本地的deb包
 * 查看更新记录：`cat /var/log/apt/history.log`，而`/var/lib/apt/periodic`中什么也没有
-* apt list -i只能用dpkg -l替代，前者无法直接输出到`code -`里
-* apt-cache rdepends -i：查询反向依赖；-i理论上是只显示已安装的，但实际好像有些未安装的也显示了？
+* 查看安装了哪些：apt list -i、dpkg -l
+* 查询反向依赖：apt-cache rdepends -i -i理论上是只显示已安装的，但实际好像有些未安装的也显示了？
 * apt-mark hold/unhold <pkgname>：锁定/解锁版本，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
 * 使用前最好安装一下gnupg2（apt-key需要）、apt-transport-https、ca-certificates
 * apt edit-sources
@@ -105,6 +105,7 @@ pip list -o --format=freeze | % {pip install -U $_.split("=")[0]}
 # pipupgrade -ly 在win下有各种各样的问题；千万不要装成pip-upgrade了；还有个pipdate只能在Linux上用，pip-review不积极开发了，pip-upgrader好像还能用
 
 pipdeptree [-p package1,p2]：显示依赖哪些包，也有check的效果；-r：显示某个包是被那些依赖的
+pipgrip --tree pkg：显示依赖哪些包，关键是不需要安装指定的pkg，而是仅仅读取的依赖，无法离线使用
 ```
 
 ### 国内源
