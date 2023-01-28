@@ -41,7 +41,7 @@ Nullable：enable
 NoWarn：NU1602,NU1604
 WarningsAsErrors：$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618 # 几个nullable的视为error
 GenerateAssemblyInfo：默认为true。自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明，则还要定义RootNamespace和AssemblyName
-DefineConstants：未看
+DefineConstants：相当于-d/-define
 AnalysisMode：AllEnabledByDefault启用更多的Lint，但可能太多了，比如public filed都会有警告
 ServerGarbageCollection：默认是false表示工作站类型，会GC更频繁以保持小内存占用。ASP会默认用true
 
@@ -73,14 +73,14 @@ ApplicationManifest：app.manifest # 好像会自动使用
 
 EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 最小的全自定义Compile项：`<Compile Include="**/*.cs" Exclude="**/*.csproj; **/*.sln; bin/**; obj/**" />`，不能只写bin，必须加/**
-所有默认排除项可用$(DefaultItemExcludes)引用。
+所有默认排除项可用$(DefaultItemExcludes)引用。还可用DefaultItemExcludes属性
 
 .settings和.resx需要手动加入：https://docs.microsoft.com/zh-cn/dotnet/desktop/winforms/migration/#resources-and-settings
 
 ## dotnet CLI
 
 * dotnet new list 列出可用的模板
-* dotnet add/remove package xxx；dotnet list package --outdated
+* dotnet add/remove package xxx；dotnet list package --outdated --include-transitive
 * dotnet add app/app.csproj reference **/*.csproj；dotnet list/remove reference
 * dotnet sln todo.sln add **/*.csproj；dotnet sln remove
 * dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的。无法在sln目录下运行，必须加-p csproj的目录
@@ -256,10 +256,15 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 ## bflat
 
 * https://github.com/MichalStrehovsky/bflat 删去lib里的Linux和arm64，不要删pdb
-* bflat build src.cs lib.cs
+* bflat build src.cs lib.cs -Ot或-Os --no-debug-info --no-globalization --no-reflection --no-stacktrace-data --no-exception-messages
 * 支持C#10的“顶级语句”
-* 如果源文件没有EntryPoint自动视为库生成dll，函数要指定`[UnmanagedCallersOnly(EntryPoint="xxx")]`，之后从C#中调用必须用P/Invoke，可选内嵌进最终exe
-* 仅x64，不支持csproj
+* 如果源文件没有Main，自动视为库生成dll，导出函数要指定`[UnmanagedCallersOnly(EntryPoint="xxx")]`，异常必须捕获，之后可当作C函数调用。若用在另一个bflat的cs中，要用-i:库名 --ldflags:库名.lib
+* 仅x64，不支持csproj但可以不加源文件名表示CWD所有cs文件
+
+## csc
+
+* -o开启优化
+* 默认不生成调试内容，-debug开启。默认生成外部pdb文件，有个内嵌版但实测无法显示行号
 
 ## 反编译
 
@@ -279,6 +284,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 
 * https://zhuanlan.zhihu.com/p/35979897
 * https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-concepts
+* PackageReference的PrivateAssets="All"
 
 ```
 ItemGroup:

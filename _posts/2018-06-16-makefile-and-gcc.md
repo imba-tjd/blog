@@ -104,6 +104,7 @@ add_executable(hello main.cpp utils.cpp)
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
 * -fuse-ld=gold比普通的ld快，MinGW不自带
 * -s：去掉符号信息
+* --include：相当于`#include`，与-I无关
 
 ### 编译步骤
 
@@ -152,6 +153,7 @@ add_executable(hello main.cpp utils.cpp)
 
 * 安装：https://apt.llvm.org/
 * Win: https://github.com/mstorsjo/llvm-mingw 有ucrt，但支持太多的target导致可执行文件有点多
+* https://gitee.com/qabeowjbtkwb/windows-hosted-llvm-clang
 
 ### MinGW
 
@@ -163,7 +165,7 @@ add_executable(hello main.cpp utils.cpp)
 * https://nuwen.net/mingw.html
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
-* https://gitee.com/qabeowjbtkwb/mingw-gcc
+* https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain
 * https://musl.cc/
 * __MINGW64_VERSION_MAJOR定义了它自己的版本
 
@@ -200,3 +202,4 @@ add_executable(hello main.cpp utils.cpp)
 * https://github.com/rui314/mold
 * https://zhuanlan.zhihu.com/p/163287897 九图记住Makefile
 * https://github.com/hellogcc/100-gcc-tips/blob/master/src/index.md
+* https://github.com/rr-debugger/rr

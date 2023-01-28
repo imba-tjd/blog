@@ -35,8 +35,11 @@ System.IO
 
 #### FileStream
 
-* 构造函数的isAsync参数或useAsync或FileOptions.Asynchronous可以使IsAsync属性为true；如果为false，调用以Async结尾的方法不会阻塞UI，但实际IO流是同步的；而调用Begin开头的函数会变成真异步IO，但读取小文件反而会变慢
-* 构造函数的FileShare.None可以以独占的方式打开，其他程序读都不让
+* 异步：构造函数的isAsync参数或useAsync或FileOptions.Asynchronous可以使IsAsync属性为true；如果为false，调用以Async结尾的方法不会阻塞UI，但实际IO流是同步的；而调用Begin开头的函数会变成真异步IO，但读取小文件反而会变慢
+* 构造函数
+  * 一般只需指定FileMode，当不为Append时，FileAccess默认为读写
+  * 只读：FileMode.Open, FileAccess.Read
+  * FileShare.None可以以独占的方式打开，其他程序读都不让。默认是Read
 * Name：打开的文件的绝对路径
 * Lock、Unlock：锁定/解锁文件的一部分
 
@@ -62,7 +65,7 @@ System.IO
 * Encrypt、Decrypt：用的是EFS；但只有Windows下才能用，而且其实EFS应该是透明的，最好不要用这个
 * Replace：使用当前文件替换指定路径的文件并创建备份
 * FileInfo独有：Name：带后缀的纯文件名、Directory：返回DirectoryInfo、DirectoryName：最后无斜杠的完全路径、Length：文件大小，单位为字节、IsReadOnly：**设置**/获取文件是否只读
-* File独有：Append/Read/WriteAllLines(string[])/Text(string)/Bytes[Async]：都是先打开，读取/写入后再关闭；还有一些读取/设定修改时间的函数，在FileInfo中是属性
+* File独有：Append/Read/WriteAllLines(string[])/Text(string)/Bytes[Async]：都是先打开，读取/写入后再关闭；还有一些读取/设定修改时间的函数，在FileInfo中是属性。读取的没加任何锁，注意并发写的安全性
 * FileInfo.ToString：如果主动使用构造函数，即使传递给它相对路径，也会返回绝对路径；如果使用DirectoryInfo.GetFiles/EnumerateFiles，则只会返回文件名，即使枚举子文件夹
 
 #### Directory/DirectoryInfo
