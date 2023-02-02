@@ -5,83 +5,51 @@ category: dotnet
 
 ## EF Core
 
+* 只学和asp.net core结合使用的
+
 ### 安装和CLI
 
 * 生成的Migrations文件夹和数据库里留下的那个表都不要删
-* 迁移可能很危险，可能造成数据丢失。比如可能真的想要删一个表，但也可能是误判，或者可能本地成功，线上出问题；还有现在用git，而连接到的数据库可不会自动改变；再有就是可能忘了迁移、
-* VS中可以直接右键Update Model from Database和Generate Database from Medel
+* 迁移可能很危险，可能造成数据丢失。比如可能真的想要删一个表，但也可能是误判，或者可能本地成功，线上出问题；还有现在用git，而连接到的数据库可不会自动改变；再有就是可能忘了迁移
+* VS：右键Update Model from Database和Generate Database from Model
 
 ```bash
 dotnet add package Microsoft.EntityFrameworkCore.Design # VS中用.Tools
-dotnet add package Microsoft.EntityFrameworkCore.SQLite # 用于开发环境
-# 还有InMemory及MySql.Data.EntityFrameworkCore；以及另外两个Identity和Diagnostics包
+dotnet add package Microsoft.EntityFrameworkCore.SQLite # 还有InMemory
 
 dotnet tool install --global dotnet-ef # 用于“迁移”和查询DbContext信息
 dotnet tool install --global dotnet-aspnet-codegenerator # 脚手架，依赖下面的Web和SqlServer包，否则三者都不用装
 dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
 dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 
+dotnet aspnet-codegenerator razorpage -m Movie -dc Proj.Data.MovieContext -udl -outDir Pages/Movies --referenceScriptLibraries -sqlite
+
+dotnet ef database drop # SQlite不支持修改和删除列，修改Model字段迁移时会失败，要删除迁移文件夹，运行此条，重建
 dotnet ef migrations add XXX # 尝试将当前Model和Context代码与数据库进行比较，生成设计结果和迁移脚本
 dotnet ef database update # 运行迁移脚本，会自动修改数据库
 
-Scaffold-DbContext <connectionstring> Microsoft.EntityFrameworkCore.Sqlserver -OutputDir Models -Context CustomerContext -DataAnnotations 可以反向从已经创建好的数据库中获取信息创建Model和上下文
-```
-
-### DbContext连接
-
-* 加载导航属性的方式有三种：Eager loading进行查询的时候就加载导航属性的相关数据、Explicit loading查询后某一时刻通过代码显式地从数据库加载相关数据、Lazy loading仅当访问导航属性时，相关数据才会从数据库进行加载（由EF Core自动进行）
-* 最简单的懒加载的方式是安装Microsoft.EntityFrameworkCore.Proxies，在DbContextOptionsBuilder中调用UseLazyLoadingProxies，再用virtual修饰想启用的导航属性
-* 可以重写OnModelCreating方法：`builder.Entity<T>.HasData`可以添加种子数据；Property(x=>x.Name).IsRequired().HasMaxLength(10)可以代替标签进行限制
-* 手动建立也可用ASP那样的DBContext的构造函数，需传DbContextOptionsBuilder的Options属性
-
-```c#
-class MyDBContext : DBContext {
-    ...
-    protected override void OnConfiguring(DbContextOptionsBuilder op) {
-        op.UseSqlServer(@"connectionString");
-    }
-}
-
-// appsettings.json
-"ConnectionStrings": {
-    "CustomerContext": "DataSource=Customers.db"
-}
-
-// Startup
-// 还可在ctor中注入IWebHostEnvironment，用env.IsDevelopment()在开发环境和生产环境用不同的数据库
-// 用AddDbContextPool可重用DbContext
-var connectionString = builder.Configuration.GetConnectionString("CustomerContext");
-builder.Services.AddDbContext<CustomerDbContext>(op => op.UseSqlServer(connectionString)/UseInMemoryDatabase("name"));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-if (app.Environment.IsDevelopment()) app.UseMigrationsEndPoint();
-
-// Data/CustomerDbContext.cs
-using Microsoft.EntityFrameworkCore;
-using RazorPagesContacts.Models;
-namespace RazorPagesContacts.Data;
-public class CustomerDbContext : DbContext {
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options){ }
-    public DbSet<Customer> Customers { get; set; } // 一个DbSet通常与一个表对应
+Scaffold-DbContext <connectionstring> Microsoft.EntityFrameworkCore.Sqlserver -OutputDir Models -Context CustomerContext -DataAnnotations 反向从已经创建好的数据库中获取信息创建Model和上下文
 ```
 
 ### Model
 
+* 可以启用C#8的可空引用类型，迁移时会决定对应的数据库字段是否可空
 * 两个Model之间的引用（包括`List<T>`）称作导航属性，会自动创建外键；如果另一个类没有ID，仍会有“卷影属性”
 
 ```c#
-// Models/Customer.cs；与EF在架构上没有直接关系，除非用了标签限制
-using System.ComponentModel.DataAnnotations; //还有个Schema命名空间，不知道区别
-namespace RazorPagesContacts.Models;
+// Models/Customer.cs
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+namespace Proj.Models;
 public class Customer {
-    // 此时可以启用C#8的可空引用类型，迁移时会决定对应的数据库字段是否可空
     [Key] // 如果是以Id结尾就可以不加；类型也可以是Guid
     public int Id { get; set; }
 
-    [Required, StringLength(10)]
+    [Required, StringLength(10),RegularExpression(@"...")]
     public string Name { get; set; }
 
     [Display(Name = "Your BirthDate")]
-    [DataType(DataType.Date)] // 还可以是Password、Time、Url等
+    [DataType(DataType.Date)] // 还可以是Password、Time、Url等，修改表示，与验证无关
     public DateTime BirthDate { get; set; }
 
     [Column(TypeName = "decimal(18, 2)"), Range(0.01, 9999.99)]
@@ -91,40 +59,57 @@ public class Customer {
 }
 ```
 
+### DbContext连接
+
+* 加载导航属性的方式
+  * Eager loading进行查询的时候就加载导航属性的相关数据
+  * Explicit loading查询后某一时刻通过代码显式地从数据库加载相关数据
+  * Lazy loading仅当访问导航属性时，相关数据才会从数据库进行加载，也由EFCore自动进行
+* 另一种懒加载方式：Microsoft.EntityFrameworkCore.Proxies
+* 一个DbSet通常与一个表对应
+* 重写OnModelCreating方法：`builder.Entity<T>.HasData`可以添加种子数据；Property(x=>x.Name).IsRequired().HasMaxLength(10)可以代替标签进行限制
+* 不在ASP中使用，手动创建DbContext：重写自定义DbContext的OnConfiguring，参数的builder相当于op
+
+```c#
+// appsettings.json
+"ConnectionStrings": {
+    "CustomerContext": "DataSource=Customers.db"
+}
+
+// Startup
+// 用AddDbContextPool可重用DbContext
+var constr = builder.Configuration.GetConnectionString("CustomerContext");
+builder.Services.AddDbContext<CustomerDbContext>(op => op.UseSqlServer(constr)/UseInMemoryDatabase("name")/UseSqlite(constr));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+if (app.Environment.IsDevelopment()) app.UseMigrationsEndPoint();
+
+// Data/CustomerDbContext.cs，一般由脚手架自动生成
+using Microsoft.EntityFrameworkCore;
+using Proj.Models;
+namespace Proj.Data;
+public class CustomerDbContext : DbContext {
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options){ }
+    public DbSet<Customer> Customers { get; set; }
+```
+
 ### 使用
 
 * 查询可使用Linq，但Find效率更高；增删改都要记得保存，查可用AsNoTracking提高性能
+* 需要处理异常，如DbUpdateConcurrencyException
+* 提供异步方法
 
 ```c#
-using (var context = new MyDBContext()) {
-    var models = MyDBContext.MyModels
-        .Where(b => b.Id == "id")
-        .ToList();
-    context.MyModels.Add(new MyModel()); // 好像也可直接context.Add，会自动识别
-    context.Attach(model).State=EntityState.Modified; // 修改后使用，但好像如果是跟踪的就不用显式指定了
-    context.SaveChanges(); // 可能出现DbUpdateConcurrencyException
-}
+using var ctx = new MyDBContext(); // ASP中用DI
 
+var models = MyDBContext.MyModels
+    .Where(b => b.Id == "id")
+    .ToList();
+ctx.MyModels.Add(new MyModel()); // 好像也可直接context.Add，会自动识别
+ctx.Attach(model).State=EntityState.Modified; // 修改后使用，但好像如果是跟踪的就不用显式指定了
+ctx.SaveChanges();
 ```
 
-### ASP中的使用
-
-* 也可以建立IRepository，一般每个对应一张表，注入DbContext封装成业务上的Async方法；要用services.Addxxx注册
-
-```c#
-// Page/Customers.cshtml.cs
-using Microsoft.EntityFrameworkCore;
-using RazorPagesContacts.Models;
-...
-private readonly RazorPagesContacts.Data.CustomerDbContext _context; // DI略
-...
-[BindProperty] public Customer Customer { get; set; } // BP表示能被修改
-OnGet: Customers = _context.Customers.ToListAsync();
-OnPost:_context.Customers.Add(Customer); await _context.SaveChangesAsync();
-OnPostDeleteAsync: await _context.Customers.FindAsync(id); if ... Remove ...
-```
-
-### 3.0的变化
+### 变化
 
 * 3.0之后，如果代码不能在服务端执行（不能翻译成SQL），会直接报错（除了最后一个Select）；之前是放到本地执行的。可以显式用ToList或者AsEnumerable
 * 3.0之后，删除主体时会立刻删除依赖实体，之前SaveChanges时才会操作
@@ -277,17 +262,14 @@ for(int i=0;i<tb.Rows.Count;i++)
 * SqlSugar：国产的ORM，号称简单，star数还算可以但贡献者极少；FreeSql：国产，支持的数据库多一点
 * Linq to SQL：已经不维护了，且只支持SQL Server
 * [AutoMapper](https://docs.automapper.org/en/latest/Getting-started.html)：用于类与类之间的映射，或者数据库模型与实体之间的映射。https://zhuanlan.zhihu.com/p/89550593 https://zhuanlan.zhihu.com/p/136602715
-* mysql-connector-net：官方ADO驱动，支持X协议
 * [sqlite-net](https://github.com/praeclarum/sqlite-net)：不遵循ADO规范，更易用也更专用，内置简单ORM。也依赖SQLitePCLRaw，但不支持winsqlite3
 * https://github.com/CollaboratingPlatypus/PetaPoco 轻量级ORM
+* PG驱动：npgsql。官方：https://www.postgresql.org/ftp/odbc/versions/msi/
+* mysql-connector-net：官方ADO驱动，支持X协议
 
 ## 参考
 
-* https://zhuanlan.zhihu.com/p/67492809
-* https://zhuanlan.zhihu.com/p/35652195
-* 浙江省高等学校精品在线开放课程共享平台——Web应用程序设计（.NET）
 * https://www.youtube.com/channel/UC-ptWR16ITQyYOglXyQmpzw
-* https://zhuanlan.zhihu.com/p/36608131
 
 ### TODO
 

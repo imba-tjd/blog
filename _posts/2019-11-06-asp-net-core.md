@@ -9,34 +9,27 @@ tags:
 ## 初始化
 
 ```bash
-dotnet new razor --no-https
+dotnet new webapp --no-https
+dotnet watch
 dotnet dev-certs https --trust/--clean # 安装sni为localhost的证书；Linux下只会生成不会自动安装
-dotnet watch run
-启用隐式引用：Microsoft.AspNetCore.Builder、Hosting、Http、Routing; Microsoft.Extensions.Configuration、DependencyInjection、Hosting、Logging;
+隐式引用：Microsoft.AspNetCore.Builder、Hosting、Http、Routing; Microsoft.Extensions.Configuration、DependencyInjection、Hosting、Logging;
 ```
 
-## Startup
-
-* 不学自定义管道和中间件
-* Services：依赖注入，没有强依赖，利于单元测试、不需要了解具体的服务类、不需要管理服务类的生命周期
-  * 使用方法：cshtml.cs的构造函数接受IT t，自动获得实例，cshtml用@inject It t
-  * 自定义服务：Services.AddTransient/AddScoped/AddSingleton<IT,T>(); 表示每次请求IT时返回T的实例，也可用单参数的T
-  * Transient是每次请求都会新实例化，Scoped是在一次连接中多次实例化都是同一个。另有TryAddXXX方法用于某个接口若已注册了就什么都不做
-  * `using var scope = app.Services.CreateScope(); scope.ServiceProvider.GetRequiredService<SampleService>();`
+## Builder
 
 ```c#
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddRazorPages(); // AddController()为WebAPI，AddControllersWithView()为MVC
+builder.Services.AddRazorPages(); // WebApi用AddController()，MVC用AddControllersWithView()
 var app = builder.Build();
 
 app.UseForwardedHeaders(new() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto }); // 仍仅信任本地环回发的
-if (!app.Environment.IsDevelopment()) { // .NET6开发环境下自动UseDeveloperExceptionPage()
+if (!app.Environment.IsDevelopment()) { // .NET6 IsDevelopment()下自动UseDeveloperExceptionPage()
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-app.UseHttpsRedirection(); // 用的307
+app.UseHttpsRedirection(); // 307
 app.UseStaticFiles(); // 使用时用~表示web根目录，默认wwwroot；另外还有DirectoryBrowser目录浏览和FileServer中间件
-app.UseCookiePolicy(); // 添加符合欧洲GDPR条例的提示
+app.UseCookiePolicy(); // 添加欧洲GDPR的提示
 app.UseRouting();
 
 app.UseCors(); // 还必须Services.AddCors(op=>op.AddDefaultPolicy(builder=>builder.WithOrigins(...)))
@@ -50,13 +43,23 @@ app.MapFallbackToPage("/404");
 app.MapControllers() // WebApi
 app.MapControllerRoute() // MVC
 
-app.Run(); // 与await RunAsync()差不多，会阻塞直到关闭主机。Start()和StartAsync()一般用于非Web程序，不学它们的行为。RunConsoleAsync()应该是Run()的stub，不支持IIS
+app.Run(); // 与await RunAsync()差不多，会阻塞直到关闭主机。Start()和StartAsync()一般用于非Web程序，不学。RunConsoleAsync()应该是Run()的stub，不支持IIS
 ```
 
-## Configuration配置
+### Services
+
+* 依赖注入的优点：没有强依赖，利于单元测试、不需要了解具体的服务类、不需要管理服务类的生命周期
+* 创建：Services.AddTransient/AddScoped/AddSingleton<IT,T>() 表示每次请求IT时返回T的实例，也可用单参数的T
+* 使用：cshtml.cs的构造函数接受IT t，赋值给类字段，或handler的参数也可以直接用。cshtml用@inject It t
+* Transient表示每次请求都新实例化，Scoped表示在一次连接中多次实例化都是同一个。另有TryAddXXX方法用于某个接口若已注册了就什么都不做
+* 在builder中使用：`using var scope = app.Services.CreateScope(); scope.ServiceProvider.GetRequiredService<SampleService>();`
+
+## Microsoft.Extension.Configuration
 
 * key不区分大小写
 * 允许注释和行尾逗号
+* 命令行指定：dotnet run --key=val
+* 使用：依赖注入IConfiguration config
 
 ```c#
 {
@@ -64,10 +67,8 @@ app.Run(); // 与await RunAsync()差不多，会阻塞直到关闭主机。Start
     "simple_obj": { "value1": "subvalue1_from_json" }
 }
 
-using Microsoft.Extension.Configuration;
-Model和Razor中使用：依赖注入IConfiguration config
 builder.Configuration["simple_obj:value1"] // 取数组元素用:[n]
-var obj = config.GetSection("simple_obj").Get<SimpleObject>(); // 反序列化
+var obj = config.GetSection("simple_obj").Get<SimpleObject>();
 
 var config = new ConfigurationBuilder() // 手动指定要加载的数据源
     .AddJsonFile("appsettings.json") // 一重载支持reloadOnChange
@@ -83,45 +84,34 @@ config.GetChildren(); // 返回IEnumerable<IConfigurationSection>
 ### appsettings.json
 
 * 修改后会立即生效，前提是支持动态加载，像绑端口就不行
-* 支持dotnet run --key=val
 * 多环境（Environment）
   * 发布后运行会读取ASPNETCORE_ENVIRONMENT环境变量，支持Development Staging Production(默认)
-  * 获得当前是哪种环境：IHostingEnvironment env; env.IsDevelopment()
+  * 获得当前是哪种环境：IWebHostEnvironment env; env.IsDevelopment()
   * 不同环境下会加载完普通的appsettings.json后再加载appsettings.xxx.json，与普通的**覆盖合并**
   * cshtml中用environment include/exclude指定不同环境下的行为
-* 如果要实现自定义选项，可用`Microsoft.Extensions.Options`，要先定义一个类，到服务中注册一下，使用时`IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentValue/Value/Get("Key")`
+* 实现自定义选项用`Microsoft.Extensions.Options`，要先定义一个类，到服务中注册一下，使用时`IOptionsMonitor/IOptionsSnapshot<MyOptions> optionsAccessor.CurrentValue/Value/Get("Key")`
 * Properties/launchSettings.json
   * 仅用于本地开发，即使手动复制到publish里也没有用
   * dotnet run会使用profiles中第一个"commandName"为"Project"的条目，代表使用Kestrel；用--launch-profile xxx使用指定的配置。VS里运行才使用那个IIS的配置
-* 配置终结点：默认只会监听localhost:port，其中端口不同版本不同，可指定`"urls": "http://localhost"`或dotnet run --urls="..."或用Run()的重载，支持设为`*`和`[::]`
+* 配置终结点：默认只会监听localhost:port，其中端口不同版本不同。可指定`"urls": "http://localhost"`或命令行--urls=...或用Run()的重载，支持设为`*`和`[::]`
 * Kestrel对象：能对KestrelServerOptions选项进行设置，包括限制流量、指定绑定的端口
 
 ## 日志
 
+* Application Insides可以图形化查看日志
+* TODO: https://www.youtube.com/watch?v=oXNslgIXIbQ
+
 ```c#
 builder.Logging.AddJsonConsole();
-// 自定义太复杂了，这里仅记录使用的方法；Application Insides可以图形化查看日志
 services.AddLogging(); // 然而这几个不做也能获得依赖注入和控制台日志
 Configure(ILoggerFactory loggerFac){ // 应该有选项能记录到文件
-loggerFac.AddConsole(); loggerFac.AddDebug(); } // 不清楚Debug是什么
+loggerFac.AddConsole();
+loggerFac.AddDebug();
+} // 不清楚Debug是什么
 
-using Microsoft.Extensions.Logging;
-public class TodoController : ControllerBase {
-    private readonly ILogger _logger;
-    public TodoController(ILogger<TodoController> logger) => _logger=logger;
-
-    [HttpGet("{id}", Name = "GetTodo")]
-    public ActionResult<TodoItem> GetById(string id) {
-        _logger.LogInformation(LoggingEvents.GetItem, "Getting item {Id}", id); // 还有LogCritical等方法
-        // Item lookup code removed.
-        if (item == null) {
-            _logger.LogWarning(LoggingEvents.GetItemNotFound, "GetById({Id}) NOT FOUND", id);
-            return NotFound();
-        }
-        return item;
-    }
-}
-// 未看：https://www.youtube.com/watch?v=oXNslgIXIbQ
+ILogger<XXXController> logger; // DI进来
+logger.LogInformation(LoggingEvents.GetItem, "Getting item {Id}", id);
+logger.LogWarning(LoggingEvents.GetItemNotFound, "GetById({Id}) NOT FOUND", id);
 
 // appsettings.json
 "Logging": {
@@ -170,18 +160,19 @@ public string Message { get; set; }
 
 ### Razor
 
-* cshtml，第一行必须是`@page`
-* `@using`引用命名空间，`@inject`使用服务，后面类似于构造函数的参数
+* cshtml，第一行必须是@page
+* @using引用命名空间，@inject IT t使用服务
 * @model：提供Model属性用于访问传递到视图的模型
-* HTML代码中`@表达式`或`@(表达式)`可以使用变量的值，不用加分号。可以是属性，可以调用索引器，可用函数，可用await
-* 如果表达式是字符串，里面的内容会经过HTML编码，显示出来的就是字符串原来的样子；如果想把字符串当作HTML，用HtmlHelper.Raw；非IHtmlContent的表达式会自动ToString
-* 两个@会转义一个，email中的会自动处理；`@* *@`是最优先注释
-* 用`@{}`、`@xxx`开头，中间可以写C#代码，可以声明变量和函数，可以调用函数，可以写C#的注释。关键是里面也可以写HTML和普通的@：函数可以返回void，函数体只有HTML（Core3）；如果编译器无法分辨语言而报错或者不想有空格，可用text标记把HTML括起来，或者用`@:`表示该行后面都是HTML
-* 支持的以@开头的：if（else和else if就不用@了）、switch、for、foreach、while、dowhile、using、try,catch,finally、lock
+* HTML代码中`@表达式`或`@(表达式)`可使用变量的值、属性、索引器、函数、await
+  * 如果表达式是字符串，里面的内容会经过HTML编码，显示出来的就是字符串原来的样子；如果想把字符串当作HTML，用HtmlHelper.Raw；非IHtmlContent的表达式会自动ToString
+* 两个@会转义一个，email链接中单个@就为字面量
+* `@* *@`为razor的注释，最优先，不会发送到客户端
+* `@{}`里可以写C#代码，可以声明变量和函数，可以调用函数，可以写C#的注释。关键是里面也可以写HTML和普通的@：函数可以返回void，函数体只有HTML（Core3）；如果编译器无法分辨语言而报错或者不想有空格，可用text标记把HTML括起来，或者用`@:`表示该行后面都是HTML
+* 以@开头的命令：if（else和else if就不用@了）、switch、for、foreach、while、dowhile、using、try,catch,finally、lock
 * @functions没看懂有什么用。好像是不用就只能写本地函数，用了能用属性和public以及写OnGet，也可用@Functions.xxx调用；不用PM时可用
 * View Component：属于高级用法，PartialView不能添加业务逻辑，Controller无法到处复用
 * @helper在3中无法使用了
-* 启用运行时编译，与watch run不兼容，仅限View层，编辑后刷新能重新编译：安装Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包，services.AddRazorPages().AddRazorRuntimeCompilation()或者在launchSettings中加"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES":"Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
+* 启用运行时编译，与watch run不兼容，仅限View层，编辑后刷新能重新编译：添加Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包，services.AddRazorPages().AddRazorRuntimeCompilation()或在launchSettings中加"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES":"Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
 
 ### Razor Page
 
@@ -192,7 +183,7 @@ public string Message { get; set; }
 
 ```c#
 .cshtml代码，Page：
-@page "..."//后面可跟路由规则。/或~/开头是以Page开始，否则是相对路径；{id}和{参数名:int}可添加参数，后者是约束，还可以是alpha:minlength(4)；{id?}中的问号表示参数可选，能把?id=xxx变成路径；View中可用RouteData.Values["id"];
+@page "..." //后面可跟路由规则。/或~/开头是以Page开始，否则是相对路径；{id}和{参数名:int}可添加参数，后者是约束，还可以是alpha:minlength(4)；{id?}中的问号表示参数可选，能把?id=xxx变成路径；View中可用RouteData.Values["id"];
 @model IndexModel // 可以是IEnumerable<T>，但不知道怎么用；一个viewmodel可以对应多个view
 
 .cshtml.cs代码，PageModel：
@@ -201,7 +192,7 @@ using Microsoft.Extensions.Logging;
 namespace MyWebapp.Pages; // 子文件夹用别的命名空间应该也可以
 // 大部分内容都要是public的，依赖注入放在构造函数里
 public class IndexModel : PageModel { // 继承了HttpContext属性
-    [BindProperty(SupportGet=true)] public int Id {get;set;} // View中可以用@Model.Id获取或赋值，但只有想修改时才添加BindProperty，默认只在Post时有效；对于Get添加后可以写在OnGet参数中，能直接赋进去；但它在Mvc命名空间下
+    [BindProperty(SupportsGet=true)] public int Id {get;set;} // View中可以用@Model.Id获取或赋值，但只有想修改时才添加BindProperty，默认只在Post时有效；对于Get添加后可以写在OnGet参数中，能直接赋进去；但它在Mvc命名空间下
     public void OnGet(int id){ } --or-- public async Task OnGetAsync(){ }
     public async Task<PageResult> OnPostAsync() { // 可以有Model类型的参数
         if (!ModelState.IsValid)
@@ -220,8 +211,10 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 
 ### 结构
 
+* Services、Models、Data、Web根(wwwroot)
+  * Data类似于Java的Service，放IxxxDataStore.cs和某数据库xxxDataStore.cs
 * js，css，lib，favicon放在wwwroot下作为静态文件，可以用IWebHostEnvironment.WebRootPath获取
-* 内容根：Services、Models、Data、Repositories、Web根(wwwroot)；内容根和Web根在构建主机时可以修改
+  * 在 Razor.cshtml 文件中，~/ 指向 Web 根。 以 ~/ 开头的路径称为虚拟路径。
 
 ### 布局
 
@@ -240,10 +233,10 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * asp-page/asp-controller/asp-action/asp-route-xxx：MVC的
 * asp-href-include
 * 好像是替代htmlhelper的
-* asp-items asp-validation-summary="All"
+*  asp-validation-summary="All" asp-validation-for
 * partial
 * `<input asp-for="PageModel.属性">`：自动添加id和name，根据PageModel指定的属性类型自动设置input的类型
-
+* asp-items：与asp-for配合用在select元素中
 
 #### HTML Helper
 
@@ -263,6 +256,10 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * 显式参数绑定
 * 可选参数
 
+### Blazor Server
+
+* 以.razor位后缀的组件，在@code{}里写C#代码，能起到JS的作用，元素属性加 @事件="handler名"
+
 ### MVC
 
 * 默认路由为{controller=Home}/{action=Index}/{id?}，代表默认找HomeController的Index方法，Index方法有一个名字叫做id的参数，问号允许不传时用默认值
@@ -280,10 +277,10 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * 继承ControllerBase，添加[ApiController]和[Route("api/[controller]")]特性。其中[controller]表示去掉结尾的Controller的类名
 * 方法
   * 添加[HttpPost]等特性，不加就是Get，可以加逗号应用多个
-  * 方法名不重要，只会路由到控制器，然后看Verb
+  * 方法名不重要，只会路由到类，然后看Verb。但也可以在[HttpGet(...)]中添加子路由
   * 特性支持路由参数传递到方法的参数，如[HttpGet("{id}")]
   * 返回值可以是具体类型，会自动json序列化。可以是IEnumerable。可以是`ActionResult<T>`。
-  * 形参上可加[FromBody]推断绑定源，这样参数可以直接是自定义类，有时不加也行
+  * 形参上可加[FromBody] FromHeader推断绑定源，这样参数可以直接是自定义类，有时不加也行
 * 默认输入和输出的都是JSON(Content-Type: application/json)。在AddControllers的选项里用ReturnHttpNotAcceptable=true 对其它的返回406 Not Acceptable
 * dotnet tool install -g Microsoft.dotnet-httprepl; httprepl localhost:port 之后可以输入ls cd get命令
 
@@ -306,7 +303,7 @@ app.Run("http://localhost:3000");
 * 预定义的ActionResult的子类对象：NoContent()用在PUT和DELETE中、Ok()、BadRequest()、NotFound()
 * Created()、CreatedAtRoute()、CreatedAtAction()：表示201资源创建成功。区别：https://ochzhen.com/blog/created-createdataction-createdatroute-methods-explained-aspnet-core
 
-## Swagger/OpenAPI
+### Swagger/OpenAPI
 
 ```c#
 builder.Services.AddEndpointsApiExplorer();
@@ -334,7 +331,7 @@ if (app.Environment.IsDevelopment()) {
 
 * 后端API学习指南：https://zhuanlan.zhihu.com/p/38215531
 * SOA和微服务：https://www.zhihu.com/question/37808426、https://zhuanlan.zhihu.com/p/88095798、https://www.zhihu.com/question/37808426
-* .NET 微服务：适用于容器化 .NET 应用程序的体系结构（书，2.2）：https://docs.microsoft.com/zh-cn/dotnet/architecture/microservices/
+* .NET 微服务：适用于容器化 .NET 应用程序的体系结构：https://docs.microsoft.com/zh-cn/dotnet/architecture/microservices/
 * https://zhuanlan.zhihu.com/p/46894251
 * https://zhuanlan.zhihu.com/p/127415186
 * https://zhuanlan.zhihu.com/p/82903204
