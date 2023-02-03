@@ -249,7 +249,7 @@ ip link
   * --data-raw @符号也作为普通字符串，不作为读取文件名的标志
   * --data-urlencode 自动对v做URL编码，但key不变。k=@f从文件中读取v并编码
   * -F k=@f 类型指定为 multipart/form-data
-  * --json 只是设置一些头，不更改或验证内容
+  * --json '{"tool": "curl"}' 只是设置一些头，不更改或验证内容，官方推荐配合jo -p k=v | curl --json @- | jq。需7.82
 * -k忽略证书错误。--ssl-no-revoke不进行ocsp检查，此检查好像不受--proxy的影响，也可能是WinAPI的缘故
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md

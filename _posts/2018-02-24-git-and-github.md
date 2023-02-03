@@ -151,7 +151,7 @@ title: Git/GitHub笔记
 * git clean -df：删除未跟踪的文件，-x无视gitignore（例如bin），-X只清除ignore的
 * git bisect：以二分的方式找需要的记录，示例https://www.worldhello.net/2016/02/29/git-bisect-on-git.html
 * 在文件夹中添加一个.gitkeep可以上传空文件夹；没有内容的提交：--allow-empty，没有信息的提交：--allow-empty-message
-* git rebase --rebase-merges/-r、rebase --preserve-merges/-p：没看懂
+* git rebase --rebase-merges/-r、rebase --preserve-merges/-p：没看懂。现在-p弃用了
 * git help -g：显示一些内置的教程，git help -a：显示所有的git命令
 * git update-ref -d HEAD：把所有的改动都放回local并清空所有的commit
 * git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支，无参使用显示所有分支和tag，包括远端的
