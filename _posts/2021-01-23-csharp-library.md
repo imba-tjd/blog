@@ -4,17 +4,43 @@ title: C#库
 
 ## Newtonsoft.Json
 
+* 部分功能依赖Microsoft.CSharp命名空间
+
 ```c#
 using
-JsonConvert.SerializeObject(obj [,Formatting.Indented]); // 支持基元类型、IEnumerable、IDictionary
+JsonConvert.SerializeObject(obj [,Formatting.Indented]); 支持基元类型、IEnumerable、IDictionary
 JsonConvert.DeserializeObject<OBJ>(str);
 
 using JsonWriter writer = new JsonTextWriter(sw);
 var serializer = new JsonSerializer() {NullValueHandling = NullValueHandling.Ignore};
 serializer.Serialize(writer, obj);
 
-JObject.Parse(str); 之后当作dict用，其实一般用SerializeObject<dynamic>()
+JObject.Parse(str); 之后当作dict用，还可SelectToken(jsonpath)
 JObject.FromObject(匿名对象)
+JArray 当作List用，长度用Count
+
+SerializeObject<dynamic>()，之后object可用.xxx或同JObject，数组同JArray
+反序列化时json字面量支持单引号
+```
+
+## Config.Net
+
+* 支持多种数据源：app.config 命令行 环境变量 ini json
+* ini
+  * `[Option(Alias = "SectionOne.MyOption")]`将产生Section
+  * 支持数组，表示法：Numbers="1 2 3"
+  * 值最好不要有分号，否则会与注释混淆。Key不能有等号
+
+```c#
+using Config.Net;
+public interface IMySettings { // 可选继承INotifyPropertyChanged，使用者订阅PropertyChanged事件
+   [DefaultValue("n/a")]
+   string AuthClientId { get; }
+}
+
+IMySettings settings = new ConfigurationBuilder<IMySettings>()
+   .UseIniFile(filePath)
+   .Build();
 ```
 
 

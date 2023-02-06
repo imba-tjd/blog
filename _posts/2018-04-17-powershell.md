@@ -228,10 +228,11 @@ category: windows
 * echo不换行：`Write-Host "xxx" -NoNewLine`，但注意如果重定向输出，仍会输出到屏幕上
 * Write-Debug：默认情况下（"SilentlyContinue"）不会往终端输出，$DebugPreference为"stop"时不允许使用此命令，为"Continue"时会显示，为"Inqure"时会显示并询问是否继续
 * $host.UI.WriteErrorLine，WriteVerboseLine，WriteWarningLine：不受$DebugPreference控制
-* Out-File: 将输出发送到文件，与`>`等效；Core的默认编码是U8，5.1的是U16LE；Add-Content附加到文件。不能cat xxx > 同一个xxx，因为是流式的，这样会导致xxx被清空，可以(cat xxx) | out-file xxx，这样就会读取完并关闭文件
+* Out-File: 将输出发送到文件，与`>`等效；Add-Content附加到文件。不能cat xxx > 同一个xxx，因为是流式的，这样会导致xxx被清空，可以(cat xxx) | out-file xxx，就会读取完并关闭文件
 * Out-Null: 与`>$null`等效，删除输出，不将其发送到控制台，但不会删除stderr
 * Out-Printer: 将输出发送到打印机。不一定要真实的打印机，可以用Microsoft Print to PDF这种
 * Out-Host -Paging：分页显示，惰性处理管道内容，经过它之后就变成字符串了。more.exe是非流的
+* 编码：对于Core，读取外部程序的GBK输出（注意有些程序输出到控制台跟重定向用的编码不同），之后进入管道或输出到文件都是U8-no-BOM。另一种治标方式是用cmd，因为它不会改变编码。PS5.1输出到文件用的U16LE
 
 ## 模块
 

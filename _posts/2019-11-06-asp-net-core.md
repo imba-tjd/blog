@@ -24,7 +24,7 @@ var app = builder.Build();
 
 app.UseForwardedHeaders(new() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto }); // 仍仅信任本地环回发的
 if (!app.Environment.IsDevelopment()) { // .NET6 IsDevelopment()下自动UseDeveloperExceptionPage()
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Error"); // 出错时重定向到指定路由
     app.UseHsts();
 }
 app.UseHttpsRedirection(); // 307
@@ -155,6 +155,7 @@ public string Message { get; set; }
 
 * HttpContext.Connection.RemoteIpAddress
 * HttpRequest HttpResponse
+* 处理出错时的信息：`var ctx = HttpContext.Features.Get<IExceptionHandlerFeature>(); ctx.Error`
 
 ## Razor和MVC和WebApi
 
@@ -341,3 +342,5 @@ if (app.Environment.IsDevelopment()) {
 * https://zhuanlan.zhihu.com/p/460624318 WebApplicationBuilder
 * https://github.com/AiursoftWeb/Tracer
 * https://github.com/aspnet/AspNetCore/issues/1012
+* 自动扫描 https://github.com/khellang/Scrutor
+* https://code-maze.com/net-core-series/
