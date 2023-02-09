@@ -155,7 +155,7 @@ cnn.Open(); // 没Open时也可以创建Command，读取数据就必须Open了
 
 using var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
 cmd.CommandText ="INSERT INTO user (name) VALUES (@name)";
-cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，这诡异的写法居然没问题。一般还是给AddWithValue的返回值赋一个变量再进一步设置
+cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，诡异的写法，一般给AddWithValue的返回值赋一个变量再进一步设置。不支持位置参数
 
 cmd.ExecuteNonQuery(); // 执行DML，返回被影响的行数
 cmd.ExecuteScalar().ToString(); // 以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令，无值时为null
@@ -266,10 +266,6 @@ for(int i=0;i<tb.Rows.Count;i++)
 * https://github.com/CollaboratingPlatypus/PetaPoco 轻量级ORM
 * PG驱动：npgsql。官方：https://www.postgresql.org/ftp/odbc/versions/msi/
 * mysql-connector-net：官方ADO驱动，支持X协议
-
-## 参考
-
-* https://www.youtube.com/channel/UC-ptWR16ITQyYOglXyQmpzw
 
 ### TODO
 

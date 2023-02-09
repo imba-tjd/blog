@@ -37,6 +37,7 @@ title: Git/GitHub笔记
 * 删除已经合并到了 master 的分支：`git branch --merged master | grep -v '^\*\|  master' | xargs -n 1 git branch -d`
 * 如果有其它分支依赖了当前分支，不要rebase，否则其它分支就依赖不存在的节点了
 * git merge --squash：不会进行提交，只会add
+* rebase时保留原时间（未测试）：--committer-date-is-author-date
 
 ### 冲突
 
@@ -438,6 +439,7 @@ collapsable content
 * type:symbo 搜索成员
 * 考虑屏蔽js.sentry-cdn.com因为太慢了
 * 精确代码智能感知：Go、TS/JS、C/C++、Java，需要上传LSIF数据
+* 类似网站：https://grep.app/ 很快但只索引一部分仓库
 
 ## 参考
 

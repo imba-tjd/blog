@@ -27,7 +27,7 @@ System.Diagnostics.Process.Start("explorer.exe /n," + Environment.GetFolderPath(
 判断Windows10
 -------------
 
-如果不做任何操作，Environment.OSVersion.ToString()为`Microsoft Windows NT 6.2.9200.0`，在.NET5中返回正确的值了，如`Microsoft Windows NT 10.0.19043.0`。非Windows应该一直可以用。
+如果不做任何操作，Environment.OSVersion.ToString()为`Microsoft Windows NT 6.2.9200.0`，在.NET5中返回正确的值了，如`Microsoft Windows NT 10.0.19043.0`。
 
 第一种解决办法是添加一个manifest，去掉兼容性中Windows10的id的注释。
 
@@ -41,10 +41,12 @@ System.Runtime.InteropServices.RuntimeInformation.OSDescription：`Microsoft Win
 
 判断是不是Windows：OSVersion.Platform == PlatformID.Win32NT
 
+当前程序以x86还是x64运行：System.Runtime.InteropServices.RuntimeInformation.OSArchitecture、Environment.Is64BitProcess
+
 ### 判断框架版本
 
-* 从Core3开始，Environment.Version能正确返回版本；之前一直是4.0.30319.42000
-* System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription为`.NET Framework 4.8.4300.0`，但Core3之前的信息仍是错的
+* Core3后，Environment.Version能正确返回版本，如7.0.2。FX和Core3之前是4.0.30319.42000
+* System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription为`.NET Framework 4.8.4300.0`或`.NET 7.0.2`。Core3之前是错的
 
 检测以及获得管理员权限
 ----------------------

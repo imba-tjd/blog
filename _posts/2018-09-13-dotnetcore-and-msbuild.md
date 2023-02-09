@@ -29,9 +29,8 @@ PublishReadyToRun：true # 混合AOT，必须指定RID；提高启动速度，�
 PublishReadyToRunComposite：显著增加体积和编译时间，稍微增加R2R效果。只能在自包含中启用。建议如果启用了分层编译就别开
 InvariantGlobalization：true # 减少Linux下自包含的体积
 DebugType：none # 默认portable，是一种跨平台格式。VS模板默认pdbonly，与full等价，在Win下使用专有格式。embedded嵌入文件内部，但直接用csc时不会报行号
-Prefer32Bit：默认false，但VS模板默认true
 ImplicitUsings：true 自动添加System Generic IO Linq Http Tasks的引用。启用Winform时还会添加Drawing Forms
-PublishAot：隐式启用且必须启用PublishTrimmed。只在publish时生效，win下要装VC
+PublishAot：隐式启用且必须启用PublishTrimmed。只在publish时生效，win下要装VC。一般再加StripSymbols否则大量体积是调试符号
 
 LangVersion：latest/preview # 目标框架是net472时可加上
 AllowUnsafeBlocks：true # 启用后才能写unsafe块，不是默认全局unsafe
@@ -263,8 +262,10 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 
 ## csc
 
-* -o开启优化
-* 默认不生成调试内容，-debug开启。默认生成外部pdb文件，有个内嵌版但实测无法显示行号
+* /o开启优化
+* 默认不生成调试内容，/debug开启。默认生成外部pdb文件，有个内嵌版但实测无法显示行号
+* /r:System.Net.Http.dll
+* /platform:默认anycpu，在32位下运行是32位的，64位下运行是64位的。VS的csproj模板默认加了Prefer32Bit，导致64位下运行还是32位的
 
 ## 反编译
 
