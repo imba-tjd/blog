@@ -43,6 +43,26 @@ IMySettings settings = new ConfigurationBuilder<IMySettings>()
    .Build();
 ```
 
+## Windows.Networking.Sockets
+
+```c#
+var socket = new StreamSocket();
+await socket.ConnectAsync(new HostName("localhost"), "8888");
+var w = new DataWriter(socket.OutputStream);
+w.WriteString(s);
+await w.StoreAsync();
+
+var serversocket = new StreamSocketListener();
+await serversocket.BindEndpointAsync(new HostName("localhost"), "8888");
+serversocket.ConnectionReceived += async (sender, e) => { // 一次连接
+   var reader = new DataReader(e.Socket.InputStream);
+   while(true) {
+         await reader.LoadAsync(4); // 必须读满指定长度才继续
+         string s = reader.ReadString(4);
+         Console.WriteLine(s);
+   }
+};
+```
 
 ## 第三方库
 
@@ -58,3 +78,4 @@ IMySettings settings = new ConfigurationBuilder<IMySettings>()
 * https://github.com/SixLabors/ImageSharp 处理图片，跨平台，替代System.Drawing
 * https://github.com/microsoft/FASTER 包括一个日志库和一个KV数据库
 * https://github.com/bilal-fazlani/commanddotnet
+* 混淆器：https://github.com/NotPrab/.NET-Obfuscator

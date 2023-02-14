@@ -72,4 +72,4 @@ title: 油猴
 ## 参考
 
 * https://wiki.greasespot.net 中文参考：https://github.com/examplecode/tampermonkey-api-reference
-* TODO: https://github.com/FirefoxBar/userscript https://github.com/hoothin/UserScripts https://github.com/mengzonefire/rapid-upload-userscript https://github.com/Tsuk1ko/userscript 学习其他人是怎么写的
+* TODO: https://github.com/FirefoxBar/userscript https://github.com/hoothin/UserScripts https://github.com/mengzonefire/rapid-upload-userscript https://github.com/Tsuk1ko/userscript https://www.youxiaohou.com/ 学习其他人是怎么写的

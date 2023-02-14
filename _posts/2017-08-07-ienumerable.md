@@ -38,4 +38,4 @@ title: 枚举器和迭代器
 * 可以将迭代器（返回IEnumerator<T>）作为属性，GetEnumerator方法根据判断返回指定的迭代器
 * 在编译器生成的枚举器中，Reset方法没有实现
 
-return yield foreach（等于Py的yield from）: https://github.com/dotnet/csharplang/discussions/378
+不支持Py的yield from

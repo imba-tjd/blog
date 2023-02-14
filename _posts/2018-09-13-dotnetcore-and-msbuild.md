@@ -24,7 +24,7 @@ RuntimeIdentifier：win-x64 # https://docs.microsoft.com/zh-cn/dotnet/core/rid-c
 
 PublishSingleFile：true
 IncludeNativeLibrariesForSelfExtract=true；6.0添加了[RequiresAssemblyFiles]和EnableCompressionInSingleFile
-PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错，小心反射失败除非确定目标能静态检测到
+PublishTrimmed：true # 删除未使用的成员，只有和自包含一起用才有意义和不报错。即使不开启它也可开启EnableTrimAnalyzer检测裁剪错误
 PublishReadyToRun：true # 混合AOT，必须指定RID；提高启动速度，增加体积和编译时间，代码质量不如JIT不过运行后会自动分层编译
 PublishReadyToRunComposite：显著增加体积和编译时间，稍微增加R2R效果。只能在自包含中启用。建议如果启用了分层编译就别开
 InvariantGlobalization：true # 减少Linux下自包含的体积
@@ -41,7 +41,7 @@ NoWarn：NU1602,NU1604
 WarningsAsErrors：$(WarningsAsErrors);CS8600;CS8602;CS8603;CS8618 # 几个nullable的视为error
 GenerateAssemblyInfo：默认为true。自定义了Properties/AssemblyInfo.cs时可改为false否则会报重复声明，则还要定义RootNamespace和AssemblyName
 DefineConstants：相当于-d/-define
-AnalysisMode：AllEnabledByDefault启用更多的Lint，但可能太多了，比如public filed都会有警告
+AnalysisMode：默认已开启分析器，此项设为Minimum/Recommended/All可启用更多的Lint
 ServerGarbageCollection：默认是false表示工作站类型，会GC更频繁以保持小内存占用。ASP会默认用true
 
 WPF：
@@ -220,7 +220,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
   * asInvoker：调用者是什么权限就是什么权限，一般Explorer运行就是标准权限
   * requireAdministrator：在Explorer中双击会弹UAC
   * highestAvailable：在管理员账户里弹UAC，在标准账户里以受限权限运行
-  * UWP只能以受限权限运行，所以关闭UAC后会都闪退
+  * UWP只能以受限权限运行，关闭UAC后会都闪退
 * highResolutionScrollingAware：还有一个ultraHigh的，用于触摸板
 
 ## Upgrade Assistant
@@ -265,7 +265,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * /o开启优化
 * 默认不生成调试内容，/debug开启。默认生成外部pdb文件，有个内嵌版但实测无法显示行号
 * /r:System.Net.Http.dll
-* /platform:默认anycpu，在32位下运行是32位的，64位下运行是64位的。VS的csproj模板默认加了Prefer32Bit，导致64位下运行还是32位的
+* /platform:默认anycpu，产生32位程序，在32位下运行是32位的，64位下运行是64位的。FX的csproj默认为Prefer32Bit=true，导致64位下运行还是32位的。Core完全不支持anycpu，相当于仅有x86和x64
 
 ## 反编译
 

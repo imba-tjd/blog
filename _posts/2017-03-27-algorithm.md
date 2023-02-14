@@ -332,3 +332,4 @@ https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
 https://oi-wiki.org
 https://github.com/labuladong/fucking-algorithm
 https://github.com/hzwer/shareOI
+https://algorithm-essentials.soulmachine.me/
