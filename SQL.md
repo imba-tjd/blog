@@ -64,7 +64,7 @@ title: SQL
 * 会破坏GROUP BY的聚集性，除非也按分组的顺序来排序
 * 如果没有分过组，可以使用SELECT中未使用的列
 * 可以使用SELECT中的别名
-* NULL在时的位置：MySQL MSSQL在开头，PG SQLite在末尾
+* NULL在ASC时的位置：MySQL MSSQL在开头，PG SQLite在末尾
 
 ### 窗口函数
 
