@@ -49,9 +49,9 @@ END
 
 * 第一个字符的索引是1
 * 标准规定使用单引号，两个单引号转义出一个
-* 大小写不敏感，PG除外
+* 一般默认大小写不敏感，PG除外
 * 拼接
-  * SQLite PG和Oracle用`||`
+  * SQLite PG Oracle用`||`
   * MSSQL用`+`
   * 都支持CONCAT()
   * SQLite MySQL支持GROUP_CONCAT()聚合函数，MSSQL PG支持STRING_AGG()，对应普通编程语言的字符串JOIN，其中前者第二个参数可省默认为逗号，有的还支持再排序
@@ -65,7 +65,10 @@ END
 * LOWER()、UPPER()
 * COLLATE
   * SQLite：BINARY默认 NOCASE RTRIM去除尾随空格。可用在定义TABLE时，或SELECT中WHERE ORDERBY列名后
-  * MSSQL：Chinese_PRC_CI_AS_SC_UTF8，其中CI不区分大小写，CS区分；AS区分重音但对中文好像没用；SC为启用U16非标准平面但好像2017默认启用了；_BIN2为二进制，不兼容其他的
+  * MSSQL：考虑用Chinese_PRC_CI_AS_SC_UTF8。其中CI不区分大小写，CS区分；AS区分重音，AI不区分，对中文没用；SC为启用U16非标准平面，2017后默认开启；_BIN2为二进制，使用时无法指定其它变体，速度较快
+  * MySQL：8.0后无需更改。之前的版本用utf8mb4_general_ci。general版对中英文没区别，德文有区别
+* 哈希
+  * MySQL：SHA2('str', 256)
 
 ### 日期和时间
 
@@ -95,11 +98,11 @@ END
   * 3.37(2021.11)：在定义完表的回小括号后加STRICT能禁用Flexible Typing且不允许不加类型，又引入了ANY类型；ANY在非STRICT表中会优先转换成整数，与不加类型行为不同
 * 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名；非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL，现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
 * 定义表的字符串或WHERE和ORDERBY时可指定COLLATE RTRIM/NOCASE
-* STRICTh和WITHOUT ROWID若要同时指定，加逗号
+* 若想同时指定STRICT和WITHOUT ROWID，加逗号
 
 ### MySQL
 
-* TINYINT, SMALLINT, INT, BIGINT分别使用1、2、4、8个字节；INT UNSIGNED不接受负数；INT(n) ZEROFILL小于列宽时补0且也不接受负数，不影响储存；BOOL就是TINYINT
+* TINYINT, SMALLINT, INT, BIGINT分别使用1、2、4、8个字节；INT UNSIGNED不接受负数；INT(n) ZEROFILL小于列宽时补0且不接受负数，不影响储存；BOOL就是TINYINT
 * FLOAT, DOUBLE/REAL；也能用UNSIGNED
 * DECIMAL(P,D)：P为有效位数（包含整数位数和D），D为小数位数
 * YEAR, DATE, TIME, TIMESTAMP, DATETIME：分别占1、3、3、4、8个字节，TIMESTAMP最大2038年
@@ -117,6 +120,7 @@ END
 ### MSSQL
 
 * TEXT类型已弃用，应用varchar(max)
+* nchar nvarchar：UTF16编码
 
 ## 理论
 
@@ -147,6 +151,7 @@ END
 * 视图索引：也称虚表
 * 全文索引：搜索引擎的关键技术，每个表只能有一个
 * 哈希索引：好像只有内存数据库才支持，而且没法进行范围比较
+* 前缀索引(MySQL)：仅限字符串
 
 ### WHERE中索引失效
 
@@ -204,6 +209,7 @@ END
 * SQLite单纯BEGIN是没有加任何锁的，其他连接提交了能看到，开始SELECT了才会加锁。PG不同，BEGIN了，其他提交了看不到
 * PG：默认RC下就已经能重读了，好像也不存在幻读，读写也能并发，都跟快照差不多了，写入时如果存在任意未提交的就会报错；RR下能并发写，在提交时非最新版报错，感觉就等于快照了
 * MSSQL：默认RC下非常标准，脏读就是会阻塞的，也会出现不可重读和幻读。RR下的行为非常怪，另一事务可以写，未提交时读取的事务会阻塞即不会脏读，提交后读取的事务能读到新内容，这不就是完全没有实现吗？难道是因为localdb的问题？
+* 显示当前隔离级别：PG:SHOW TRANSACTION ISOLATION LEVEL
 
 ### 备份还原
 
@@ -225,13 +231,13 @@ END
 * 分表的问题：分布式事务、跨节点Join和聚合（分别取出再在应用层处理）、ID无法自增（可用UUID）
 * 读多写少可冗余
 
-## SQL Server
+## SQL Server/MSSQL
 
+* 查询版本：select @@version
 * 查询服务器属性：select SERVERPROPERTY('collation')
-* 查询数据库属性：select DATABASEPROPERTYEX('Your DB Name','collation')
+* 查询数据库属性：select DATABASEPROPERTYEX('db1','collation')
 * 更改会话语言：SET LANGUAGE 'Simplified Chinese'可更改datetime和货币的表示方式，以及报错信息
 * 升级大版本后，已存在的数据库的版本不会自动升级，需要修改它们的COMPATIBILITY_LEVEL
-* select @@version;
 * GO命令：不是T-SQL语句，而是用于分隔sql文件的标记，有些语句要在第一行执行就要再在前面用GO。后面不能跟分号，可以跟数字表示执行上一段多少遍
 * exec sp_rename 'a', 'b'：重命名表、索引、列等对象；db用renamedb
 * sp_spaceused 查看占用空间
@@ -242,46 +248,92 @@ END
 * sp_helptext：显示定义对象的SQL语句
 * ALTER SERVER CONFIGURATION SET MEMORY_OPTIMIZED TEMPDB_METADATA = ON;对TempDB启用内存中OLTP
 * ALTER DATABASE ... SET DELAYED_DURABILITY = FORCED：延迟事务持续性，IO太重又可容忍丢失部分数据可以启用；若设为ALLOWED就必须每次事务手动控制
-* Express版单实例限制利用4核、1G多内存、10G储存。但可运行多个实例绕过
+* 价格
+  * Express版：单实例数据库核心限制利用4核、1.4G内存、10G储存。但可运行多个实例绕过
+  * Developer版：全功能，但只能用于非生产环境。其中生产环境指最终用户访问的环境，包括生产环境的灾难恢复备份。非生产指用于测试和收集反馈
+  * Server+CAL授权方式：每个运行数据库的服务器需要Server授权$989，且每个访问数据库服务器的“客户端”需CAL授权$230
+  * Azure SQL Edge：仅Linux，同样使用MSSQL引擎，有开发版和正式版，无免费版
 * 版本号：2022对应16.x
 
 ### LocalDB
 
-* C:\Program Files\Microsoft SQL Server\150\Tools\Binn\SqlLocalDB.exe create/delete/start/stop 实例名，不加时或为点默认为MSSQLLocalDB
-* info无参使用列出所有的实例，info加实例名显示命名管道等信息，有可能客户端要去掉np前缀
-* 如果启动失败，考虑删除重建，有可能是用了老版本的数据库
-* 连接字符串：`Server=(localdb)\\.;Integrated Security=true`。如果点不支持就换成MSSQLLocalDB或其它实例名；IntegratedSecurity好像不加也行
+* SqlLocalDB.exe create/delete/start/stop 实例名，不加时或为点默认为MSSQLLocalDB
+  * info无参使用列出所有的实例，info加实例名显示命名管道等信息，管道名每次启动都不一样
+  * 现在安装包会自动添加路径到系统级别的PATH里
+* 如果启动失败，考虑删除重建，一般是用了老版本的数据库：Unexpected error occurred inside a LocalDB instance API method call
+* 连接字符串：`"Server=(localdb)\\.;Integrated Security=true"`，其它实例名用`(localdb)\.\实例名`
+  * 某些客户端只支持命名管道连接，如HeidiSQL，且主机名不需要加np:
 * 需指定数据库级别的排序规则：`CREATE/ALTER DATABASE db1 COLLATE Chinese_PRC_CI_AS`；不会影响已有的列，还需要ALTER TABLE一下
 * 下载地址：https://www.hanselman.com/blog/download-sql-server-express
-* 数据库文件和日志在`%LocalAppData%\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB`
-
-### Azure SQL Edge
-
-* 仅Linux，同样使用MSSQL引擎，可用Docker拉取，需求内存1GB，磁盘10GB
+* 数据库文件和日志：`%LocalAppData%\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB`
+* 一段时间不用会自动停止，需要客户端有能力开起来
 
 ## MySQL
 
 * set foreign_key_checks=0：不检查外键约束
-* select version()：版本，database()：数据库名，user()：当前用户名，status：状态
-* show create table：显示能创建那个表的语句；create table targettb like srctb：按指定表的结构创建另一个表
+* status：状态
 * 工具：https://github.com/github/gh-ost MySQLTuner-perl
-* DESC tb1：显示表结构
-* show database
-* 定义列时可以加没有FOREIGN KEY的REFERENCE，但它什么都不做，直接忽略
 
-### my.cnf
+### 安装
+
+* https://dev.mysql.com/downloads
+  * Debian稳定源里只有mariadb-server，unstable里才有mysql-server。要装MySQL APT Repository的deb 再update再装mysql-server，会交互式提示设置密码。再运行mysql_secure_installation进行一些设置。也有二进制deb，在MySQL Community Server里
+  * 仅客户端CLI：装MySQL Shell
+  * 8.0不再有32位的
+* 创建数据库到datadir中：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码
+* 忘记密码：在服务器机器上用root登录无需密码（通过auth_socket插件）。强行修改：mysqld --skip-grant-tables; mysql; USE mysql; update user set  password=password('新密码') where user='root' and host='localhost'; FLUSH PRIVILEGES;
+* 以Deamon运行，日志写入datadir中：-D。结束服务端：kill $(</var/run/mysqld/mysqld.sock.lock)
+* Win下创建服务：--install
+* 加密：服务端单纯设置ssl后会自动生成自签名证书在datadir中并使用，传里面的三个给客户端。强制加密：require_secure_transport
+
+### /ect/mysql/my.cnf
+
+* 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'
+* Windows：服务端启用shared_memory，客户端用--protocol=MEMORY，能提高性能
 
 ```conf
-启用慢查询日志，如果执行时间大于3秒则记录
+[mysqld]
+user=mysql
+datadir=数据库文件目录
+bind_address=指定ip，默认为*
+skip_name_resolve  客户端连接时默认会对ip反向解析
+
+innodb_buffer_pool_size=默认128M，应设为内存的50-75%，或开启innodb_dedicated_server后会自动调整
+innodb_use_fdatasync  8.0.26+
+innodb_flush_method=O_DSYNC  官方文档只在Solaris10上使用O_DIRECT
+innodb_io_capacity=默认值是机械硬盘的200，用SSD时设为1000
+innodb_strict_mode
+
+sql_mode=ansi,traditional  默认为traditional，也启用ansi后 real为float、||拼接字符串、双引号指示标识符
+mysqlx=off
+
+# 启用慢查询日志，如果执行时间大于3秒则记录
 slow_query_log=1
-slow_query_log_file=/var/log/mysql/log-slow-queries.log
+slow_query_log_file=log-slow-queries.log
 long_query_time=3
 ```
 
 ### CLI
 
-* mysql [-h 主机名] -u 用户名 -p：主机参数默认本机可省，用户名一般用root，指定初始数据库用-D，参数也可以不加空格紧挨着写。重定向stdin可读取执行sql脚本
-* 修改密码：mysqladmin -u root -p password 新密码；或set password='新密码';
+* mysql -h主机 -P端口 -u用户名 -p
+  * host默认localhost，端口默认3306，user默认root，-p不加参数表示交互式输入密码
+  * 指定初始数据库用-D。重定向stdin可读取执行sql脚本
+* 修改密码：mysqladmin -u用户名 -p旧密码 password 新密码，或set password [for xxx] ='新密码';
+* 交互式中顺便保存记录：--tee
+* 执行命令后退出：-e
+* 压缩：-C 对于100M以下网速应启用，若客户端和服务端在同一机器上不应启用
+* 命令
+  * 执行sql文件：source或\.
+* 记录登录选项：mysql_config_editor set，会把参数混淆存到~/.mylogin.cnf中，之后简单用mysql命令行就能登录。还支持创建多个配置，称为login-path
+* 加密：默认启用但回退到未加密，指定--ssl-mode=REQUIRED --ssl-mode=VERIFY_CA强制加密。连接时指定--ssl-ca --ssl-cert --ssl-key。8.0.29默认支持SSL复用但客户端配置麻烦
+
+### 事务日志
+
+* 进行事务时写redo log，提交时写入redo log缓存，写入文件系统缓存，fsync。这也是innodb_flush_log_at_trx_commit=1默认策略
+  * =0时，提交事务写入redo log缓存，不写入文件系统缓存，由后台线程每隔1秒写入文件系统缓存和fsync。可能损失1秒数据
+  * =2时，会写入文件系统缓存，但不会fsync。如果mysql挂了不会损失数据，但系统挂了会损失1秒数据
+* binlog归档日志：记录语句的原始逻辑，数据备份(主备 主从)要用到，维护集群数据一致性
+* undo log：保证事务的原子性。redo log保证事务的持久性
 
 ## SQLite
 
@@ -293,9 +345,8 @@ long_query_time=3
   * file:data.db?cache=shared&mode=ro/rw/rwc
   * 文件名用:memory:为内存数据库，默认仍会在tmp中产生处理临时表的文件；文件名用空的则为临时文件数据库
   * 如果也不会被其它进程改变可用immutable=1
-  * cache=shared：单进程多连接都启用此参数能类似于一个连接减少资源占用，内部再自动序列化，感觉可以无脑开
+  * cache=shared：单进程多连接都启用此参数能类似于一个连接减少内存占用，内部再自动序列化，但会降低性能，专门有一个推荐的编译参数忽略共享缓存
   * 打开已存在的数据库时小心别打错字，否则就自动创建了一个新的，或者mode不用rwc就能避免
-  * psow=1：假定断电时文件系统不会写入超过范围的数据
 * 读写锁和事务
   * 事务一开始，单纯的BEGIN是没有加锁的。开始读取了会加SHARED锁，允许有多个，能同一时间多个连接并发读取
   * 当遇到了DML语句，会给整个数据库文件加RESERVED锁，只允许有一个，然后写日志。此时仍可以正常读，也允许新连接读，读不到未提交的，因为新内容在日志里，不在文件里
@@ -310,7 +361,7 @@ long_query_time=3
 * 并发和线程安全
   * THREADSAFE=1下，官方说是“线程安全”的；=2时官方说只要没有两个线程同时使用同一个连接就是安全的
   * 各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。我认为不是这样，=1下单个连接可以同时使用多个游标，只是没有隔离
-  * =0时不应用在多线程程序中，官方CLI就是=0，所以应该仍可以多个进程使用同一个数据库文件
+  * =0时不应用在多线程程序中，官方CLI就是=0，所以应该仍可以多进程使用同一个数据库文件
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
 * WAL
   * 隔离性表现为Snapshot，开始读取事务后另一连接能并发写且能提交，本连接始终读到的是旧数据；如果之后本连接又要写，则会报错，因为数据不是最新的，解决办法是一开始BEGIN IMMEDIATE。释放完本连接所有读锁后再读到的是新数据，或者新连接读到的也是新数据
@@ -318,8 +369,14 @@ long_query_time=3
   * 对应数据库级别或者所有连接，不是单个连接级别，且是持久的，关闭连接重新打开后还是此模式
   * 不支持NFS
   * WAL2：需从源码分支编译。能避免长时间写入导致日志没有机会清除，实现方式是创建两个日志文件，运行checkpoint时先切换到另一个日志，后续写入就不会使用老日志
-* rqlite：Go实现的分布式关系数据库，使用SQLite作为储存，三大系统都支持，还提供了多种语言的binding。相比之下dqlite的生态就差得多
-* mvsqlite：分布式的SQLite，基于FoundationDB。客户端是drop-in替代，设定LD_PRELOAD注入原版sqlite即可；但服务端部署有点麻烦。它表示rqlite和dqlite是replicated数据库而非分布式的，会把所有数据每台机器上都放一份
+* 其他工具
+  * rqlite：Go，使用SQLite作为储存，与原版SQLiteAPI完全不同，本身是HTTP API，官方提供了多种语言的库
+  * dqlite：只支持Linux，官方只有Go的库，没看懂怎么启服务端。由Ubuntu的公司维护
+  * Litestream：在线流式备份，方便损坏时恢复。LiteFS：同作者，只支持Linux，基于fuse文件系统同步SQLite数据库，建立好后可使用原版命令行，非主节点的写入会自动forward到主节点来写入。postlite：同作者，支持pg的通信协议，使用sqlite作为存储，但维护状态极差，不考虑
+  * cr-sqlite：支持分布式多写入。可以作为原版的扩展加载
+  * mvsqlite：分布式，基于FoundationDB。客户端是drop-in替代sqlite，设定LD_PRELOAD注入原版sqlite即可；但服务端部署有点麻烦，需要FoundationDB集群和mvstore无状态实例，不考虑。它表示rqlite和dqlite是replicated数据库而非分布式的，会把所有数据每台机器上都放一份
+  * FTS5：全文搜索引擎
+  * realm：mongodb出的嵌入式数据库
 
 ### CLI
 
@@ -331,46 +388,52 @@ long_query_time=3
 * .dump/d [tb1]：输出创建表的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
 * .timeout：等待加锁的时间
-* 用DQL取得schema元数据：SELECT name, sql FROM sqlite_schema WHERE type='table/index'; 版本：SELECT sqlite_version();
+* 查询schema元数据
+  * SELECT name, sql FROM sqlite_schema WHERE type='table/index'
+  * 版本：SELECT sqlite_version()
+* 另一种备份：sqlite3 db "VACUUM INTO '/path/to/backup'"
 
 ### PRAGMA
 
 * 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错；几乎所有设置都限于连接非持久，下次连接还要设置
 * optimize 推荐关闭连接时使用，或长时间连接每隔几小时用一次，用于内部优化查询性能
 * journal_mode = DELETE/TRUNCATE/PERSIST/WAL/MEMORY。默认DELETE完成事务后就删除日志，TRUNCATE不删除日志文件只是清空，PERSIST在日志头部写零；这三种性能依次少量提升，这日志不在临时文件夹而是在数据库同级目录；MEMORY不安全但也算能用，OFF无法ROLLBACK无意义
-* synchronous = 默认是FULL/2，切换成WAL会自动改为NORMAL/1
+* synchronous = 默认是FULL/2，在WAL下可安全用NORMAL/1
 * secure_delete = FAST/2 默认为off，开启后删除时会写0
 * temp_store = MOMORY/2 让临时表放到内存里，默认用tmp下的临时文件
 * database_list 显示附加了的数据库文件；table_list 显示存在哪些表(3.37,2021.11)；table_info(tb1) 显示表的列信息，每项一行
 * integrity_check quick_check 进行错误和约束检查，前者更完整，后者更快
-* auto_vacuum FULL 默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum才行。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
-* compile_options 显示编译选项
+* auto_vacuum FULL 默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
 * PRAGMA mmap_size=xxx字节 能提高IO效率，但发生IO错误时无法捕获，Win下无法VACUUM
-* 用DQL取得元数据：SELECT * FROM pragma_xxx
+* 查询当前选项值：SELECT * FROM pragma_xxx
 
 ### 编译
 
+* 显示编译选项：pragma compile_options
+
 ```bash
-#gcc sqlite3.c -o sqlite3.dll -shared -lpthread  # 编译dll
+#gcc sqlite3.c -o sqlite3.dll -shared  # 编译dll
 gcc sqlite3.c shell.c -o sqlite3.exe \
 -Os -mtune=native -Wl,--as-needed -Wl,--strip-all \
 -DNDEBUG \
--DSQLITE_ENABLE_ATOMIC_WRITE \
 -DSQLITE_LIKE_DOESNT_MATCH_BLOBS \
--DSQLITE_OMIT_DECLTYPE \
+-DSQLITE_OMIT_DECLTYPE \  # 取消返回查询结果集的列类型的功能
 -DSQLITE_OMIT_DEPRECATED \
 -DSQLITE_OMIT_LOAD_EXTENSION \  # 不指定此项则要加-ldl -lm
+-DSQLITE_OMIT_PROGRESS_CALLBACK \  # 不再汇报进度
 -DSQLITE_UNTESTABLE \
 -DSQLITE_USE_ALLOCA \
 -DSQLITE_WIN32_MALLOC \
 -DSQLITE_DEFAULT_FOREIGN_KEYS \
 -DSQLITE_DEFAULT_AUTOVACUUM \
 -DSQLITE_DEFAULT_MEMSTATUS=0 \  # 会禁用.dbinfo和.stats
+-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
 -DSQLITE_DQS=0 \  # 禁用双引号表示字符串
--DSQLITE_MAX_EXPR_DEPTH=0 \
+-DSQLITE_MAX_EXPR_DEPTH=0 \  # 不再检查表达式深度
 -DSQLITE_POWERSAFE_OVERWRITE \
 -DSQLITE_TEMP_STORE=2 \
--DSQLITE_THREADSAFE=0  # 编译dll时不加
+-DSQLITE_THREADSAFE=0  # 编译dll时不加，不为0时Linux下要-lpthread
+-DSQLITE_ENABLE_ATOMIC_WRITE  # 在不支持的文件系统上启用会检查是否可用而降低性能，经测试NTFS不支持
 ```
 
 ### 内置函数
@@ -386,6 +449,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * 具有jsonb类型
 * Linux下安装：https://www.postgresql.org/download/linux/debian/ 仅客户端为postgresql-client
 * Win下客户端可用pipx install pgcli
+* Citus：分布式PG
 
 ## Access
 
@@ -393,25 +457,23 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * ACE驱动下载：https://www.microsoft.com/zh-cn/download/details.aspx?id=54920
 * OLEDB通过COM调用，比ODBC高层，比ADO低层。感觉没有必要使用
 
-## Oracle
-
-* 免费版：https://www.oracle.com/database/technologies/appdev/xe.html
 
 ## 工具和其它DBMS
 
 * https://github.com/sqlmapproject/sqlmap 注入
 * https://github.com/PostgREST/postgrest 把PG变成RESTAPI
 * https://clickhouse.com/ OLAP数据库
-* https://github.com/questdb/questdb/blob/master/i18n/README.zh-cn.md 国产，基于PG，JAVA，自带WebUI
-* etcd、Consul
+* https://github.com/questdb/questdb/blob/master/i18n/README.zh-cn.md 时序数据库，基于PG，JAVA，自带WebUI
+* etcd：分布式的高一致可靠kv数据库，当内容发生变化时可以及时执行回调函数
 * edgedb：自创DML的关系型数据库，基于pg
 * https://duckdb.org/ OLAP
 * https://github.com/directus/directus node，给数据库创建RESTAPI
 * https://github.com/milvus-io/milvus/ 国产向量搜索引擎
+* Oracle 免费版：https://www.oracle.com/database/technologies/appdev/xe.html
 
 ### GUI
 
-* HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，上架了商店但为32位，有少量的维护功能，对于大量数据很卡，对MSSQL的脚本不太兼容
+* HeidiSQL：Delphi，有中文，支持MySQL(选6.1版本的dll)、MSSQL、PG、SQLite(内置dll)，有32位，有少量的维护功能，对于大量数据很卡，对MSSQL的脚本不太兼容
 * https://dbeaver.io JAVA，Star数多，有中文。驱动等数据下在%AppData%\Roaming\DBeaverData。网页版https://demo.cloudbeaver.io/
 * https://www.beekeeperstudio.io/ Electron，有便携版，常见的四种都支持
 * phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
@@ -483,6 +545,8 @@ dayofyear() date_add() date_sub(ts, interval 3 hour) timestampdiff(hour,'2021-01
 select weekofyear('2022-01-02');返回52，dayofweek('2022-01-02')返回1
 如何比较日期数据 https://mp.weixin.qq.com/s?__biz=MzAxMTMwNTMxMQ==&mid=2649247727&idx=1&sn=414455c2f0303a55a31e0c189f1e2c12
 
+@@GLOBAL/SESSION.系统变量
+
 MSSQL：
 创建数据库 https://docs.microsoft.com/zh-cn/sql/relational-databases/databases/create-a-database
 insert ignore，replace into，insert on duplicate key update
@@ -506,7 +570,9 @@ ISNULL NVL https://www.runoob.com/sql/sql-isnull.html
 
 https://zhuanlan.zhihu.com/p/429637485 mysql和redis数据一致性问题
 
-Citus：分布式PG
+与迁移有关：
+https://github.com/golang-migrate/migrate
+https://documentation.red-gate.com/fd/welcome-to-flyway-184127914.html
 ```
 
 access和MSSQL的语法区别：
