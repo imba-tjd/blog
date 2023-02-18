@@ -91,3 +91,25 @@ app.Quit();
 
 * 清理注册表的方法：https://www.cnblogs.com/sunxin88/articles/3456395.html
 * 重新安装WPS，再完整卸载
+
+## Windows服务
+
+* Core：https://learn.microsoft.com/zh-cn/dotnet/core/extensions/windows-service
+* FX：https://learn.microsoft.com/zh-cn/dotnet/framework/windows-services
+
+## 从资源中加载程序集
+
+```c#
+AppDomain.CurrentDomain.AssemblyResolve += OnResolveAssembly; // 当找不到时自动执行此委托
+static Assembly OnResolveAssembly(object sender, ResolveEventArgs e) {
+    var thisAssembly = Assembly.GetExecutingAssembly();
+    foreach (string name in thisAssembly.GetManifestResourceNames()) // 当前程序集的所有资源名。以项目名.开头，因此下面要用EndsWith
+        if (name.EndsWith(e.Name + ".dll")) {
+            var stream = thisAssembly.GetManifestResourceStream(name);
+            var block = new byte[stream.Length];
+            stream.Read(block, 0, block.Length);
+            return Assembly.Load(block);
+        }
+    return null;
+}
+```

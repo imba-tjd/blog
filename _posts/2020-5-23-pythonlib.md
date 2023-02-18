@@ -555,16 +555,17 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib
 
-* 自带，但urlopen明确不支持keep-alive，无法大量使用
+* 自带，但urlopen明确不支持keep-alive，无法大量使用。结束时会发RST而不是FIN
 * http.client更加底层
 * UA默认为Python-urllib/3.9
 * POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
 * 似乎没有办法做出浏览器的URL编码的方式：把空格编码为%20，把中文用UTF8编码后每个加上%，其余的特殊字符不变。urllib3 requests不会对URL自动编码
 * 支持HTTP_PROXY
+* 默认超时20秒
 
 ```py
 req = urllib.request.Request(url, headers={...})
-with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse。TODO: timeout
+with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
 text = resp.read().decode(); resp.getcode()
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.info().get_content_charset()

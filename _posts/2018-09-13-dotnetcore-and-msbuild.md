@@ -45,7 +45,7 @@ AnalysisMode：默认已开启分析器，此项设为Minimum/Recommended/All可
 ServerGarbageCollection：默认是false表示工作站类型，会GC更频繁以保持小内存占用。ASP会默认用true
 
 WPF：
-OutputType：WinExe # 存在下一条时设置为exe也可，会自动替换，但不能不设置；有选项关闭自动替换
+OutputType：WinExe # 存在下一条时本条设为exe也可，会自动替换，但不能不设置
 UseWPF：true # 还有UseWindowsForms
 TargetFramework：net5.0-windows
 ApplicationIcon：favicon.ico
@@ -85,7 +85,7 @@ EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
 * dotnet run -- -flag：--后的是传递给运行的程序，不是传递给dotnet程序的。无法在sln目录下运行，必须加-p csproj的目录
 * dotnet watch：任何文件修改后就重新编译一遍，程序退出后有修改又会自动再启动运行；对ASP比较有用。VSC修改后有一直重启的BUG
 * 未读：dotnet user-secrets
-* --configuration/c Release：默认Debug
+* --configuration/c Release：默认Debug。.NET8 publish时默认Release
 * --runtime/-r rid
 * --output/-o dir：指定存放目录，默认是./bin/Debug/net5.0
 * SCD独立部署(自包含)带运行时体积大，必须指定rid且一旦指定就默认加了--self-contained
@@ -231,6 +231,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 老的方式：https://natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/ https://github.com/hvanbakel/CsprojToVs2017
 * Microsoft.Windows.Compatibility：对于FX项目，添加此包可直接迁移到Core，它包含了那些被移除的API
 * https://marketplace.visualstudio.com/items?itemName=ConnieYau.NETPortabilityAnalyzer VS的插件，分析从FX迁移到Core的兼容性问题
+* https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.upgradeassistant 官方VS插件
 
 ## infersharp
 

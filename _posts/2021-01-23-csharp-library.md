@@ -5,22 +5,19 @@ title: C#库
 ## Newtonsoft.Json
 
 * 部分功能依赖Microsoft.CSharp命名空间
+* 反序列化时json字面量支持单引号
 
 ```c#
-using
 JsonConvert.SerializeObject(obj [,Formatting.Indented]); 支持基元类型、IEnumerable、IDictionary
-JsonConvert.DeserializeObject<OBJ>(str);
-
-using JsonWriter writer = new JsonTextWriter(sw);
+JsonConvert.DeserializeObject<T>(str);
+SerializeObject<dynamic>()，之后object可用.xxx或同JObject，数组同JArray
+// 文件
 var serializer = new JsonSerializer() {NullValueHandling = NullValueHandling.Ignore};
-serializer.Serialize(writer, obj);
-
+serializer.Serialize(File.CreateText(...), obj)/Deserialize<T>(new JsonTextReader(File.OpenText(...)));
+// Newtonsoft.Json.Linq
 JObject.Parse(str); 之后当作dict用，还可SelectToken(jsonpath)
 JObject.FromObject(匿名对象)
 JArray 当作List用，长度用Count
-
-SerializeObject<dynamic>()，之后object可用.xxx或同JObject，数组同JArray
-反序列化时json字面量支持单引号
 ```
 
 ## Config.Net
@@ -63,6 +60,21 @@ serversocket.ConnectionReceived += async (sender, e) => { // 一次连接
    }
 };
 ```
+
+## JS
+
+* https://github.com/Taritsyn/MsieJavaScriptEngine 基本上是用IE11，支持ES5
+* https://github.com/JeringTech/Javascript.NodeJS 使用PATH中的NodeJS
+* https://github.com/sebastienros/jint 支持很多ES新特性
+* https://github.com/nilproject/NiL.JS ES6。Star数较少
+* https://github.com/paulbartrum/jurassic ES5和一部分ES6。能编译到IL而不是解释执行。不活跃
+
+## WebView
+
+* https://github.com/webview2/EdgeSharp
+* https://github.com/cefsharp/CefSharp
+* https://github.com/ElectronNET/Electron.NET 不活跃
+* https://github.com/tryphotino/photino.NET
 
 ## 第三方库
 

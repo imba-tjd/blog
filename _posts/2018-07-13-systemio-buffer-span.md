@@ -183,3 +183,12 @@ DriveInfo[] di = DriveInfo.GetDrives();
 把对象看作二进制数组
 var span = MemoryMarshal.CreateSpan(ref t, 1);
 var bytes = MemoryMarshal.Cast<T, byte>(span);
+
+---
+
+Stream转byte[]：
+```
+byte[] block = new byte[stream.Length];
+stream.Read(block, 0, block.Length); // Core支持Read(span)
+ms.ToArray();
+```
