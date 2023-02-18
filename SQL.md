@@ -30,7 +30,7 @@ title: SQL
 * 如果存在同名的列，SELECT中要加表名，可用tb1.*表示第一个表的所有列
 * CROSS JOIN：笛卡尔积，参数只需加表名，无需on；MySQL允许有on但直接忽略
 * INNER JOIN tb2 ON tb1.col1 = tb2.col2：等价于老版本标准的FROM t1, t2 WHERE ...
-* LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；SQLite3.39之前只支持LEFT；LEFT时一般把小表放到左边
+* LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；LEFT时一般把小表放到左边。SQLite3.39前只支持LEFT
 * LEFT JOIN WHERE tb2.id IS NULL可查询仅存在于左边的，即减去共有部分
 * SELF JOIN：如选择来自于相同城市的人、时间间隔
 * 内连接不会把col1.NULL与col2.NULL看作相等，会忽略
@@ -41,11 +41,11 @@ title: SQL
 * NOT、AND、OR：与一般的编程语言一样
 * IS NULL、IS NOT NULL：只有这个能判断。col = NULL和col != NULL或任何其它运算，结果都为NULL，用在WHERE中就恒假
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
-* IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其要注意
-* [NOT] LIKE：默认不区分大小写，PG除外用ilike不区分。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`
+* IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其注意
+* [NOT] LIKE：默认不区分大小写，PG除外用ilike不区分。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`。正则匹配：MySQL用RLIKE，PG用SIMILAR TO，MSSQL不支持，SQLite只内置了接口默认没实现
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
-* 拼接的时候常加`WHERE 1=1`，方便之后加AND
+* 拼接时常加`WHERE 1=1`，方便之后加AND
 * MySQL SQLite对于非空还支持类似Py的写法，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
 * 大于等于 比 大于 更优化
 
@@ -55,7 +55,7 @@ title: SQL
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
 * HAVING的只能是常数、分组的列、聚合函数，即与分了组后的SELECT一样
-* SQLite能选择不在GROUPBY中的列，但没啥意义
+* SQLite：能选择不在GROUPBY中的列，但没啥意义
 * SQLite：BY的可以是表达式 TODO: 测试
 
 ### ORDER BY
@@ -64,7 +64,7 @@ title: SQL
 * 会破坏GROUP BY的聚集性，除非也按分组的顺序来排序
 * 如果没有分过组，可以使用SELECT中未使用的列
 * 可以使用SELECT中的别名
-* NULL在ASC时的位置：MySQL MSSQL在开头，PG SQLite在末尾
+* NULL在时的位置：MySQL MSSQL在开头，PG SQLite在末尾
 
 ### 窗口函数
 
@@ -97,7 +97,7 @@ title: SQL
 * MySQL不能在子查询中SELECT一个表，再按此条件进行更新和删除同一个表的记录。解决办法是再加一层SELECT
 * SQLite
   * INSERT/UPDATE OR ABORT/FAIL/IGNORE/REPLACE/ROLLBACK：定义违反约束时的行为，默认ABORT，是曾经ON CONFLICT的简化，另有REPLACE是INSERT OR REPLACE的简化
-  * RETURNING *：在DML语句的结尾加类似于SELECT的语句，能返回本次改变了的行
+  * RETURNING id：一般加在insert语句最后，返回创建的id
   * 能开启选项在UPDATE和DELETE中支持LIMIT和ORDERBY
 
 ### INSERT
@@ -118,6 +118,7 @@ SELECT * FROM ... -- ORDERBY无意义
 INSERT ...
 ON CONFLICT [(col1)] [where ...] DO UPDATE -- 也可以DO NOTHING
 SET ...
+-- MySQL：INSERT IGNORE、REPLACE INTO、ON DUPLICATE KEY UPDATE
 ```
 
 ### UPDATE
@@ -157,9 +158,9 @@ WHERE tb1.id=tb2.id
 * 将INSERT、UPDATE、DELETE合并为一句
 
 ```sql
-MERGE INTO tgttb
+MERGE INTO dsttb
 USING srctb
-ON tgttb.id = srctb.id
+ON dsttb.id = srctb.id
 WHEN MATCHED THEN
 UPDATE SET ...
 WHEN NOT MATCHED [AND ...] THEN
@@ -168,12 +169,17 @@ WHEN NOT MATCHED BY srctb THEN -- 目标表中存在，源表中不存在
 DELETE
 ```
 
+### 其它功能
+
+```sql
+-- MySQL，是SELECT INTO OUTFILE的反向，另有mysqlimport命令行工具。数据文件以tab分隔，NULL值用\N表示，换行符用LF
+LOAD DATA LOCAL INFILE 'data.txt' INTO TABLE tb1;
+```
+
 ## DDL
 
 ### TABLE
 
-* 只有MSSQL支持trailing comma
-* MSSQL不支持所有的IF NOT EXISTS
 * 临时表
   * MSSQL：表名以#开头，当前会话断开后删除，以##开头，所有引用该表的会话断开后删除
   * MySQL SQLite PG：CREATE TEMPORARY TABLE；SQLite PG还可简写为TEMP
@@ -184,8 +190,6 @@ DELETE
   * SQLite：AUTOINCREMENT。整数主键插入NULL也会自增。两者有一点区别，后者是取最大值+1，如果删除了最后的行再插入就会出现用过的值。其实也可以不定义主键
   * 自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了，SQlite也改不了
   * PG：id serial PRIMARY KEY
-* UNIQUE的列，其它数据库都允许存在多个NULL，MSSQL不允许
-* 默认值：ALTER TABLE新添加有默认值的列，已存在的行的那一列，MySQL PG SQLite为那个默认值，MSSQL为NULL，再加NOT NULL则为默认值
 * 外键
   * 假设B(b)引用A(a)，A称为ParentTable，a称为ParentKey，B称为Child，A是外键refer to的，B是外键apply to的
   * a必须为主键或UNIQUE，Oracle下必须是唯一约束不能是唯一索引
@@ -197,6 +201,14 @@ DELETE
     * 定义时加上DEFERRABLE INITIALLY DEFERRED或用PRAGMA defer_foreign_keys=on能使得检查推迟到提交时
     * 定义表时允许引用A中不存在的列甚至不存在的表，就好像未开启外键约束一样，只在插入删除时检查
     * 支持FOREIGN KEY (a,b) REFERENCES (c,d)
+  * MySQL
+    * 若不写FOREIGN KEY只写REFERENCE，它什么都不做，静默忽略
+* 查询表的元数据
+  * MySQL：SHOW TABLES有哪些表; DESCRIBE tb1表的列和类型; SELECT TABLE()当前表？; SHOW CREATE TABLE创建表的SQL语句; CREATE TABLE tgttb LIKE srctb按指定表的结构创建另一个表
+* 只有MSSQL支持trailing comma TODO: 测试Select
+* MSSQL不支持所有的IF NOT EXISTS
+* UNIQUE的列，其它数据库都允许存在多个NULL，MSSQL不允许
+* 默认值：ALTER TABLE新添加有默认值的列，已存在的行的那一列，MySQL PG SQLite为那个默认值，MSSQL为NULL，再加NOT NULL则为默认值
 * SQLite支持在某些约束后定义ON CONFLICT ROLLBACK/ABORT/FAIL/IGNORE/REPLACE，默认是ABORT即终止语句但保留当前事务，如果没有“活动事务”则相当于ROLLBACK，FAIL相当于在本句之前提交掉，IGNORE相当于本句不存在会继续执行后面的
 
 ```sql
@@ -264,6 +276,13 @@ AS SELECT ...
 DROP VIEW [IF EXISTS]
 ```
 
+### DATABASE
+
+* CREATE DATABASE db1，MySQL在Linux下对数据库名是大小写敏感的
+* SHOW DATABASES
+* USE db1
+* SELECT DATABASE()显示当前使用的数据库
+
 ## TCL
 
 ### 事务
@@ -293,11 +312,9 @@ DROP VIEW [IF EXISTS]
 * 与DBMS密切相关，移植性差，SQLite不支持
 * 不适合需求经常变的，因为表会变，就要改所有对应的存储过程
 * 难横向扩展，只能纵向扩展
-* 没有日志
 * 适合处理场景固定的复杂事务，不要求并发性
 * 能消除不必要的网络IO，适合做集合运算
 * 调试困难
-* 建议只用来存数据，不要写业务逻辑
 
 ```
 CREATE PROCEDURE proc1(@var1[=default_value1] [output], ...)
@@ -339,7 +356,7 @@ END;
 
 ## DCL
 
-* 在删除角色之前必须删除该角色的成员；如果角色有用安全对象，必须首先转移这些安全对象的所有权
+* 在删除角色之前必须删除该角色的成员
 
 ```sql
 CREATE ROLE r1 [*AUTHORIZATION*]
@@ -355,6 +372,15 @@ audit select, insert, delete, update on *TableName* whenever succecssful
 no audit all on *TableName*
 
 grant SELECT/INSERT/UPDATE(col1)/ALTER/ALL PRIVILEGES ON TABLE t1,t2 To user1, user2
+```
+
+### MySQL
+
+```sql
+CREATE USER 'username'@'hostname' IDENTIFIED BY 'passwd'; -- hostname用%表示任意客户端ip，不加时默认就是；当用户名没有空格和-等字符时可不加引号
+GRANT ALL ON db1.* to 'username'@'%';
+
+select user(); SELECT CURRENT_USER();
 ```
 
 ## JSON
