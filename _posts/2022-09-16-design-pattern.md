@@ -233,6 +233,37 @@
 * 泛化(继承)：实线空心箭头，箭头端是父类
 * 实现(接口)：虚线空心箭头
 
+### PlainUML
+
+```js
+@startuml
+skinparam classAttributeIconSize 0 # 显示+-#而不是颜色
+
+interface Serviceable {
+   +needs_service(): bool
+}
+
+abstract class Component {
+    {abstract}+needs_service(): bool
+}
+Serviceable <|.. Component # 实现接口，其中<|看起来像空心箭头，..是虚线
+
+class Engine {
+    +needs_service(): bool # 已实现的方法，子类不必再写
+}
+Component <|-- Engine # 继承
+
+Calliope o-- CapuletEngine # 聚合
+Calliope o-- SpindlerBattery
+
+@enduml
+```
+
+## Compatibility
+
+* backward compatibility：如程序新版本能打开老格式的文件
+* forward compatibility：如程序能跳过未知格式的文件、老版本程序面对新设计不出错
+
 ## 参考
 
 * 《Java设计模式》刘伟

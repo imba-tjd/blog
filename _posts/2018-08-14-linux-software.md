@@ -348,14 +348,14 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * 字幕：--write-sub --sub-lang zh --all-subs，--write-auto-sub --embed-subs，--skip-download仅下载字幕
 * 把视频转成音频：-x；--audio-quality 9，默认5
 * 保存的文件名，支持元信息：-o `%(title)s.%(ext)s`，默认含有id
-* --playlist-start、end
+* 指定播放列表中的范围或某些视频：--playlist-start、end、items 2,4-6
 * 缓存大小是自动调整的
 * -s：dry-run
 * --add-metadata
 * -i：下载列表时跳过出错的；-w强制不覆盖文件
 * -a links.txt/-
 * 多线程下载单个视频：--external-downloader aria2c --external-downloader-args -x5
-* 只下载播放列表里所有的链接：`youtube-dl -j --flat-playlist '播放列表链接' | jq -r '.id' | sed 's_^_https://youtu.be/_' > links.txt`
+* 获取播放列表里所有的网页链接：`youtube-dl -j --flat-playlist '播放列表链接' | jq -r '.id' | sed 's_^_https://youtu.be/_' > links.txt`
 
 ### rsync
 

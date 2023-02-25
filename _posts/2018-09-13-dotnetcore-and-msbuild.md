@@ -58,7 +58,7 @@ ApplicationManifest：app.manifest # 好像会自动使用
   <Resource Include="logo.ico" />
 
   <PackageReference Include="Newtonsoft.Json" Version="12.*" />
-  <ProjectReference Include="..\xxx\xxx.csproj" />
+  <ProjectReference Include="..\xxx\xxx.csproj" /> # FX中此项不是传递性的，而Core是，即Prj1引用Prj2，2引用3，则FX中1不能用3
   <Reference Hintpath="xxx.dll" />
   <Reference Include="System.Net.Http" /> # 目标框架是net472时可加上
 </ItemGroup>
@@ -70,11 +70,10 @@ ApplicationManifest：app.manifest # 好像会自动使用
 
 ### 默认编译项
 
-EnableDefaultCompileItems属性设为false后可取消默认的Compile项。
-最小的全自定义Compile项：`<Compile Include="**/*.cs" Exclude="**/*.csproj; **/*.sln; bin/**; obj/**" />`，不能只写bin，必须加/**
-所有默认排除项可用$(DefaultItemExcludes)引用。还可用DefaultItemExcludes属性
-
-.settings和.resx需要手动加入：https://docs.microsoft.com/zh-cn/dotnet/desktop/winforms/migration/#resources-and-settings
+* 取消默认的Compile项：EnableDefaultCompileItems false
+* 最小的全自定义Compile项：`<Compile Include="**/*.cs" Exclude="**/*.csproj; **/*.sln; bin/**; obj/**" />`，不能只写bin，必须加/**
+* 自定义排除内容：`<DefaultItemExcludes>$(DefaultItemExcludes);xxx</DefaultItemExcludes>`
+* Core中.settings和.resx仍需手动加入：https://docs.microsoft.com/zh-cn/dotnet/desktop/winforms/migration/#resources-and-settings
 
 ## dotnet CLI
 
@@ -175,6 +174,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 获取项的值用`@()`
 * 可以有多个相同名字的项，其中Exclude仅对同一句中的Include生效
 * 项还可能有元数据，如`<FileName>`；大概是项的属性；用%(项.metaname)；预定义的参见：https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-well-known-item-metadata
+* EmbeddedResource：内嵌到程序集内，运行时不更改；Page是特殊的资源，会编译。Content：程序集中只包含一些元数据。None：允许编译时文件不存在
 
 ### Csc示例
 
@@ -287,11 +287,3 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * https://zhuanlan.zhihu.com/p/35979897
 * https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-concepts
 * PackageReference的PrivateAssets="All"
-
-```
-ItemGroup:
-<Folder Include="datafiles\" />
-  <None Update="datafiles\datafile.db">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-         </None>
-```
