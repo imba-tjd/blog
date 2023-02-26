@@ -934,17 +934,17 @@ await response(scope, receive, send)
 ### Django
 
 * MTV框架：Model-Template-View
-* manage.py与django-admin做的事一样，只是manage.py还设定了settings的位置。当使用单一项目只有一个设置时，用manage.py更方便
+* manage.py与django-admin命令行做的事一样，只是manage.py还设定了settings的位置。当使用单一项目只有一个设置时，用manage.py更方便
 * 创建项目：django-admin startproject mysite .
-* 运行：python manage.py runserver，会自动重载
+* 运行：python manage.py runserver 会自动重载
 * 创建应用：manage.py startapp news
 * 创建数据库：manage.py makemigrations; migrate。查看会执行什么sql语句：sqlmigrate news 0001
 * 交互式命令行：manage.py shell
 * 创建管理员账号：manage.py createsuperuser
 * 准备部署：manage.py check --deploy
-* https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com https://realpython.com/learning-paths/django-web-development/
+* https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com https://realpython.com/learning-paths/django-web-development/ https://appliku.com/post/django-project-tutorial-beginners-settings-docker https://appliku.com/post/django-rest-framework-openapi-3
 * 第三方中间件：WhiteNoise压缩静态文件
-* REST：django-rest-framework、django-ninja
+* REST：django-rest-framework、django-ninja、djangorestframework-simplejwt
 
 ```py
 # news/model.py
@@ -1485,7 +1485,7 @@ print(template.render(the="variables", go="here"))
 * threading.Timer(秒数, fun[,args,kwargs]).start()：自带，非阻塞，只执行一次，不易管理
 * sched：自带，使用麻烦
 * dbader/schedule：every(10).minutes/every().hour.do(fun) 轻量无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
-* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455 官网是CF被移动封IP了
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455
 * rq：使用redis的任务队列，比celery简单
 * huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
 * dramatiq：需用redis或rabbitmq

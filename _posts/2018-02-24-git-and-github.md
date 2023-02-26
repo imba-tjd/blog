@@ -219,12 +219,12 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * git merge -Xignore-space-change --no-ff patch-1：换行符不会导致自动合并冲突。如果仅仅只有换行符的改变，则不会变；否则**保留更改过后的**。但与`ignore-all-space`参数的区别不明；试过一次没有效果
 * `git diff -U0 -w | git apply --cached --ignore-whitespace --unidiff-zero -`：在未add且未commit时使用；用完后会给warning意义不明，去掉-U0会消失，$?仍是0；末尾的横线用处不明；如果没有可以合并的，会报unrecognized input错误，属正常现象，此时$?不是0。如果某一行发生了更改，末尾的空格改变不会忽略；但是现在遇到了`fatal: corrupt patch at line`的问题，且没有`--no-verify`可用
 
-### 全局设置
+### autocrlf
 
 * Windows下：git config --global core.autocrlf true，提交时转换为LF，检出时转换为CRLF；如果本地已经是LF了，提交不会改变本地文件，但reset时会；VS附带的Git默认为true
 * Linux下：git config --global core.autocrlf input，提交时转换为LF，检出时不转换
 * 关闭自动转换：git config --global core.autocrlf false
-* 允许提交混合换行符：git config --global core.safecrlf true/false/warn
+* 拒绝提交混合换行符的文件：core.safecrlf true/false/warn
 
 ### 设置.gitattributes
 

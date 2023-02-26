@@ -101,8 +101,7 @@ title: 浏览器
 
 ### 扩展（Add-ons）
 
-* Chrome Store Foxified：让火狐运行Chrome的扩展
-* Grammarly for Firefox：拼写检查
+* https://github.com/Noitidart/Chrome-Store-Foxified：让FF使用Chrome的扩展商店
 * History Master：统计历史访问的网页的数据
 * 云盘万能钥匙
 

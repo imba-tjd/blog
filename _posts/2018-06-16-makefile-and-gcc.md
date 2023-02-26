@@ -138,6 +138,8 @@ add_executable(hello main.cpp utils.cpp)
 -static-libgcc -static-libstdc++ -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
 ```
 
+* MinGW32编译出来的程序可能依赖libgcc_s_sjlj-1.dll等，使用-static-libgcc就可避免依赖。好像MinGW64不会。另外g++必须用shared-libgcc
+
 ### 临时禁用警告
 
 ```c

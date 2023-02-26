@@ -21,7 +21,7 @@ category: linux
 * figlet：把文本转换为某些字符拼凑显示
 * software-properties-common：含有add-apt-repository
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
-* netcat
+* netcat：echo xxx | nc [-u] ip addr
 * jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；还有个yq是py的；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
