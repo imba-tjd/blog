@@ -1277,8 +1277,12 @@ ffi.cast("int", 2)
 
 * 依赖numpy，适合大量循环数学计算，需要一个较大的运行时依赖
 * @njit强制nopython模式
-* parallel=True多线程执行，fastmath=True启用精度较低但更快的浮点运算，cache=True启用硬盘缓存
+* 自动处理模块中的所有函数：jit_module(nopython=True)，只会处理调用前声明的
+* parallel=True多线程执行，fastmath=True启用精度较低但更快的浮点运算，cache=True缓存到pycache里，error_model='numpy'除以零时不抛异常而是变为inf或nan
 * 可以加速pandas，pd的某些函数用参数engine='numba'
+* AOT：运行时不再需要numba，但仍需要numpy
+* 函数中用了isinstance()“重载”：@generated_jit
+* 特化对数组类似于卷积运算的情形：@stencil
 
 ## pandas
 

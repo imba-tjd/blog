@@ -174,7 +174,10 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 获取项的值用`@()`
 * 可以有多个相同名字的项，其中Exclude仅对同一句中的Include生效
 * 项还可能有元数据，如`<FileName>`；大概是项的属性；用%(项.metaname)；预定义的参见：https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-well-known-item-metadata
-* EmbeddedResource：内嵌到程序集内，运行时不更改；Page是特殊的资源，会编译。Content：程序集中只包含一些元数据。None：允许编译时文件不存在
+* EmbeddedResource：内嵌到程序集内，运行时不更改
+* Content：程序集中只包含一些元数据，VS里选择“包含在项目中”后就是此项，默认不会复制到生成目录。另外文件夹是Folder
+* None：允许编译时文件不存在
+* Resource：仅WPF，内嵌到程序集内，VS里将文件包含时默认变为此项。使用时用new Uri("/xxx",UriKind.Relative)，绝对路径是pack://application:,,,/xxx这样的，若文件路径中有井号百分号则需转义。Page是特殊的资源，会编译
 
 ### Csc示例
 

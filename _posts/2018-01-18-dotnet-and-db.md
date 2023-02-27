@@ -147,6 +147,7 @@ db.Query(query, dbParams);
 * IDb前缀是通用接口，各个数据库也有自己的实现：Connection、Command、DataReader（类似于数据源Stream）
 * 连接字符串的DataSource支持魔值`|DataDirectory|`，winform下表示bin/debug等
 * DbProviderFactory：允许在多个数据库Provider之间切换，基本就是IDb接口的应用
+* 没有明确规定是否支持位置参数?，已知System.Data.SqlClient不支持，System.Data.SQLite支持
 
 ```c#
 string cnnstr = System.Configuration.ConfigurationManager.ConnectionStrings["连接字符串名称"].connectionString;
@@ -155,7 +156,7 @@ cnn.Open(); // 没Open时也可以创建Command，读取数据就必须Open了
 
 using var cmd = cnn.CreateCommand(); // 或new SqliteCommand(sqltext,cnn)
 cmd.CommandText ="INSERT INTO user (name) VALUES (@name)";
-cmd.Parameters.AddWithValue("@name", name).Size = 30; // 添加参数并设置截断长度，诡异的写法，一般给AddWithValue的返回值赋一个变量再进一步设置。不支持位置参数
+cmd.Parameters.AddWithValue("@name", name);
 
 cmd.ExecuteNonQuery(); // 执行DML，返回被影响的行数
 cmd.ExecuteScalar().ToString(); // 以object类型返回结果表第一行第一列的值，一般用于执行查询单值Select命令，无值时为null
@@ -169,7 +170,7 @@ while (reader.Read()) { // 读完时返回false
 }
 
 using var tran = cnn.BeginTransaction();
-// 创建cmd，最好不要提前创建
+// 创建cmd、创建Parameter添加进cmd，循环插入时每次只设置param.Value，不要重新创建cmd或Param，能提高性能
 tran.Commit()/Rollback();
 ```
 
