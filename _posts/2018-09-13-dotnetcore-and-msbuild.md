@@ -43,6 +43,7 @@ GenerateAssemblyInfo：默认为true。自定义了Properties/AssemblyInfo.cs时
 DefineConstants：相当于-d/-define
 AnalysisMode：默认已开启分析器，此项设为Minimum/Recommended/All可启用更多的Lint
 ServerGarbageCollection：默认是false表示工作站类型，会GC更频繁以保持小内存占用。ASP会默认用true
+SatelliteResourceLanguages：en 当存档多语言资源时，此项只保留指定的
 
 WPF：
 OutputType：WinExe # 存在下一条时本条设为exe也可，会自动替换，但不能不设置

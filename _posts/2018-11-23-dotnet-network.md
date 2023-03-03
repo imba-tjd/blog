@@ -126,9 +126,10 @@ byte[] bytes = new byte[1024];
 int bytesRead = ns.Read(bytes, 0, bytes.Length);
 string s = Encoding.UTF8.GetString(bytes,0,bytesRead);
 
-var listener = new TcpListener(IPAddress.Any, port);
+var listener = TcpListener.Create(port) // 监听双栈
 listener.Start();
 TcpClient client = listener.AcceptTcpClient();
+client.Client.RemoteEndPoint.ToString()
 NetworkStream ns = client.GetStream();
 ns.Write(bytes, 0, bytes.Length);
 ns.Close(); client.Close();

@@ -1128,6 +1128,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
+* pip install Cython [--install-option="--no-cython-compile"] 在无预编译的包的环境或CI中可用未编译的版本
 * 纯Python模式
   * 第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py
   * 也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突

@@ -365,6 +365,7 @@ collapsable content
 * https://fossa.com/developers-guide-open-source-software-licenses
 * AGPL：如果能通过网络访问某软件，那就应该要能获得它的源代码。如果只是使用AGPL软件，没有修改它，那可以不公开自己的源代码
 * MPL：修改了MPL下的代码，必须把修改后的开源，且必须也用MPL。但允许把MPL的代码单独作为一些文件，与非MPL的一起使用，且不用开源
+* 避免GPL传染：二进制隔离：不链接，只通过系统调用来共享数据。可选依赖：某一软件可包含GPL库来增强功能，在不使用此库时也是独立软件，此时该软件不必是GPL的，但不能发布包含GPL库的完整软件
 
 ## bare和mirror
 
@@ -441,6 +442,11 @@ collapsable content
 * 考虑屏蔽js.sentry-cdn.com因为太慢了
 * 精确代码智能感知：Go、TS/JS、C/C++、Java，需要上传LSIF数据
 * 类似网站：https://grep.app/ 很快但只索引一部分仓库
+
+## Copilot
+
+* 问答模式：前一行写//q: 问题，下一行就会回答
+* GitHub Copilot Labs：提供一些预定义场景的功能，如代码翻译，TS自动声明变量类型，添加文档等
 
 ## 参考
 
