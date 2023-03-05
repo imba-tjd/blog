@@ -121,7 +121,7 @@ title: Linux命令
 #### xz
 
 * 压缩：xz -9e data.txt
-  * 它会生成data.txt.gz且自动删除源文件，-k保留。其它压缩程序都默认保留
+  * 它会生成data.txt.gz且自动删除源文件，-k保留。只有gzip和它会删
 * 流压缩：cat data.txt | xz -9e > data.txt.xz
 * 解压：xz -d file，用-c输出到stdout
   * 自带软连接unxz相当于-d，xzcat相当于-dc，其他压缩程序一般也支持这类

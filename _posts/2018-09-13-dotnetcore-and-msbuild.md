@@ -270,7 +270,11 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * /o开启优化
 * 默认不生成调试内容，/debug开启。默认生成外部pdb文件，有个内嵌版但实测无法显示行号
 * /r:System.Net.Http.dll
-* /platform:默认anycpu，产生32位程序，在32位下运行是32位的，64位下运行是64位的。FX的csproj默认为Prefer32Bit=true，导致64位下运行还是32位的。Core完全不支持anycpu，相当于仅有x86和x64
+* /platform
+  * 默认anycpu，产生32位程序，在32位下运行是32位的，64位下运行是64位的
+  * FX的csproj默认为Prefer32Bit=true，对应csc的anycpu32bitpreferred，导致64位下运行还是32位的
+  * dll不支持anycpu32bitpreferred，不受Prefer32Bit影响，anycpu的dll能被anycpu和x86和x64的exe使用
+  * Core完全不支持anycpu，相当于仅有x86和x64，64位SDK默认x64
 
 ## 反编译
 
@@ -285,6 +289,20 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * https://github.com/de4dot/de4dot
 * https://github.com/SychicBoy/NetReactorSlayer
 * https://github.com/obfuscar/obfuscar
+
+## VS社区版协议
+
+* 个人：任意使用
+* 开发 OSI批准的开源协议的程序、教育教学、Win驱动 允许任意数量的人使用。若不是开发这些，且也不是企业，最多5人使用
+* 企业，不允许使用：指超过250台电脑或250位用户或年收入超过100万美元
+
+## JetBrains协议
+
+* IDEA社区版和PyCharm社区版可以商业使用，只是不能将社区版IDE商业化
+* 可以使用个人授权许可证在商业开发上，只是个人的只能本人用，不能分享，也不能向公司报销
+* 永久回退许可证：订阅一年以上，若停止订阅，仍可以一直使用订阅到期日往回推一年前时的正式版本
+* 开源项目免费许可证：需正在积极开发、不提供付费版本和付费支持等、未获得商业公司的资助
+* EAP：无限制，无需订阅，可以商用。但每个build只有Release后的30天内有效。CLion和Rider都有
 
 ## TODO
 

@@ -891,7 +891,7 @@ def myfile(_):
 * uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询默认监视CWD
 * --uds指定unix socket，--workers多线程
 * --log-level默认info，没有简单的指定日志文件的方法；客户端不会收到traceback
-* 默认处理来自于127.0.0.1的X-Forwarded等头，可用--forwarded-allow-ips '*'信任所有
+* 默认启用--proxy-headers处理来自于127.0.0.1的X-Forwarded等头，用--forwarded-allow-ips '*'信任所有
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)，没有原始uri
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
 * 默认是http的，如果用https访问，会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL

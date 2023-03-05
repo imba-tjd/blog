@@ -108,18 +108,6 @@ System.IO
 * IsPathFullyQualified：是否是绝对路径
 * Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)可以获取特殊文件夹的路径
 
-### 管道
-
-* 位于System.IO.Pipes命名空间中，用于进程间传递消息
-* 分为匿名管道和命名管道
-* 示例参见[文档教程](https://docs.microsoft.com/zh-cn/dotnet/standard/io/pipe-operations)
-
-### 内存映射文件
-
-* 可以处理极大的文件，可以让多个程序同时使用
-* 位于System.IO.MemoryMappedFiles命名空间
-* https://docs.microsoft.com/zh-cn/dotnet/standard/io/memory-mapped-files
-
 权限
 ----
 
@@ -192,3 +180,18 @@ byte[] block = new byte[stream.Length];
 stream.Read(block, 0, block.Length); // Core支持Read(span)
 ms.ToArray();
 ```
+
+---
+
+命名管道：可以在局域网上全双工通信，可以与多个客户端通信。匿名管道：只能本机通信，使用时把管道的handle通过命令行参数传递给子进程，很麻烦
+var server = new System.IO.Pipes.NamedPipeServerStream("testpipe"); // 可指定方向，默认InOut、异步、允许同名连接的数量
+server.WaitForConnection();
+之后当作Stream使用，可包一个StreamWriter。写入后用server.WaitForPipeDrain();等待读取完。最后Close()
+
+内存映射文件：当作Stream使用时需要互斥。需Dispose()
+using System.IO.MemoryMappedFiles;
+MemoryMappedFile.CreateFromFile()创建自硬盘已有的文件，可命名，一般用于处理大文件
+CreateNew()和CreateOrOpen()创建临时文件，用于IPC
+OpenExisting()根据命名打开
+mmf.CreateViewAccessor(offset, length); ac.Read(offset2, out var 结构体);
+new BinaryWriter(mmf.CreateViewStream());
