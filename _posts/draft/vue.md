@@ -1,31 +1,27 @@
 # Vue
 
-https://cn.vuejs.org/tutorial/#step-10
 https://cn.vuejs.org/guide/essentials/list.html#maintaining-state-with-key
 https://docs.microsoft.com/zh-cn/learn/paths/vue-first-steps/
-https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzA3NTc4Njk1NQ==&action=getalbum&album_id=1978608648645902339&scene=173&from_msgid=2247490996&from_itemidx=2&count=3&nolastread=1#wechat_redirect
+https://cn.vuejs.org/examples/
+https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzA3NTc4Njk1NQ==&action=getalbum&album_id=1978608648645902339
 
 https://vueschool.io/lessons/vue-3-component-template
 https://vueschool.io/courses/reusable-vuejs-components-with-slots
 https://vueschool.io/courses/vue-router-4-for-everyone
 https://www.vuemastery.com/courses/touring-vue-router/vue-router-introduction/
 
-
-暂时不看的：
-https://vueschool.io/courses/application-monitoring-in-vue-js-with-sentry
-https://vueschool.io/courses/javascript-testing-fundamentals
-https://www.vuemastery.com/courses/vue3-forms/base-input https://www.vuemastery.com/courses/validating-vue3-forms/why-vee-validate/
-
-
 ## 单文件组件SFC
 
 * 在一个.vue中写html css js
 * 使用者：import Cmp from './Comp.vue'，之后在template中就可以像使用HTML元素一样声明
+* props：允许使用者传入参数给本组件
+* event：组件内发出，使用者添加处理程序后相当于信息由组件传出去了。无冒泡机制
+* slot：使用者在content里的东西，会替换掉组件中的slot元素，slot如果有content则为默认值
 
 ```html
 <script>
 export default {
-  name: 'Cmp', // 需全局唯一，不声明也能用但只有坏处
+  name: 'Cmp', // 需全局唯一，不声明也能用但在devtools中会显示匿名的。组合式会自动推导
   data() { ... },
 }
 </script>
@@ -42,25 +38,43 @@ export default {
 ```html
 <script>
 export default {
-  data() {  // 它返回的属性作为响应式的状态，暴露在this上
+  data() {  // 它返回的对象作为响应式的状态，暴露在this上
     return {
       count: 0
     }
   },
 
   computed: {  // 相当于C#的get property。不应修改数据，只应转换
-	countplusone(){ return this.count + 1 } // 也可以写countplusone:{get(){},set(v){}}
+	  countplusone(){ return this.count + 1 } // 也可以写countplusone:{get(){},set(v){}}
   },
 
   methods: {  // 用来更改状态与触发更新的函数，在template中作为事件监听器绑定
     increment() {  // 不能使用箭头函数
       this.count++
+    },
+
+    trigger_ev1(e) {
+      this.$emit('event1', 123) // 普通的方法，也可以在模板中行内写$emit()，参数也可以由使用者传attr进来；也可放在生命周期钩子中
     }
   },
 
-  mounted() {  // 生命周期钩子会在组件生命周期的各个不同阶段被调用
+  emits: ['event1'], // 使用者<Cmp @event1="(arg) => ...">
+
+  props: {
+      arg1: {
+          type: Boolean,
+          required: true,
+          default: xxx
+          validator: (val) => 布尔值
+      },
+      arg2: String
+  },
+
+  mounted() {  // 生命周期钩子会在组件生命周期的各个不同阶段被调用。一般还有created
     console.log(`The initial count is ${this.count}.`)
-  }
+  },
+
+  watch() { ... } // 执行副作用
 }
 </script>
 
@@ -72,12 +86,12 @@ export default {
 * 响应式状态
   * 基础类型用ref；object array Map Set用reactive()，且是深层响应的
   * 感觉上ref就是(reactive({value:v}))
-  * tempalte中当ref对象是顶层属性或作为最终表达式时会自动解包（相当于.value），如{{foo+1}}和{{obj.foo}}，但{{obj.foo+1}}这种不会
+  * tempalte中当ref对象是顶层属性或作为最终表达式时会自动解包（相当于.value），如{{foo+1}}和{{obj.foo}}和@click="v => foo=v"，但{{obj.foo+1}}这种不会
   * ref对象在reactive object里使用时会自动解包，但reactive数组或Map不会
 
 ```html
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, computed } from 'vue'
+import { ref, computed, onMounted, nextTick, computed, watch } from 'vue'
 
 const count = ref(0)
 
@@ -88,54 +102,33 @@ function increment() {
   nextTick(()=>访问更新后的DOM) // 改变状态后，DOM不会立即更新，此函数等待
 }
 
-const p = ref(null) // 模板引用手动操作DOM：<p ref="p">hello</p> 创建一个与ref属性同名的ref对象，必须这么声明
+const p = ref(null) // 模板引用手动操作DOM：<p ref="p">hello</p> 创建一个与ref attr同名的ref对象，必须这么声明
 onMounted(() => { ... })  // 生命周期钩子
-</script>
 
-<template> ... </template>
-```
-
-### Props和Event
-
-* props：允许使用者传入参数给本组件
-* event：组件内发出，使用者添加处理程序后相当于信息由组件传出去了。无冒泡机制
-
-```js
-props: {
-    arg1: {
-        type: Boolean,
-        required: true,
-        default: xxx
-        validator: (val) => 布尔值
-    },
-    arg2: String
-},
-methods: {
-    event1(event) {
-        this.$emit('event1', arg) // 也可以在模板中行内写$emit()
-    }
-}
-<cmp arg1="true" @event1="..."></cmp>
+watch(count, (newCount) => 当count改变时要执行的副作用回调)
 
 interface Props {
   foo: string
   bar?: number
 }
-const props = defineProps<Props>()
-event: Event
+const props = defineProps<Props>() // 此函数无需导入。js版用defineProps({foo: String})
+
+const emit = defineEmits(['event1'])
+function trigger_ev1(ev: Event) { emit('event1', 123) }
+</script>
 ```
 
 ## 模板template
 
 * 文本插值
-  * {{xxx}}，当xxx变动时会自动更新；可以也只能是表达式
+  * {{xxx}}，当xxx变动时会自动更新；可以也只能是表达式，如 {{xxx || 不存在时的值}}
   * 内容会解释为纯文本（转义为实体）。若想插入HTML，用`<span v-html="xxx"></span>`
   * 不能直接访问用户附加在window上的全局对象，要手动加到app.config.globalProperties里；常用的可以直接访问，如Math和Date
-* 属性绑定
-  * 单个属性：<div v-bind:id="xxx"></div> 或 :id="xxx"
-  * 多个属性：v-bind="xxx"，其中xxx是个object
+* attr绑定
+  * 单个attr：<div v-bind:id="xxx"></div> 或 :id="xxx"
+  * 多个attr：v-bind="xxx"，其中xxx是个object
   * 还支持表达式，如 :disabled="xxx.length<5" 当长度小于5时禁用。布尔型attribute根据值决定是否存在于该元素上
-  * 动态计算绑定的属性名：:[var_attrname]="xxx"，事件同理。在DOM内嵌模板中使用时，变量名不能大写，因为浏览器转换成小写，SFC不受此限制
+  * 动态计算绑定的attr名：:[var_attrname]="xxx"，事件同理。在DOM内嵌模板中使用时，变量名不能大写，因为浏览器转换成小写，SFC不受此限制
 * toggle class
   * :class="{ cls名称: 布尔表达式 }"，当表达式为truthy时则启用此cls，可绑定计算出的obj
   * 数组语法 :class="[b?c1:c2, c3, {c4:b2}]"。单纯的[c1,c2]不如用原生的静态class
@@ -163,17 +156,19 @@ event: Event
   * @submit.prevent 在form里按下button或回车时触发，但并不发出请求，只是方便将事件放在form元素上
   * .once 只触发一次
 * 透传
-  * 对于组件，若只有一个根元素，使用时加在上面的非props或emits的属性，会直接合并添加到根元素上
-  * 若多于一个根元素，或禁用了自动透传，用$attrs，其中事件暴露为onXxx，属性若有横杠需用[]，一般直接v-bind="$attrs"全绑定到指定元素上
+  * 对于组件，若只有一个根元素，使用时加在上面的非props或emits的attr，会直接合并添加到根元素上
+  * 若多于一个根元素，或禁用了自动透传，用$attrs，其中事件暴露为onXxx，attr若有横杠需用[]，一般直接v-bind="$attrs"全绑定到指定元素上
   * 在js中访问：useAttrs()
 
 ## 安装
 
 * 浏览器调试扩展：https://devtools.vuejs.org/
-* 创建脚手架：npm init vue@latest，会交互式安装一些组件。然后进入创建的项目文件夹，npm install
-* 运行：npm run dev。生产环境：npm run build，会输出到./dist中
+* 创建脚手架：npm init vue@latest，会交互式安装一些组件。然后手动进入创建的项目文件夹，npm install
+* 运行：npm run dev。生产环境输出到dist中：npm run build
 
-### 在浏览器中直接使用，不支持SFC
+### 使用
+
+在浏览器中直接使用，不支持SFC。
 
 ```html
 <div id="app">{{ message }}</div>  // DOM内嵌模板，仅限根
@@ -186,16 +181,11 @@ ESM版：
     data() { ...}
   }).mount('#app')
 </script>
+```
 
-ImportMaps版，目前只有Chrome原生支持，需要下面第一条polyfill：
-<script async src="https://ga.jspm.io/npm:es-module-shims@latest/dist/es-module-shims.js"></script>
-<script type="importmap">{"imports": {"vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"}}</script>
-import { createApp } from 'vue'
+### app
 
-全局构建版，所有API暴露在Vue对象上，一般不使用：
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-const { createApp } = Vue
-
+```js
 const app = createApp(根组件)
 app.config 能配置一些应用级选项，如.errorHandler捕获所有由子组件上抛而未被处理的错误
 console中用$vm0也能访问到第一个app
@@ -209,7 +199,7 @@ console中用$vm0也能访问到第一个app
 
 https://cn.vitejs.dev/
 npm install vite@latest myapp -- --template vue-ts; cd myapp; npm install; npm run devf
-npm init @vitejs/app 交互式创建项目。或npx create-vue
+npm init @vitejs/app 交互式创建项目
 自动重载。可以直接在html的script中引入module和ts。内置postcss支持。可以在js中import css
 https://github.com/fi3ework/vite-plugin-checker
 
@@ -217,6 +207,9 @@ https://github.com/fi3ework/vite-plugin-checker
 
 * https://vueuse.org/ 一些组合式API的增强
 * VSC：Volar、TypeScript Vue Plugin，关闭@builtin的TS LSP
+* pinia：状态管理
+* nuxt：ssr全栈
+* petite-vue
 
 ### UI
 
@@ -228,3 +221,9 @@ https://github.com/fi3ework/vite-plugin-checker
 * balmjs/balm-ui 虽然贡献值少但提交数多
 * antoniandre/wave-ui 虽然贡献值少但提交数多
 * https://vuestic.dev/ 虽然贡献值少但提交数多
+
+## 暂时不看的
+
+https://vueschool.io/courses/application-monitoring-in-vue-js-with-sentry
+https://vueschool.io/courses/javascript-testing-fundamentals
+https://www.vuemastery.com/courses/vue3-forms/base-input https://www.vuemastery.com/courses/validating-vue3-forms/why-vee-validate/
