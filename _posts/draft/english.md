@@ -319,4 +319,4 @@ https://www.zhihu.com/question/270213158 https://www.zhihu.com/question/33108367
 问频率：how often、when do you usually
 https://www.zhihu.com/question/280534420 为什么英语中有些动词后只能接 doing，而不能接 to do
 
-
+https://linggle.com/ 查询某种表达是否使用的人多。用a/b表示对比查看a和b，用~a表示a的近义词，用?a表示对比有无a
