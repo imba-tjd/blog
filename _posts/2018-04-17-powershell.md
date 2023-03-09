@@ -171,6 +171,7 @@ category: windows
 * Compress-Archive、Expand-Archive
 * Enter-PSSession -ComputerName RemoteComputer; Exit-PSSession
 * Stop-Computer
+* Move-Item(mv)：目标已存在时不会静默覆盖，要加-Force
 
 ### meta
 
