@@ -21,7 +21,7 @@ category: linux
 * figlet：把文本转换为某些字符拼凑显示
 * software-properties-common：含有add-apt-repository
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
-* netcat：echo xxx | nc [-u] ip addr
+* netcat：echo xxx | nc [-u] ip addr -w0读取完输入后不等待直接关闭
 * jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；还有个yq是py的；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
@@ -416,6 +416,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://turbovnc.org/ Tight的fork，想在画面速度上更快，比Tight大很多，且无Win下的服务端
 * https://uvnc.com/
 * https://remmina.org/ 不支持Win
+* https://github.com/quasar/Quasar
 
 ## TODO
 

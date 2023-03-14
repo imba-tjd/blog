@@ -78,6 +78,19 @@ app.Quit();
 
 * Core：https://learn.microsoft.com/zh-cn/dotnet/core/extensions/windows-service
 * FX：https://learn.microsoft.com/zh-cn/dotnet/framework/windows-services
+  * 安装[和卸载]：installutil [/u] mysc.exe
+
+```c#
+using System.ServiceProcess; // Core下没有，除非装Windows Compatibility Pack使用.NET Platform Extensions API
+class UserService: ServiceBase {
+  public UserService() {
+    ServiceName = "MyService";
+    设定一些其它能力如是否能暂停和恢复
+  }
+  protected override void OnStart(string[] args) {}
+}
+ServiceBase.Run(new UserService());
+```
 
 ## 从资源中加载程序集
 

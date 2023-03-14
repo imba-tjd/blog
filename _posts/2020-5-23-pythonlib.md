@@ -548,7 +548,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * Headers：UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
 * 支持自动gzip解码，但默认AE是identity，且Content-Length是解压前的
 * 默认retries=3，重定向3次，timeout无限
-* 流式处理，可看错io.BytesIO：preload_content=False; resp.read(4); resp.release_conn()
+* 流式处理，可看成io.BytesIO，超时异常在read()处发生：preload_content=False; resp.read(4); resp.release_conn()
 * PoolManager：管理ConnectionPool，默认最大10个池
 * ConnectionPool：一个域名对应一个，默认maxsize=1只长连接一个，更多的能连接但不会保留长连接，设置block=True可阻止更多连接，这俩参数也能在PM的构造函数中使用。一般用connection_from_url()创建，pool.request(这里的url部分可以是相对路径)
 * 不会自动使用HTTP_PROXY
@@ -890,11 +890,11 @@ def myfile(_):
 * pip install uvicorn：依赖click和h11，[standard]还会装上uvloop（Win不支持）等数个依赖
 * uvicorn main:app --host 127.0.0.1 --port 8000：【默】对应main.py的app对象，--reload最小版为轮询默认监视CWD
 * --uds指定unix socket，--workers多线程
-* --log-level默认info，没有简单的指定日志文件的方法；客户端不会收到traceback
-* 默认启用--proxy-headers处理来自于127.0.0.1的X-Forwarded等头，用--forwarded-allow-ips '*'信任所有
+* --log-level默认info。无法从命令行指定日志文件，客户端不会收到traceback
+* 默认启用--proxy-headers处理来自于127.0.0.1的X-Forwarded等头，信任所有用--forwarded-allow-ips '*'
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)，没有原始uri
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
-* 默认是http的，如果用https访问，会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
+* 默认是http的，直接请求https会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
 * 只支持HTTP1.1，直接基于asyncio。hypercorn支持HTTP/2，Daphne依赖twisted
 
 ```py
@@ -918,12 +918,13 @@ async def app(scope, receive, send): # 必须是异步的，也可以是定义�
         'body': b'Hello, world!',
     })
 
-if __name__ == "__main__": # 从脚本运行
+if __name__ == "__main__":  # 若与app在同一文件中，当心全局变量二次执行，如打开了文件未关闭，因为下一句内部重新运行了main.py。可以把那些内容放在else里
     uvicorn.run("main:app", reload=True)
 
 class App: # 使用类定义的方式，指定运行目标是类名而不是实例；也可以定义一个只有scope的函数，返回参数为receive和send的异步函数
     def __init__(self, scope): ...
     async def __call__(self, receive, send): ...
+logging.getLogger('uvicorn.error' if 'uvicorn' in __import__('sys').modules else __name__)
 
 # 使用Starlette简单封装uvicorn请求
 request = Request(scope, receive)
