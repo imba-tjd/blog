@@ -1,35 +1,44 @@
 # jQuery
 
 * 中文文档3.0：https://www.jquery123.com/
-* https://github.com/nefe/You-Dont-Need-jQuery/blob/master/README.zh-CN.md
-* slim版无ajax和动画，但小不了多少，不用
 * `$`是window.jQuery的别名，是个函数，可以链式调用
 * `$(...)`把内部的东西变成jQuery对象，可以是CSS选择器、HTML字符串、DOM对象，之后.append()等里面也可以是一样的东西
-* jQuery对象可认为是个HTML对象集合，用`[]`取出单个HTMLElement，无参get()变为真正的数组。设置它们的属性会应用到每一个数组元素，空集合也不报错。一些函数传一个参数是查询，传两个是修改；还有一些函数无参调用是查询，传参是修改。查询时若集合中有多个元素最好不要直接用，而是用.each(function(ndx){$(this)...})
-* 选择器找不到时为`[]`；支持:has和:contains(相当于has-text) :input/text/password/submit/checked/selected表单元素
-* 进一步选择，关键是用这些方法后对象仍是jQuery对象：find(选择器/jQuery对象) filter(选择器/回调函数) map() next(支持选择器) nextAll() prev() eq(第几个) slice(替代:eq和:lt) first() last() even() siblings() children() contents()也会选中文本节点 parent()直接父元素 parents()一直往上的每一个父元素集合，支持选择器来过滤 closest()
-* $.contains(parent, child)
+* jQuery对象
+  * 可认为是个HTML对象集合，用`[]`取出单个HTMLElement，无参get()变为真正的数组
+  * 设置它们的属性会应用到每一个数组元素，空集合也不报错
+  * 一些函数传一个参数是查询，传两个是修改；还有一些函数无参调用是查询，传参是修改
+  * 查询时若集合中有多个元素最好不要直接用，而是用.each(function(ndx){$(this)...})
+* 选择器
+  * 找不到时为`[]`
+  * 支持:has和:contains(相当于has-text) :input/text/password/submit/checked/selected表单元素
+  * 进一步选择：find(选择器/jQuery对象) filter(选择器/回调函数) map() next(支持选择器) nextAll() prev() eq(第几个) slice(替代:eq和:lt) first() last() even() siblings() children() contents()也会选中文本节点 parent()直接父元素 parents()一直往上的每一个父元素集合，支持选择器来过滤 parentsUntil(selector, filter) closest()
+* $.contains(parent, child) 检测不会包含parent
 * end()：链式调用时，假设前面调用了find()和css()，调用此函数后可返回最开始的对象上
 * text() html()：相当于textContent和InnerHTML，但重载接受返回string的回调，另外后者能自动执行script
-* css()：是计算后的值
-* is()：判断调用者与参数选择器是否相等，返回bool
+* css()：是计算后的值。设置：传{k:v}
+* is()：判断调用者与参数选择器是否相等
 * 操作类：hasClass() addClass() removeClass() toggleClass()
-* 操作属性：attr() removeAttr()。attr对应inline DOM属性，prop对应JS属性：prop('checked')->true，attr('checked')->'checked'（若有）
+* 操作属性：attr(属性名, 若有第二个参数则为设置否则为获取) removeAttr()
+  * attr对应inline DOM属性，prop对应JS属性：prop('checked')->true，attr('checked')->'checked'（若有）
 * data()：储存任意数据，能读取data-属性初始化，但储存时并不通过修改它
 * a.append(b)等于b.appendTo(a) prepend() after() insertAfter() before() remove()返回被删除的元素 detach()也是删除但保留原来绑定的事件 empty()清空子元素
 * add()：把元素添加到jQuery对象元素集合中；addBack()：链式调用中，假设调用了nextAll()和此方法，把最初的和后来选中的一起作为jQuery对象
 * clone()：复制元素，传true也复制事件
 * height()：是CSS计算后的值，是数字而不是'123px'这样，类似于原生的clientHeight；offset()相对于body顶端的偏离，position()相对于最近具有相对位置的父元素的距离；outerHeight(true)包含margin的高度
-* index()
-* $.parseHTML()
+* index() 相比于原生，能直接用于伪数组
+* 工具
+  * $.parseHTML()
+  * $.globaleval()
 * 插件系统：`$.fn.modal = function(){ ...; return this}; $.fn.modal.defaults设定默认值 $('div').modal()`
 * jQuery Tiny Pub/Sub插件：类似于C#概念上的事件
+* 当前版本：$.fn.jquery
+* 多版本共存时让出$和jQuery变量控制权：`const jQ = $.noConflict(true)`
 
 ## AJAX
 
 * 注意同源策略，以及https网页无法请求http的
 * JSONP：利用了script标签能跨域，但只能用于GET。先准备好回调函数，动态创建一个script标签添加到页面里，完
-* $.get getJSON getScript加载后就执行：第二个参数为object的查询字符串，第三个参数为成功后的回调但第二个参数不存在时也能作为第二个
+* $.get getJSON getScript加载后就执行。第二个参数为object的查询字符串，第三个参数为成功后的回调但第二个参数不存在时也能作为第二个
 * $.post：第二个参数是表单body
 * jqo.load()：把HTML文件加载到选择的元素中
 * $.ajax('url',settings).done(data=>...).fail((xhr,status)=>...).always(()=>xxx)
@@ -62,6 +71,15 @@
 * 自定义动画：animate()
 * 串行动画：中间用delay()暂停
 * 有的动画没有效果，比如对非block元素设置height就无效
+
+## 替代品
+
+* 本体90KB。slim版无ajax和动画，72KB，不用
+* https://github.com/nefe/You-Dont-Need-jQuery/blob/master/README.zh-CN.md 原生
+* fabiospampinato/cash NPM上叫cash-dom，17KB
+* https://umbrellajs.com/ 操作DOM和事件，有ESM版，8KB，最后更新2022年
+* https://blissfuljs.com/ 最后更新2019年，12KB
+* Zepto 不维护了
 
 # svelte
 
