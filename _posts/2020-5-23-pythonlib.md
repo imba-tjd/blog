@@ -946,6 +946,7 @@ await response(scope, receive, send)
 * https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com https://realpython.com/learning-paths/django-web-development/ https://appliku.com/post/django-project-tutorial-beginners-settings-docker https://appliku.com/post/django-rest-framework-openapi-3
 * 第三方中间件：WhiteNoise压缩静态文件
 * REST：django-rest-framework、django-ninja、djangorestframework-simplejwt
+* 基于Django的CMS：Wagtail、Django-CMS
 
 ```py
 # news/model.py
@@ -1585,7 +1586,6 @@ print(template.render(the="variables", go="here"))
 * 缓存：python-diskcache cacheout rafalp/async-caches
 * mkdocs mkdocs-material
 * ansible
-* Wagtail：基于Django的CMS
 * Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器；pyodide 编译到WA；PyScript 在html中引入一个script就能用
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium

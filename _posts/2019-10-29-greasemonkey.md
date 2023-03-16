@@ -21,7 +21,7 @@ title: 油猴
 // @exclude      优先于include
 // @match        一般写 *://*.xxx.com/path/*，对xxx.com/path也有效。https://open.chrome.360.cn/extension_dev/match_patterns.html
 // @require      https://xxx.com/xxx.min.js
-// @run-at       默认document-end即在html加载后、其它资源加载前执行。还可以是document-start或document-idle全部加载完，但只有end是保证可靠的，实测也确实如此。可给onload加handler，但注意下面setTimeout提到的坑
+// @run-at       默认document-end即在html加载后、其它资源加载前执行。还可以是document-start或document-idle全部加载完，但只有end是保证可靠的，idle设计上当外部资源长时间加载时会在end处加载脚本。若确实在idle时触发，则不应使用window.onload，因为它已经触发过了
 // @resource     resourceName url 在安装时下载一次到本地，之后通过API使用它不再需要下载
 // @noframes     无参，默认不启用，启用后在iframe里不会执行
 // ==/UserScript==
@@ -69,6 +69,7 @@ title: 油猴
 * https://violentmonkey.github.io/guide/using-modern-syntax/ 介绍了现代化的开发方式，提供了简单的JSX Runtime
 * 其他脚本站：https://openuserjs.org/ https://www.userscript.zone https://userscripts-mirror.org/ 好像原站挂了
 * User Style：https://userstyles.org/ https://github.com/openstyles/stylus
+* 老版本Chrome内置了一部分userscript的支持，但后来越来越严格，尤其是原版Chrome。实测Cent可以添加
 
 ## 参考
 
