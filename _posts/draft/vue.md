@@ -1,6 +1,5 @@
 # Vue
 
-https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1978608648645902339
 https://vueschool.io/lessons/vue-3-component-naming-best-practices-in-vue
 https://vueschool.io/courses/reusable-vuejs-components-with-slots
 
@@ -14,7 +13,7 @@ v-pre v-once v-cloak v-is
 * 在一个.vue中写html css js
 * 使用者：import Cmp from './Comp.vue'，之后在template中就可以像使用HTML元素一样声明。组件命名规则一般为AxxBxx，HTML中对应axx-bxx
 * props：允许使用者传入参数给本组件
-* event：组件内发出，使用者添加处理程序后相当于信息由组件传出去了。无冒泡机制
+* event：组件内发出，使用者添加处理程序后相当于信息由组件传出去了
 * slot：使用者在content里的东西，会替换掉组件中的slot元素，slot如果有content则为默认值
 
 ```html
@@ -71,8 +70,8 @@ export default {
 
   components: { 子组件对象 }
 
-  mounted() {  // 生命周期钩子会在组件生命周期的各个不同阶段被调用。一般还有created
-    console.log(`The initial count is ${this.count}.`)
+  mounted() {  // 生命周期钩子会在组件生命周期的各个不同阶段被调用。还有created等
+    console.log(`The initial count is ${this.count}.`) // mounted可以访问this，一般放AJAX获取状态数据
   },
 
   watch() { ... } // 执行副作用
@@ -158,10 +157,12 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
   * 如要配合v-if，不应放在同一级，根据需要配合template元素
 * 事件
   * @等价于v-on:
-  * @click="js代码，或调用methods中的函数，无参时可不加括号"
+  * @click="调用methods中的函数，无参时可不加括号" 不支持行内直接写alert等
   * @keyup.enter="js" 按回车时触发
   * @submit.prevent 在form里按下button或回车时触发，但并不发出请求，只是方便将事件放在form元素上
   * .once 只触发一次
+  * .stop 阻止继续冒泡 .capture 阻止捕获
+  * .middle .right 点击中键 右键触发（还需配合oncontextmenu="return false"）
   * v-on:"object"
 * 透传
   * 对于组件，若只有一个根元素，使用时加在上面的非props或emits的attr，会直接合并添加到根元素上
