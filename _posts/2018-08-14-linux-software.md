@@ -417,6 +417,10 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://uvnc.com/
 * https://remmina.org/ 不支持Win
 * https://github.com/quasar/Quasar
+* https://github.com/moonlight-stream
+* https://www.nomachine.com/
+* teamviewer、rustdesk、todesk、parsec、向日葵
+* 异地组网，之后可用微软远程桌面：蒲公英、ZeroTier、Tailscale
 
 ## TODO
 

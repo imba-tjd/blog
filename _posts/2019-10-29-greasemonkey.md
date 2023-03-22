@@ -76,3 +76,11 @@ title: 油猴
 * https://wiki.greasespot.net 中文参考：https://github.com/examplecode/tampermonkey-api-reference
 * TODO: 学习其他人是怎么写的 https://github.com/FirefoxBar/userscript https://github.com/hoothin/UserScripts https://github.com/mengzonefire/rapid-upload-userscript https://github.com/Tsuk1ko/userscript https://www.youxiaohou.com/
 * violentmonkey现在仍在更新
+
+# 浏览器扩展
+
+* https://open.chrome.360.cn/extension_dev/overview.html
+* https://developer.chrome.com/docs/extensions/
+* 如何从零开始写一个 Chrome 扩展？ https://www.zhihu.com/question/20179805
+* https://developer.mozilla.org/zh-CN/docs/Mozilla/Add-ons/WebExtensions
+* https://dev.to/scleriot/build-a-firefox-extension-step-by-step-5dbl
