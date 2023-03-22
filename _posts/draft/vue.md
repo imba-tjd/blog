@@ -1,20 +1,21 @@
 # Vue
 
-https://vueschool.io/lessons/vue-3-component-naming-best-practices-in-vue
-https://vueschool.io/courses/reusable-vuejs-components-with-slots
-
+https://vueschool.io/lessons/fake-scoped-slots-with-functions
 https://vueschool.io/courses/vue-router-4-for-everyone
 https://www.vuemastery.com/courses/touring-vue-router/vue-router-introduction/
 
 v-pre v-once v-cloak v-is
 
-## 单文件组件SFC
+https://cn.vuejs.org/guide/essentials/forms.html
 
-* 在一个.vue中写html css js
+## 组件
+
+* 单文件组件SFC：在一个.vue中写html css js
 * 使用者：import Cmp from './Comp.vue'，之后在template中就可以像使用HTML元素一样声明。组件命名规则一般为AxxBxx，HTML中对应axx-bxx
 * props：允许使用者传入参数给本组件
 * event：组件内发出，使用者添加处理程序后相当于信息由组件传出去了
-* slot：使用者在content里的东西，会替换掉组件中的slot元素，slot如果有content则为默认值
+* slot：使用者在content里的东西，会替换掉组件中的slot元素。创建者的slot如果有content则为默认值
+  * 命名slot：创建者给slot加name attr，使用者在content里的template上加 v-slot:名称 或 #名称 对应
 
 ```html
 <script>
@@ -157,12 +158,16 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
   * 如要配合v-if，不应放在同一级，根据需要配合template元素
 * 事件
   * @等价于v-on:
-  * @click="调用methods中的函数，无参时可不加括号" 不支持行内直接写alert等
-  * @keyup.enter="js" 按回车时触发
-  * @submit.prevent 在form里按下button或回车时触发，但并不发出请求，只是方便将事件放在form元素上
-  * .once 只触发一次
-  * .stop 阻止继续冒泡 .capture 阻止捕获
-  * .middle .right 点击中键 右键触发（还需配合oncontextmenu="return false"）
+  * @click="简单js代码如count++。或调用methods中的函数，无参时可只写方法名"
+    * 不支持行内直接写alert等
+    * 只写方法名时handler具有event参数，.target访问到绑定的DOM元素
+    * 内联调用函数时可用`$event`访问event参数，或创建具有event参数的箭头函数
+  * 事件修饰符
+    * @submit.prevent 在form里按下button或回车时触发，但并不发出请求，只是方便将事件放在form元素上
+    * .once 只触发一次 .stop 阻止继续冒泡 .capture 使用捕获模式
+    * .self 只有target是自己时才触发
+  * 按键修饰符：@keyup.enter="js" 按回车时触发。还有tab delete esc space等
+  * 鼠标修饰符：.middle .right 右键还需配合oncontextmenu="return false"
   * v-on:"object"
 * 透传
   * 对于组件，若只有一个根元素，使用时加在上面的非props或emits的attr，会直接合并添加到根元素上
@@ -191,6 +196,9 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
     data() { ...}
   }).mount('#app')
 </script>
+
+另一种模板：<script type="text/x-template" id="xxx">模板内容</script> 或用template元素。注册组件时指定template:"#xxx"。无法加载自外部js
+一种加载外部模板的方法：用ajax获取，赋给组件的template属性
 ```
 
 ### app
@@ -203,7 +211,7 @@ console中用$vm0也能访问到第一个app
 
 ### TS
 
-* 对单文件组件类型检查：vue-tsc --noEmit
+* 编译SFC：vue-tsc，仅类型检查：--noEmit
 
 ## vite
 
@@ -247,7 +255,6 @@ https://github.com/fi3ework/vite-plugin-checker
 
 ## 暂时不看的
 
-https://cn.vuejs.org/guide/essentials/event-handling.html
 https://cn.vuejs.org/examples/
 
 https://vueschool.io/courses/application-monitoring-in-vue-js-with-sentry
