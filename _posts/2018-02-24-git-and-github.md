@@ -167,6 +167,7 @@ title: Git/GitHub笔记
 
 ```bash
 git stash
+git stash push或-- 单个文件
 git checkout [branchname]
 git stash pop
 git checkout stash@{n} -- file-path # 从stash中拿出某一个文件
@@ -251,9 +252,11 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 ### SSH
 
 1. ssh-keygen -t ed25519 -C "email@example.com"
-2. cat ~/.ssh/id_rsa.pub | clip （Win自带）
+2. cat ~/.ssh/id_ed25519.pub
 3. 把密钥添加到GitHub账户里去
-4. ssh -T git@gitlab.com
+4. ssh -T git@github.com
+  * 公钥指纹：https://docs.github.com/zh/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints
+  * 对于GitHub，即使成功了，exitcode也为1
 
 ## Oh My Zsh Alias
 

@@ -78,15 +78,13 @@ except ImportError:
 ### setuptools
 
 * 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
-* pip的包名与模块无关
 * python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install，命令行接口还会产生可能存在编码问题的xxx-script.py；不存在--static-deps参数
 * twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
 * pip install .：仍需wheel包；可以识别setup.py和那个toml，已安装了也能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe；pip install --force-reinstall才是重新安装，不能用-f，那是另一个参数的简写
 * pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py和wheel包，-v显示依赖安装过程，-vv显示pyx处理过程；注意不是python -m wheel
 * pip download：理论功能是下载包及其依赖方便离线安装，实际遇到非whl又需要构建的包时会去构建但最后结果却又是源码包，最好干脆不用
-* 还有一个pbr模块可用在setup_requires，好像能从requirements.txt自动生成依赖
 * 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
-* MANIFEST.in额外控制sdist的内容，默认包含和不包含：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
+* MANIFEST.in额外控制sdist的内容，一般就是`include 文件名; recursive-include 文件夹名 *`：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
 * 使用包内数据：importlib.resources.files("mypkg")/"data/data.csv" https://importlib-resources.readthedocs.io/en/latest/using.html；单个py_modules无法使用
 * 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
 * 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
@@ -96,15 +94,15 @@ except ImportError:
 
 ```py
 # __init__.py；必须有此文件才能自动发现
-from impl import fun # 从实现中公开函数
-__version__ = '0.0.1' # 默认0.0.0
+from impl import fun
+__version__ = '0.0.1'
 __all__ = ('fun',) # 在被import *时如果存在此字段，只会导入它指定的，help也只能看到这些
 
 # __main__.py
 from . import xxx
 def _main(): # 即使不存在__all__也不会被import *
     xxx()
-if __name__ == '__main__': # 理论上本文件就是设计成直接运行的，但保不齐被别人import
+if __name__ == '__main__':
     _main()
 
 # setup.py：https://packaging.python.org/guides/distributing-packages-using-setuptools/
@@ -124,22 +122,21 @@ setuptools.sandbox.run_setup('setup.py', [args]/sys.argv[1:]) # 非命令行运�
 verbose=1
 
 [metadata]
-name = xxx
+name =
 version = attr: mypkg.__version__
-author = xxx
-author_email = xxx
-description = xxx
+author =
+author_email =
+description =
 long_description = file: README # long_description_content_type = text/markdown
 keywords = one, two
 license = MIT # license_file = LICENSE 3rdparty/*.txt （多个需换行）
-url = xxx
+url =
 platform = any
 classifiers = # https://pypi.org/pypi?%3Aaction=list_classifiers
     Development Status :: 5 - Production/Stable # 3 - Alpha
-    Intended Audience :: Developers
     License :: OSI Approved :: MIT License
     Operating System :: OS Independent
-    Programming Language :: Python :: 3
+    Programming Language :: Python :: 3 :: Only
     Topic :: Internet :: WWW/HTTP
 project_urls =
     Bug Tracker = https://github.com/user/repo/issues
@@ -152,7 +149,7 @@ package_dir = # 假设包的目录在src下，find:会在指定目录下寻找
 install_requires =
     requests;python_version<'3.4' # https://www.python.org/dev/peps/pep-0508/
     pywin32 >= 1.0;platform_system=='Windows' # 还有platform_machine=='x86_64'
-python_requires = >=2.7, !=3.0.*
+python_requires = >=3.8
 scripts =
     bin/script
     scripts/script
@@ -177,20 +174,16 @@ exclude = tests
 hello = *.msg
 
 [bdist_wheel] # 对应verb的开关
-universal = True # 能在py2和3上不做任何改变就运行且无C扩展才能开，命名上是py2.py3-none-any
-
 [build_ext]
-compiler=mingw32
-inplace=1
 
 # pyproject.toml
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
-https://www.python.org/dev/peps/pep-0518/
-https://github.com/takluyver/flit
-https://www.python.org/dev/peps/pep-0621/
-https://pypa-build.readthedocs.io/en/latest/
+https://setuptools.pypa.io/en/latest/userguide/quickstart.html
+https://betterprogramming.pub/a-pyproject-toml-developers-cheat-sheet-5782801fb3ed
+https://godatadriven.com/blog/a-practical-guide-to-setuptools-and-pyproject-toml/
+https://pypa-build.readthedocs.io/en/latest/ 相当于sdist和bdist_wheel，只不过不限于setuptools
 版本支持upper bound限定，不会修改最左边的非0数字：^0.1.11能更新到0.1.19但不会到0.2.0
 
 # ~/.pypirc；chmod 600
@@ -455,11 +448,11 @@ etree.tostring(root, encoding="unicode") # 此处的encoding是避免编码为�
 root.iter() # 递归遍历所有子节点，可选指定tag名
 root.index(c) # c在root中的位置，原版没有
 
-etree.parse('filename'/file-like-obj) # 返回tree，用.getroot()获得根Element；子元素用.getroottree()获得tree
+etree.parse('filename'/filelike) # 返回tree，用.getroot()获得根Element；子元素用.getroottree()获得tree
 etree.fromstring('xml literal') # 返回Element，基本相当于etree.XML()
 etree.dump(root) # 格式化输出到sysout，应仅用于调试；没有html.dump。原版手动格式化要用xml.dom.minidom.parseString().toprettyxml(indent="  ")
 etree.xmlfile() # 类似于open()，用于流式创建xml，原版没有
-ET.canonicalize('xml literal', out=file-like-obj) # 以低自由度的方式写入文件，更规范
+ET.canonicalize('xml literal', out=filelike) # 以低自由度的方式写入文件，更规范
 tree.write('filename', encoding="unicode") # 还有method='html'
 
 html.fromstring() # 尝试同时处理document和fragment
@@ -510,8 +503,8 @@ cookies.set(k,v,domain,path) # 类型是RequestsCookieJar，但也可以传dict�
 * url必须要有scheme；必须每次写完整url，要不就用requests_toolbelt提供的BaseUrlSession
 * get的params会自动变成查询参数，且值为None的不会附加上去
 * post的data和json传dict（json还可以是list）会自动编码并设置Content-Type，前者是form
-* 传字符串给data是设置body，不要传字符串给json；data还支持file-like-obj且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
-* post支持files={'filefield': file-like-obj-bin}，requests-toolbelt提供了更多功能
+* 传字符串给data是设置body，不要传字符串给json；data还支持filelike且支持流式处理，文件记得以rb打开；data还支持生成器，则会传输分块编码
+* post支持files={'filefield': filelike-bin}，requests-toolbelt提供了更多功能
 * RFC 2616规定如果Content-Type没指定编码且类型是text/*，那就用ISO-8859-1；又不过RFC 7231去掉了这个限制
 
 ```py
@@ -879,7 +872,7 @@ def test_homepage():
         response = client.get("/")
         assert response.status_code == 200
 
-# 手动模拟FileResponse，必须先全部读完再包装成file-like-obj，且不具有ETag和Content-Length且不会自动猜测media_type
+# 手动模拟FileResponse，必须先全部读完再包装成filelike，且不具有ETag和Content-Length且不会自动猜测media_type
 def myfile(_):
     with open('test.txt', 'rb') as f:
         return StreamingResponse(io.BytesIO(f.read()))
@@ -932,66 +925,30 @@ response = Response(content)
 await response(scope, receive, send)
 ```
 
-### Django
+## WSGI
 
-* MTV框架：Model-Template-View
-* manage.py与django-admin命令行做的事一样，只是manage.py还设定了settings的位置。当使用单一项目只有一个设置时，用manage.py更方便
-* 创建项目：django-admin startproject mysite .
-* 运行：python manage.py runserver 会自动重载
-* 创建应用：manage.py startapp news
-* 创建数据库：manage.py makemigrations; migrate。查看会执行什么sql语句：sqlmigrate news 0001
-* 交互式命令行：manage.py shell
-* 创建管理员账号：manage.py createsuperuser
-* 准备部署：manage.py check --deploy
-* https://www.liujiangblog.com/course/django/ https://tutorial.djangogirls.org/zh/ https://www.fullstackpython.com https://realpython.com/learning-paths/django-web-development/ https://appliku.com/post/django-project-tutorial-beginners-settings-docker https://appliku.com/post/django-rest-framework-openapi-3
-* 第三方中间件：WhiteNoise压缩静态文件
-* REST：django-rest-framework、django-ninja、djangorestframework-simplejwt
-* 基于Django的CMS：Wagtail、Django-CMS
+* env是一个dict。它包含os.environ的副本。还加了REQUEST_METHOD、REMOTE_ADDR，除了Content-Type和Length以外的HTTP头以HTTP_的方式提供
+* body：env['wsgi.input'] 是filelike
+* wsgiref.util.request_uri(environ, include_query=True)
 
 ```py
-# news/model.py
-from django.db import models
-class Article(models.Model):
-    name = models.CharField(max_length=10)
-    text = models.TextField()
-# news/admin.py 管理面板
-from django.contrib import admin
-from . import models
-admin.site.register(models.Article)
-# news/views.py
-from django.shortcuts import get_object_or_404, render
-def index(request):
-    return django.http.HttpResponse("Hello, world. You're at the polls index.")
-    # HttpResponseRedirect(reverse('链接名', args=(xxx.id,)))
-def year_archive(request, year):
-    a_list = Article.objects.filter(pub_date__year=year)
-    context = {'year': year, 'article_list': a_list}
-    # o = get_object_or_404(Person, pk=art_id) # 如果不存在则自动返回404
-    return render(request, 'news/year_archive.html', context) # 会去渲染mysite/news/templates/news/year_archive.html
-request：method如"POST"、POST字典
-# news/urls.py
-from django.urls import path
-from . import views
-urlpatterns = [path('', views.index, name='index')]
-# path('articles/<int:year>/', views.year_archive) # 会调用news.views.year_archive(request, year=2005)
-# mysite/urls.py
-from django.urls import include, path
-urlpatterns = [
-    path('news/', include('news.urls')), # 用于引用其它urls
-    path('admin/', admin.site.urls), # 应总是使用include()，admin是唯一例外
-]
-# mysite/settings.py
-INSTALLED_APPS = ['news.apps.NewsConfig']
-# 使用model
-p = Article(name=xxx); p.save()
-Article.objects.all()/get(id=1/name__startswith=xxx/name__contains=xxx)/filter()
+from wsgiref.simple_server import make_server
+from wsgiref.types import * # 3.11，目前几乎无用
+
+def app(env:WSGIEnvironment, start_resp:StartResponse, /) -> Iterable[bytes]:
+    resp_headers = [('Content-type', 'text/plain; charset=utf-8')]
+    start_resp('200 OK', resp_headers)
+    return [b'hello world']
+
+from wsgiref.validate import validator # 中间件，检测一些常见的实现错误
+app = validator(app)
+
+with make_server('', 8000, app) as httpd:
+    httpd.serve_forever()
+
+wsgiref.headers.Headers：方便创建返回的header，类似于dict，大小写不敏感，基本没用
+wsgiref.util.FileWrapper(filelike, 分块大小默认8KB) 将文件对象转换为Iterable
 ```
-
-#### 模板
-
-* url语句：读取urlpatterns中的name，并在行内传参构建url，避免硬编码
-* load static和static语句：以每个应用下的static文件夹作为基础路径获得静态文件的路径，其中推荐再写一遍应用名。部署时推荐设置STATIC_ROOT，运行manage.py collectstatic就会把所有应用的静态文件都复制到那个文件夹中
-* csrf_token：放在form里
 
 ## ORM和数据库
 
@@ -1442,51 +1399,6 @@ table.schema
 client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ```
 
-## Jinja3
-
-### 模板
-
-* `{% ... %}`语句，需要`{% endxxx %}`结束
-  * 循环：`{% for e in arr/range [if ...] %} <li><a href="{{e.a}}">{{e.b}}</a></li>`，默认不支持break和continue。内部可用loop变量，如index0、previtem
-  * 测试：if age is equalto 5
-  * 原始文本：raw
-  * 赋值：set a = 1。顶层的可导出
-  * 导入：import 'xxx.html' as xxx，之后作为变量使用
-  * 包含：include 'xxx.html'，渲染此模板内容并显示，默认会导入上下文
-  * 默认情况下，模板标签产生的空行会去除，普通空格会保留。在%旁加+或-可控制其行为
-  * 宏：类似于函数
-* `{{ ... }}`表达式
-  * 变量可用a.b代替a['b']
-  * 引用静态文件路径：`src="{{ url_for('static', filename='js/index.js') }}"`
-* `{# ... #}`注释
-* filter：变量后加|
-  * default：当变量未定义时使用此函数提供的值，第二个参数允许变量评估为False时也使用
-  * join：参数是分隔符，可无参调用
-  * map
-  * tojson
-  * escape/e：当渲染可能含有html的文本时使用。但未来会默认转义，想不转义用safe
-  * format、length
-  * select
-  * slice
-* block语句和模板继承
-  * base中定义`block xxx`，结束块可选相同名称，里面的内容可为没有覆盖时的默认内容，在整个页面可随时用`{{self.xxx}}`引用
-  * 子模板第一行`extends "xxx.html"`，再也用`block xxx`覆盖内容；内部可用`{{super()}}`渲染父模板的内容，当多层继承时可链式调用
-  * 默认情况下块中不能访问外面的变量，因为替换后可能就变了；添加scoped修饰可传递变量
-  * 标记为required表示必须覆盖
-
-### API
-
-```py
-from jinja2 import Environment, PackageLoader, select_autoescape
-env = Environment(
-    loader=PackageLoader("yourapp"), # 会在yourapp/templates/中搜索，还可用FileSystemLoader('templates')
-    autoescape=select_autoescape(),
-    enable_async=True # 之后可用render_async
-)
-template = env.get_template("mytemplate.html")
-print(template.render(the="variables", go="here"))
-```
-
 ## 定时任务和任务队列
 
 * threading.Timer(秒数, fun[,args,kwargs]).start()：自带，非阻塞，只执行一次，不易管理
@@ -1517,6 +1429,21 @@ print(template.render(the="variables", go="here"))
 * 对于用户的每一次交互，整个脚本从头到尾执行一遍
 * 中文文档：http://cw.hubwiz.com/card/c/streamlit-manual/
 * streamlit run xxx.py/URL
+* 其它项目：pynecone
+
+## Docker镜像
+
+```dockerfile
+FROM python:3.11-slim # 或单纯的slim
+ENV PIP_NO_CACHE_DIR 1
+ENV PIP_DISABLE_PIP_VERSION_CHECK 1
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . . # 用上.dockerignore
+```
 
 ## 杂项
 
@@ -1586,7 +1513,7 @@ print(template.render(the="variables", go="here"))
 * 缓存：python-diskcache cacheout rafalp/async-caches
 * mkdocs mkdocs-material
 * ansible
-* Brython 在浏览器中运行的Py；Transcrypt Py2JS编译器；pyodide 编译到WA；PyScript 在html中引入一个script就能用
+* Brython 在浏览器中运行的Py，支持一部分标准库；~~Transcrypt Py2JS编译器~~；pyodide 编译到WA，支持第三方纯Py库；PyScript 基于Pyodide
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium
 * pyinstrument：使用简单的profile工具
