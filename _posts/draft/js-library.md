@@ -37,7 +37,7 @@
 ## AJAX
 
 * 注意同源策略，以及https网页无法请求http的
-* JSONP：利用了script标签能跨域，但只能用于GET。先准备好回调函数，动态创建一个script标签添加到页面里，完
+* JSONP：利用了script标签能跨域，但只能GET。先准备一个函数用来处理参数里的真正的内容，用JS动态创建一个script标签添加到页面里，在服务端的脚本里调用前面约定的函数
 * $.get getJSON getScript加载后就执行。第二个参数为object的查询字符串，第三个参数为成功后的回调但第二个参数不存在时也能作为第二个
 * $.post：第二个参数是表单body
 * jqo.load()：把HTML文件加载到选择的元素中
@@ -112,3 +112,7 @@ const app = new App({
 {#if xxx} {:else if xxx} {:else} {/if}
 {#each cats as cat} <p>{cat.name}</p> {/each}，as后也可以解构
 ```
+
+## 前端
+
+* sweetalert2
