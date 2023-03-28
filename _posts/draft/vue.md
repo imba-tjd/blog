@@ -3,8 +3,7 @@
 https://vueschool.io/lessons/fake-scoped-slots-with-functions
 https://vueschool.io/courses/vue-router-4-for-everyone
 https://www.vuemastery.com/courses/touring-vue-router/vue-router-introduction/
-
-v-pre v-once v-cloak v-is
+https://www.liujiangblog.com/course/Vue3/297
 
 https://cn.vuejs.org/guide/essentials/forms.html
 
@@ -183,6 +182,7 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
 ### 使用
 
 * 在浏览器中直接使用：不支持SFC，因为module强制检查MIME只能是JS类型，而SFC算text/html，无法导入
+  * v-cloak：当所在元素被挂载后移除，配合`[v-cloak] { display: none; }`避免“未编译模板闪现”
 * 构建：index.html有script引入main.js module，js里面import App.vue和css，调用createApp()
 
 ```html
@@ -246,12 +246,14 @@ https://github.com/fi3ework/vite-plugin-checker
 
 * NaiveUI
 * element plus
-* vuetify MD
+* vuetify MD风格
 * https://quasar.dev/ 用同一套代码同时开发桌面端和移动端应用
 * primefaces/primevue
 * balmjs/balm-ui 虽然贡献值少但提交数多
 * antoniandre/wave-ui 虽然贡献值少但提交数多
 * https://vuestic.dev/ 虽然贡献值少但提交数多
+* varlet MD风格
+* ant-design-vue
 
 ## 暂时不看的
 
