@@ -88,7 +88,7 @@ except ImportError:
 * 使用包内数据：importlib.resources.files("mypkg")/"data/data.csv" https://importlib-resources.readthedocs.io/en/latest/using.html；单个py_modules无法使用
 * 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
 * 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
-* --global-option "-a" --install-option "-b"相当于setup.py -a install -b
+* --global-option "-a" --install-option "-b"相当于setup.py -a install -b。现在global-option被pip废弃了，改用--config-settings
 * --no-build-isolation：目前版本的pip在构建时会自动创建虚拟环境，导致即使系统中存在满足依赖的包也不会去使用，此参数禁用这一行为
 * 当setup.py不存在时，可使用python -m build --sdist生成压缩包，但build这个包不自带
 
@@ -1404,7 +1404,7 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * threading.Timer(秒数, fun[,args,kwargs]).start()：自带，非阻塞，只执行一次，不易管理
 * sched：自带，使用麻烦
 * dbader/schedule：every(10).minutes/every().hour.do(fun) 轻量无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
-* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455
+* celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455 。kombu：也是celery出的，messaging
 * rq：使用redis的任务队列，比celery简单
 * huey：peewee作者出的，支持redis,sqlite,in-memory的任务队列
 * dramatiq：需用redis或rabbitmq
@@ -1434,7 +1434,7 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ## Docker镜像
 
 ```dockerfile
-FROM python:3.11-slim # 或单纯的slim
+FROM python:3.11-slim # 或单纯的slim。没有git
 ENV PIP_NO_CACHE_DIR 1
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONUNBUFFERED 1

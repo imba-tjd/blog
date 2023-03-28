@@ -132,6 +132,7 @@ title: Git/GitHub笔记
   * 默认会把修改了的内容都显示出来，用--stat只显示文件和变化行数，用于获取比git status更多的信息
   * --check：检查行尾有没有多余的空白
   * --name-only --diff-filter=U显示冲突文件列表
+  * git diff-index --stat HEAD 显示更改了的文件，增加删除数
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
 * git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录
 * git bundle create repo.bundle HEAD/master可以把当前分支（可同时指定多个分支）整个打包成一个二进制文件，之后路径可以直接当作仓库fetch和clone

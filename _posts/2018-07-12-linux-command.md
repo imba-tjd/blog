@@ -99,7 +99,7 @@ title: Linux命令
 ### 压缩/解压
 
 * unar：自动正确解压非Unicode的zip，可惜最后更新时间2015年
-* unzip：不自带，最后更新时间2009年
+* unzip：不自带，最后更新时间2009年，不支持读取stdin
 * 分卷zip，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
 * unrar：是rar官方的，但在non-free中
@@ -108,7 +108,7 @@ title: Linux命令
 * lzip：后缀 .lz，仅使用LZMA非2
 * lz4：压缩率比zip低，默认级别为-1，解压速度非常快，用--best会大幅减慢压缩速度且压缩率一般但解压速度不变，-BD增大压缩率。官方CLI是单核的
 * zstd：后缀 .zst，速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0
-* brotli：后缀 .br，默认已使用最高压缩级别，根据测试，平均不如zstd，仅在单线程下br好一点
+* brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点
 
 #### tar
 

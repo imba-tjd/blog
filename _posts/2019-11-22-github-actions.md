@@ -113,7 +113,7 @@ ${{ github.workspace }}
 
 ## 环境
 
-* 软件环境：https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md gcc是11，clang是12
+* 软件环境：https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md
 * 环境变量：https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables 在某一步骤中写入以供后续使用 `echo k=v >> $GITHUB_ENV`
 * 直接使用apt必须加sudo，但在容器里就必须不用
 * win自带nuget，但不自带msbuild的可执行文件，要用microsoft/setup-msbuild；dotnet msbuild好像不能用于fx的

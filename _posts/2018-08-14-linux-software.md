@@ -14,6 +14,7 @@ category: linux
 * apt-mark hold/unhold <pkgname>：锁定/解锁版本，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
 * 使用前最好安装一下gnupg2（apt-key需要）、apt-transport-https、ca-certificates
 * apt edit-sources
+* -s(simulation)/--dry-run
 
 ### 软件列表
 
