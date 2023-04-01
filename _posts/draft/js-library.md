@@ -113,6 +113,53 @@ const app = new App({
 {#each cats as cat} <p>{cat.name}</p> {/each}，as后也可以解构
 ```
 
+## tinyhttp
+
+* 原生TS，类Express
+
+```js
+npm i @tinyhttp/app @tinyhttp/logger
+
+import { App } from '@tinyhttp/app'
+import { logger } from '@tinyhttp/logger'
+
+const app = new App({
+  noMatchHandler: (req, res) => res.status(404).end('Not found')
+})
+app.use(logger())
+
+app.get('/', (_, res) => void res.send('Hello World'))
+
+app.get('/page/:page/', (req, res) => {
+    res.status(200).send(`
+    ${req.url},
+    ${JSON.stringify(req.params, null, 2)}
+  `)
+})
+
+app.listen(3000)
+
+Middleware: app.use([path,] handler)
+path:
+  同一级的path不是按顺序的，而是按最长匹配的
+  参数和后缀：/:title.(mp4|mov)、可选：/:title?、通配：*、正则对象。放在req.params里
+  app.route('/prefix')
+handler: (req, res, next) => { ...; next(); } 支持async，但send()不是async的，只能用于readFile等
+new App({
+    onError: (err, req, res) => { 500 },
+    settings: { // 或app.enable('xxx')
+        networkExtensions: true // 添加req.protocol hostname ip
+        xPoweredBy: true
+        enableReqRoute: true
+    }
+})
+app.locals、req.locals 不同生命周期的自定义属性
+Mount子App：app.use(subapp)
+模板引擎：https://eta.js.org/
+静态文件：https://github.com/vercel/serve-handler
+Session：https://github.com/expressjs/session
+```
+
 ## 前端
 
 * sweetalert2
