@@ -110,6 +110,11 @@ title: 浏览器
 * Quantum：https://addons.mozilla.org/zh-CN/firefox/addon/quantum-launch/
 * Rainbow Blur：https://addons.mozilla.org/zh-CN/firefox/addon/rainbow-blur-1
 
+### 在容器中运行，网页端访问
+
+* https://github.com/jlesage/docker-firefox
+* https://hub.docker.com/r/linuxserver/firefox
+
 ## Chrome
 
 * https://static.centbrowser.cn/win_stable/
