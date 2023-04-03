@@ -308,4 +308,4 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 
 * https://zhuanlan.zhihu.com/p/35979897
 * https://docs.microsoft.com/zh-cn/visualstudio/msbuild/msbuild-concepts
-* PackageReference的PrivateAssets="All"
+* PackageReference的PrivateAssets="All"表示仅用于开发依赖。无需设置IncludeAssets，默认all
