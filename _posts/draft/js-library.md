@@ -75,7 +75,7 @@
 ## 替代品
 
 * 本体90KB。slim版无ajax和动画，72KB，不用
-* https://github.com/nefe/You-Dont-Need-jQuery/blob/master/README.zh-CN.md 原生
+* 原生：https://github.com/nefe/You-Dont-Need-jQuery/blob/master/README.zh-CN.md https://youmightnotneedjquery.com/ https://blog.garstasio.com/you-dont-need-jquery/
 * fabiospampinato/cash NPM上叫cash-dom，17KB
 * https://umbrellajs.com/ 操作DOM和事件，有ESM版，8KB，最后更新2022年
 * https://blissfuljs.com/ 最后更新2019年，12KB
@@ -113,7 +113,7 @@ const app = new App({
 {#each cats as cat} <p>{cat.name}</p> {/each}，as后也可以解构
 ```
 
-## tinyhttp
+# tinyhttp
 
 * 原生TS，类Express
 
