@@ -262,7 +262,10 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * https://github.com/MichalStrehovsky/bflat 删去lib里的Linux和arm64，不要删pdb
 * bflat build src.cs lib.cs -Ot或-Os --no-debug-info --no-globalization --no-reflection --no-stacktrace-data --no-exception-messages
 * 支持C#10的“顶级语句”
-* 如果源文件没有Main，自动视为库生成dll，导出函数要指定`[UnmanagedCallersOnly(EntryPoint="xxx")]`，异常必须捕获，之后可当作C函数调用。若用在另一个bflat的cs中，要用-i:库名 --ldflags:库名.lib
+* 如果源文件没有Main，自动视为库生成dll
+* 导出函数给Native调用：`[UnmanagedCallersOnly(EntryPoint="xxx", CallConvs=new[]{typeof(CallConvCdecl)})]`
+  * 必须捕获异常，CallConvs在Win下默认为stdcall，只能为static函数，参数必须是blittable的，不能有泛型
+  * 在另一个bflat的cs中使用：-i:库名 --ldflags:库名.lib
 * 仅x64，不支持csproj但可以不加源文件名表示CWD所有cs文件
 
 ## csc
