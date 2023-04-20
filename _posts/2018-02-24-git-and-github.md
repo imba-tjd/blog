@@ -64,7 +64,7 @@ title: Git/GitHub笔记
 * git revert --no-edit pushed：在当前分支上创建一个撤销pushed分支最后一次更改的更改，总之此命令只跟单个提交，不是进行比较。若要在一个提交中撤销多个，可以`git revert --no-commit HEAD~n..`再手动提交；也可以先hard reset到要撤销的提交前，再soft reset要撤销的提交后，再commit
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup refspec：把add了的自动写提交信息作为指定refspec的修正，之后rebase -i --autosquash自动把这些提交放到合适的位置合并
-* git checkout -- filename：将staged的文件恢复到local中，未add那个文件或加了refspec时就相当于hard reset；git reset -- filename：将已提交的文件覆盖到staged中，相当于unadd。新文件不用担心消失，会报错。实际上不加--也能生效，导致可能与分支弄混。现在被git restore --source=refspec f d替代，默认--worktree对应checkout，--staged对应reset，两者同时用对应hard reset
+* git checkout -- filename/.：将staged的文件恢复到local中，未add那个文件或加了refspec时就相当于hard reset；git reset -- filename：将已提交的文件覆盖到staged中，相当于unadd。新文件不用担心消失，会报错。实际上不加--也能生效，导致可能与分支弄混。现在被git restore --source=refspec f d替代，默认--worktree对应checkout，--staged对应reset，两者同时用对应hard reset
 * git reset --hard upstream/master：好像会重新完整释放一遍？如果是就很耗资源
 * 如果reset的不是当前分支，则会进入分离模式
 * 找回删掉了的文件：一般先用git rev-list -n 1 HEAD -- file_path找到删除那个文件的commit，再用refspec^

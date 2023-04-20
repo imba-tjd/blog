@@ -1510,7 +1510,7 @@ COPY . . # 用上.dockerignore
 * NLTK：自然语言处理
 * https://github.com/jpadilla/pyjwt
 * memcached：pymemcache pylibmc
-* 缓存：python-diskcache cacheout rafalp/async-caches
+* 缓存：python-diskcache cacheout rafalp/async-caches cachetools（提供支持TTL的类dict）
 * mkdocs mkdocs-material
 * ansible
 * Brython 在浏览器中运行的Py，支持一部分标准库；~~Transcrypt Py2JS编译器~~；pyodide 编译到WA，支持第三方纯Py库；PyScript 基于Pyodide
