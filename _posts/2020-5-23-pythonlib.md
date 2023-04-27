@@ -448,7 +448,8 @@ etree.tostring(root, encoding="unicode") # 此处的encoding是避免编码为�
 root.iter() # 递归遍历所有子节点，可选指定tag名
 root.index(c) # c在root中的位置，原版没有
 
-etree.parse('filename'/filelike) # 返回tree，用.getroot()获得根Element；子元素用.getroottree()获得tree
+parser = etree.XMLParser(resolve_entities=False, no_network=True) # 禁用外部实体防止XXE攻击。需验证XMLSchema时不可禁用网络
+etree.parse('filename'/filelike, parser) # 返回tree，用.getroot()获得根Element；子元素用.getroottree()获得tree
 etree.fromstring('xml literal') # 返回Element，基本相当于etree.XML()
 etree.dump(root) # 格式化输出到sysout，应仅用于调试；没有html.dump。原版手动格式化要用xml.dom.minidom.parseString().toprettyxml(indent="  ")
 etree.xmlfile() # 类似于open()，用于流式创建xml，原版没有
