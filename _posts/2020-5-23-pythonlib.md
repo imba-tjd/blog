@@ -1527,3 +1527,4 @@ COPY . . # 用上.dockerignore
 * pyupgrade：自动把老版本语法更新到新版本，但条目不多
 * https://hatch.pypa.io/latest/ 包管理
 * https://tox.wiki/en/latest/
+* https://github.com/charliermarsh/ruff An extremely fast Python linter, written in Rust.

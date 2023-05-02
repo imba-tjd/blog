@@ -169,7 +169,8 @@ add_executable(hello main.cpp utils.cpp)
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain
 * https://musl.cc/
-* __MINGW64_VERSION_MAJOR定义了它自己的版本
+* https://www.ed-x.cc/manual.html 优化了某些工具的性能
+* __MINGW64_VERSION_STR定义了它自己的版本
 
 ### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
 

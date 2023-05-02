@@ -446,7 +446,7 @@ collapsable content
 * type:symbo 搜索成员
 * 考虑屏蔽js.sentry-cdn.com因为太慢了
 * 精确代码智能感知：Go、TS/JS、C/C++、Java，需要上传LSIF数据
-* 类似网站：https://grep.app/ 很快但只索引一部分仓库
+* 类似网站：https://grep.app/ 很快但只索引一部分仓库。https://bloop.ai 桌面端，带有AI解释代码库
 
 ## Copilot
 
