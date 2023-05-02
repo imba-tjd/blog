@@ -35,7 +35,7 @@ export default {
 
 ```html
 <script>
-export default {
+export default { // TS加defineComponent()
   data() {  // 它返回的对象作为响应式的状态，暴露在this上
     return {
       count: 0
@@ -111,9 +111,11 @@ interface Props {
   foo: string
   bar?: number
 }
-const props = defineProps<Props>() // 此函数无需导入。js版用defineProps({foo: String})
+const props = defineProps<Props>() // 此函数无需导入。Props也可以行内写，不能从别的文件导入。定义默认值要再包一个withDefaults
 
-const emit = defineEmits(['event1'])
+const emit = defineEmits<{
+  (e: 'event1', val: number): void
+}>()
 function trigger_ev1(ev: Event) { emit('event1', 123) }
 </script>
 ```
@@ -176,7 +178,7 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
 ## 安装
 
 * 浏览器调试扩展：https://devtools.vuejs.org/
-* 创建脚手架：npm init vue@latest，会交互式安装一些组件。然后手动进入创建的项目文件夹，npm install
+* 创建脚手架：npm create vue@latest，会交互式安装一些组件。然后手动进入创建的项目文件夹，npm install
 * 运行：npm run dev。生产环境输出到dist中：npm run build
 
 ### 使用
