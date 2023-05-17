@@ -745,7 +745,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## jupyter
 
-* pip install notebook 目前7正在开发，安装时加--pre，仍会装上jupyterlab。不要直接装jupyter否则依赖太多。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了
+* pip install notebook 目前7正在开发，安装时加--pre，仍会装上jupyterlab。不要直接装jupyter否则依赖太多。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了。VSC只要装ipykernel即可
 * jupyter notebook --no-browser; jupyer run xxx.ipynb
 * 会往`%AppData%\jupyter`里写东西，但在商店版Python里会装到隔离区里
 * Docker映像：https://jupyter-docker-stacks.readthedocs.io/
@@ -754,12 +754,11 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 ### 配置
 
 * jupyter notebook --generate-config 在 ~/.jupyter/jupyter_notebook_config.py 下生成默认配置。jupyter server也有此命令
-* c.NotebookApp.notebook_dir：启动目录（好像也是运行时的根目录）
-* c.NotebookApp.open_browser = False
-* c.NotebookApp.ip = '*'
-* c.NotebookApp.port = 8888
-* 密码：c.NotebookApp.allow_password_change=False，命令行jupyter notebook password输入密码（无回显）会在.jupyter中生成一个json，设置c.NotebookApp.password为里面的值即可
-* 在反代之后需要配置`NotebookApp.allow_remote_access`或`c.NotebookApp.allow_origin`，否则会报`Blocking Cross Origin API request`或`Blocking request with non-local 'Host'`；`/api/kernels/`和`/terminals/`需要配websocket，各种配置中都设置了`Host`
+* c.ServerApp.root_dir：启动目录、运行时候的根目录
+* c.JupyterNotebookApp.open_browser = False
+* c.ServerApp.ip = '*'; c.ServerApp.port = 8888
+* 添加密码：c.NotebookApp.allow_password_change=False，命令行jupyter notebook password输入密码（无回显）会在.jupyter中生成一个json，设置c.NotebookApp.password为里面的值即可 TODO: 废弃了
+* 在反代之后需配置`c.ServerApp.allow_remote_access`或`c.ServerApp.allow_origin`，否则会报`Blocking Cross Origin API request`或`Blocking request with non-local 'Host'`；`/api/kernels/`和`/terminals/`需要配websocket，各种配置中都设置了`Host`
 
 ### 快捷键(H显示所有)
 
