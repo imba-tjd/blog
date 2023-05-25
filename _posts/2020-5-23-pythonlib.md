@@ -745,7 +745,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## jupyter
 
-* pip install notebook 目前7正在开发，安装时加--pre，仍会装上jupyterlab。不要直接装jupyter否则依赖太多。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了。VSC只要装ipykernel即可
+* pip install jupyter 目前7正在开发，安装时加--pre。之前只装notebook的依赖较少，现在仍会装上jupyterlab。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了。VSC只要装ipykernel即可
 * jupyter notebook --no-browser; jupyer run xxx.ipynb
 * 会往`%AppData%\jupyter`里写东西，但在商店版Python里会装到隔离区里
 * Docker映像：https://jupyter-docker-stacks.readthedocs.io/

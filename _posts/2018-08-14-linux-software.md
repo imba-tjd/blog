@@ -167,6 +167,11 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 
 * gem install lolcat：彩虹颜色的管道输出
 
+## Dnf
+
+* install/autoremove/update/search
+* list installed
+
 ## 不在包管理器中的软件
 
 * [chafa](https://github.com/hpjansson/chafa)：在终端中显示图像，支持gif，不过是像素化显示的
