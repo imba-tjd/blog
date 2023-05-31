@@ -111,7 +111,7 @@ interface Props {
   foo: string
   bar?: number
 }
-const props = defineProps<Props>() // 此函数无需导入。Props也可以行内写，不能从别的文件导入。定义默认值要再包一个withDefaults
+const props = defineProps<Props>() // 此函数无需导入。Props也可以行内写。定义默认值要再包一个withDefaults
 
 const emit = defineEmits<{
   (e: 'event1', val: number): void
@@ -264,3 +264,4 @@ https://cn.vuejs.org/examples/
 https://vueschool.io/courses/application-monitoring-in-vue-js-with-sentry
 https://vueschool.io/courses/javascript-testing-fundamentals
 https://www.vuemastery.com/courses/vue3-forms/base-input https://www.vuemastery.com/courses/validating-vue3-forms/why-vee-validate/
+https://cn-vuejs-challenges.netlify.app/
