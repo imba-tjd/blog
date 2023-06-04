@@ -178,6 +178,8 @@ LOAD DATA LOCAL INFILE 'data.txt' INTO TABLE tb1;
 
 ## DDL
 
+* MSSQL不支持所有的IF NOT EXISTS
+
 ### TABLE
 
 * 临时表
@@ -206,10 +208,10 @@ LOAD DATA LOCAL INFILE 'data.txt' INTO TABLE tb1;
 * 查询表的元数据
   * MySQL：SHOW TABLES有哪些表; DESCRIBE tb1表的列和类型; SELECT TABLE()当前表？; SHOW CREATE TABLE创建表的SQL语句; CREATE TABLE tgttb LIKE srctb按指定表的结构创建另一个表
 * 只有MSSQL支持trailing comma TODO: 测试Select
-* MSSQL不支持所有的IF NOT EXISTS
 * UNIQUE的列，其它数据库都允许存在多个NULL，MSSQL不允许
 * 默认值：ALTER TABLE新添加有默认值的列，已存在的行的那一列，MySQL PG SQLite为那个默认值，MSSQL为NULL，再加NOT NULL则为默认值
 * SQLite支持在某些约束后定义ON CONFLICT ROLLBACK/ABORT/FAIL/IGNORE/REPLACE，默认是ABORT即终止语句但保留当前事务，如果没有“活动事务”则相当于ROLLBACK，FAIL相当于在本句之前提交掉，IGNORE相当于本句不存在会继续执行后面的
+* CHECK约束：MySQL8后某个版本才支持
 
 ```sql
 CREATE TABLE [IF NOT EXISTS] tb1 ( -- MSSQL除外
@@ -240,7 +242,7 @@ ALTER TABLE tb1 ALTER COLUMN col1 type [NOT NULL] -- MSSQL, Oracle，只有非�
 ALTER TABLE tb1 MODIFY col1 ... -- MySQL，可改任何约束；还有一种CHANGE语句，也能用来修改列名，但若不修改则要写两遍原列名
 
 -- 添加约束，如果已有数据不符合会失败；修改约束都要先DROP再ADD
-ALTER TABLE tb1 ADD [CONSTRAINT cons1] UNIQUE/PRIMARY KEY/FOREIGN KEY/CHECK(col1) -- 通用，PG除外，cons1只是命名
+ALTER TABLE tb1 ADD [CONSTRAINT cons1] UNIQUE/PRIMARY KEY/FOREIGN KEY/CHECK(col1) -- 通用，PG除外。cons1只是命名
 ALTER TABLE tb1 ADD DEFAULT n FOR col1 -- MSSQL，CREATE DEFAULT弃用了
 ALTER TABLE tb1 ALTER COLUMN col1 SET NOT NULL/DEFAULT n -- MySQL, PG
 
