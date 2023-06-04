@@ -278,7 +278,8 @@ DROP VIEW [IF EXISTS]
 
 ### DATABASE
 
-* CREATE DATABASE db1，MySQL在Linux下对数据库名是大小写敏感的
+* CREATE DATABASE [IF NOT EXISTS] db1
+  * MySQL在Linux下对数据库名是大小写敏感的
 * SHOW DATABASES
 * USE db1
 * SELECT DATABASE()显示当前使用的数据库
