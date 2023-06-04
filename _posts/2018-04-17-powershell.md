@@ -50,8 +50,9 @@ category: windows
   * -contains在这里又不把字符串看作序列了，变成完全匹配
   * 这几个在前面都可以加no来取相反的集合，再在前面加c表示区分大小写，全都返回bool
 * join
-  * `127, 0, 0, 1 -join '.'`。注意优先级，最好加括号；分隔：``-split "`n"``
+  * `127, 0, 0, 1 -join '.'`。注意优先级，最好加括号
   * Join-String：6.2
+  * 分隔：``-split "`n"``。其中5.1视为按char分隔，现在按字符串了
 * 格式化：`"{0:N0}" -f 1000`
 * Select-String(sls)
   * 可使用正则搜索，但默认只匹配`$_.ToString()`的结果而不是交互式输出的结果，此时可用`| out-string -stream`，其中steram用于分行否则会视为一整个字符串，或者不用sls而用where的`$_.xxx -match`

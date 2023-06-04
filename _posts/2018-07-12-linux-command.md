@@ -285,17 +285,19 @@ ip link
 
 * wc：-l按行统计，-w按空白分隔的单词统计
 * tr old new：替换stdin的内容但功能更多，如`tr 'a-z' 'A-Z'`能把小写的都换成大写的，-d删除匹配的。但字符集用的是POSIX风格，不支持正则字符集
-* cut：-c2,5-8取第2和5到8个字符的内容；-d默认为制表符，-f指定取第几个区域
+* cut：类似于split，-d默认为制表符，-f指定取第几个区域。-c2,5-8取第2和5到8个字符的内容
+* sort | uniq -c | sort -nk1,1：排序，统计重复行数，再按第一列的数字从小到大排序（实际此处-n也行）
+* paste -s：相当于join，把多行输入内容整合成一行。-d,指定分隔符为逗号
 
 ### awk
 
-* awk 'BEGIN {commands} condition /pattern/ {commands} END {commands}' file，其中模式支持正则
-* condition支持变量与常见运算符，等于用=，正则匹配用`~`，正则不匹配用`!~`。pattern为正则匹配过滤$0
+* awk 'BEGIN {commands} condition /pattern/ {commands} END {commands}' file。其中模式为正则，BEGIN后的{}只在第一行处理
+* condition支持变量与常见运算符，等于用=，正则匹配用`变量 ~ /pattern/`，正则不匹配用`!~`。pattern为正则匹配过滤$0
 * 变量
   * 使用时必不能放在双引号内否则不会扩展
   * `$0`为当期行，无参时也为它，`$1`为第一项
   * NF：本行字段个数
-  * 自定义变量可在大括号内直接赋值，支持C风格数组
+  * 自定义变量：大括号内var = xxx，使用时也无需加$。支持C风格数组
   * -v从命令行传递参数
 * 流程控制（大括号中）
   * if、while、break、continue：与C相同
@@ -304,7 +306,7 @@ ip link
   * 输出字符串字面量必须放在双引号内，相邻的自动合并
   * 逗号会扩展为OFS变量的值，默认为空格
   * 会自动换行
-* `-F:`指定行内分隔符为冒号；如果为分号，要加引号包裹。相当于设定FS变量
+* `-F:`指定行内分隔符为冒号。如果设为分号，要加引号包裹。相当于设定FS变量。默认为空格
 * 函数
   * gsub(x,y,z)：在z中以x为模式正则替换为y，z默认用$0
   * length：无参调用时默认用$0
@@ -345,7 +347,7 @@ ip link
 * 选项
   * -i：指定了文件名时，直接修改文件内容，而非输出
   * -e：指示后一个参数为指令而非文件，同时用多个指令时使用。如`sed -e '2,5d' -e '8d'`删除2至5行和第8行，其中那个第8行是删除2-5行前的
-  * -r：使正则支持扩展字符，否则用+等字符时需要加反斜杠
+  * -r(-E)：使正则支持扩展字符，否则用+、括号等字符时需要加反斜杠
 * 命令
   * 命令前可加行号，从1开始。如果不加则对每一行都应用
   * 以下的斜杠也可对应换为其他符号，如内容中存在 `http://` 时一般可用下划线
@@ -353,7 +355,7 @@ ip link
   * i：插入，如 5ixxx 将xxx插入为第5行，原第5行变为第6行
   * c：替换
   * d：删除，如 /aaa/d 删除所有匹配到了aaa的行，/aaa/,+5d 从匹配到了aaa的行开始再删除后面的5行，1~2d删除奇数行
-  * s：替换，如 s/aaa/bbb/g 把所有的aaa都替换为bbb，用`\1`引用匹配组
+  * s：替换，如 s/aaa/bbb/g 把所有的aaa都替换为bbb。用`\1`引用匹配组。不加g则每行最多处理一次
   * p：通常加-n使得不默认每一行都输出，如 /aaa/p 输出aaa的那一行
   * n：获取下一行，如 /aaa/{n;s/bbb/ccc} 把aaa下一行的bbb换成ccc
   * w：保存，如 /aaa/w data.txt
@@ -387,7 +389,7 @@ ip link
 
 ### crontab
 
-* crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}`
+* crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -d: -f1 | xargs -I {} crontab -l -u {}`
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
 * systemctl list-timers（systemd-timer）
