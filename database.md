@@ -529,6 +529,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * 各数据库设置隔离级别的方法
 * 删除存在外键引用的值或列时怎么办
 * 通过SSH tunnel连接
+* 测试大小写敏感
 * https://docs.microsoft.com/zh-cn/sql/relational-databases/tutorial-getting-started-with-the-database-engine https://docs.microsoft.com/zh-cn/sql/t-sql/tutorial-writing-transact-sql-statements
 * https://www.1keydata.com/cn/sql/
 
