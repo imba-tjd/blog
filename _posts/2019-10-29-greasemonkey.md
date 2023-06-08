@@ -68,7 +68,7 @@ title: 油猴
 
 * https://violentmonkey.github.io/guide/using-modern-syntax/ 介绍了现代化的开发方式，提供了简单的JSX Runtime
 * 其他脚本站：https://openuserjs.org/ https://www.userscript.zone https://userscripts-mirror.org/ 好像原站挂了
-* User Style：https://userstyles.org/ https://github.com/openstyles/stylus
+* User Style：https://userstyles.org/ https://github.com/openstyles/stylus https://stylebot.dev/
 * 老版本Chrome内置了一部分userscript的支持，但后来越来越严格，尤其是原版Chrome。实测Cent可以添加
 
 ## 参考
