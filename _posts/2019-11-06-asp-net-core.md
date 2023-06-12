@@ -174,6 +174,7 @@ public string Message { get; set; }
 * View Component：属于高级用法，PartialView不能添加业务逻辑，Controller无法到处复用
 * @helper在3中无法使用了
 * 启用运行时编译，与watch run不兼容，仅限View层，编辑后刷新能重新编译：添加Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation包，services.AddRazorPages().AddRazorRuntimeCompilation()或在launchSettings中加"ASPNETCORE_HOSTINGSTARTUPASSEMBLIES":"Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
+* VSC："emmet.includeLanguages": { "aspnetcorerazor": "html" }
 
 ### Razor Page
 
