@@ -66,7 +66,7 @@ END
 * COLLATE
   * SQLite：BINARY默认 NOCASE RTRIM去除尾随空格。可用在定义TABLE时，或SELECT中WHERE ORDERBY列名后
   * MSSQL：考虑用Chinese_PRC_CI_AS_SC_UTF8。其中CI不区分大小写，CS区分；AS区分重音，AI不区分，对中文没用；SC为启用U16非标准平面，2017后默认开启；_BIN2为二进制，使用时无法指定其它变体，速度较快
-  * MySQL：8.0后无需更改。之前的版本用utf8mb4_general_ci。general版对中英文没区别，德文有区别
+  * MySQL：8.0后无需更改。之前的版本可使用utf8mb4_general_ci。general版对中英文没区别，德文有区别
 * 哈希
   * MySQL：SHA2('str', 256)
 
@@ -306,6 +306,7 @@ innodb_strict_mode
 
 sql_mode=ansi,traditional  默认为traditional，也启用ansi后 real为float、||拼接字符串、双引号指示标识符
 mysqlx=off
+block_encryption_mode=aes-128-cbc
 
 # 启用慢查询日志，如果执行时间大于3秒则记录
 slow_query_log=1
@@ -529,7 +530,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * 各数据库设置隔离级别的方法
 * 删除存在外键引用的值或列时怎么办
 * 通过SSH tunnel连接
-* 测试大小写敏感
+* 测试大小写敏感，包括表名。以及调整的设置
 * https://docs.microsoft.com/zh-cn/sql/relational-databases/tutorial-getting-started-with-the-database-engine https://docs.microsoft.com/zh-cn/sql/t-sql/tutorial-writing-transact-sql-statements
 * https://www.1keydata.com/cn/sql/
 
