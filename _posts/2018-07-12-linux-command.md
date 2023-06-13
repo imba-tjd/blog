@@ -411,6 +411,7 @@ ip link
 * https://github.com/tmux-python/tmuxp
 * https://pityonline.gitbooks.io/tmux-productive-mouse-free-development_zh/content/index.html
 * https://louiszhai.github.io/2017/09/30/tmux/
+* Rust写的终端复用器：Zellij
 
 ## systemd
 

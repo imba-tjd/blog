@@ -43,7 +43,7 @@ OBJ = lib.o
 CC = gcc
 CFLAGS = -Wall
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^  # $@表示目标，$^表示依赖
+	$(CC) $(CFLAGS) -o $@ $^  # $@表示目标，$^表示依赖。其它$变量：https://blog.csdn.net/qu1993/article/details/88871799
 %.o: %.c  # 类似于模式匹配？
 	$(CC) $(CFLAGS) -o $@ -c $<  # $<表示第一个依赖，此处每次只有一个依赖
 
