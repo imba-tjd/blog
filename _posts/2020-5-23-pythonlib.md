@@ -1515,7 +1515,7 @@ COPY . . # 用上.dockerignore
 * ansible
 * Brython 在浏览器中运行的Py，支持一部分标准库；~~Transcrypt Py2JS编译器~~；pyodide 编译到WA，支持第三方纯Py库；PyScript 基于Pyodide
 * decorator：更方便地创建装饰器
-* 操控浏览器：playwright-python Splinter pyppeteer selenium
+* 操控浏览器：playwright-python Splinter pyppeteer selenium crawlee
 * pyinstrument：使用简单的profile工具
 * multibuild：用于产生多平台的wheel
 * birdseye：调试工具，与pysnooper是同类的

@@ -99,7 +99,7 @@ title: Linux命令
 ### 压缩/解压
 
 * unar：自动正确解压非Unicode的zip，可惜最后更新时间2015年
-* unzip：不自带，最后更新时间2009年，不支持读取stdin
+* unzip：不自带，最后更新时间2009年，不支持读取stdin，但支持-p表示输出到stdout
 * 分卷zip，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
 * unrar：是rar官方的，但在non-free中
@@ -195,6 +195,16 @@ title: Linux命令
   * 一定程度上支持IPV6，根据过去的经验，要用`--tcp-connect -6`，addr无需也不能用中括号因为端口单独指定。--tcp没有回显
 * 有空的时候更新一下中文文档：https://github.com/nmap/nmap/blob/master/docs/man-xlate/nmap-man-zh.xml
 * https://nmap.org/book/toc.html 读到3
+
+### netcat/nc
+
+* 端口扫描：nc -vz ip 起始端口-结束端口。会输出每个端口是否打开
+* 传输内容或文件：echo xxx | nc ip port -w0读取完输入后不等待直接关闭否则会一直开着
+* 监听：-lp 端口
+* 因为TCP是收发都可以，因此也可以写入listen端的stdin，以及重定向客户端的stdout
+* -c bash_cmd：客户端指定此参数，连接成功后服务端将会执行命令
+* -u UDP模式
+* ncat是nmap的，与nc无关
 
 ### mtr
 
@@ -450,7 +460,6 @@ ip link
 * IPTraf-ng：监控网络流量
 * https://github.com/denisidoro/navi
 * fzf https://zhuanlan.zhihu.com/p/91873965 https://github.com/junegunn/fzf https://einverne.github.io/post/2019/08/fzf-usage.html
-* nc/ncat
 * iface：查看网卡信息
 * https://github.com/google/cdc-file-transfer
 * open view see edit compose print：都是run-mailcap的alias，根据mime类型调用对应程序

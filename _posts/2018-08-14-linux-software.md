@@ -22,7 +22,6 @@ category: linux
 * figlet：把文本转换为某些字符拼凑显示
 * software-properties-common：含有add-apt-repository
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
-* netcat：echo xxx | nc [-u] ip addr -w0读取完输入后不等待直接关闭
 * jq：json文件处理以及格式化显示，支持高亮 https://github.com/stedolan/jq；还有个yq是py的；json_pp是perl自带
 * fpp：用管道传递给它可以自动把文件染色
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
@@ -32,7 +31,7 @@ category: linux
 * gparted：图形化的管理磁盘分区的工具
 * network-manager、network-manager-gnome：为了使网络配置尽可能简单而开发的网络管理软件包
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
-* pv：用于显示进度，放在两个管道之间或放到最前面起cat的作用
+* pv：用于显示进度，放在两个管道之间，或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
 * ssl-cert：方便地自签证书
 * nmap
@@ -425,7 +424,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/quasar/Quasar
 * https://github.com/moonlight-stream
 * https://www.nomachine.com/
-* teamviewer、rustdesk、todesk、parsec、向日葵
+* teamviewer、rustdesk、todesk、parsec、向日葵、RayLink（全免费）
 * 异地组网，之后可用微软远程桌面：蒲公英、ZeroTier、Tailscale
 
 ## TODO

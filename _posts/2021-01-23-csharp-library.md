@@ -40,7 +40,11 @@ IMySettings settings = new ConfigurationBuilder<IMySettings>()
    .Build();
 ```
 
-## Windows.Networking.Sockets
+## UWP
+
+* 内存流：InMemoryRandomAccessStream
+
+### Windows.Networking.Sockets
 
 ```c#
 var socket = new StreamSocket();
