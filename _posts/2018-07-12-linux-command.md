@@ -198,13 +198,22 @@ title: Linux命令
 
 ### netcat/nc
 
+* 现在版本安装的一般是openbsd版的，比gnu版的好
 * 端口扫描：nc -vz ip 起始端口-结束端口。会输出每个端口是否打开
-* 传输内容或文件：echo xxx | nc ip port -w0读取完输入后不等待直接关闭否则会一直开着
-* 监听：-lp 端口
+* 传输内容或文件：echo xxx | nc ip port -N 遇到EOF时结束否则会一直开着
+* 监听：-l 端口。但客户端关闭后服务端也会关闭，无法持续使用；加-k不会关闭，但只允许单客户端连接
 * 因为TCP是收发都可以，因此也可以写入listen端的stdin，以及重定向客户端的stdout
-* -c bash_cmd：客户端指定此参数，连接成功后服务端将会执行命令
-* -u UDP模式
-* ncat是nmap的，与nc无关
+* -ku UDP模式
+* -c/-e bash_cmd：客户端指定此参数，连接成功后服务端将会执行命令。openbsd版删除了
+* ncat是nmap的，但完全兼容nc。debian装ncat就会把nc指向它
+
+### socat
+
+* socat addr1 addr2 将两者的输入输出相互传递
+* 两个地址的顺序不重要因为是双向的。加-u表示从左到右
+* 用-表示标准输入输出
+* 端口转发：socat TCP-LISTEN:8080,fork,reuseaddr TCP:targetip:port
+* 其它功能：服务端指定一个命令，当客户端连上后执行，并处理标准输入输出。文件传输。使用Socks或HTTP代理
 
 ### mtr
 
