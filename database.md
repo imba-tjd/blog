@@ -79,12 +79,18 @@ END
 * 提取部分：EXTRACT(YEAR FROM ts)，MSSQL为DATEPART(YEAR, ts)，SQLite不支持
 * 格式化
   * MySQL：DATE_FORMAT(ts, 'format')
-  * SQLite：STRFTIME('format', datecol)
+  * SQLite：STRFTIME('format', time-value)
   * format同C语言，分别用%Y %m %d %H %M %S，%w为0-6的星期，%s为时间戳秒数
 * SQLite
-  * date('now', '+1 month', '-1 day')
-  * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00
-  * UNIXEPOCH() Unix时间戳，秒数整数。秒数转日期用datetime(1092941466, 'auto')
+  * 基本上以ISO 8601字符串表示日期，如'2013-10-07 04:23:19'
+  * 提供datetime(time-value, modifier, modifier, ...)对日期字符串进行运算
+    * date() time()分别表示最后结果只取日期或时间
+    * unixepoch()将运算结果转换为秒数整数，要保证结果是UTC日期
+  * 修饰符
+    * date('now', '+1 month', '-1 day') now表示当前UTC时间
+    * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00 UTC修饰符表示将左边的日期视为本地时间，转换为UTC；localtime相反
+    * 秒数转本地日期：datetime(UNIXEPOCH(), 'unixepoch', 'localtime') unixepoch修饰符将整数转换为UTC时间
+  * UNIXEPOCH() Unix时间戳，秒数整数
 
 #### 时区
 
