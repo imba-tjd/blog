@@ -96,6 +96,7 @@ END
   * 保留时刻：https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-time-instants.html
     * serverTimezone在现在是connectionTimeZone
   * 从目前看来，系统时区设为UTC，会话时区设为本地的，是对的
+  * https://kaimingwan.com/2022/06/20/ns4y3a/
 
 ### SQLite
 
