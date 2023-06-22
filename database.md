@@ -43,7 +43,7 @@ END
   * CAST(原数据 AS 新类型) 标准写法，MySQL必须指明SIGNED
   * CONVERT()：MySQL第一个参数是数据，第二个参数是类型；MSSQL刚好相反；PG SQLite不支持
   * SQLite MySQL在处理字符串和数字之间运算时会隐式转换成数字，如'1.1'+'+1'->2.1，'a1'也是转换成1
-* 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL可以创造临时表再查看表结构
+* 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL可以创造临时表再查看表结构：`drop temporary table if exists tp; create temporary table tp select @v; desc tp;`
 
 ### 字符串
 
@@ -85,6 +85,17 @@ END
   * date('now', '+1 month', '-1 day')
   * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00
   * UNIXEPOCH() Unix时间戳，秒数整数。秒数转日期用datetime(1092941466, 'auto')
+
+#### 时区
+
+* 最简单的就是数据库和web服务器在同一时区，则它俩不用转换
+* MySQL
+  * TIMEZONE是唯一用于储存时刻的类型，内部以UTC保存，与客户端交互时进行会话时区转换
+    * now()和curtime()受会话时区影响，UTC_TIMESTAMP()不受，实测它们都是DATETIME类型
+  * 不要把java.sql.Timestamp存到DATETIME里或把java.time.LocalDateTime存到TIMESTAMP里，不考虑这种情况
+  * 保留时刻：https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-time-instants.html
+    * serverTimezone在现在是connectionTimeZone
+  * 从目前看来，系统时区设为UTC，会话时区设为本地的，是对的
 
 ### SQLite
 
@@ -138,6 +149,7 @@ END
 * 有大量重复值或者太宽不适合建立索引。区分度：COUNT(DISTINCT col1)/COUNT(*)在80%以上就可以
 * 聚集索引：一个表只能有一个，顺序与表的物理顺序相同，叶子储存数据值，不额外占用空间，不应频繁修改；自增对插入和密集读很友好，用UUID容易导致页分裂
 * 非聚集索引(NONCLUSTERED)
+
   * 顺序与物理储存顺序不同，叶子储存主键id
   * 可以一次性设置多个列，但在一组AND中使用时要按顺序，不能有间隔，可以只用前面的，不等条件必须在最后
   * 用到的所有列都在索引中叫覆盖索引，不会查表
@@ -146,6 +158,7 @@ END
 * 唯一索引(UNIQUE)：指数据是唯一的，不是只能创建一个；等值查询性能高
 * 筛选索引/部分索引(MySQL除外)：创建非聚集索引时添加WHERE，维护开销更小；如果查询时WHERE中有AND，创建索引一般要用OR
 * 包含列的索引(MSSQL)：创建非聚集索引时添加INCLUDE(col1)，适合col1只存在于SELECT而不在WHERE中时
+
 * 列存储索引(MSSQL)：适用于频繁使用聚合函数，而行储存适用于表查找；多于100万行时才考虑，适合大量插入、少量更新和删除
 * 堆(MSSQL)：没有聚集索引的表，SELECT的顺序不确定，适合暂存大量无序插入
 * 视图索引：也称虚表
