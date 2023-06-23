@@ -82,12 +82,14 @@ END
   * SQLite：STRFTIME('format', time-value)
   * format同C语言，分别用%Y %m %d %H %M %S，%w为0-6的星期，%s为时间戳秒数
 * SQLite
-  * 基本上以ISO 8601字符串表示日期，如'2013-10-07 04:23:19'
+  * 基本上以ISO 8601字符串表示日期，如'2013-10-07 04:23:19'，支持单独储存日期或时间，支持储存时区
   * 提供datetime(time-value, modifier, modifier, ...)对日期字符串进行运算
+    * time-value在select中时一般为日期列名
     * date() time()分别表示最后结果只取日期或时间
     * unixepoch()将运算结果转换为秒数整数，要保证结果是UTC日期
+    * 在对含时区的日期使用函数运算时，sqlite会先转换到UTC并去掉时区，之后如果返回给使用者一般要加'localtime'因为使用者一般假定不含时区信息的是本地时间
   * 修饰符
-    * date('now', '+1 month', '-1 day') now表示当前UTC时间
+    * datetime('now', '+1 month', '-1 day') now表示当前UTC时间
     * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00 UTC修饰符表示将左边的日期视为本地时间，转换为UTC；localtime相反
     * 秒数转本地日期：datetime(UNIXEPOCH(), 'unixepoch', 'localtime') unixepoch修饰符将整数转换为UTC时间
   * UNIXEPOCH() Unix时间戳，秒数整数
