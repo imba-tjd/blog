@@ -96,18 +96,12 @@ END
 * MSSQL
   * 基本上使用DATETIMEOFFSET、DATETIME2
   * 只有DTO支持时区，TIME都不支持时区。将DTO储存到DT会保留时间去掉时区，将DT取出到DTO会视为本地时区
-
-#### 时区
-
-* 最简单的就是数据库和web服务器在同一时区，则它俩不用转换
 * MySQL
-  * TIMESTAMP是唯一用于储存时刻的类型，内部以UTC保存，与客户端交互时进行会话时区转换
-    * now()和curtime()受会话时区影响，UTC_TIMESTAMP()不受，实测它们都是DATETIME类型
-  * 不要把java.sql.Timestamp存到DATETIME里或把java.time.LocalDateTime存到TIMESTAMP里，不考虑这种情况
-  * 保留时刻：https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-time-instants.html
-    * serverTimezone在现在是connectionTimeZone
-  * 从目前看来，系统时区设为UTC，会话时区设为本地的，是对的
-  * https://kaimingwan.com/2022/06/20/ns4y3a/
+  * TIMESTAMP内部以UTC保存，与客户端交互时进行会话时区转换
+    * 假如实际时间值是0，会话时区是1，则数据库会返回1；客户端另有参数决定如何处理
+    * NOW()和CURTIME()的结果也受会话时区影响，UTC_TIMESTAMP()不受，它们的结果都是DATETIME
+  * 8.0.19后DATETIME也支持时区了
+  * TIMESTAMP储存表示时刻的类型：Calendar java.util.Date OffsetDateTime java.sql.Timestamp。其它数据库时间类型储存非时刻类型：java.sql.DATE LocalDate LocalTime OffsetTime
 
 ### SQLite
 
@@ -136,7 +130,6 @@ END
 * SET：与ENUM类似，相当于位域。字符串自动对应数字，使用时可用数字相加，或一个以逗号分隔多个值的字符串
 * MySQL5后，一个char就代表一个字符，无论中英文
 * 标识符使用反引号。若要用双引号，需SET GLOBAL/SESSION sql_mode='ANSI'或'ANSI_QUOTES'或在配置中sql-mode="ANSI"
-* innodb_file_per_table=1
 * ALTER DATABASE xxx CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 * mysqldump --default-character-set=utf8mb4
 
@@ -328,6 +321,7 @@ innodb_use_fdatasync  8.0.26+
 innodb_flush_method=O_DSYNC  官方文档只在Solaris10上使用O_DIRECT
 innodb_io_capacity=默认值是机械硬盘的200，用SSD时设为1000
 innodb_strict_mode
+innodb_file_per_table=1 有好处也有坏处且感觉都不明显
 
 sql_mode=ansi,traditional  默认为traditional，也启用ansi后 real为float、||拼接字符串、双引号指示标识符
 mysqlx=off
@@ -391,6 +385,7 @@ long_query_time=3
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
 * WAL
   * 隔离性表现为Snapshot，开始读取事务后另一连接能并发写且能提交，本连接始终读到的是旧数据；如果之后本连接又要写，则会报错，因为数据不是最新的，解决办法是一开始BEGIN IMMEDIATE。释放完本连接所有读锁后再读到的是新数据，或者新连接读到的也是新数据
+
   * 每个数据库会生成对应多个文件，正常退出后会删除
   * 对应数据库级别或者所有连接，不是单个连接级别，且是持久的，关闭连接重新打开后还是此模式
   * 不支持NFS
