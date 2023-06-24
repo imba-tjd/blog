@@ -93,6 +93,8 @@ END
     * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00 UTC修饰符表示将左边的日期视为本地时间，转换为UTC；localtime相反
     * 秒数转本地日期：datetime(UNIXEPOCH(), 'unixepoch', 'localtime') unixepoch修饰符将整数转换为UTC时间
   * UNIXEPOCH() Unix时间戳，秒数整数
+* MSSQL
+  * 基本上使用DATETIMEOFFSET、DATETIME2。只有前者支持时区
 
 #### 时区
 
