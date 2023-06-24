@@ -132,6 +132,7 @@ IEnumerable<Person> people = cnn.Query<Person>("SELECT ... name = @Name", new { 
 var people2 = cnn.Query(...).AsList(); // 不加<T>返回Dynamic，类似于SELECT出来的匿名对象的数组，AsList()不会额外分配一遍
 // 还有QueryFirst[OrDefault]()和QuerySingle()
 // 参数：前缀必须用@，但对于数字和bool也支持{=xxx}且效率更高；支持in运算符：in @Names, new {Names=new[] {...}}
+// 使用dynamic时依赖Microsoft.Chsarp命名空间引用
 
 // DML，还支持存储过程
 List<Person> people = ...;

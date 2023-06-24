@@ -4,7 +4,7 @@ title: C#库
 
 ## Newtonsoft.Json
 
-* 部分功能依赖Microsoft.CSharp命名空间
+* 部分功能依赖Microsoft.CSharp命名空间引用
 * 反序列化时json字面量支持单引号
 
 ```c#
