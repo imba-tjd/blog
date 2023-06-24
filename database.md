@@ -94,13 +94,14 @@ END
     * 秒数转本地日期：datetime(UNIXEPOCH(), 'unixepoch', 'localtime') unixepoch修饰符将整数转换为UTC时间
   * UNIXEPOCH() Unix时间戳，秒数整数
 * MSSQL
-  * 基本上使用DATETIMEOFFSET、DATETIME2。只有前者支持时区
+  * 基本上使用DATETIMEOFFSET、DATETIME2
+  * 只有DTO支持时区，TIME都不支持时区。将DTO储存到DT会保留时间去掉时区，将DT取出到DTO会视为本地时区
 
 #### 时区
 
 * 最简单的就是数据库和web服务器在同一时区，则它俩不用转换
 * MySQL
-  * TIMEZONE是唯一用于储存时刻的类型，内部以UTC保存，与客户端交互时进行会话时区转换
+  * TIMESTAMP是唯一用于储存时刻的类型，内部以UTC保存，与客户端交互时进行会话时区转换
     * now()和curtime()受会话时区影响，UTC_TIMESTAMP()不受，实测它们都是DATETIME类型
   * 不要把java.sql.Timestamp存到DATETIME里或把java.time.LocalDateTime存到TIMESTAMP里，不考虑这种情况
   * 保留时刻：https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-time-instants.html
