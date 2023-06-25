@@ -558,7 +558,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * 各数据库设置隔离级别的方法
 * 删除存在外键引用的值或列时怎么办
 * 通过SSH tunnel连接
-* 测试大小写敏感，包括表名。以及调整的设置
+* 测试大小写敏感，包括表名。以及调整的设置。mysql：lower_case_table_names=1表示表名转为小写且不敏感，Win默认1，Linux默认0
 * https://docs.microsoft.com/zh-cn/sql/relational-databases/tutorial-getting-started-with-the-database-engine https://docs.microsoft.com/zh-cn/sql/t-sql/tutorial-writing-transact-sql-statements
 * https://www.1keydata.com/cn/sql/
 
@@ -609,6 +609,7 @@ access和MSSQL的语法区别：
 2、日期字段表示方式：ACCESS表示为：#2022-07-16#  ，SQL Server表示为：“2022-07-16”
 
 3、多表操作时update语句的区别
+
 （1）SQL SERVER中更新多表的UPDATE语句:UPDATE Tab1 SET a.Name = b.Name FROM Tab1 a,Tab2 b WHERE a.ID = b.ID;
 （2）同样功能的SQL语句在ACCESS中应该是：UPDATE Tab1 a,Tab2 b SET a.Name = b.Name WHERE a.ID = b.ID;即:ACCESS中的UPDATE语句没有FROM子句,所有引用的表都列在UPDATE关键字后。更新单表时：都为：UPDATE table1 set ab=‘12‘,cd=444 where ....
 
