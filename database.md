@@ -291,6 +291,11 @@ END
 * set foreign_key_checks=0：不检查外键约束
 * status：状态
 * 工具：https://github.com/github/gh-ost MySQLTuner-perl
+* SSL加密：默认就会在datadir中生成自签名证书，客户端默认就会进行加密连接，只不过默认允许回退到未加密
+  * 强制要求加密：服务端：require_secure_transport=1，客户端：--ssl-mode=REQUIRED
+  * 客户端验证服务端：服务端传ca.pem给客户端，客户端用--ssl-ca=证书路径和--ssl-mode=VERIFY_CA。自签名不支持VERIFY_IDENTITY
+  * 服务端验证客户端：传两个client-证书，客户端用--ssl-cert和key。但好像没有强制验证的选项
+  * 开启后仍要验证用户名和密码
 
 ### 安装
 
@@ -302,10 +307,11 @@ END
 * 忘记密码：在服务器机器上用root登录无需密码（通过auth_socket插件）。强行修改：mysqld --skip-grant-tables; mysql; USE mysql; update user set  password=password('新密码') where user='root' and host='localhost'; FLUSH PRIVILEGES;
 * 以Deamon运行，日志写入datadir中：-D。结束服务端：kill $(</var/run/mysqld/mysqld.sock.lock)
 * Win下创建服务：--install
-* 加密：服务端单纯设置ssl后会自动生成自签名证书在datadir中并使用，传里面的三个给客户端。强制加密：require_secure_transport
 
-### /ect/mysql/my.cnf
+### my.cnf
 
+* 管理器安装的在/ect/mysql下，官方直接运行的在/etc下。Win通过MSI安装后在%ProgramData%\MySQL\MySQL Server 8.0下，直接运行的考虑放C:\下
+* 直接运行的重载配置：/etc/init.d/mysql reload
 * 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'
 * Windows：服务端启用shared_memory，客户端用--protocol=MEMORY，能提高性能
 
@@ -322,6 +328,7 @@ innodb_flush_method=O_DSYNC  官方文档只在Solaris10上使用O_DIRECT
 innodb_io_capacity=默认值是机械硬盘的200，用SSD时设为1000
 innodb_strict_mode
 innodb_file_per_table=1 有好处也有坏处且感觉都不明显
+innodb_flush_log_at_trx_commit和sync_binlog看下面
 
 sql_mode=ansi,traditional  默认为traditional，也启用ansi后 real为float、||拼接字符串、双引号指示标识符
 mysqlx=off
@@ -345,7 +352,6 @@ long_query_time=3
 * 命令
   * 执行sql文件：source或\.
 * 记录登录选项：mysql_config_editor set，会把参数混淆存到~/.mylogin.cnf中，之后简单用mysql命令行就能登录。还支持创建多个配置，称为login-path
-* 加密：默认启用但回退到未加密，指定--ssl-mode=REQUIRED --ssl-mode=VERIFY_CA强制加密。连接时指定--ssl-ca --ssl-cert --ssl-key。8.0.29默认支持SSL复用但客户端配置麻烦
 
 ### 事务日志
 
@@ -353,6 +359,7 @@ long_query_time=3
   * =0时，提交事务写入redo log缓存，不写入文件系统缓存，由后台线程每隔1秒写入文件系统缓存和fsync。可能损失1秒数据
   * =2时，会写入文件系统缓存，但不会fsync。如果mysql挂了不会损失数据，但系统挂了会损失1秒数据
 * binlog归档日志：记录语句的原始逻辑，数据备份(主备 主从)要用到，维护集群数据一致性
+  * sync_binlog=0 默认为1表示每次事务都同步binlog，设为0完全交给操作系统刷新，设为N表示经过N个事务后同步
 * undo log：保证事务的原子性。redo log保证事务的持久性
 
 ## SQLite
@@ -369,6 +376,7 @@ long_query_time=3
   * 打开已存在的数据库时小心别打错字，否则就自动创建了一个新的，或者mode不用rwc就能避免
 * 读写锁和事务
   * 事务一开始，单纯的BEGIN是没有加锁的。开始读取了会加SHARED锁，允许有多个，能同一时间多个连接并发读取
+
   * 当遇到了DML语句，会给整个数据库文件加RESERVED锁，只允许有一个，然后写日志。此时仍可以正常读，也允许新连接读，读不到未提交的，因为新内容在日志里，不在文件里
   * 当COMMIT时，会加PENDING锁，能阻止新连接读，但无法阻止老连接多游标不间断读。如果一段时间内仍无法加上，就会失败，此时事务并未取消，可以再次提交
   * 当所有的读锁都结束后，就加EXCLUSIVE锁，此时只有本连接能读写
