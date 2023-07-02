@@ -117,6 +117,7 @@ title: Linux命令
 * 其他主选项：t查看内容，r追加，u更新；它们与c和x只能选其中一个
 * 其它参数：C指定解压目录必须已存在，v显示详细信息，z代表tar.gz，j代表tar.bz2，-J/--xz代表xz，-I手动指定压缩或解压程序且能设定参数
 * 现在Windows也自带了，但只支持gzip
+* tgz等价于tar.gz
 
 #### xz
 
@@ -271,6 +272,7 @@ ip link
   * --data-urlencode 自动对v做URL编码，但key不变。k=@f从文件中读取v并编码
   * -F k=@f 类型指定为 multipart/form-data
   * --json '{"tool": "curl"}' 只是设置一些头，不更改或验证内容，官方推荐配合jo -p k=v | curl --json @- | jq。需7.82
+  * -G配合-d拼接url参数
 * -k忽略证书错误。--ssl-no-revoke不进行ocsp检查，此检查好像不受--proxy的影响，也可能是WinAPI的缘故
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
