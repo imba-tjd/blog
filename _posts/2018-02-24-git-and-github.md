@@ -61,7 +61,7 @@ title: Git/GitHub笔记
 * git reset --hard：完全与回移到的地点一致，会丢弃本地更改，但不会丢弃未跟踪的文件
 * git reset --merge：保留staged和local之间的差异文件，把分支和staged回移（staged会丢失），对local中的其它文件hard reset；如果回移中的提交也修改了那些差异文件，会abort；或者可以看成把staged的内容提交了再reset --keep
 * git reset --keep：保留HEAD和local之间的差异，相当于先unadd，也相当于stash；我觉得并不类似于checkout -B
-* git revert --no-edit pushed：在当前分支上创建一个撤销pushed分支最后一次更改的更改，总之此命令只跟单个提交，不是进行比较。若要在一个提交中撤销多个，可以`git revert --no-commit HEAD~n..`再手动提交；也可以先hard reset到要撤销的提交前，再soft reset要撤销的提交后，再commit
+* git revert --no-edit pushed：在当前分支上创建一个撤销pushed分支最后一次更改的更改，总之此命令只跟单个提交，不是进行比较。若要在一个提交中撤销多个，可以`git revert --no-commit HEAD~n..`再手动提交；也可以先hard reset到要撤销的提交前，再soft reset要撤销的提交后，再commit。撤销merge一般加-m 1
 * git commit --amend：修补最后一次的提交（但hash会变），可以用-m参数只修改信息，或--no-edit只修改提交内容；可以先git rebase -i HEAD~n把之前需要修改的放到最后（用edit），修改后再放回去
 * git commit --fixup refspec：把add了的自动写提交信息作为指定refspec的修正，之后rebase -i --autosquash自动把这些提交放到合适的位置合并
 * git checkout -- filename/.：将staged的文件恢复到local中，未add那个文件或加了refspec时就相当于hard reset；git reset -- filename：将已提交的文件覆盖到staged中，相当于unadd。新文件不用担心消失，会报错。实际上不加--也能生效，导致可能与分支弄混。现在被git restore --source=refspec f d替代，默认--worktree对应checkout，--staged对应reset，两者同时用对应hard reset

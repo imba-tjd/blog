@@ -9,6 +9,7 @@ title: Linux命令
 * https://tldr.ostera.io/
 * https://cheat.sh/
 * http://bropages.org/
+* https://command-not-found.com/
 
 ## 简单笔记
 
