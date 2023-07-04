@@ -305,15 +305,16 @@ END
   * 8.0不再有32位的
 * 创建数据库到datadir中：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码
 * 忘记密码：在服务器机器上用root登录无需密码（通过auth_socket插件）。强行修改：mysqld --skip-grant-tables; mysql; USE mysql; update user set  password=password('新密码') where user='root' and host='localhost'; FLUSH PRIVILEGES;
-* 以Deamon运行，日志写入datadir中：-D。结束服务端：kill $(</var/run/mysqld/mysqld.sock.lock)
-* Win下创建服务：--install
+* 以Deamon运行，日志写入datadir中：-D
+  * 官方版本推荐使用mysqld_safe运行
+  * 结束服务端：`kill $(</var/run/mysqld/mysqld.sock.lock)`，官方默认在`/tmp/mysql.sock`
+  * Win下创建服务：--install，删除：--remove，重启：net stop/start mysql
 
 ### my.cnf
 
-* 管理器安装的在/ect/mysql下，官方直接运行的在/etc下。Win通过MSI安装后在%ProgramData%\MySQL\MySQL Server 8.0下，直接运行的考虑放C:\下
+* 管理器安装的在/ect/mysql下，官方直接运行的在/etc下。Win通过MSI安装后在%ProgramData%\MySQL\MySQL Server 8.0下，直接运行的可放在安装目录下
 * 直接运行的重载配置：/etc/init.d/mysql reload
 * 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'
-* Windows：服务端启用shared_memory，客户端用--protocol=MEMORY，能提高性能
 
 ```conf
 [mysqld]
@@ -321,12 +322,13 @@ user=mysql
 datadir=数据库文件目录
 bind_address=指定ip，默认为*
 skip_name_resolve  客户端连接时默认会对ip反向解析
+shared_memory  仅限Win，无脑开，不过好像只有cli和.NET的会用
 
-innodb_buffer_pool_size=默认128M，应设为内存的50-75%，或开启innodb_dedicated_server后会自动调整
-innodb_use_fdatasync  8.0.26+
-innodb_flush_method=O_DSYNC  官方文档只在Solaris10上使用O_DIRECT
+innodb_strict_mode 感觉可以无脑开
+innodb_buffer_pool_size=默认128M，应设为内存的50-75%；或开启innodb_dedicated_server后会自动调整，在容器中也推荐开
+innodb_use_fdatasync  8.0.26+无脑开
+innodb_flush_method=O_DIRECT_NO_FSYNC  当redo_log和data不在同一块磁盘上时用O_DIRECT，在NFS上时用默认值
 innodb_io_capacity=默认值是机械硬盘的200，用SSD时设为1000
-innodb_strict_mode
 innodb_file_per_table=1 有好处也有坏处且感觉都不明显
 innodb_flush_log_at_trx_commit和sync_binlog看下面
 
@@ -345,12 +347,14 @@ long_query_time=3
 * mysql -h主机 -P端口 -u用户名 -p
   * host默认localhost，端口默认3306，user默认root，-p不加参数表示交互式输入密码
   * 指定初始数据库用-D。重定向stdin可读取执行sql脚本
+  * Win下用户名默认为无意义的odbc
 * 修改密码：mysqladmin -u用户名 -p旧密码 password 新密码，或set password [for xxx] ='新密码';
 * 交互式中顺便保存记录：--tee
 * 执行命令后退出：-e
 * 压缩：-C 对于100M以下网速应启用，若客户端和服务端在同一机器上不应启用
 * 命令
   * 执行sql文件：source或\.
+  * 显示连接信息：\s
 * 记录登录选项：mysql_config_editor set，会把参数混淆存到~/.mylogin.cnf中，之后简单用mysql命令行就能登录。还支持创建多个配置，称为login-path
 
 ### 事务日志
