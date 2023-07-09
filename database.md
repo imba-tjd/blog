@@ -66,7 +66,7 @@ END
 * COLLATE
   * SQLite：BINARY默认 NOCASE RTRIM去除尾随空格。可用在定义TABLE时，或SELECT中WHERE ORDERBY列名后
   * MSSQL：考虑用Chinese_PRC_CI_AS_SC_UTF8。其中CI不区分大小写，CS区分；AS区分重音，AI不区分，对中文没用；SC为启用U16非标准平面，2017后默认开启；_BIN2为二进制，使用时无法指定其它变体，速度较快
-  * MySQL：8.0后无需更改。之前的版本可使用utf8mb4_general_ci。general版对中英文没区别，德文有区别
+  * MySQL：8.0后无需更改，或者用utf8mb4_zh_0900_as_cs。之前的版本可使用utf8mb4_general_ci。general版对中英文没区别，德文有区别
 * 哈希
   * MySQL：SHA2('str', 256)
 
