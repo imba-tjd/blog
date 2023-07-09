@@ -57,6 +57,7 @@ title: 浏览器
 * security.tls.enable_0rtt_data
 * browser.preferences.moreFromMozilla 设置中对手机端的推广
 * extensions.unifiedExtensions.enabled false去掉工具栏上的“扩展”按钮，109版本新增
+* network.cookie.sameSite.laxByDefault：true
 
 #### 页面翻译
 

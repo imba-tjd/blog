@@ -109,7 +109,7 @@ putchar("0123456789ABCDEF"[value%16]);
 宽字符支持：wchar.h和wctype.h
 -----------------------------
 
-wchar.h提供类似stdio.h的函数，在标准输入输出返回EOF的时候返回WEOF：
+wchar.h提供类似stdio.h的函数，在标准输入输出返回EOF的时候返回WEOF，以及含有wchar_t类型：
 
 * fwprintf/fwscanf
 * swprintf/swscanf
