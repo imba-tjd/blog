@@ -386,7 +386,7 @@ ip link
 ## 磁盘管理
 
 * smartctl：查看硬盘smart信息，在smartmontools中
-* fdisk -l：显示磁盘信息；cfdisk：命令行中的图形化的分区工具
+* fdisk -l：显示磁盘信息；cfdisk：命令行中的图形化的分区工具。考虑改用parted，支持GPT
 * mkfs.ext4 /dev/xxx：格式化分区。若用xfs需先安装xfsprogs。fstransform：转换文件系统
 * du -sh [filename]：显示目录的占用空间；dust：新版du
 * df -h：显示挂载点的总大小、已用空间、剩余空间
