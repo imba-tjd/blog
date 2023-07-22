@@ -291,9 +291,9 @@ END
 * set foreign_key_checks=0：不检查外键约束
 * status：状态
 * 工具：https://github.com/github/gh-ost MySQLTuner-perl
-* SSL加密：默认就会在datadir中生成自签名证书，客户端默认就会进行加密连接，只不过默认允许回退到未加密
+* SSL加密：默认就会在datadir中生成自签名证书，客户端（不含mariadb）默认就会进行加密连接，只不过默认允许回退到未加密
   * 强制要求加密：服务端：require_secure_transport=1，客户端：--ssl-mode=REQUIRED
-  * 客户端验证服务端：服务端传ca.pem给客户端，客户端用--ssl-ca=证书路径和--ssl-mode=VERIFY_CA。自签名不支持VERIFY_IDENTITY
+  * 客户端验证服务端：服务端传ca.pem给客户端，客户端用--ssl-ca=证书路径和--ssl-mode=VERIFY_CA。非自动生成的可用VERIFY_IDENTITY，还会检查SNI，自动生成的证书不包含SNI
   * 服务端验证客户端：传两个client-证书，客户端用--ssl-cert和key。但好像没有强制验证的选项
   * 开启后仍要验证用户名和密码
 
