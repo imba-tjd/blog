@@ -141,7 +141,7 @@ SET ...
 * 会走事务，会执行触发器
 * InnoDB中DELETE只是标记为已删除
 * 清除所有数据而保留表结构用TRUNCATE TABLE，更快，且能重置自增数；SQLite没有此语句但清除所有数据时会自动优化
-* MySQL：[LOW_PRIORITY] [QUICK] [IGNORE]
+* MySQL：[LOW_PRIORITY] [QUICK] [IGNORE] LIMIT只删除n条
 
 ```sql
 DELETE
