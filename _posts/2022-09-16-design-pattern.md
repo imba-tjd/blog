@@ -261,7 +261,7 @@ Calliope o-- SpindlerBattery
 
 ## Compatibility
 
-* backward compatibility：如程序新版本能打开老格式的文件
+* backward compatibility 向后兼容/向下兼容：如程序新版本能打开老格式的文件
 * forward compatibility：如程序能跳过未知格式的文件、老版本程序面对新设计不出错
 
 ## 参考
