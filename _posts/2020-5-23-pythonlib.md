@@ -1527,3 +1527,4 @@ COPY . . # 用上.dockerignore
 * https://hatch.pypa.io/latest/ 包管理
 * https://tox.wiki/en/latest/
 * https://github.com/charliermarsh/ruff An extremely fast Python linter, written in Rust.
+* https://github.com/lcompilers/lpython 编译器

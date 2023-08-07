@@ -7,7 +7,7 @@ title: Makefile和gcc
 * 缩进只能用tab
 * “目标”其实是要生成的文件名，如果存在那个文件且依赖最新，就自动不运行。依赖当有另一个目标时就执行对应的目标，当没有时仍视为文件
 * 变量赋值：=会自动推导最终赋值作为结果，与使用它的位置无关；:=是覆盖式赋值，与一般语言的赋值类似；+=相当于字符串拼接；?=当变量未定义时赋值，已定义时什么也不做
-* 多线程：`-j"$(nproc 2> /dev/null || sysctl -n hw.ncpu)"`
+* 多线程：`-j"$(nproc 2> /dev/null || sysctl -n hw.ncpu)"`，单纯使用-j将不限制
 
 ```makefile
 include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通配符和变量
@@ -79,15 +79,96 @@ pattern中%表示0或任意字符；路径可以用冒号分隔多个
 
 ## CMake
 
-* 文件名用CMakeLists.txt
-* mkdir build; cd build; cmake ..; make; make clean
+* CMakeLists.txt
+  * 参数也可以用分号隔开
+* cmake -B build -G "MinGW Makefiles"; cmake --build build --verbose --parallel; cmake --build build --target install
+  * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel，适用于Makefile。对于VS用--build --config Release
+* 另一种方式：mkdir build; cd build; cmake ..; make -j VERBOSE=1; make install; make clean
 
 ```cmake
-cmake_minimum_required(VERSION xxx)
+cmake_minimum_required(VERSION 3.5)
+project(hello VERSION 1.0)
+set(CMAKE_CXX_STANDARD 17)
 
-project(hello)
+add_executable(${PROJECT_NAME} main.cpp utils.cpp)  # 生成exe，第一个参数是文件名
 
-add_executable(hello main.cpp utils.cpp)
+add_library(hello_library STATIC或SHARED  # 生成库。好像默认就是STATIC的
+    src/Hello.cpp
+)
+add_library(Foo::Bar ALIAS Bar)
+
+file(GLOB SOURCES "src/*.cpp") # 之后可用${SOURCES}表示所有源文件。但不推荐这样做，因为添加了cpp后本文件无法反映变化
+aux_source_directory(src SOURCES) # 另一种方式，不会递归包含子目录
+
+
+target_include_directories(hello_library  # 相当于-I。第一个参数是目标
+    PUBLIC  # PRIVATE表示生成目标时添加本语句，INTERFACE表示目标被link时添加本语句，PUBLIC表示二者都是。一般目标是库就用PUBLIC，是header-only库就用INTERFACE
+        ${PROJECT_SOURCE_DIR}/include
+)
+
+target_link_libraries(hello_binary  # 相当于-l
+    PRIVATE  # 目标是exe，一般用它
+        hello_library # 会自动引入它的PUBLIC和INTERFACE的-I的内容
+)
+
+target_compile_definitions(hello
+    PRIVATE MYMACRO=1  # 相当于-DMYMACRO=1；此条也兼容加-D
+)
+target_compile_options
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEX2" CACHE STRING "Set C++ Compiler Flags" FORCE)  # 全局参数
+# 还有CMAKE_C_FLAGS CMAKE_LINKER_FLAGS。可以在cmake命令行时加-D设定
+
+
+find_package(Boost 1.46.1 REQUIRED COMPONENTS filesystem system) # 另一个支持CMAKE且被install了的包
+源码依赖：add_subdirectory()
+下载GitHub的内容：https://cmake.org/cmake/help/latest/module/FetchContent.html
+
+添加预编译的库：
+add_library(foo SHARED IMPORTED)
+set_property(TARGET foo PROPERTY
+    IMPORTED_LOCATION "/dir-of-libfoo")
+再对mylib加target_include_directories
+或者直接使用者link加绝对路径。或者配合find_library和find_path在多个地方寻找指定文件保存到变量里再使用
+还能把后者逻辑放到cmake/FindXxx.cmake里，名称按约定的，使用时先set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")，就可以find_package()了
+
+
+if(Boost_FOUND) # 这里面使用变量无需${}。运算符支持MATCHES、STREQUAL
+    message ("boost found")
+    include_directories(${Boost_INCLUDE_DIRS})
+else()  # 不用REQUIRED时手动处理不存在的场景
+    message (FATAL_ERROR "Cannot find Boost")
+endif()
+
+option (USE_MYMATH
+       "Use provided math implementation" ON)
+if (USE_MYMATH) ... endif()
+
+foreach(var IN ITEMS foo bar baz) ...
+foreach(var IN LISTS my_list) ...
+foreach(var IN LISTS my_list ITEMS foo bar baz) ...
+
+function(my_func ret_var_name) # 没有返回值，使用者要把期待接受返回值的变量名传进去
+    set(${ret_var_name} "return value" PARENT_SCOPE)
+endfunction()
+
+target_compile_options(demo PRIVATE
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:"-Wall">
+    $<$<CXX_COMPILER_ID:MSVC>:"/W4">)
+$<$<BOOL:${WIN32}>:
+    # for Windows
+>
+$<$<NOT:$<BOOL:${WIN32}>>:
+    # for POSIX
+>
+# 以上实际一般用IF (WIN32)、UNIX
+
+https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/
+https://github.com/Akagi201/learning-cmake
+https://www.youtube.com/watch?v=y7ndUhdQuU8 https://www.youtube.com/watch?v=y9kSr5enrSk
+https://github.com/onqtam/awesome-cmake
+https://cmake.org/cmake/help/latest/command/target_sources.html
+install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-installing/CMakeLists.txt https://github.com/BrightXiaoHan/CMakeTutorial/blob/master/Installation/README.md
 ```
 
 ## gcc
@@ -179,6 +260,10 @@ add_executable(hello main.cpp utils.cpp)
 * 支持C99
 * 不支持-O
 
+### MSVC
+
+* #pragma comment(lib, "emapi") 相当于-lemapi
+
 ### 其他
 
 * https://github.com/swig/cccl 把Unix编译器参数转换为cl的参数（cl的wrapper）
@@ -192,7 +277,6 @@ add_executable(hello main.cpp utils.cpp)
 ### TODO
 
 * https://zhuanlan.zhihu.com/p/78091632
-* CMake：https://www.zhihu.com/question/58949190
 * https://zhuanlan.zhihu.com/p/100964932
 * https://www.ruanyifeng.com/blog/2015/02/make.html
 * https://github.com/seisman/how-to-write-makefile
@@ -201,7 +285,6 @@ add_executable(hello main.cpp utils.cpp)
 * -Wno-excessive-errors
 * https://zhuanlan.zhihu.com/p/296191493
 * https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/
-* CMake: https://zhuanlan.zhihu.com/p/361123818
 * https://github.com/rui314/mold
 * https://zhuanlan.zhihu.com/p/163287897 九图记住Makefile
 * https://github.com/hellogcc/100-gcc-tips/blob/master/src/index.md
