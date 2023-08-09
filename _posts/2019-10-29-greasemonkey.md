@@ -74,7 +74,7 @@ title: 油猴
 ## 参考
 
 * https://wiki.greasespot.net 中文参考：https://github.com/examplecode/tampermonkey-api-reference
-* TODO: 学习其他人是怎么写的 https://github.com/FirefoxBar/userscript https://github.com/hoothin/UserScripts https://github.com/mengzonefire/rapid-upload-userscript https://github.com/Tsuk1ko/userscript https://www.youxiaohou.com/
+* TODO: 学习其他人是怎么写的 https://github.com/FirefoxBar/userscript https://github.com/hoothin/UserScripts https://github.com/mengzonefire/rapid-upload-userscript https://github.com/Tsuk1ko/userscript https://www.youxiaohou.com/ https://github.com/XIU2/UserScript
 * violentmonkey现在仍在更新
 
 # 浏览器扩展

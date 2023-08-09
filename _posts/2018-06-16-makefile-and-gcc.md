@@ -8,6 +8,7 @@ title: Makefile和gcc
 * “目标”其实是要生成的文件名，如果存在那个文件且依赖最新，就自动不运行。依赖当有另一个目标时就执行对应的目标，当没有时仍视为文件
 * 变量赋值：=会自动推导最终赋值作为结果，与使用它的位置无关；:=是覆盖式赋值，与一般语言的赋值类似；+=相当于字符串拼接；?=当变量未定义时赋值，已定义时什么也不做
 * 多线程：`-j"$(nproc 2> /dev/null || sysctl -n hw.ncpu)"`，单纯使用-j将不限制
+* 依赖要加上.h，但这不是人类能完成的事，因为.h之间可以存在依赖。gcc有选项生成，但不如用别的构建工具了
 
 ```makefile
 include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通配符和变量
@@ -15,8 +16,6 @@ include a.mk # 引用其他的makefile，可以写绝对路径，可以使用通
 # 变量定义，可在命令行中用key="val"重写，用$()使用
 objects = main.o \ # 用反斜杠换行
 	utils.o
-objects := $(wildcard *.o) # wildcard关键字会进行扩展；如果直接用*.o，那就是普通的*.o，（效果应该是在command中当作shell命令会生效，但makefile自动推导无效）
-obj = $(patsubst %.c ,%.o ,$(src)) # 表示从src目录中找到所有.c，替换为.o，赋值给obj
 
 # 显式规则
 prog: $(objects) # 如果make时没有指定目标就用第一个目标
@@ -34,9 +33,7 @@ search.o files.o: buffer.h
 # 伪目标，不是文件，只是标签；不会因为存在一个叫做clean的文件而认为已是最新不执行，所有依赖总会被执行
 .PHONY: clean cleandiff
 clean: cleandiff
-	-rm prog $(objects) # 减号表示出现错误也继续执行
-cleandiff :
-	rm *.diff
+	-rm prog $(objects) # 减号表示出现错误也继续执行。Win下也用rm
 
 TARGET = hello
 OBJ = lib.o
@@ -44,46 +41,32 @@ CC = gcc
 CFLAGS = -Wall
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^  # $@表示目标，$^表示依赖。其它$变量：https://blog.csdn.net/qu1993/article/details/88871799
-%.o: %.c  # 类似于模式匹配？
+%.o: %.c  # 某种通配
 	$(CC) $(CFLAGS) -o $@ -c $<  # $<表示第一个依赖，此处每次只有一个依赖
 
 ifeq (, $(shell which curl))
 	$(error "No curl in $$PATH, please install")
 endif
 
-EMPTY:=
-SPACE:=$(EMPTY) $(EMPTY)
-COMMA:=$(EMPTY),$(EMPTY)
+objects := $(wildcard *.o) # wildcard关键字会进行扩展；如果直接用*.o，那就是普通的*.o，（效果应该是在command中当作shell命令会生效，但makefile自动推导无效）
+obj = $(patsubst %.c ,%.o ,$(src)) # 表示从src中找到所有.c，替换为.o，赋值给obj
 
 	@echo 正在编译 # 单独的命令，也要用tab。@表示不显示命令本身，类似于bat的
 	cd /etc; pwd # 不同命令之间独立，如果不用分号而是换行，又会回到cd前的地方
 	cd subdir && make # 进入子文件夹make；父makefile定义的变量手动用export命令可以传递到子makefile中，但SHELL和MAKEFLAGS变量会自动传递
+
+多目标、静态模式：如果command相似，可以使用此功能，会进行一些扩展。见https://blog.csdn.net/haoel/article/details/2890
 ```
-
-### 文件搜寻
-
-* 在一些大的工程中，有大量的源文件。通常的做法是把这许多的源文件分类，并存放在不同的目录中。所以，当make需要去找寻文件的依赖关系时，你可以在文件前加上路径。但最好的方法是把一个路径告诉make，让make在自动去找：VPATH = src:../headers（src和headers是目录名）
-* 当然，当前目录永远是最高优先搜索的地方
-
-还可以使用vpath关键字：
-
-1. vpath pattern directories ：为符合模式的文件指定搜索目录。
-2. vpath pattern：清除符合模式的文件的搜索目录。
-3. vpath：清除所有已被设置好了的文件搜索目录。
-
-pattern中%表示0或任意字符；路径可以用冒号分隔多个
-
-### 多目标、静态模式
-
-如果command相似，可以使用此功能，会进行一些扩展。见《[跟我一起写 Makefile（五）](https://blog.csdn.net/haoel/article/details/2890)》
 
 ## CMake
 
 * CMakeLists.txt
   * 参数也可以用分号隔开
-* cmake -B build -G "MinGW Makefiles"; cmake --build build --verbose --parallel; cmake --build build --target install
+* cmake -B build -G "MinGW Makefiles"; cmake --build build --verbose --parallel --target install/子项目 -- -传递给make或ninja的参数
   * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel，适用于Makefile。对于VS用--build --config Release
+  * 第一次要用-G，之后就不用了
 * 另一种方式：mkdir build; cd build; cmake ..; make -j VERBOSE=1; make install; make clean
+* 项目组织形式：include与src同级。include/项目名/xxx.h放公开接口，被install后会放在/usr/local/include里因此要加项目名，使用者用<项目名/xxx.h>
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
@@ -92,7 +75,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME} main.cpp utils.cpp)  # 生成exe，第一个参数是文件名
 
-add_library(hello_library STATIC或SHARED  # 生成库。好像默认就是STATIC的
+add_library(hello_library STATIC或SHARED  # 生成库。默认STATIC。header-only库用INTERFACE。SHARED会自动-D库名_EXPORT
     src/Hello.cpp
 )
 add_library(Foo::Bar ALIAS Bar)
@@ -102,7 +85,7 @@ aux_source_directory(src SOURCES) # 另一种方式，不会递归包含子目�
 
 
 target_include_directories(hello_library  # 相当于-I。第一个参数是目标
-    PUBLIC  # PRIVATE表示生成目标时添加本语句，INTERFACE表示目标被link时添加本语句，PUBLIC表示二者都是。一般目标是库就用PUBLIC，是header-only库就用INTERFACE
+    PUBLIC  # PRIVATE表示生成目标时添加本语句，INTERFACE表示目标被link时添加本语句，PUBLIC表示二者都是且默认。一般目标是库就用PUBLIC，是header-only库就用INTERFACE
         ${PROJECT_SOURCE_DIR}/include
 )
 
@@ -125,11 +108,10 @@ find_package(Boost 1.46.1 REQUIRED COMPONENTS filesystem system) # 另一个支�
 
 添加预编译的库：
 add_library(foo SHARED IMPORTED)
-set_property(TARGET foo PROPERTY
-    IMPORTED_LOCATION "/dir-of-libfoo")
+set_property(TARGET foo PROPERTY IMPORTED_LOCATION "/dir-of-libfoo")
 再对mylib加target_include_directories
 或者直接使用者link加绝对路径。或者配合find_library和find_path在多个地方寻找指定文件保存到变量里再使用
-还能把后者逻辑放到cmake/FindXxx.cmake里，名称按约定的，使用时先set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")，就可以find_package()了
+还能把后者逻辑放到cmake/FindXxx.cmake里，名称按约定的，使用时先set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")，就可以find_package()了。或者用include()添加文件，手动加
 
 
 if(Boost_FOUND) # 这里面使用变量无需${}。运算符支持MATCHES、STREQUAL
@@ -186,22 +168,38 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * -fuse-ld=gold比普通的ld快，MinGW不自带
 * -s：去掉符号信息
 * --include：相当于`#include`，与-I无关
+* -rdynamic：使得可执行程序也导出符号，只在Linux下有效
 
 ### 编译步骤
 
 1. gcc -E 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
 2. gcc -S 生成AT&T风格汇编
 3. gcc -c 生成二进制代码(.o)，未链接方便静态反汇编
-4. -shared -fPIC生成动态库(.so)，fpic产生的代码更小更快但在某些平台有限制一般不用；fPIE用于可执行文件；Win下的-mdll或--dll现在的效果与shared相同，简化起见永远使用shared
-5. ar -crv libname.a src.o ... 生成静态库；-t显示包含哪些.o
+4. 生成动态库：-shared -fPIC
+  * fPIC是必须的，其实应在-c时使用。fpic产生的代码更小更快但在某些平台有限制一般不用，或者好像x86_64上二者相同PowerPC上才不同。fPIE用于可执行文件
+  * Win下-mdll或--dll现在与shared相同，简化起见永远使用shared。Win下是默认PIC的，不需要加
+5. ar rcsv libname.a src.o ... 生成静态库。-t显示包含哪些.o
+  * 静态库转动态库：-Wl,--whole-archive
 
 ### 库
 
-* Linux下，.a是静态库，由多个.o组成，编译时当作.o附加到参数中就是；.so是动态库，需要-L指定库存在的文件夹，当前目录可省，再-l库名，也支持静态库但优先用动态的，可在前面加-Wl,-Bstatic优先用静态的；一般库都以lib开头，-l:库名.a可精确指定名字
-* Windows下，.lib是静态库，.dll是动态库；但与so相比，dll可不包含符号，此时符号在.lib中，即同一个后缀两个不同的作用
-* MinGW的-lxxx的搜索顺序：libxxx.dll.a xxx.dll.a libxxx.a cygxxx.dll libxxx.dll xxx.dll
-* ldd命令能查看程序所依赖的共享库
-* `-Wl,-rpath=/...` 可以指定**运行时**要搜索的动态库目录
+* Linux
+  * .a是静态库，由多个.o组成，编译时当作.o附加到参数中就是
+  * .so是动态库，需要-L指定库存在的文件夹，当前目录也不可省，再-l库名
+  * -l也支持静态库但优先用动态的，可在前面加-Wl,-Bstatic优先用静态的
+  * 一般库都以lib开头，-l时省略前缀和后缀。-l:可精确指定名字
+  * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath=.`，即Linux默认不会寻找CWD的链接库
+  * 假如两个库ab，a依赖b，在编译a时可以完全不管b，只在编译可执行文件时再去指定b；也可以编译a时链接b，则编译可执行文件时就不再需要指定b
+* Windows
+  * .lib是静态库，.dll是动态库
+  * 另有一种dll，函数符号在lib中，虽然类型为T但没有实现，还会再生成一个`__imp_`开头的I符号，实现在dll中。MinGW产生用-o example.dll -Wl,--out-implib=libexample.a。使用时将它当作.o编译
+    * 对于现在的MinGW，作为使用者，用上面这条、把dll当作.o、用-l，产生的效果一样
+    * 假如两个库ab，a依赖b，在编译a时可以自己生成.o，但必须要引用b才能生成dll
+  * MinGW的-lxxx的搜索顺序：libxxx.dll.a xxx.dll.a libxxx.a cygxxx.dll libxxx.dll xxx.dll
+* 工具
+  * 查看程序所依赖的共享库：ldd
+  * 查看库导出的符号：nm -C，其中-C能解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
+  * 上面两条都支持：objdump -p
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
 * -ftrapv在linux下整数溢出时会触发core dump，会减慢速度
