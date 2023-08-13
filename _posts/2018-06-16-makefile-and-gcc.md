@@ -48,8 +48,11 @@ ifeq (, $(shell which curl))
 	$(error "No curl in $$PATH, please install")
 endif
 
-objects := $(wildcard *.o) # wildcard关键字会进行扩展；如果直接用*.o，那就是普通的*.o，（效果应该是在command中当作shell命令会生效，但makefile自动推导无效）
-obj = $(patsubst %.c ,%.o ,$(src)) # 表示从src中找到所有.c，替换为.o，赋值给obj
+$(wildcard *.o) # wildcard关键字进行扩展
+$(patsubst %.c ,%.o ,$(src)) # 表示从src变量（列表）中找到所有.c，替换为.o
+$(foreach item, 以空格分隔的列表, 含有$(item)的拼接字符串结果)
+$(dir xxx/yyy) 取目录部分，此处返回值为xxx/。$(notdir)去掉目录部分。$(basename)去掉扩展名
+$(filter 模式, 列表)
 
 	@echo 正在编译 # 单独的命令，也要用tab。@表示不显示命令本身，类似于bat的
 	cd /etc; pwd # 不同命令之间独立，如果不用分号而是换行，又会回到cd前的地方
@@ -60,28 +63,31 @@ obj = $(patsubst %.c ,%.o ,$(src)) # 表示从src中找到所有.c，替换为.o
 
 ## CMake
 
+* pip install cmake ninja
 * CMakeLists.txt
   * 参数也可以用分号隔开
 * cmake -B build -G "MinGW Makefiles"; cmake --build build --verbose --parallel --target install/子项目 -- -传递给make或ninja的参数
   * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel，适用于Makefile。对于VS用--build --config Release
-  * 第一次要用-G，之后就不用了
+  * -G -D等只要用第一次，之后会保留。如果要刷新，可删除CMakeCache.txt
 * 另一种方式：mkdir build; cd build; cmake ..; make -j VERBOSE=1; make install; make clean
 * 项目组织形式：include与src同级。include/项目名/xxx.h放公开接口，被install后会放在/usr/local/include里因此要加项目名，使用者用<项目名/xxx.h>
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
-project(hello VERSION 1.0)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17) set(CMAKE_CXX_STANDARD_REQUIRED ON) # 后者不设置时若编译器不支持会自动降低版本
+set(CMAKE_CXX_EXTENSIONS OFF) # 默认on，表示启用GUN扩展。这些需要在project之前设置
+project(hello VERSION 1.0)  # 产生PROJECT_NAME、PROJECT_SOURCE_DIR。还有CMAKE_SOURCE_DIR表示根目录，BINARY_DIR一般就是build。CURRENT表示当前目录，若当前不存在project语句时PROJECT目录就为上层的。LANGUAGE默认为C和CXX。还有VERSION x.y.z DESCRIPTION HOMEPAGE_URL
 
 add_executable(${PROJECT_NAME} main.cpp utils.cpp)  # 生成exe，第一个参数是文件名
 
-add_library(hello_library STATIC或SHARED  # 生成库。默认STATIC。header-only库用INTERFACE。SHARED会自动-D库名_EXPORT
+if(WIN32) set(CMAKE CMAKE_SHARED_LIBRARY_PREFIX "") endif() # 使得Win下的dll不加lib前缀
+add_library(hello_library STATIC或SHARED  # 生成库。默认STATIC，或用BUILD_SHARED_LIBS:BOOL=ON表示默认动态库。header-only库用INTERFACE。SHARED会自动-D库名_EXPORT
     src/Hello.cpp
 )
 add_library(Foo::Bar ALIAS Bar)
 
-file(GLOB SOURCES "src/*.cpp") # 之后可用${SOURCES}表示所有源文件。但不推荐这样做，因为添加了cpp后本文件无法反映变化
-aux_source_directory(src SOURCES) # 另一种方式，不会递归包含子目录
+file(GLOB或GLOB_RECURSE SOURCES "src/*.cpp") # 之后可用${SOURCES}表示所有源文件。但不推荐这样做，因为添加了cpp后本文件无法反映变化，缓解办法是再加CONFIGURE_DEPENDS
+aux_source_directory(src SOURCES) # 另一种方式，不会递归包含子目录。可以多次对同一个结果变量使用来添加
 
 
 target_include_directories(hello_library  # 相当于-I。第一个参数是目标
@@ -98,7 +104,7 @@ target_compile_definitions(hello
     PRIVATE MYMACRO=1  # 相当于-DMYMACRO=1；此条也兼容加-D
 )
 target_compile_options
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEX2" CACHE STRING "Set C++ Compiler Flags" FORCE)  # 全局参数
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEX2" CACHE STRING "Set C++ Compiler Flags" FORCE)  # 全局参数，FORCE表示忽略命令行调用时-D的覆盖，STRING是类型，后面那个是注释
 # 还有CMAKE_C_FLAGS CMAKE_LINKER_FLAGS。可以在cmake命令行时加-D设定
 
 
@@ -107,21 +113,21 @@ find_package(Boost 1.46.1 REQUIRED COMPONENTS filesystem system) # 另一个支�
 下载GitHub的内容：https://cmake.org/cmake/help/latest/module/FetchContent.html
 
 添加预编译的库：
-add_library(foo SHARED IMPORTED)
+add_library(foo SHARED IMPORTED) 如果位置不在项目中再加GLOBAL
 set_property(TARGET foo PROPERTY IMPORTED_LOCATION "/dir-of-libfoo")
-再对mylib加target_include_directories
+再对mylib加target_include_directories，必为INTERFACE
 或者直接使用者link加绝对路径。或者配合find_library和find_path在多个地方寻找指定文件保存到变量里再使用
 还能把后者逻辑放到cmake/FindXxx.cmake里，名称按约定的，使用时先set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")，就可以find_package()了。或者用include()添加文件，手动加
 
 
-if(Boost_FOUND) # 这里面使用变量无需${}。运算符支持MATCHES、STREQUAL
+if(Boost_FOUND) # 这里面使用变量无需${}。运算符支持MATCHES、STREQUAL。一元NOT、NOT DEFINED、TARGET是否存在指定目标
     message ("boost found")
     include_directories(${Boost_INCLUDE_DIRS})
 else()  # 不用REQUIRED时手动处理不存在的场景
     message (FATAL_ERROR "Cannot find Boost")
 endif()
 
-option (USE_MYMATH
+option (USE_MYMATH  # 是set BOOL类型的简写
        "Use provided math implementation" ON)
 if (USE_MYMATH) ... endif()
 
@@ -142,7 +148,14 @@ $<$<BOOL:${WIN32}>:
 $<$<NOT:$<BOOL:${WIN32}>>:
     # for POSIX
 >
-# 以上实际一般用IF (WIN32)、UNIX
+# 以上实际一般用IF (WIN32)、UNIX、MSVC
+
+find_program(CCACHE ccache)
+
+set_target_properties(tgt PROPERTEIS
+  属性名1 值1
+  属性名2 值2
+)
 
 https://cmake.org/cmake/help/latest/guide/tutorial/index.html
 https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/
@@ -230,6 +243,12 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 ## 编译器
 
+* 平台：指令集体系结构(ISA) - os - libc（一般只有Linux区分，其它os自带）。如x86_64-linux-gnu。ISA还有aarch64。libc还有musl、android(bionic)。Win下libc分为gnu和msvc。不同平台之间的程序不通用
+  * ISA后还可能有厂商，win下一般是unknown或者pc，linux下可以是ubuntu
+* 构建(build) - 宿主(host) - 目标(target)。host是运行编译器的平台，target是编译器生成的程序运行的平台。
+  * build和host不同，称为加拿大编译(Canadian)。host和target不同，称为交叉编译。当构建和目标相同但host不同时又称为反向编译(Crossback)
+  * clang（在编译编译器本身时）不区分target
+
 ### Clang
 
 * 安装：https://apt.llvm.org/
@@ -246,10 +265,12 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * https://nuwen.net/mingw.html
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
-* https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain
+* https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
 * https://musl.cc/
 * https://www.ed-x.cc/manual.html 优化了某些工具的性能
 * __MINGW64_VERSION_STR定义了它自己的版本
+* 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads
+* Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc
 
 ### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
 

@@ -642,6 +642,7 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()，但好像它已经patch过了
 * pywin32-ctypes：用纯Py重新实现的pywin32，但只有一小部分API，且很久没更新了
+* 报错LoadLibrary找不到python312.dll：不要运行build里的文件，运行dist里的
 
 ### 其它打包项目
 
