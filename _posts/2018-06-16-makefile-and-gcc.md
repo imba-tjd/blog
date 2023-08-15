@@ -66,11 +66,13 @@ $(filter 模式, 列表)
 * pip install cmake ninja
 * CMakeLists.txt
   * 参数也可以用分号隔开
-* cmake -B build -G "MinGW Makefiles"; cmake --build build --verbose --parallel --target install/子项目 -- -传递给make或ninja的参数
+* cmake -B build -G "MinGW Makefiles"; cmake --build build -v/--verbose -j/--parallel -t/--target 子项目 -- -传递给make或ninja的参数
   * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel，适用于Makefile。对于VS用--build --config Release
   * -G -D等只要用第一次，之后会保留。如果要刷新，可删除CMakeCache.txt
+  * --install build、-t clean
 * 另一种方式：mkdir build; cd build; cmake ..; make -j VERBOSE=1; make install; make clean
 * 项目组织形式：include与src同级。include/项目名/xxx.h放公开接口，被install后会放在/usr/local/include里因此要加项目名，使用者用<项目名/xxx.h>
+* 各个版本新增的特性：https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/chapters/intro/newcmake.html
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
@@ -127,7 +129,7 @@ else()  # 不用REQUIRED时手动处理不存在的场景
     message (FATAL_ERROR "Cannot find Boost")
 endif()
 
-option (USE_MYMATH  # 是set BOOL类型的简写
+option (USE_MYMATH  # 是set BOOL类型的简写，另外能在图形化配置或cmake -LH中显示出来
        "Use provided math implementation" ON)
 if (USE_MYMATH) ... endif()
 
@@ -185,14 +187,14 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 ### 编译步骤
 
-1. gcc -E 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
-2. gcc -S 生成AT&T风格汇编
-3. gcc -c 生成二进制代码(.o)，未链接方便静态反汇编
-4. 生成动态库：-shared -fPIC
+1. gcc -E 或 cpp 进行预处理，一般以.i为后缀，如果不加-o会直接输出到终端里
+2. gcc -S 或 cc1 生成汇编（称为编译）
+3. gcc -c 或 as 生成目标文件(.o)二进制代码
+4. 生成动态库：gcc -shared -fPIC 或 ld
   * fPIC是必须的，其实应在-c时使用。fpic产生的代码更小更快但在某些平台有限制一般不用，或者好像x86_64上二者相同PowerPC上才不同。fPIE用于可执行文件
   * Win下-mdll或--dll现在与shared相同，简化起见永远使用shared。Win下是默认PIC的，不需要加
 5. ar rcsv libname.a src.o ... 生成静态库。-t显示包含哪些.o
-  * 静态库转动态库：-Wl,--whole-archive
+  * 静态库转动态库：-Wl,--whole-archive -lxxx。此参数本意是包含所有静态库中的符号，不管是否用到；默认使用静态库只会载入用到的
 
 ### 库
 
@@ -211,7 +213,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
   * MinGW的-lxxx的搜索顺序：libxxx.dll.a xxx.dll.a libxxx.a cygxxx.dll libxxx.dll xxx.dll
 * 工具
   * 查看程序所依赖的共享库：ldd
-  * 查看库导出的符号：nm -C，其中-C能解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
+  * 查看库导出的符号，但必须有调试符号：nm -C，其中-C能解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
   * 上面两条都支持：objdump -p
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444

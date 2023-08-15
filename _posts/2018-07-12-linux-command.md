@@ -475,3 +475,4 @@ ip link
 * iface：查看网卡信息
 * https://github.com/google/cdc-file-transfer
 * open view see edit compose print：都是run-mailcap的alias，根据mime类型调用对应程序
+* parallel

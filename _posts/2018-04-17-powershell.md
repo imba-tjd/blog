@@ -312,3 +312,5 @@ $env:POWERSHELL_UPDATECHECK
 $ErrorActionPreference：当有cmdlet往stderr里输出信息时如何动作，默认是显示并继续执行。好像没有bash的set-ex的功能(stop on error)
 
 保留byte进入管道：https://learn.microsoft.com/en-us/powershell/scripting/learn/experimental-features?view=powershell-7.4#psnativecommandpreservebytepipe
+
+split-path：-leaf取文件名带后缀，-leafbase不带后缀。支持由ls传入

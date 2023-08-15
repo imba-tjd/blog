@@ -395,19 +395,30 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 
 ## FFmpeg
 
-* ffmpeg 全局参数 输入文件产生 -i 输入文件/文件列表.txt 输出文件参数 输出文件
-* -hide_banner隐藏编译参数
-* 可不加输出文件参数，则只会查看元数据
-* 转换编码：-c:v libx265
-* 转换容器会根据后缀自动处理，可用-c copy不重新编码加快速度
-* 调整码率：-minrate 964K -maxrate 3856K -bufsize 2000K
-* 调整分辨率：-vf scale=480:-1
-* 视频转音频：-vn -c:a copy；去除音频流：-an
+* ffmpeg 全局参数 输入文件的参数 -i 输入文件 输出文件的参数 输出文件
+  * 不加输出文件，可只查看元数据
+  * -hide_banner隐藏编译参数，可用alias默认加上
+  * -formats、-coders
+  * -y 覆盖
+* 转换视频编码：-c:v libx265。音频：-c:a aac，实际一般用copy表示不重新编码加快速度
+  * 老版参数：-vcodec
+* 转换容器会根据后缀自动处理
+  * 视频转音频（去除视频流）：-vn -c:a copy，也可以直接保存成音频文件。去除音频流：-an
+* 压缩
+  * 码率：-minrate 964K -maxrate 3856K -bufsize 2000K。固定码率：-b:v xxxk
+  * 分辨率：-vf scale=480:-1
+  * TODO: 帧率。以及现在更推荐用preset和tune，先选定CRF，0代表最好，默认23。u2b推荐配置：https://support.google.com/youtube/answer/1722171
 * 裁剪一段：-ss [start] -to [end]
 * 合并：-f concat
-* 为Web优化，将元数据放在开头：-movflags faststart
-* 二进制：https://github.com/BtbN/FFmpeg-Builds
-* https://ffmpeg.guide/
+* 为Web优化，将元数据放在开头：-movflags +faststart
+* filter：如调整音量大小、混合声道、低通滤波(lowpass)
+* AAC
+  * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要加--enable-nonfree。aac_at更好，但只有mac有
+  * 格式：AAC-LC比HE-AAC好
+  * 默认的aac，比特率默认是128，高质量的推荐加-b:a 192k。可变比特率质量差
+* 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
+* 第三方图形化配置：https://ffmpeg.guide/graph/demo
+* 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
 
 ## iperf3
 
