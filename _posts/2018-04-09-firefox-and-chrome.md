@@ -56,7 +56,7 @@ title: 浏览器
 * browser.newtabpage.activity-stream.improvesearch.handoffToAwesomebar：false 在新标签页的搜索引擎栏不要直接输到标签栏里
 * security.tls.enable_0rtt_data
 * browser.preferences.moreFromMozilla 设置中对手机端的推广
-* extensions.unifiedExtensions.enabled false去掉工具栏上的“扩展”按钮，109版本新增
+* ~~extensions.unifiedExtensions.enabled~~ false去掉工具栏上的“扩展”按钮，109版本新增，116去掉了
 * network.cookie.sameSite.laxByDefault：true
 
 #### 页面翻译
