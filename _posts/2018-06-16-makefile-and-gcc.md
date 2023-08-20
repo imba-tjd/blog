@@ -98,7 +98,7 @@ target_include_directories(hello_library  # 相当于-I。第一个参数是目�
 )
 
 target_link_libraries(hello_binary  # 相当于-l
-    PRIVATE  # 目标是exe，一般用它
+    PRIVATE  # 目标是exe时一般用PRIVATE，是库时如果依赖在头文件里出现了则用PUBLIC，只在cpp里出现则用PRIVATE
         hello_library # 会自动引入它的PUBLIC和INTERFACE的-I的内容
 )
 
@@ -290,6 +290,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * https://github.com/swig/cccl 把Unix编译器参数转换为cl的参数（cl的wrapper）
 * https://github.com/rui314/chibicc 小型C编译器
 * ICC/ICX：https://www.intel.cn/content/www/cn/zh/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp 大小超过1G
+* https://github.com/jart/cosmopolitan 编译出可以在Linux和Win上运行的程序
 
 ## 参考
 
@@ -311,3 +312,4 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * https://github.com/hellogcc/100-gcc-tips/blob/master/src/index.md
 * https://github.com/rr-debugger/rr
 * https://makefiletutorial.com/
+* scan-build
