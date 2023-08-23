@@ -438,6 +438,12 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * teamviewer、rustdesk、todesk、parsec、向日葵、RayLink（全免费）
 * 异地组网，之后可用微软远程桌面：蒲公英、ZeroTier、Tailscale
 
+## perl
+
+* Win版
+  * https://www.activestate.com/products/perl/
+  * https://strawberryperl.com/ 自带GCC还会加入PATH里，要手动去掉
+
 ## TODO
 
 * unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691

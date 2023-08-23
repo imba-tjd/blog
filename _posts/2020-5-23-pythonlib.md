@@ -1430,7 +1430,7 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * 对于用户的每一次交互，整个脚本从头到尾执行一遍
 * 中文文档：http://cw.hubwiz.com/card/c/streamlit-manual/
 * streamlit run xxx.py/URL
-* 其它项目：pynecone
+* 其它项目：pynecone、gradio
 
 ## Docker镜像
 

@@ -65,7 +65,7 @@ $(filter 模式, 列表)
 
 * pip install cmake ninja
 * CMakeLists.txt
-  * 参数也可以用分号隔开
+  * 参数（列表）也可以用分号隔开，分号和空格是等价的
 * cmake -B build -G "MinGW Makefiles"; cmake --build build -v/--verbose -j/--parallel -t/--target 子项目 -- -传递给make或ninja的参数
   * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel，适用于Makefile。对于VS用--build --config Release
   * -G -D等只要用第一次，之后会保留。如果要刷新，可删除CMakeCache.txt
@@ -97,7 +97,7 @@ target_include_directories(hello_library  # 相当于-I。第一个参数是目�
         ${PROJECT_SOURCE_DIR}/include
 )
 
-target_link_libraries(hello_binary  # 相当于-l
+target_link_libraries(hello_binary  # 相当于-l。target不存在时会寻找系统库
     PRIVATE  # 目标是exe时一般用PRIVATE，是库时如果依赖在头文件里出现了则用PUBLIC，只在cpp里出现则用PRIVATE
         hello_library # 会自动引入它的PUBLIC和INTERFACE的-I的内容
 )
@@ -158,6 +158,8 @@ set_target_properties(tgt PROPERTEIS
   属性名1 值1
   属性名2 值2
 )
+
+$ENV{PATH}
 
 https://cmake.org/cmake/help/latest/guide/tutorial/index.html
 https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/
