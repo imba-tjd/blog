@@ -364,7 +364,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 
 ### rsync
 
-* rsync -avzP src dest：a保留文件所有属性且递归，z启用压缩，P断点续传且显示每个文件的进度，v详细模式但在P下只会再多显示一点总结信息
+* rsync -avzP src dest：a保留文件所有属性且递归（隐含r等多个选项），z启用压缩，P断点续传且显示每个文件的进度，v详细模式但在P下只会再多显示一点总结信息
 * -H保留硬链接，-u只更新变化了的（文件存在于dest且mtime更新），-n是dry run，--delete删除dest中所有不在src中的文件，-c用校验和而不是时间和大小判断是否不同会大量消耗资源，-vvvv显示debug级别的信息
 * 设置--inplace和--append后好像是增量同步；有限速功能避免把服务器带宽占满（scp也有）；Host::/path用的是rsync协议，运行daemon时可以类似ftp提供文件出去，可以设置只读和IP黑白名单；不提供dest等价于运行ll，此时-h才有用；-R的作用：`-rR /var/./log/nginx /tmp`将会创建/tmp/log/nginx；-S发送稀疏文件时使用
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
@@ -419,6 +419,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
 * 第三方图形化配置：https://ffmpeg.guide/graph/demo
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
+* 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
 
 ## iperf3
 
