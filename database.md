@@ -490,7 +490,6 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * ACE驱动下载：https://www.microsoft.com/zh-cn/download/details.aspx?id=54920
 * OLEDB通过COM调用，比ODBC高层，比ADO低层。感觉没有必要使用
 
-
 ## 工具和其它DBMS
 
 * https://github.com/sqlmapproject/sqlmap 注入
@@ -503,6 +502,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://github.com/directus/directus node，给数据库创建RESTAPI
 * https://github.com/milvus-io/milvus/ 国产向量搜索引擎
 * Oracle 免费版：https://www.oracle.com/database/technologies/appdev/xe.html
+* ElasticSearch的替代品：https://github.com/zincsearch/zincsearch https://github.com/manticoresoftware/manticoresearch
 
 ### GUI
 
