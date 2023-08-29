@@ -150,3 +150,9 @@ title: 浏览器
 
 * `function FindProxyForURL(url, host)`：其中url现在不包含协议和查询参数。返回一个字符串，如果为空或者为`DIRECT`就直连，`PROXY host:port`就使用HTTP代理，改为SOCKS就是SOCKS代理。支持用分号指定Fallback
 * 扩展名为pac，MIME为`application/x-ns-proxy-autoconfig`
+
+## 禁止Edge自动更新
+
+https://msedgeblockertoolkit.blob.core.windows.net/blockertoolkit/MicrosoftEdgeChromiumBlockerToolkit.exe
+
+下载后运行，指定解压路径。管理员权限运行EdgeChromium_Blocker.cmd /B。/U恢复。实际上就是执行`REG ADD HKLM\SOFTWARE\Microsoft\EdgeUpdate /v DoNotUpdateToEdgeWithChromium /t REG_DWORD /d 1 /f`
