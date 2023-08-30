@@ -398,9 +398,11 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * ffmpeg 全局参数 输入文件的参数 -i 输入文件 输出文件的参数 输出文件
   * 不加输出文件，可只查看元数据
   * -hide_banner隐藏编译参数，可用alias默认加上
-  * -formats、-coders
+  * -formats、-codecs
+  * -h encoder=xxx 列出xxx的详细参数
   * -y 覆盖
-* 转换视频编码：-c:v libx265。音频：-c:a aac，实际一般用copy表示不重新编码加快速度
+* 转换视频编码（指定编码器）：-c:v libx265 -c:a copy
+  * copy表示不重新编码加快速度，a表示音频
   * 老版参数：-vcodec
 * 转换容器会根据后缀自动处理
   * 视频转音频（去除视频流）：-vn -c:a copy，也可以直接保存成音频文件。去除音频流：-an
@@ -414,8 +416,8 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * filter：如调整音量大小、混合声道、低通滤波(lowpass)
 * AAC
   * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要加--enable-nonfree。aac_at更好，但只有mac有
-  * 格式：AAC-LC比HE-AAC好
-  * 默认的aac，比特率默认是128，高质量的推荐加-b:a 192k。可变比特率质量差
+  * 默认的aac，比特率默认128，高质量的考虑加-b:a 192k。可变比特率质量差不考虑
+  * 格式：AAC-LC比HE-AAC好。默认的aac只支持LE
 * 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
 * 第三方图形化配置：https://ffmpeg.guide/graph/demo
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
