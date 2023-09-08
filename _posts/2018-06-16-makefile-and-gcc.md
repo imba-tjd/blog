@@ -315,3 +315,5 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * https://github.com/rr-debugger/rr
 * https://makefiletutorial.com/
 * scan-build
+* crosstool-NG
+* https://github.com/jrfonseca/drmingw JIT-debugger
