@@ -153,10 +153,17 @@ title: 浏览器
 
 ## 禁止Edge自动更新
 
-https://msedgeblockertoolkit.blob.core.windows.net/blockertoolkit/MicrosoftEdgeChromiumBlockerToolkit.exe
+```
+C:\Program Files (x86)\Microsoft\EdgeUpdate 权限全部禁止
 
+无用的：
+https://msedgeblockertoolkit.blob.core.windows.net/blockertoolkit/MicrosoftEdgeChromiumBlockerToolkit.exe
 下载后运行，指定解压路径。管理员权限运行EdgeChromium_Blocker.cmd /B。/U恢复。实际上就是执行`REG ADD HKLM\SOFTWARE\Microsoft\EdgeUpdate /v DoNotUpdateToEdgeWithChromium /t REG_DWORD /d 1 /f`
 
-或加UpdateDefault为0，在edge://policy/里能看到。2表示允许手动更新，0表示禁用。
+加UpdateDefault为0，在edge://policy/里能看到。2表示允许手动更新，0表示禁用。
 
-或删除MicrosoftEdgeUpdate.exe或加防火墙规则。
+删除MicrosoftEdgeUpdate.exe
+
+未测试：
+加防火墙规则
+```

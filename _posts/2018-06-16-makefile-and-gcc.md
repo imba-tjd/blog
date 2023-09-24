@@ -205,7 +205,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
   * .so是动态库，需要-L指定库存在的文件夹，当前目录也不可省，再-l库名
   * -l也支持静态库但优先用动态的，可在前面加-Wl,-Bstatic优先用静态的
   * 一般库都以lib开头，-l时省略前缀和后缀。-l:可精确指定名字
-  * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath=.`，即Linux默认不会寻找CWD的链接库
+  * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath=.`，即Linux默认不会寻找CWD的链接库。另外还可用LD_LIBRARY_PATH和LD_PRELOAD
   * 假如两个库ab，a依赖b，在编译a时可以完全不管b，只在编译可执行文件时再去指定b；也可以编译a时链接b，则编译可执行文件时就不再需要指定b
 * Windows
   * .lib是静态库，.dll是动态库
