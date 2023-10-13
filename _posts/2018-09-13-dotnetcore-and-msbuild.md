@@ -213,6 +213,8 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * Version指定的是最低兼容版本，用*可指定最高版本
 * 国内镜像，VS中使用时要删掉原来的，不知是不是BUG：https://nuget.cdn.azure.cn/v3/index.json
 * `error NU1100: Unable to resolve xxx for 'net6.0'`：删除%AppData%\NuGet\NuGet.Config
+* 版本：1.0表示>=1.0，但会优先用满足条件的最低版本。1.*会优先用高版本
+* 冲突解析：优先直接依赖，然后是传递依赖，但不按深度
 
 ## [manifest](https://docs.microsoft.com/windows/win32/sbscs/application-manifests)
 

@@ -332,3 +332,7 @@ https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
 算法知识集合网站：
 https://www.hello-algo.com/
 https://labuladong.github.io/algo/
+
+打点标记法处理整数区间：如24小时对应int[24]，未公开对应0，公开且空闲对应1，占用中对应2。
+
+题目中数据量很大(如10^9)时，也许要从另一个不那么大的数据量(如10^5)入手遍历，从总数中减去遍历计算的结果。
