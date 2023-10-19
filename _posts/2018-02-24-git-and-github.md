@@ -38,11 +38,12 @@ title: Git/GitHub笔记
 * 如果有其它分支依赖了当前分支，不要rebase，否则其它分支就依赖不存在的节点了
 * git merge --squash：不会进行提交，只会add
 * rebase时保留原时间（未测试）：--committer-date-is-author-date
+* rebase的edit选项，修改后要add, commit --amend, continue，与冲突不同
 
 ### 冲突
 
 * 发生冲突时，文件状态为unmerged changes，像是staged和local的中间态
-* 解决冲突后需要add，或rm，然后git merge --continue，不用加分支名
+* 解决冲突后需要add，或rm，然后git merge --continue，不用加分支名，无需commit
 * git和GitHub解决冲突不同：后者是把base往fork合并一次，再在PR中无冲突合并回base；前者直接在merge commit中解决了
 * checkout对于新文件不会有问题。对于local修改了的文件，如果HEAD和目标之间那些文件未修改，也没有问题；但如果修改过，即使不存在冲突，也无法直接切换，此时可用-m尝试合并和解决冲突，但staged可能会丢失。对于staged，如果存在冲突，用-m也无法进行切换，如果不存在冲突，会相当于自动合并一次，如果此时再切换会原分支，staged可能和之前不一样（如果不换回原分支应该没问题）。总之最好不要在有staged的情况下切换分支
 * config merge.conflictStyle diff3：发送冲突时还会显示原内容
