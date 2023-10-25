@@ -48,10 +48,6 @@ void print_tokens(char* line)
 }
 ```
 
-复制一个字符串：
-char* strdup(char* str);
-该函数非标准库函数，返回str的拷贝。内部使用strlen计算需要分配内存的大小，malloc分配空间（一般实现）；而strcpy需要自己分配空间。用完后需要free释放，否则会内存泄漏。因为用了strlen，所有str参数不能为NULL，否则会报段错误；因为是非标准的，某些C++库如果重写它使用了new，则释放就要用delete了。
-
 字符串常量：
 *"xyz" == 'x';
 *("xyz" + 1) == 'y';
@@ -83,6 +79,7 @@ putchar("0123456789ABCDEF"[value%16]);
 * 如果realloc第一个参数为NULL，它的行为就和malloc一样
 * free的参数只能是NULL或从malloc、calloc、realloc返回的指针，不能是指针+-后的结果，因为分配了多少内存是记录在某个偏移的地方的。也不能二次free之前已经释放过的
 * realloc(p,0)未定义
+* malloc和free是线程安全的，但不可重入，不能在信号处理函数中用
 
 ## 可移植类型：stdint.h和inttypes.h
 

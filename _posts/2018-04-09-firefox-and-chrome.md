@@ -70,8 +70,8 @@ title: 浏览器
 * network.trr.mode：3为强制，2为允许fallback
 * network.trr.uri：https://1.1.1.1/dns-query 或 https://mozilla.cloudflare-dns.com/dns-query 或 https://rubyfish.cn/dns-query
 * network.trr.bootstrapAddress：1.1.1.1 避免上一条被劫持
-* network.security.esni.enabled：true开启esni
 * ttr的reference：https://bagder.github.io/TRRprefs/ https://wiki.mozilla.org/Trusted_Recursive_Resolver
+* 检测ECH：https://defo.ie/ech-check.php https://tls-ech.dev/ https://www.cloudflare-cn.com/ssl/encrypted-sni dig HTTPS类型，结果里有ech的
 
 ### 图标
 
@@ -145,6 +145,10 @@ title: 浏览器
 ### 书签
 
 * 没有保存历史版本，仅本地保存了上一个版本，在`User Data\Default\Bookmarks.bak`中
+
+### Edge
+
+* Enable history accelerator to open the full page：Ctrl+H显示历史页而非浮窗
 
 ## PAC
 

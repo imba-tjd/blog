@@ -77,6 +77,14 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 
 * `N: Download is performed unsandboxed as root as file '/root/xxx.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)`：https://askubuntu.com/questions/908800 但是好像可以安装成功
 
+## Yum
+
+* /etc/yum.repos.d/xxx.repo
+* clean; makecache
+* list installed
+* install -y pkg-ver
+* update --allowerase
+
 ## PIP
 
 * 安装pip本身和一些库：python3-dev python3-venv python3-pip python-pip-whl python3-setuptools python3-wheel，Linux下安装后的名称只会是pip3
@@ -353,7 +361,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * 字幕：--write-sub --sub-lang zh --all-subs，--write-auto-sub --embed-subs，--skip-download仅下载字幕
 * 把视频转成音频：-x；--audio-quality 9，默认5
 * 保存的文件名，支持元信息：-o `%(title)s.%(ext)s`，默认含有id
-* 指定播放列表中的范围或某些视频：--playlist-start、end、items 2,4-6
+* 指定播放列表中的范围或某些视频：--playlist-start、end、items 2,4-6。默认即使URL为后续视频也会从头下载播放列表，且--no-playlist无效
 * 缓存大小是自动调整的
 * -s：dry-run
 * --add-metadata
@@ -422,6 +430,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 第三方图形化配置：https://ffmpeg.guide/graph/demo
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
 * 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
+* 视频容器：webm u2b支持，无声
 
 ## iperf3
 
