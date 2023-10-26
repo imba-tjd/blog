@@ -77,13 +77,15 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 
 * `N: Download is performed unsandboxed as root as file '/root/xxx.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)`：https://askubuntu.com/questions/908800 但是好像可以安装成功
 
-## Yum
+## Yum/dnf
 
 * /etc/yum.repos.d/xxx.repo
-* clean; makecache
-* list installed
+* repolist; clean all; makecache
+* list installed/updates/pkg
 * install -y pkg-ver
 * update --allowerase
+* search pkg 自动通配
+* provides 查询某个程序或so库是哪个包装上的
 
 ## PIP
 

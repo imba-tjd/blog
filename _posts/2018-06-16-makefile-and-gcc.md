@@ -294,6 +294,20 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * ICC/ICX：https://www.intel.cn/content/www/cn/zh/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp 大小超过1G
 * https://github.com/jart/cosmopolitan 编译出可以在Linux和Win上运行的程序
 
+## gdb
+
+* gdb a.out [coredump]
+* run(r)、continue(c)
+* breakpoint(br) line/func
+* step(s)、s func
+* next(n)
+* print(p) arr 支持字符串、数组。打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素。打印指针变量的值及其指向的值，或打印地址里的值：x p/add
+* list(l) line/func 显示源码，无参默认为当前函数的
+* info(i) registers(r)等
+* quit(q)
+* !xxx 执行shell命令
+* 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用
+
 ## 参考
 
 * https://blog.csdn.net/haoel/article/details/2886

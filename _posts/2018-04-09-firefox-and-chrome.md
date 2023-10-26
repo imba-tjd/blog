@@ -149,6 +149,7 @@ title: 浏览器
 ### Edge
 
 * Enable history accelerator to open the full page：Ctrl+H显示历史页而非浮窗
+* 设置 - 侧栏(sidebar) - 始终显示边栏。下面的 应用和通知设置 - 特定于应用的设置 - Discover - 显示必应聊天
 
 ## PAC
 
