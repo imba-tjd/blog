@@ -298,13 +298,15 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 * gdb a.out [coredump]
 * run(r)、continue(c)
-* breakpoint(br) line/func
+* breakpoint(br) src.c:line/func if(...)
 * step(s)、s func
 * next(n)
-* print(p) arr 支持字符串、数组。打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素。打印指针变量的值及其指向的值，或打印地址里的值：x p/add
+* print(p) arr 支持字符串、数组。/x以十六进制显示值。打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素。打印指针变量的值及其指向的值，或打印地址里的值：x p/add
 * list(l) line/func 显示源码，无参默认为当前函数的
-* info(i) registers(r)等
+* info(i) registers(r)/functions等
 * quit(q)
+* backtrace(bt)
+* set var=v
 * !xxx 执行shell命令
 * 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用
 
