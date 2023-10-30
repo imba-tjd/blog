@@ -179,7 +179,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
 * -flto：编译和链接都要用，与make -j同时用或自动多线程时加=auto，-fno-fat-lto-objects能减少生成时间但无法进行普通链接，只需在编译时用，没看懂默认是否启用。clang支持=thin比普通的更好
 * -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
-* -g等于-g2，-g3的体积更大，-g0禁用前面的-g。-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度，但无法与-flto一起使用
+* -g等于-g2，-g3还会包含宏定义体积更大，-g0禁用前面的-g，-ggdb(3)产生仅限于gdb的信息，-Og保留调试信息且优化。-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度，但无法与-flto一起使用
 * -###为dry-run，能显示具体编译用到的命令
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
 * -fuse-ld=gold比普通的ld快，MinGW不自带
@@ -193,7 +193,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 2. gcc -S 或 cc1 生成汇编（称为编译）
 3. gcc -c 或 as 生成目标文件(.o)二进制代码
 4. 生成动态库：gcc -shared -fPIC 或 ld
-  * fPIC是必须的，其实应在-c时使用。fpic产生的代码更小更快但在某些平台有限制一般不用，或者好像x86_64上二者相同PowerPC上才不同。fPIE用于可执行文件
+  * fPIC是必须的，其实应在-c时使用。fpic产生的代码更小更快但在某些平台有限制一般不用，或者好像x86_64上二者相同PowerPC上才不同。fPIE用于可执行文件，可在编译时都用pic，只在最后链接时用pie
   * Win下-mdll或--dll现在与shared相同，简化起见永远使用shared。Win下是默认PIC的，不需要加
 5. ar rcsv libname.a src.o ... 生成静态库。-t显示包含哪些.o
   * 静态库转动态库：-Wl,--whole-archive -lxxx。此参数本意是包含所有静态库中的符号，不管是否用到；默认使用静态库只会载入用到的
@@ -221,6 +221,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
 * -ftrapv在linux下整数溢出时会触发core dump，会减慢速度
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
+* Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
 * 减少体积
   * -Wl,--as-needed
   * -Wl,--strip-all
@@ -296,12 +297,14 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 ## gdb
 
-* gdb a.out [coredump]
+* gdb a.out [coredump]。-q不显示startup-text，--args 命令行参数（也可以run时传），-ex一进入就执行的命令
 * run(r)、continue(c)
-* breakpoint(br) src.c:line/func if(...)
-* step(s)、s func
-* next(n)
-* print(p) arr 支持字符串、数组。/x以十六进制显示值。打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素。打印指针变量的值及其指向的值，或打印地址里的值：x p/add
+* breakpoint(br) 'src.c'::line/func if(...)、delete、clear
+* step(s)、s func、next(n)
+* print(p) 'src.c'::arr 支持字符串、数组
+  * /x以十六进制显示值
+  * 打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素
+  * 打印指针变量的值及其指向的值，或打印地址里的值：x p/add。有选项修改打印的数量和格式
 * list(l) line/func 显示源码，无参默认为当前函数的
 * info(i) registers(r)/functions等
 * quit(q)

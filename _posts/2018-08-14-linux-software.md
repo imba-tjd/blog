@@ -80,7 +80,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 ## Yum/dnf
 
 * /etc/yum.repos.d/xxx.repo
-* repolist; clean all; makecache
+* repolist all; clean all; makecache
 * list installed/updates/pkg
 * install -y pkg-ver
 * update --allowerase
