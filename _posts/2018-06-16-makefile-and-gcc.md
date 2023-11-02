@@ -220,7 +220,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
   * FORTIFY_SOURCE将不安全函数替换为对应的_chk版本
-  * -Wl,-z,relro使得GOT部分只读，再加-z,now全部只读但可能影响启动性能
+  * -Wl,-z,relro使得GOT部分只读，再加-z,now全部只读，会在启动时全部加载符号，可能影响性能
   * -ftrapv在linux下整数溢出时会触发core dump，会减慢速度
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
@@ -315,6 +315,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * watch(wa)
 * !xxx 执行shell命令
 * 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用
+* ulimit -c unlimited后才会产生dump
 
 ## 参考
 
