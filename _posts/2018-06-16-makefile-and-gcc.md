@@ -301,7 +301,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 * gdb a.out [coredump]。-q不显示startup-text，--args 命令行参数（也可以run时传），-ex一进入就执行的命令
 * run(r)、continue(c)
-* breakpoint(br) 'src.c'::line/func if(...)、delete bp_n、clear line
+* breakpoint(br) src.c:line/func if(...)、delete bp_n、clear line
 * step(s)、s func、next(n)
 * print(p) 'src.c'::arr 支持字符串、数组
   * /x以十六进制显示值
@@ -315,7 +315,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * watch(wa)
 * !xxx 执行shell命令
 * 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用
-* ulimit -c unlimited后才会产生dump
+* ulimit -c unlimited后才会产生dump。systemd运行的另有方式
 
 ## 参考
 
