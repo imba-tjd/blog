@@ -312,7 +312,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * quit(q)
 * backtrace(bt)
 * set var=v
-* watch(wa)
+* watch(wa)变量被写入时中断，rwatch被读取时中断，awatch读写
 * !xxx 执行shell命令
 * 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用
 * ulimit -c unlimited后才会产生dump。systemd运行的另有方式
