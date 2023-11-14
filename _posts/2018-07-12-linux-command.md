@@ -45,7 +45,7 @@ title: Linux命令
 * ldd --version：能看到glibc版本
 * top：显示进程内存/cpu占用信息，会自动更新，-c显示详细的命令；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
-* lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍
+* lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
 
 ## 文件处理
 
@@ -354,6 +354,7 @@ ip link
 * -v：反向(invert)，输出不匹配的
 * -w：单词，相当于前后加了\b
 * --：使得之后以横杠开头的参数不看作选项
+* zgrep
 * 还有个ugrep貌似速度很快，但是社区不够好，也不稳定
 
 #### ripgrep(rg)

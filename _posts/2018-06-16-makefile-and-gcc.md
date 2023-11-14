@@ -302,13 +302,13 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * gdb a.out [coredump]。-q不显示startup-text，--args 命令行参数（也可以run时传），-ex一进入就执行的命令
 * run(r)、continue(c)
 * breakpoint(br) src.c:line/func if(...)、delete bp_n、clear line
-* step(s)、s func、next(n)
+* step(s)、s func、next(n)、finish
 * print(p) 'src.c'::arr 支持字符串、数组
   * /x以十六进制显示值
   * 打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素
   * 打印指针变量的值及其指向的值，或打印地址里的值：x p/add。有选项修改打印的数量和格式
 * list(l) line/func 显示源码，无参默认为当前函数的
-* info(i) registers(r)/functions等
+* info(i) registers(r)/functions/locals等
 * quit(q)
 * backtrace(bt)
 * set var=v
