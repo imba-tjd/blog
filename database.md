@@ -279,7 +279,7 @@ END
   * info无参使用列出所有的实例，info加实例名显示命名管道等信息，管道名每次启动都不一样
   * 现在安装包会自动添加路径到系统级别的PATH里
 * 如果启动失败，考虑删除重建，一般是用了老版本的数据库：Unexpected error occurred inside a LocalDB instance API method call
-* 连接字符串：`"Server=(localdb)\\.;Integrated Security=true"`，其它实例名用`(localdb)\.\实例名`
+* 连接字符串：`"Server=(localdb)\\.;Integrated Security=true"`，其它实例名用`(localdb)\实例名`
   * 某些客户端只支持命名管道连接，如HeidiSQL，且主机名不需要加np:
 * 需指定数据库级别的排序规则：`CREATE/ALTER DATABASE db1 COLLATE Chinese_PRC_CI_AS`；不会影响已有的列，还需要ALTER TABLE一下
 * 下载地址：https://www.hanselman.com/blog/download-sql-server-express
