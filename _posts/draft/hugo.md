@@ -40,6 +40,7 @@ slug: xxx # 永久链接，默认等于文件名
 ## 主题
 
 * https://themes.gohugo.io/hugo-theme-stack/ 国产，有侧边栏和分类
+* https://github.com/google/docsy
 * https://themes.gohugo.io/hugo-theme-terminal/ 暗色
 * https://themes.gohugo.io/hugo-papermod/
 * https://themes.gohugo.io/hugo-eureka/ 国产，首页有头图，有TOC
