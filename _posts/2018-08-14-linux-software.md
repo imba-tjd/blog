@@ -449,6 +449,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/quasar/Quasar
 * https://github.com/moonlight-stream
 * https://www.nomachine.com/
+* https://github.com/FreeRDP/FreeRDP
 * teamviewer、rustdesk、todesk、parsec、向日葵、RayLink（全免费）
 * 异地组网，之后可用微软远程桌面：蒲公英、ZeroTier、Tailscale
 

@@ -58,6 +58,7 @@ title: 浏览器
 * browser.preferences.moreFromMozilla 设置中对手机端的推广
 * ~~extensions.unifiedExtensions.enabled~~ false去掉工具栏上的“扩展”按钮，109版本新增，116去掉了
 * network.cookie.sameSite.laxByDefault：true
+* media.wmf.hevc.enabled=1 启用HEVC硬件解码支持，至少要120beta
 
 #### 页面翻译
 

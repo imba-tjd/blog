@@ -1466,7 +1466,7 @@ COPY . . # 用上.dockerignore
   * https://github.com/pytransitions/transitions FSM
   * https://github.com/dabeaz/sly 源于lex和yacc，作者不维护了
 * pretty_errors：精简stacktrace，可全局安装
-* uwsgi：不支持Win，用了sys/socket.h，可考虑WSL
+* uwsgi：不支持Win，用了sys/socket.h，可考虑WSL。https://pypi.org/project/pyuwsgi/
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
 
 ## 参考
