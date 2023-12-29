@@ -216,7 +216,7 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
 * Services、Models、Data、Web根(wwwroot)
   * Data类似于Java的Service，放IxxxDataStore.cs和某数据库xxxDataStore.cs
 * js，css，lib，favicon放在wwwroot下作为静态文件，可以用IWebHostEnvironment.WebRootPath获取
-  * 在 Razor.cshtml 文件中，~/ 指向 Web 根。 以 ~/ 开头的路径称为虚拟路径。
+  * 在 Razor.cshtml 文件中，~/ 指向 Web 根。 以 ~/ 开头的路径称为虚拟路径
 
 ### 布局
 
@@ -281,7 +281,7 @@ options.Conventions.AddPageRoute("/extras/products", "product");});
   * 添加[HttpPost]等特性，不加就是Get，可以加逗号应用多个
   * 方法名不重要，只会路由到类，然后看Verb。但也可以在[HttpGet(...)]中添加子路由
   * 特性支持路由参数传递到方法的参数，如[HttpGet("{id}")]
-  * 返回值可以是具体类型，会自动json序列化。可以是IEnumerable。可以是`ActionResult<T>`。
+  * 返回值可以是具体类型，会自动json序列化。可以是IEnumerable。可以是`ActionResult<T>`
   * 形参上可加[FromBody] FromHeader推断绑定源，这样参数可以直接是自定义类，有时不加也行
 * 默认输入和输出的都是JSON(Content-Type: application/json)。在AddControllers的选项里用ReturnHttpNotAcceptable=true 对其它的返回406 Not Acceptable
 * dotnet tool install -g Microsoft.dotnet-httprepl; httprepl localhost:port 之后可以输入ls cd get命令

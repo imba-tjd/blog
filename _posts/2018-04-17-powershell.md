@@ -85,7 +85,7 @@ category: windows
 
 `ls 驱动器名加冒号`可打印内部的值，创建用New-Item(ni)，删除用ri/del/rm，注意此时无需加`$`。key可用dos通配符。只有使用里面的变量内容的时候才用`$`，如`$env:path`。使用Get-PSDrive可看到所有的驱动器，Get-Volume只看实际的卷。如果key中也含有变量，需用Set-Item。
 
-* env：环境变量，其中修改path要用+=且记得加分号。永久修改需要用`[environment]::SetEnvironmentvariable`。
+* env：环境变量，其中修改path要用+=且记得加分号。永久修改需要用`[environment]::SetEnvironmentvariable`
 * alias：所有的别名。仅仅打印，要执行用&
 * variable：所有的变量，与gv结果相同
 * ${c:/123.txt}：直接取得路径指示的文件里的内容，必须要用大括号，必须是具体的路径，不能用变量替换

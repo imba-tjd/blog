@@ -252,7 +252,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 * 平台：指令集体系结构(ISA) - os - libc（一般只有Linux区分，其它os自带）。如x86_64-linux-gnu。ISA还有aarch64。libc还有musl、android(bionic)。Win下libc分为gnu和msvc。不同平台之间的程序不通用
   * ISA后还可能有厂商，win下一般是unknown或者pc，linux下可以是ubuntu
-* 构建(build) - 宿主(host) - 目标(target)。host是运行编译器的平台，target是编译器生成的程序运行的平台。
+* 构建(build) - 宿主(host) - 目标(target)。host是运行编译器的平台，target是编译器生成的程序运行的平台
   * build和host不同，称为加拿大编译(Canadian)。host和target不同，称为交叉编译。当构建和目标相同但host不同时又称为反向编译(Crossback)
   * clang（在编译编译器本身时）不区分target
 

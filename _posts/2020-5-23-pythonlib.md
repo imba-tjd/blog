@@ -213,7 +213,7 @@ password:
 
 ### CLI
 
-* startproject MyPrj .：产生项目模板。scrapy.cfg所在目录是项目根目录，default的值就是scrapy命令行使用的项目，但此文件基本没用。
+* startproject MyPrj .：产生项目模板。scrapy.cfg所在目录是项目根目录，default的值就是scrapy命令行使用的项目，但此文件基本没用
 * genspider [-t crawl] douban url：在MyPrj/spiders中产生douban.py单个文件，类名自动为DoubanSpider
 * shell url：交互式爬取指定页面。Ctrl+C退出。如果venv中有ipython，会自动使用
 * fetch/view url：根据当前项目的配置（如改了UA）发出请求，内容输出到终端/浏览器上。不会进入REPL
