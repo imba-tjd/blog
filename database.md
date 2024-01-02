@@ -163,7 +163,6 @@ END
 * 唯一索引(UNIQUE)：指数据是唯一的，不是只能创建一个；等值查询性能高
 * 筛选索引/部分索引(MySQL除外)：创建非聚集索引时添加WHERE，维护开销更小；如果查询时WHERE中有AND，创建索引一般要用OR
 * 包含列的索引(MSSQL)：创建非聚集索引时添加INCLUDE(col1)，适合col1只存在于SELECT而不在WHERE中时
-
 * 列存储索引(MSSQL)：适用于频繁使用聚合函数，而行储存适用于表查找；多于100万行时才考虑，适合大量插入、少量更新和删除
 * 堆(MSSQL)：没有聚集索引的表，SELECT的顺序不确定，适合暂存大量无序插入
 * 视图索引：也称虚表
@@ -306,8 +305,9 @@ END
   * 仅客户端CLI：装MySQL Shell
   * 8.0不再有32位的
 * zip版必须手动初始化datadir：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码，但默认只有localhost能连
+  * 推荐datadir的owner改为mysql用户，chmod 750
   * 以Deamon运行，日志写入datadir中的 .err：-D
-  * Win版默认就是Deamon，以前台运行：--console
+  * Win下默认就是Deamon，以前台运行：--console
   * Win下创建/删除服务：--install/remove，停止：sc start/stop mysql
 * mysql_secure_installation：设置root密码等，官方推荐初始化后用一次
 * systemctl管理的不需要用mysqld_safe
