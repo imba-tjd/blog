@@ -291,55 +291,58 @@ END
 * set foreign_key_checks=0：不检查外键约束
 * status：状态
 * 工具：https://github.com/github/gh-ost MySQLTuner-perl
-* SSL加密：默认就会在datadir中生成自签名证书，客户端（不含mariadb）默认就会进行加密连接，只不过默认允许回退到未加密
+* SSL加密
+  * 默认就会在datadir中生成自签名证书，客户端（不含mariadb）默认就会进行加密连接，只不过默认允许回退到未加密
   * 强制要求加密：服务端：require_secure_transport=1，客户端：--ssl-mode=REQUIRED
   * 客户端验证服务端：服务端传ca.pem给客户端，客户端用--ssl-ca=证书路径和--ssl-mode=VERIFY_CA。非自动生成的可用VERIFY_IDENTITY，还会检查SNI，自动生成的证书不包含SNI
   * 服务端验证客户端：传两个client-证书，客户端用--ssl-cert和key。但好像没有强制验证的选项
   * 开启后仍要验证用户名和密码
+  * 服务端第一次启动不能用ssl相关选项，否则不会自动生成整数
 
 ### 安装
 
 * https://dev.mysql.com/downloads
-  * Debian稳定源里只有mariadb-server，unstable里才有mysql-server。要装MySQL APT Repository的deb 再update再装mysql-server，会交互式提示设置密码。再运行mysql_secure_installation进行一些设置。也有二进制deb，在MySQL Community Server里
+  * Debian稳定源里只有mariadb-server，unstable里才有mysql-server 8.0。要装MySQL APT Repository的deb再update再装mysql-server，会交互式提示设置密码。也有二进制deb，在MySQL Community Server里
   * 仅客户端CLI：装MySQL Shell
   * 8.0不再有32位的
-* 创建数据库到datadir中：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码
-* 忘记密码：在服务器机器上用root登录无需密码（通过auth_socket插件）。强行修改：mysqld --skip-grant-tables; mysql; USE mysql; update user set  password=password('新密码') where user='root' and host='localhost'; FLUSH PRIVILEGES;
-* 以Deamon运行，日志写入datadir中：-D
-  * 官方版本推荐使用mysqld_safe运行
-  * 结束服务端：`kill $(</var/run/mysqld/mysqld.sock.lock)`，官方默认在`/tmp/mysql.sock`
-  * Win下创建服务：--install，删除：--remove，重启：net stop/start mysql
+* zip版必须手动初始化datadir：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码，但默认只有localhost能连
+  * 以Deamon运行，日志写入datadir中的 .err：-D
+  * Win版默认就是Deamon，以前台运行：--console
+  * Win下创建/删除服务：--install/remove，停止：sc start/stop mysql
+* mysql_secure_installation：设置root密码等，官方推荐初始化后用一次
+* systemctl管理的不需要用mysqld_safe
 
 ### my.cnf
 
-* 管理器安装的在/ect/mysql下，官方直接运行的在/etc下。Win通过MSI安装后在%ProgramData%\MySQL\MySQL Server 8.0下，直接运行的可放在安装目录下
+* 会在多个位置搜索此文件，如/ect/mysql、/etc。Win的msi版在%ProgramData%/MySQL/MySQL Server 8.0，zip版考虑放在basedir下
 * 直接运行的重载配置：/etc/init.d/mysql reload
-* 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'
+* 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'、--help --verbose显示所有选项实际值
 
 ```conf
 [mysqld]
 user=mysql
-datadir=数据库文件目录
+datadir=/data/mysql 默认在basedir/data
 bind_address=指定ip，默认为*
-skip_name_resolve  客户端连接时默认会对ip反向解析
-shared_memory  仅限Win，无脑开，不过好像只有cli和.NET的会用
 
 innodb_strict_mode 感觉可以无脑开
 innodb_buffer_pool_size=默认128M，应设为内存的50-75%；或开启innodb_dedicated_server后会自动调整，在容器中也推荐开
-innodb_use_fdatasync  8.0.26+无脑开
-innodb_flush_method=O_DIRECT_NO_FSYNC  当redo_log和data不在同一块磁盘上时用O_DIRECT，在NFS上时用默认值
+innodb_use_fdatasync  8.0.26+无脑开，不过对于O_DIRECT_NO_FSYNC无作用
+innodb_flush_method=O_DIRECT_NO_FSYNC  当redo_log和data不在同一块磁盘上或无UPS时用O_DIRECT，在NFS上时用默认值。Win下用默认值
 innodb_io_capacity=默认值是机械硬盘的200，用SSD时设为1000
 innodb_file_per_table=1 有好处也有坏处且感觉都不明显
-innodb_flush_log_at_trx_commit和sync_binlog看下面
+innodb_flush_log_at_trx_commit=2 见下面
 
-sql_mode=ansi,traditional  默认为traditional，也启用ansi后 real为float、||拼接字符串、双引号指示标识符
+sql_mode=ansi,traditional  默认为traditional，这样表示也启用ansi：real为float、||拼接字符串、双引号指示标识符
 mysqlx=off
-block_encryption_mode=aes-128-cbc
+block_encryption_mode=aes-128-cbc  默认ECB。影响AES_ENCRYPT()
 
 # 启用慢查询日志，如果执行时间大于3秒则记录
 slow_query_log=1
 slow_query_log_file=log-slow-queries.log
 long_query_time=3
+
+#skip_name_resolve  客户端连接时默认会对ip反向解析，指定此项后
+#shared_memory  仅限Win，只有cli .NET mariadb connector/j支持，mysql connector/j不支持
 ```
 
 ### CLI
@@ -347,7 +350,7 @@ long_query_time=3
 * mysql -h主机 -P端口 -u用户名 -p
   * host默认localhost，端口默认3306，user默认root，-p不加参数表示交互式输入密码
   * 指定初始数据库用-D。重定向stdin可读取执行sql脚本
-  * Win下用户名默认为无意义的odbc
+  * Win下用户名默认为无意义的odbc，考虑在配置文件里加[mysql]user=root
 * 修改密码：mysqladmin -u用户名 -p旧密码 password 新密码，或set password [for xxx] ='新密码';
 * 交互式中顺便保存记录：--tee
 * 执行命令后退出：-e
@@ -380,7 +383,6 @@ long_query_time=3
   * 打开已存在的数据库时小心别打错字，否则就自动创建了一个新的，或者mode不用rwc就能避免
 * 读写锁和事务
   * 事务一开始，单纯的BEGIN是没有加锁的。开始读取了会加SHARED锁，允许有多个，能同一时间多个连接并发读取
-
   * 当遇到了DML语句，会给整个数据库文件加RESERVED锁，只允许有一个，然后写日志。此时仍可以正常读，也允许新连接读，读不到未提交的，因为新内容在日志里，不在文件里
   * 当COMMIT时，会加PENDING锁，能阻止新连接读，但无法阻止老连接多游标不间断读。如果一段时间内仍无法加上，就会失败，此时事务并未取消，可以再次提交
   * 当所有的读锁都结束后，就加EXCLUSIVE锁，此时只有本连接能读写
