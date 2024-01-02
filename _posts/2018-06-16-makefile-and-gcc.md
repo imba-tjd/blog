@@ -230,6 +230,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
   * -Wl,-dead_strip 好像只有lld支持
   * -ffunction-sections -fdata-sections -Wl,--gc-sections
   * strip -s或--strip-unneeded
+* 不要用-lpthread，而是-pthread。TODO:mingw有个-mthreads，看起来是用的win运行库，且添加了线程安全异常处理，但会自动-lmingwthrd
 
 ### 超级静态的编译
 

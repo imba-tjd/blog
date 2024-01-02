@@ -103,7 +103,7 @@ title: Linux命令
 * unzip：不自带，最后更新时间2009年，不支持读取stdin，但支持-p表示输出到stdout
 * 分卷zip，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
-* unrar：是rar官方的，但在non-free中
+* unrar：是rar官方的，但在non-free中。不支持解压其它任何格式
 * upx --lzma
 * zless：查看压缩文件内容
 * lzip：后缀 .lz，仅使用LZMA非2
@@ -130,6 +130,32 @@ title: Linux命令
 * 源文件名不会保留，解压文件后的名字就是去掉.xz的部分
 * 不做把多个文件打包成一个文件的工作，可指定多个文件但只是分别压缩
 * 实际算法为LZMA2和未压缩混合。相比于7z对管道更友好
+
+#### 7z
+
+* https://sourceforge.net/projects/sevenzip/files/7-Zip/ 其中extra为精简版的7za，运行不需要附带的dll，差不多只支持7z xz zip gz tar；7za.dll只支持7z，7zxa.dll只支持解压7z，RAR就是使用的它。https://www.7-zip.org/a/7zr.exe 只支持7z
+* 第三方版，支持更多算法：https://github.com/mcmilk/7-Zip-zstd
+* 压缩：7z a 压缩包名.7z 文件名
+  * 文件名以`./`开头时，不保留路径前缀直接把目标添加到压缩包根下
+  * 文件夹名后用`/*`会添加内容而非单独一个文件夹
+  * 递归处理所有txt：-r *.txt
+* 解压：7z x 压缩包名 -o 输出目录默认CWD
+  * 遇到同名文件如何处理：-ao[a覆盖/s跳过/u自动重命名被释放的文件]
+* 其他命令：l列出所有内容，t测试是否出错，d删除压缩包内的文件，u更新文件，e不保留指定前缀解压
+* 通配符都由7z自己处理，查看内容时也能用
+* 能根据后缀识别压缩包算法
+* -p指定密码 -mhe=on加密文件名
+* 排除文件：-x!*.7z
+* 分卷压缩：-v30m
+* -slp：申请大内存页，加快压缩速度，但刚开始时会停一下，需要管理员模式，推荐内存3GB+，压缩大量内容时启用
+* -si：从stdin读取，-so：输出到stdout
+* 图形化自解压：-sfx7z.sfx
+* LZMA2
+  * 极限压缩-mx=9，默认=5，=1的压缩率就大于zip
+  * -ms=e -mqs 分文件类型的固实压缩，能秒开txt
+  * 默认启用多线程，360压缩默认单线程，机械硬盘考虑`-mmt=-`关闭多线程
+  * 是LZMA的修改版本，对于不可压缩数据能更好地处理，但是一定要开固实压缩
+* ZIP：-mcu使用U8储存文件名，-mcp=xxx解压时使用指定代码页
 
 ## 网络
 
