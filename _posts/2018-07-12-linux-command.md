@@ -45,6 +45,8 @@ title: Linux命令
 * ldd --version：能看到glibc版本
 * top：显示进程内存/cpu占用信息，会自动更新，-c显示详细的命令；htop：多彩的界面，不自带；bashtop不自带；cat /proc/loadavg和uptime：显示负载，信息少，不会自动更新（可用watch运行）
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
+  * pkill：根据ps的一些Filter来kill，一般就是pkill 进程名
+  * pgrep：同理，另外查找进程时不会显示grep自身
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
 
 ## 文件处理
@@ -139,7 +141,7 @@ title: Linux命令
   * 文件名以`./`开头时，不保留路径前缀直接把目标添加到压缩包根下
   * 文件夹名后用`/*`会添加内容而非单独一个文件夹
   * 递归处理所有txt：-r *.txt
-* 解压：7z x 压缩包名 -o 输出目录默认CWD
+* 解压：7z x 压缩包名 -o输出目录默认CWD必须不加空格
   * 遇到同名文件如何处理：-ao[a覆盖/s跳过/u自动重命名被释放的文件]
 * 其他命令：l列出所有内容，t测试是否出错，d删除压缩包内的文件，u更新文件，e不保留指定前缀解压
 * 通配符都由7z自己处理，查看内容时也能用
@@ -367,7 +369,7 @@ ip link
 ### grep
 
 * grep option pattern filename，不提供filename时从stdin读取，无法指定文件夹
-* 没必要用普通的grep，egrep对正则的支持更标准，引号中的大括号无需再转义，fgrep完全按本身匹配，-P使用Perl的规则
+* 没必要用普通的grep，egrep对正则的支持更标准`? + {} | ()`，引号中的大括号无需再转义，fgrep完全按本身匹配，-P使用Perl的规则
 * 当文件有多个时会在每一行前面打印出匹配到内容的文件名，用-h隐藏；当文件只有一个时，用-H强制显示
 * -l：仅输出匹配到的所在的文件名，与xargs配合时一般加-Z以NUL分隔输出
 * -o：只显示匹配到的内容而非那一整行；但仅仅是第零组，似乎没有办法输出捕获组
@@ -432,7 +434,7 @@ ip link
 * jobs：显示后台挂起的任务
 * 使用`%1`指定目标任务，可以用kill杀掉
 * 输命令时在最后加个&会默认在后台运行，一般会用`>log.txt 2>&1 &`不让输出到屏幕上；如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样
-* 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；~~但这样的程序无法用fg恢复~~好像可以；默认会自动把输出重定向到$HOME/nohup.out中
+* 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；~~但这样的程序无法用fg恢复~~好像可以。默认会自动把输出重定向到$HOME/nohup.out中，自动把stderr重定向到stdout
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
@@ -492,7 +494,7 @@ ip link
 
 ### TODO
 
-* killall、pkill、kill -9、pgrep
+* killall、kill -9
 * nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395
 * https://www.oschina.net/translate/useful-linux-commands-for-newbies
 * https://einverne.github.io/categories.html#每天学习一个命令
