@@ -154,7 +154,6 @@ END
 * 有大量重复值或者太宽不适合建立索引。区分度：COUNT(DISTINCT col1)/COUNT(*)在80%以上就可以
 * 聚集索引：一个表只能有一个，顺序与表的物理顺序相同，叶子储存数据值，不额外占用空间，不应频繁修改；自增对插入和密集读很友好，用UUID容易导致页分裂
 * 非聚集索引(NONCLUSTERED)
-
   * 顺序与物理储存顺序不同，叶子储存主键id
   * 可以一次性设置多个列，但在一组AND中使用时要按顺序，不能有间隔，可以只用前面的，不等条件必须在最后
   * 用到的所有列都在索引中叫覆盖索引，不会查表
@@ -305,23 +304,23 @@ END
   * 仅客户端CLI：装MySQL Shell
   * 8.0不再有32位的
 * zip版必须手动初始化datadir：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码，但默认只有localhost能连
-  * 推荐datadir的owner改为mysql用户，chmod 750
+  * 推荐datadir的owner改为mysql用户，chmod 750。TODO: 初始化时加--user=mysql是不是就是做这事的
   * 以Deamon运行，日志写入datadir中的 .err：-D
   * Win下默认就是Deamon，以前台运行：--console
-  * Win下创建/删除服务：--install/remove，停止：sc start/stop mysql
+  * Win下创建/删除服务：--install/remove，停止：sc start/stop mysql。会启动两个进程用于使用RESTART命令
 * mysql_secure_installation：设置root密码等，官方推荐初始化后用一次
 * systemctl管理的不需要用mysqld_safe
 
 ### my.cnf
 
-* 会在多个位置搜索此文件，如/ect/mysql、/etc。Win的msi版在%ProgramData%/MySQL/MySQL Server 8.0，zip版考虑放在basedir下
+* 会在多个位置搜索此文件，如/ect/mysql、/etc。Win的msi版在%ProgramData%/MySQL/MySQL Server 8.0，zip版考虑放在basedir下，实际也会在C:/Windows和C:/下搜索
 * 直接运行的重载配置：/etc/init.d/mysql reload
 * 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'、--help --verbose显示所有选项实际值
 
 ```conf
 [mysqld]
 user=mysql
-datadir=/data/mysql 默认在basedir/data
+datadir=/data/mysql 默认在basedir/data。basedir就是安装目录
 bind_address=指定ip，默认为*
 
 innodb_strict_mode 感觉可以无脑开
