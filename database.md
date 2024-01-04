@@ -313,7 +313,7 @@ END
 
 ### my.cnf
 
-* 会在多个位置搜索此文件，如/ect/mysql、/etc。Win的msi版在%ProgramData%/MySQL/MySQL Server 8.0，zip版考虑放在basedir下，实际也会在C:/Windows和C:/下搜索
+* 会在多个位置搜索此文件，如/ect/mysql、/etc、~/.my.cnf。Win的msi版在%ProgramData%/MySQL/MySQL Server 8.0，zip版考虑放在basedir下，实际也会在C:/Windows和C:/下搜索
 * 直接运行的重载配置：/etc/init.d/mysql reload
 * 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'、--help --verbose显示所有选项实际值
 
@@ -340,7 +340,7 @@ slow_query_log=1
 slow_query_log_file=log-slow-queries.log
 long_query_time=3
 
-#skip_name_resolve  客户端连接时默认会对ip反向解析，指定此项后
+#skip_name_resolve  客户端连接时默认会对ip反向解析，指定此项能加速，但会影响root@localhost登录
 #shared_memory  仅限Win，只有cli .NET mariadb connector/j支持，mysql connector/j不支持
 ```
 
