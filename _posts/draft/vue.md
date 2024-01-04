@@ -127,7 +127,7 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
   * 内容会解释为纯文本（转义为实体）。若想插入HTML，用`<span v-html="xxx"></span>`
   * 不能直接访问用户附加在window上的全局对象，要手动加到app.config.globalProperties里；常用的可以直接访问，如Math和Date
 * attr绑定
-  * 单个attr：<div v-bind:id="xxx"></div> 或 :id="xxx"
+  * 单个attr：<div v-bind:id="xxx"></div> 或 :id="xxx" 或 3.4的同名属性 :id 表示="id"
   * 多个attr：v-bind="xxx"，其中xxx是个object
   * 还支持表达式，如 :disabled="xxx.length<5" 当长度小于5时禁用。布尔型attribute根据值决定是否存在于该元素上
   * 动态计算绑定的attr名：:[var_attrname]="xxx"，事件同理。在DOM内嵌模板中使用时，变量名不能大写，因为浏览器转换成小写，SFC不受此限制
@@ -145,6 +145,7 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
     * v-model.lazy 丢失焦点后才更新
     * .number 将输入的值转换为数字
     * .trim
+  * TODO: 3.4 defineModel
 * 条件
   * v-if="布尔表达式" v-else-if v-else 当满足时才渲染进dom，否则移出dom
   * v-show不满足时添加display:none，频繁开关时性能更好，但初始必会渲染。v-if若初始条件不满足则不会渲染
