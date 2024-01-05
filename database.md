@@ -304,7 +304,7 @@ END
   * 仅客户端CLI：装MySQL Shell
   * 8.0不再有32位的
 * zip版必须手动初始化datadir：mysqld --initialize，会将root的会过期的随机密码输出到控制台中，用--initialize-insecure则无密码，但默认只有localhost能连
-  * 推荐datadir的owner改为mysql用户，chmod 750。TODO: 初始化时加--user=mysql是不是就是做这事的
+  * Linux下推荐加--user=mysql，相当于把datadir的owner改为mysql用户，chmod 750。不必先手动创建datadir
   * 以Deamon运行，日志写入datadir中的 .err：-D
   * Win下默认就是Deamon，以前台运行：--console
   * Win下创建/删除服务：--install/remove，停止：sc start/stop mysql。会启动两个进程用于使用RESTART命令
