@@ -466,7 +466,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/robertdavidgraham/masscan
 * airflow 任务调度
 * pyload 离线下载
-* supervisor(python)、PM2 (for node.js)
+* supervisor(python，还有fork的for Windows版)、PM2 (for node.js)
 * tasksel：用于安装一组软件
 * https://github.com/royhills/arp-scan。ntopng：网络的top，web界面。addrwatch
 * rustdesk：远程桌面
