@@ -581,6 +581,7 @@ select weekofyear('2022-01-02');返回52，dayofweek('2022-01-02')返回1
 如何比较日期数据 https://mp.weixin.qq.com/s?__biz=MzAxMTMwNTMxMQ==&mid=2649247727&idx=1&sn=414455c2f0303a55a31e0c189f1e2c12
 
 @@GLOBAL/SESSION.系统变量
+set persist可以永久修改配置，但不是写入my.cnf的
 
 MSSQL：
 创建数据库 https://docs.microsoft.com/zh-cn/sql/relational-databases/databases/create-a-database
