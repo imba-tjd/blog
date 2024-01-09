@@ -291,6 +291,10 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 * #pragma comment(lib, "emapi") 相当于-lemapi
 
+### msys2
+
+下好后有多个环境，msys是源自cygwin的，构建出来的依赖msys-2.0.dll等。其它几种都是原生的。不同环境共享home，但lib不同。
+
 ### 其他
 
 * https://github.com/swig/cccl 把Unix编译器参数转换为cl的参数（cl的wrapper）
