@@ -293,7 +293,8 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 ### msys2
 
-下好后有多个环境，msys是源自cygwin的，构建出来的依赖msys-2.0.dll等。其它几种都是原生的。不同环境共享home，但lib不同。
+* 下好后有多个环境，msys是源自cygwin的，构建出来的依赖msys-2.0.dll等。其它几种都是原生的。不同环境共享home，但lib不同
+* 官方仅限win。Linux上的：quasi-msys2
 
 ### 其他
 
