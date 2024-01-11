@@ -1461,7 +1461,7 @@ COPY . . # 用上.dockerignore
 * lexer/parser
   * https://github.com/lark-parser/lark 扩展的EBNF，功能最多性能好
   * https://github.com/pyparsing/pyparsing 纯Py语句，自底向上
-  * https://github.com/textX/textX DSL
+  * https://github.com/textX/textX 用于构建DSL
   * https://github.com/erikrose/parsimonious  简化了的EBNF，性能好。有几年没维护，2022年又有人接手了，提交数不多
   * https://github.com/neogeny/TatSu EBNF，3.8，star很少
   * https://github.com/pytransitions/transitions FSM
