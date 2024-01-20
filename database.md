@@ -629,3 +629,6 @@ access和MSSQL的语法区别：
 6、[.]与[!]的区别
 （1）ACCESS中多表联合查询时：select tab1!a as tab1a,tab2!b tab2b from tab1,tab2 ,中间的AS可以不要。
 （2）SQL Server中则：select tab1.a as tab1a,tab2.b tab2b from tab1,tab2 ,中间的AS可以不要。
+
+https://www.programming-books.io/essential/sql/
+https://www.programming-books.io/essential/mysql/
