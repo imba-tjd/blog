@@ -450,7 +450,7 @@ long_query_time=3
 ```bash
 #gcc sqlite3.c -o sqlite3.dll -shared  # 编译dll
 gcc sqlite3.c shell.c -o sqlite3.exe \
--Os -mtune=native -Wl,--as-needed -Wl,--strip-all \
+-Os -mtune=native -Wl,--as-needed -Wl,--strip-all -flto \
 -DNDEBUG \
 -DSQLITE_LIKE_DOESNT_MATCH_BLOBS \
 -DSQLITE_OMIT_DECLTYPE \  # 取消返回查询结果集的列类型的功能
