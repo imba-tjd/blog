@@ -1064,7 +1064,7 @@ cnnstr = (
 )
 cnn = pyodbc.connect(cnnstr)
 cur = cnn.cursor()
-for row in cur.tables(tableType='table'): # 显示所有用户定义的表名，
+for row in cur.tables(tableType='table'): # 显示所有用户定义的表名
     print(row.table_name)
 # 表的列名用cur.columns('tb'); row.column_name，本次选取了的列名用cur.description; row[0]
 ```

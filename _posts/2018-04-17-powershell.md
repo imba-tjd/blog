@@ -298,6 +298,7 @@ Profile文件
 * https://powershell.org/2022/07/on-to-the-future-with-powershell/
 * https://learn.microsoft.com/en-us/powershell/scripting/how-to-use-docs
 * https://zhuanlan.zhihu.com/p/426219741
+* https://www.programming-books.io/essential/powershell/
 
 `[System.Environment]::CurrentDirectory`会一直保持启动时的目录，不能代替pwd
 ISE无法识别utf8
