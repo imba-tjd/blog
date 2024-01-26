@@ -26,7 +26,7 @@ category: linux
 * fpp：用管道传递给它可以自动把文件染色
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
 * https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat；https://github.com/dundee/gdu 快速的du
-* https://github.com/fail2ban/fail2ban 自动禁止登陆失败次数过多的IP，活着
+* fail2ban(py)：自动禁止登陆失败次数过多的IP。Go替代：CrowdSec
 * authbind：允许普通用户绑定1024以下的端口
 * gparted：图形化的管理磁盘分区的工具
 * network-manager、network-manager-gnome：为了使网络配置尽可能简单而开发的网络管理软件包
@@ -319,7 +319,7 @@ order deny,allow
 # 默认超时60秒，重试5次，缓存16MB，存在同名文件自动重命名加数字
 max-connection-per-server=5 或-x5 # 单个域名最多几个连接，默认1，一般调这个就行
 split=5 或-s5 #【默】单个任务最多分多少块。文件太大速度又慢的时候可考虑也调这个
-file-allocation=falloc # 当使用ext4 btrfs xfs NTFS时此项最好，但需要管理员权限。否则就用默认值
+file-allocation=falloc # 当使用ext4 NTFS时此项最好，但需要管理员权限。否则就用默认值
 min-split-size=20M #【默】进行多线程的最小块，此处只有文件大于40M才会启用两个线程
 #max-concurrent-downloads 或-j 是同时下载多个任务，默认5不用改
 # BT
