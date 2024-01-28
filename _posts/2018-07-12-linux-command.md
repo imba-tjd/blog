@@ -414,32 +414,6 @@ ip link
   * w：保存，如 /aaa/w data.txt
 * 还支持“保持空间”用于储存数据
 
-## 磁盘管理
-
-* smartctl：查看硬盘smart信息，在smartmontools中
-* fdisk -l：显示磁盘信息。cfdisk：命令行中的图形化的分区工具。GPT版用gdisk
-*   ：支持GPT的分区工具，gparted图形化。parted /dev/sda [非交互式命令，不填则进入交互式]; p显示基本信息; mklabel gpt; mkpart 分区名 [fs] 0% 100%。会自动对齐；无需指定文件系统，指定了也不会格式化，但对于非Linux的文件系统则要指定；对于GPT没有Primary的概念。设置esp分区：set 分区号 boot on
-* mkfs.ext4 /dev/sda1：格式化分区，实际调用的是e2fsprogs
-  * xfs：redhat，稳定，老，适合大文件并发IO
-  * btrfs(btree或butter fs)：Oracle，Cow、文件历史、内置压缩。不适合Raid，可能需要定期碎片整理
-  * zfs：Oracle，具有btrfs的功能，以Raid作为主打功能
-  * ext4稳定
-  * f2fs：三星，适合ssd
-  * sshfs：基于ssh的文件系统，能挂载远程文件夹
-* fstransform：转换文件系统
-* du -sh [filename]：显示目录的占用空间。dust：rust版du
-* df -h：显示挂载点的总大小、已用空间、剩余空间
-* dd if=源iso of=/dev/xxx bs=4M status=progress：刻录
-* fsck.ext4 -y -f -v /dev/sda1：检测文件系统错误。碎片整理：-D，但ext4一般不需要
-* mount | column -t：显示挂载分区状态
-* lsblk：列出块设备(RAM除外)，-f显示文件系统和UUID，-l显示为列表。lsusb：显示usb设备
-* /etc/fstab：开机时自动挂载里面指定的设备。检查配置错误或使配置生效：systemctl daemon-reload && mount -a
-  * 设备可以用UUID标识，也可按名但不推荐。dump一般都是0，fsck主分区用1，其它分区用2，swap用0
-  * ext4调优：noatime不更新访问时间优化小文件读取，4.0可用lazytime在内存中维护一天后写入，nobarrier在有电池时可安全使用，data=writeback性能好但崩溃+恢复可能产生不正确的数据还可再加journal_async_commit。需5.1：tune2fs -O fast_commit /dev/sda1
-  * 用命令更改文件：tune2fs -o mount-op /dev/sda1 但选项名称和实际的不一样
-  * GPT+UEFI满足特定条件时会自动挂载
-  * mount无参：显示当前挂载情况。将只读的分区重新挂载：mount -o remount,rw /
-
 ## 持续运行
 
 * ctrl+z：相当于运行了suspend
