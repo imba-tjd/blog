@@ -18,7 +18,6 @@ title: Linux命令
 * chroot：改变根目录
 * date：http://www.runoob.com/linux/linux-comm-date.html %s为时间戳
 * xclip：复制到剪切板上，不自带
-* sudo update-grub：自动修复引导
 * htpasswd -nb -B admin password | cut -d ":" -f 2
 * fc：在editor中编辑上一条输入的命令，并在退出时执行
 * factor：求一个数的所有因数
