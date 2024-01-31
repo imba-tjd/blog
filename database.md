@@ -634,4 +634,4 @@ access和MSSQL的语法区别：
 https://www.programming-books.io/essential/sql/
 https://www.programming-books.io/essential/mysql/
 
-MySQL的表：ROW_FORMAT=COMPRESSED对于溢出的BLOB、TEXT、VARCHAR会用zlib的lz77压缩，除此之外功能与默认的DYNAMIC完全相同，但系统表不支持导致不能设为默认值。
+MySQL的表：ROW_FORMAT=COMPRESSED对于溢出的BLOB、TEXT、VARCHAR会用zlib的lz77压缩，除此之外功能与默认的DYNAMIC完全相同，但系统表不支持导致不能设为默认值。对于图片等数据不要开
