@@ -3,6 +3,9 @@ title: Linux软件
 category: linux
 ---
 
+* https://pkgs.org 搜索多个发行版的软件包
+* /usr/local/bin 存放不在包管理器里的程序，一般是自己编译的
+
 ## APT
 
 * 使用`grep " install " /var/log/apt/history.log`可查看最近安装的软件，**不包含因为依赖装上的**
@@ -15,6 +18,7 @@ category: linux
 * 使用前最好安装一下gnupg2（apt-key需要）、apt-transport-https、ca-certificates
 * apt edit-sources
 * -s(simulation)/--dry-run
+* --no-install-recommends
 
 ### 软件列表
 
