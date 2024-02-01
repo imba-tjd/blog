@@ -43,7 +43,7 @@ END
   * CAST(原数据 AS 新类型) 标准写法，MySQL必须指明SIGNED
   * CONVERT()：MySQL第一个参数是数据，第二个参数是类型；MSSQL刚好相反；PG SQLite不支持
   * SQLite MySQL在处理字符串和数字之间运算时会隐式转换成数字，如'1.1'+'+1'->2.1，'a1'也是转换成1
-* 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL可以创造临时表再查看表结构：`drop temporary table if exists tp; create temporary table tp select @v; desc tp;`
+* 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL创造临时表再查看表结构：`drop temporary table if exists tp; create temporary table tp select @v; desc tp;`
 
 ### 字符串
 
@@ -72,6 +72,7 @@ END
 
 ### 日期和时间
 
+* 都能从ISO 8601标准的字符串转换成日期和时间类型，如'2013-10-07 04:23:19'。此标准还有其它表示时间的方法，如时间段同Java的Duration格式、按周表示
 * 预定义变量，无需引号：CURRENT_DATE、CURRENT_TIME、CURRENT_TIMESTAMP
   * CTS并不是秒数，而是类似于DATETIME
   * MSSQL只支持CTS，可CAST成另两种类型
@@ -80,26 +81,27 @@ END
 * 格式化
   * MySQL：DATE_FORMAT(ts, 'format')
   * SQLite：STRFTIME('format', time-value)
-  * format同C语言，分别用%Y %m %d %H %M %S，%w为0-6的星期，%s为时间戳秒数
+  * format同C语言，有%Y %m %d %H %M %S，%w为0-6的星期，%s为时间戳秒数
 * SQLite
-  * 基本上以ISO 8601字符串表示日期，如'2013-10-07 04:23:19'，支持单独储存日期或时间，支持储存时区
-  * 提供datetime(time-value, modifier, modifier, ...)对日期字符串进行运算
+  * 没有另外设置类型，基本上就是用ISO 8601字符串表示，加上一些能处理这种格式字符串的函数。特殊字符串'now'表示当前UTC时间
+  * 运算：datetime(time-value, modifier, modifier, ...)
     * time-value在select中时一般为日期列名
-    * date() time()分别表示最后结果只取日期或时间
-    * unixepoch()将运算结果转换为秒数整数，要保证结果是UTC日期
+    * date() time() 提取日期或时间部分，可无参用
+    * unixepoch() 将运算结果转换为秒数整数，要保证结果是UTC日期
     * 在对含时区的日期使用函数运算时，sqlite会先转换到UTC并去掉时区，之后如果返回给使用者一般要加'localtime'因为使用者一般假定不含时区信息的是本地时间
   * 修饰符
-    * datetime('now', '+1 month', '-1 day') now表示当前UTC时间
+    * datetime('now', '+1 month', '-1 day')
     * time('12:00', 'utc'/'localtime') -> 04:00:00/20:00:00 UTC修饰符表示将左边的日期视为本地时间，转换为UTC；localtime相反
     * 秒数转本地日期：datetime(UNIXEPOCH(), 'unixepoch', 'localtime') unixepoch修饰符将整数转换为UTC时间
   * UNIXEPOCH() Unix时间戳，秒数整数
 * MSSQL
-  * 基本上使用DATETIMEOFFSET、DATETIME2
-  * 只有DTO支持时区，TIME都不支持时区。将DTO储存到DT会保留时间去掉时区，将DT取出到DTO会视为本地时区
+  * DATETIMEOFFSET、DATETIME2、DATE、TIME。不要用SmallDateTime和DateTime
+  * 只有DTO支持时区。将DTO储存到DT会保留时间去掉时区，将DT取出到DTO会视为本地时区
 * MySQL
-  * TIMESTAMP内部以UTC保存，与客户端交互时进行会话时区转换
+  * DATE、DATETIME、TIMESTAMP
+  * TIMESTAMP内部以UTC保存，支持1970-2038年，与客户端交互时进行会话时区转换
     * 假如实际时间值是0，会话时区是1，则数据库会返回1；客户端另有参数决定如何处理
-    * NOW()和CURTIME()的结果也受会话时区影响，UTC_TIMESTAMP()不受，它们的结果都是DATETIME
+    * NOW()和CURTIME()也受会话时区影响，UTC_TIMESTAMP()不受，它们的结果都是DATETIME
   * 8.0.19后DATETIME也支持时区了
   * TIMESTAMP储存表示时刻的类型：Calendar java.util.Date OffsetDateTime java.sql.Timestamp。其它数据库时间类型储存非时刻类型：java.sql.DATE LocalDate LocalTime OffsetTime
 
@@ -635,3 +637,5 @@ https://www.programming-books.io/essential/sql/
 https://www.programming-books.io/essential/mysql/
 
 MySQL的表：ROW_FORMAT=COMPRESSED对于溢出的BLOB、TEXT、VARCHAR会用zlib的lz77压缩，除此之外功能与默认的DYNAMIC完全相同，但系统表不支持导致不能设为默认值。对于图片等数据不要开
+
+Innodb：默认页大小16KB，对于1KB的行，如果想保持3层B+树，最多2000w行。
