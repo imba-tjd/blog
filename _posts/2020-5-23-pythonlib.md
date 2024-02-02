@@ -1096,7 +1096,7 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
   * 还可以用装饰器声明locals(a=xxx), returns, exceptval, cfunc(等价于cdef), inline, ccall(等价于cpdef)
 * Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-Ofast --link-args=xxx
 * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
-* 与C++交互：pybind11；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
+* 与C++交互：pybind11或同作者后出的nanobind，后者必须修改C++部分的代码以适应库，前者相反；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
 * 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
 * 详细教程：https://www.cnblogs.com/traditional/tag/Cython/
 
