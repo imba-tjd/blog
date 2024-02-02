@@ -62,9 +62,10 @@ title: SQL
 
 * 可以有多个，DESC只作用于那一个
 * 会破坏GROUP BY的聚集性，除非也按分组的顺序来排序
-* 如果没有分过组，可以使用SELECT中未使用的列
-* 可以使用SELECT中的别名
+* 如果没有分过组，可以用SELECT中未使用的列
+* 可以使用SELECT中的别名，可以用数字表示SELECT中的列号
 * NULL在ASC时的位置：MySQL MSSQL在开头，PG SQLite在末尾
+* 相同字母大小写不同ASC：如 a A z Z，MySQL MSSQL PG为a A z Z，SQLite为 A Z a z
 
 ### 窗口函数
 

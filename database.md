@@ -639,3 +639,4 @@ https://www.programming-books.io/essential/mysql/
 MySQL的表：ROW_FORMAT=COMPRESSED对于溢出的BLOB、TEXT、VARCHAR会用zlib的lz77压缩，除此之外功能与默认的DYNAMIC完全相同，但系统表不支持导致不能设为默认值。对于图片等数据不要开
 
 Innodb：默认页大小16KB，对于1KB的行，如果想保持3层B+树，最多2000w行。
+一行大小略小于一页大小的一半，最大32KB
