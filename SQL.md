@@ -52,11 +52,11 @@ title: SQL
 ### GROUP BY
 
 * SELECT的列必须也在GROUPBY中，或是聚合函数；用了聚合函数即使没有GROUPBY也不能SELECT普通的列；不能SELECT *
+  * 有的DBMS支持SELECT不在GROUPBY中的列，但没啥意义
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
 * HAVING的只能是常数、分组的列、聚合函数，即与分了组后的SELECT一样
-* SQLite：能选择不在GROUPBY中的列，但没啥意义
-* SQLite：BY的可以是表达式 TODO: 测试
+* 有的DBMS支持GROUPBY表达式，感觉正常应该用CASE
 
 ### ORDER BY
 
