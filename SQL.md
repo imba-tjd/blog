@@ -13,7 +13,7 @@ title: SQL
 
 * 顺序：FROM-WHERE-GROUPBY-HAVING-SELECT-DISTINCT-UNION-ORDERBY-LIMIT
 * 聚合函数，会自动忽略为NULL的：AVG、COUNT、MIN、MAX、SUM
-* COUNT(*)：行数，不忽略NULL
+  * COUNT(*)：行数，不忽略NULL
 
 ### SELECT
 
@@ -51,12 +51,11 @@ title: SQL
 
 ### GROUP BY
 
-* SELECT的列必须也在GROUPBY中，或是聚合函数；用了聚合函数即使没有GROUPBY也不能SELECT普通的列；不能SELECT *
+* SELECT和HAVING的列只能是常数、GROUPBY的列、聚合函数，不能SELECT *。用了聚合函数即使没有GROUPBY也不能SELECT普通的列
   * 有的DBMS支持SELECT不在GROUPBY中的列，但没啥意义
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
-* HAVING的只能是常数、分组的列、聚合函数，即与分了组后的SELECT一样
-* 有的DBMS支持GROUPBY表达式，感觉正常应该用CASE
+* 有的DBMS支持GROUPBY 表达式，感觉正常应该用CASE
 
 ### ORDER BY
 
