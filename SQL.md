@@ -18,7 +18,7 @@ title: SQL
 ### SELECT
 
 * 计算后的内容一般要用AS命名，此关键字可省但一般不省；FROM的也可用AS命名，一般省
-* DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；NULL只能出现一次；PG支持DISTINCT ON(col1)
+* DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；NULL只能出现一次。PG支持DISTINCT ON(col1)，其它可考虑GROUPBY
 * 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
 * FROM的可以是子查询且此处必须命名，此时可以有多列
   * PG MSSQL表达式临时表：FROM (VALUES (1,'a'),(2,'b')) AS tmp (a,b)
