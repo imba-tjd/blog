@@ -409,7 +409,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 
 ## FFmpeg
 
-* ffmpeg 全局参数 输入文件的参数 -i 输入文件 输出文件的参数 输出文件
+* ffmpeg 全局参数 输入文件的参数 -i 输入文件 调整的参数 输出文件
   * 不加输出文件，可只查看元数据
   * -hide_banner隐藏编译参数，可用alias默认加上
   * -formats、-codecs
@@ -418,20 +418,21 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 转换视频编码（指定编码器）：-c:v libx265 -c:a copy
   * copy表示不重新编码加快速度，a表示音频
   * 老版参数：-vcodec
-* 转换容器会根据后缀自动处理
+* 转换容器会根据输出文件后缀自动处理。支持将srt转换为ass
   * 视频转音频（去除视频流）：-vn -c:a copy，也可以直接保存成音频文件。去除音频流：-an
 * 压缩
-  * 码率：-minrate 964K -maxrate 3856K -bufsize 2000K。固定码率：-b:v xxxk
-  * 分辨率：-vf scale=480:-1
-  * TODO: 帧率。以及现在更推荐用preset和tune，先选定CRF，0代表最好，默认23。u2b推荐配置：https://support.google.com/youtube/answer/1722171
+  * 码率(比特率)：-minrate 964K -maxrate 3856K -bufsize 2000K。固定码率：-b:v xxxk
+  * 分辨率：-vf scale=480:-1。或-s
+  * TODO: -r帧率。以及现在更推荐用preset和tune，先选定CRF，0代表最好，默认23。u2b推荐配置：https://support.google.com/youtube/answer/1722171
 * 裁剪一段：-ss [start] -to [end]
-* 合并：-f concat
+* 合并：-i videos.txt -f concat。其中输入文件必须为每一行`file '片段名'`
 * 为Web优化，将元数据放在开头：-movflags +faststart
-* filter：如调整音量大小、混合声道、低通滤波(lowpass)
+* Filter：-vf 参数。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度
 * AAC
   * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要加--enable-nonfree。aac_at更好，但只有mac有
   * 默认的aac，比特率默认128，高质量的考虑加-b:a 192k。可变比特率质量差不考虑
   * 格式：AAC-LC比HE-AAC好。默认的aac只支持LE
+* DeMuxer：如文件含有视频和音频，把它们分解出来就叫它。之后再Decode、按需要Filter、Encode
 * 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
 * 第三方图形化配置：https://ffmpeg.guide/graph/demo
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
