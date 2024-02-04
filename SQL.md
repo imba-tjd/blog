@@ -12,8 +12,6 @@ title: SQL
 ## DQL
 
 * 顺序：FROM-WHERE-GROUPBY-HAVING-SELECT-DISTINCT-UNION-ORDERBY-LIMIT
-* 聚合函数，会自动忽略为NULL的：AVG、COUNT、MIN、MAX、SUM
-  * COUNT(*)：行数，不忽略NULL
 
 ### SELECT
 
@@ -43,26 +41,31 @@ title: SQL
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
 * IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其注意
 * [NOT] LIKE：默认不区分大小写，PG除外用ilike不区分。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`。正则匹配：MySQL用RLIKE，PG用SIMILAR TO，MSSQL不支持，SQLite只内置了接口默认没实现
-* ANY、ALL：前加比较运算符，后跟子查询。用比较运算符时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
+* ANY、ALL：前加比较运算符，后跟子查询。用比较运算符（不等号）时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
 * 拼接时常加`WHERE 1=1`，方便之后加AND
-* MySQL SQLite对于非空还支持类似Py的写法，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
+* MySQL SQLite对于非空支持truthy，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
 * 大于等于 比 大于 更优化
 
 ### GROUP BY
 
-* SELECT和HAVING的列只能是常数、GROUPBY的列、聚合函数，不能SELECT *。用了聚合函数即使没有GROUPBY也不能SELECT普通的列
+* 聚合函数，会自动忽略为NULL的：AVG、COUNT、MIN、MAX、SUM
+  * COUNT(*)：行数，不忽略NULL
+  * WHERE中不能用，分组后的步骤才能用
+  * 用了聚合函数，即使没有GROUPBY也不能SELECT普通的列
+* 分组后，SELECT和HAVING的列只能是常数、GROUPBY的列、聚合函数，不能SELECT *
   * 有的DBMS支持SELECT不在GROUPBY中的列，但没啥意义
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
-* 有的DBMS支持GROUPBY 表达式，感觉正常应该用CASE
+* 有的DBMS支持 GROUPBY 表达式，感觉正常应该用CASE
 
 ### ORDER BY
 
 * 可以有多个，DESC只作用于那一个
-* 会破坏GROUP BY的聚集性，除非也按分组的顺序来排序
-* 如果没有分过组，可以用SELECT中未使用的列
-* 可以使用SELECT中的别名，可以用数字表示SELECT中的列号
+* 会破坏GROUPBY的聚集性，除非也按分组的顺序来排序
+* 如果没有分组，可以用SELECT中未使用的列
+* 可以用聚合函数和SELECT中设定的别名
+* 可以用数字表示SELECT中的列号，但SQL标准表示要废弃
 * NULL在ASC时的位置：MySQL MSSQL在开头，PG SQLite在末尾
 * 相同字母大小写不同ASC：如 a A z Z，MySQL MSSQL PG为a A z Z，SQLite为 A Z a z
 
@@ -140,7 +143,7 @@ SET ...
 
 * 会走事务，会执行触发器
 * InnoDB中DELETE只是标记为已删除
-* 清除所有数据而保留表结构用TRUNCATE TABLE，更快，且能重置自增数；SQLite没有此语句但清除所有数据时会自动优化
+* 清除所有数据而保留表结构：TRUNCATE TABLE，更快，能重置自增数。SQLite没有此语句但清除所有数据时会自动优化；除MSSQL外也能省略TABLE
 * MySQL：[LOW_PRIORITY] [QUICK] [IGNORE] LIMIT只删除n条
 
 ```sql
@@ -265,7 +268,8 @@ e TEXT AS (substr(c,b,b+1)) STORED -- 插入此行时计算唯一一次，无法
 ### VIEW
 
 * 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句
-* MSSQL：不支持ORDERBY，不支持SELECT中用表达式。只能进行有限程度的更新，会转换成对基本表的更新。有GROUPBY或有DISTINCT时无法更新，只FROM了一张表可以更新
+* 标准对于更新的限制：不能有GROUPBY、HAVING、DISTINCT，只能FROM一张表
+* MSSQL：不支持ORDERBY，不支持SELECT中用表达式
 * SQLite：支持TEMP；不支持直接修改但能通过定义INSTEAD OF触发器修改
 * MySQL：不支持TEMP VIEW
 * TODO: 每次使用都会重新查询？索引？
@@ -291,7 +295,7 @@ DROP VIEW [IF EXISTS]
 ### 事务
 
 * 开启
-  * SQLite PG BEGIN：BEGIN和END(对应COMMIT)
+  * SQLite、PG：BEGIN和END(对应COMMIT)
   * MSSQL：BEGIN TRAN
   * MSSQL、SQLite、PG：BEGIN TRANSACTION
   * MySQL：START TRANSACTION

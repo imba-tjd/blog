@@ -4,7 +4,6 @@
   * +-*/%、括号、常数、列名、标量子查询、聚合函数、CASE
   * 除号在MySQL中结果一定是浮点数，用DIV才是整除
   * PG支持用^表示乘方
-* WHERE中不能用聚合函数因为那必须在分组后生效，ORDERBY中可以用聚合函数和SELECT中设定的别名
 * 通用函数：ABS()、ROUND()、COALESCE(返回第一个不为NULL的参数)、RANDOM()
 
 ### CASE
@@ -535,9 +534,9 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 ### 在线测试
 
 * https://dbfiddle.uk 可能出错的语句以及查询语句最好分开写，否则可能显示不出，尤其是SQLite
-* https://www.db-fiddle.com js的cdn被封IP了
-* http://sqlfiddle.com/ 不新
 * https://sqliteonline.com/ 感觉比较好
+* https://www.db-fiddle.com js的cdn被封IP了
+* https://sqlfiddle.com/
 * https://demo.questdb.io/ 仅兼容PG
 * https://livesql.oracle.com 需要登录
 * https://sandboxsql.com 仅SQLite，但自带三个示例数据库
