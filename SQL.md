@@ -17,7 +17,7 @@ title: SQL
 
 * 计算后的内容一般要用AS命名，此关键字可省但一般不省；FROM的也可用AS命名，一般省
 * DISTINCT：在SELECT后，不是每列前都加，对一整行生效，但聚合函数参数中可以加；NULL只能出现一次。PG支持DISTINCT ON(col1)，其它可考虑GROUPBY
-* 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，跳过很麻烦；Oracle`WHERE ROWNUM<=n`
+* 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，或`ORDER BY ID OFFSET m ROWS FETCH NEXT n ROWS ONLY`也是标准；Oracle`WHERE ROWNUM<=n`
 * FROM的可以是子查询且此处必须命名，此时可以有多列
   * PG MSSQL表达式临时表：FROM (VALUES (1,'a'),(2,'b')) AS tmp (a,b)
 * 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
