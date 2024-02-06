@@ -20,7 +20,7 @@ title: SQL
 * 选取前n条：SQLite MySQL在最后`LIMIT n OFFSET m`或`LIMIT m,n`；MSSQL`SELECT [DISTINCT] TOP n [PERCENT]`，或`ORDER BY ID OFFSET m ROWS FETCH NEXT n ROWS ONLY`也是标准；Oracle`WHERE ROWNUM<=n`
 * FROM的可以是子查询且此处必须命名，此时可以有多列
   * PG MSSQL表达式临时表：FROM (VALUES (1,'a'),(2,'b')) AS tmp (a,b)
-* 关联子查询：外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了
+* 关联子查询(Dependent/Correlated Query)：一个查询的WHERE里含有子查询，且子查询里使用了外部查询的列。外部查询的每一行都会执行一次子查询。例如想选择价格大于所属类别的平均价格的条目，其中计算某一类的平均价格本来需要分组和聚合函数，但最终目标又是选择条目，则需要在子查询中用WHERE过滤与外层相同的类型，就会用到外层FROM的表，分组却不必要了。如果子查询独立，应优先考虑JOIN子查询临时表，或WITH语句
 * SELECT INTO：目标表不能已存在，会自动创建。最好只在MSSQL中作为不支持CREATE TABLE AS的替代；PG支持，SQLite不支持，MySQL仅支持into变量
 
 ### JOIN
@@ -89,9 +89,9 @@ title: SQL
 * 结构必须相同（名字除外）
 * 位于两个SELECT之间，中间不用加分号
 
-### WITH通用表语句
+### WITH 通用表语句(Common Table Expression)
 
-* 相当于在前面给子查询命个名或相当于一次性视图，使用时仍要FROM它
+* 相当于在前面给子查询命个名或相当于一次性视图，使用时仍要FROM和JOIN它
 * WITH q1 AS (子查询) [,q2 AS ...] 正常的SELECT/DELETE ... FROM q1
 * WITH RECURSIVE fib(a,b) AS (VALUES(1,1) UNION ALL SELECT b,a+b FROM fib where b < 100) SELECT a FROM fib; 把查询结果再次代入到查询子句中继续查询
 
