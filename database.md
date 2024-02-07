@@ -10,6 +10,7 @@
 
 * 可用于分类
 * WHEN里的也可以是一般的带比较运算符的条件表达式，此时可不写CASE后的表达式，THEN里的可以是子查询等表达式
+  * MSSQL不支持SELECT bool表达式，必须用SEELCT CASE WHEN exp THEN 1 ELSE 0 END
 * 非标准的简化：MySQL有IF函数，Oracle有DECODE函数
 
 ```sql
