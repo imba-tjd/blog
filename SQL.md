@@ -38,7 +38,7 @@ title: SQL
 * 等于用`=`，标准的不等于为`<>`
 * NOT、AND、OR：与一般的编程语言一样
 * IS NULL、IS NOT NULL：只有这个能判断。col = NULL和col != NULL或任何其它运算，结果都为NULL，用在WHERE中就恒假
-* [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间
+* [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间。支持日期类型
 * IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其注意
 * [NOT] LIKE：默认不区分大小写，PG除外用ilike不区分。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`。正则匹配：MySQL用RLIKE，PG用SIMILAR TO，MSSQL不支持，SQLite只内置了接口默认没实现
 * ANY、ALL：前加比较运算符，后跟子查询。用比较运算符（不等号）时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
@@ -267,7 +267,7 @@ e TEXT AS (substr(c,b,b+1)) STORED -- 插入此行时计算唯一一次，无法
 
 ### VIEW
 
-* 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句
+* 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句。创建时不能指定ORDERBY
 * 标准对于更新的限制：不能有GROUPBY、HAVING、DISTINCT，只能FROM一张表
 * MSSQL：不支持ORDERBY，不支持SELECT中用表达式
 * SQLite：支持TEMP；不支持直接修改但能通过定义INSTEAD OF触发器修改
