@@ -58,6 +58,7 @@ title: SQL
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
 * 有的DBMS支持 GROUPBY 表达式，感觉正常应该用CASE
+* 有的支持GROUPBY 序号
 
 ### ORDER BY
 
