@@ -65,7 +65,7 @@ END
 * LOWER()、UPPER()
 * COLLATE
   * SQLite：BINARY默认 NOCASE RTRIM去除尾随空格。可用在定义TABLE时，或SELECT中WHERE ORDERBY列名后
-  * MSSQL：可用Chinese_Simplified_Pinyin_100_CI_AS_UTF8。其中CI不区分大小写，CS区分；AS区分重音，AI不区分，对中文没用；WS区分全角半角标点，不加时为不区分；KS和VSS只对日文有效；SC为启用U16非标准平面，140版本默认开启；_BIN2为二进制，使用时无法指定其它变体，速度较快；UTF8表示以U8储存而非ANSI，主要用于原本只支持Latin-1的程序自动支持Unicode；不加版本号时为80，版本号只存在90 100 140且只有日文等几个有140。服务器级别的设置影响系统数据库，其中master影响表名等元数据，tempdb影响临时表；数据库级别的设置影响新建的表和列，不会改变已有数据；没有表级别的，但有列级别的，可修改列级别的以转换排序规则。“SQL排序规则”弃用了
+  * MSSQL：可用Chinese_Simplified_Pinyin_100_CI_AS_SC_UTF8。其中CI不区分大小写，CS区分；AS区分重音，AI不区分，对中文没用；WS区分全角半角标点，不加时为不区分；KS和VSS只对日文有效；SC为启用U16非标准平面，140版本默认开启；_BIN2为二进制，使用时无法指定其它变体，速度较快；UTF8表示以U8储存而非ANSI，主要用于原本只支持Latin-1的程序自动支持Unicode；不加版本号时为80，版本号只存在90 100 140且只有日文等几个有140。服务器级别的设置影响系统数据库，其中master影响表名等元数据，tempdb影响临时表；数据库级别的设置影响新建的表和列，不会改变已有数据；没有表级别的，但有列级别的，可修改列级别的以转换排序规则。“SQL排序规则”弃用了
   * MySQL：8.0后无需更改，默认为utf8mb4_0900_ai_ci。general版对中英文没区别，德文有区别
 * 哈希
   * MySQL：SHA2('str', 256)
