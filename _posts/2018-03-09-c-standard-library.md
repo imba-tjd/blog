@@ -44,7 +44,7 @@ void print_tokens(char* line)
         token != NULL;
         token = strtok(NULL, whitespace)
     )
-        printf("%s", token ）;
+        printf("%s", token);
 }
 ```
 

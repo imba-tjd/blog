@@ -455,7 +455,7 @@ ip link
 
 ## systemd
 
-/lib/systemd/system/
+配置文件存放位置：/lib/systemd/system/
 
 ### systemctl
 

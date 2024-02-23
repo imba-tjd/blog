@@ -215,8 +215,9 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
   * MinGW的-lxxx的搜索顺序：libxxx.dll.a xxx.dll.a libxxx.a cygxxx.dll libxxx.dll xxx.dll
 * 工具
   * 查看程序所依赖的共享库：ldd
-  * 查看库导出的符号，但必须有调试符号：nm -C，其中-C能解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
+  * 查看库导出的符号，但必须有调试符号：nm。加-C解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
   * 上面两条都支持：objdump -p
+  * 查看库的架构（32位还是64位，解决ld: skipping incompatible xxx when searching for xxx）：objdump -f
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
   * FORTIFY_SOURCE将不安全函数替换为对应的_chk版本
@@ -292,9 +293,9 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 ### msys2
 
-* 安装包、zip版：https://github.com/msys2/msys2-installer/releases
-* 下好后有多个环境，msys是源自cygwin的，构建出来的依赖msys-2.0.dll等；不是在Win下直接运行Linux软件的方式，而必须从源代码构建。其它几种都是原生的。不同环境共享home，但lib不同
-* 国内源：/etc/pacman.d。第一次用pacman -Syyu。安装：-S。卸载：-Rs。搜索：-Ss。更新所有：-Syu。显示已安装：-Q。显示包的详细信息：-Qi。完全清理下载缓存：-Scc
+* 安装包、zip版：https://github.com/msys2/msys2-installer/releases https://repo.msys2.org/distrib/
+* 下好后有多个环境，msys是源自cygwin的，构建出来的依赖msys-2.0.dll等；不是在Win下直接运行Linux软件的方式，而必须从源代码构建。其它几种都是原生的。不同环境共享home，但lib不同。cygwin现在不支持32位
+* 国内源：/etc/pacman.conf和/etc/pacman.d。第一次用pacman -Syyu。安装：-S。卸载：-Rs。搜索：-Ss。更新所有：-Syu。显示已安装：-Q。显示包的详细信息：-Qi。完全清理下载缓存：-Scc
 * 官方仅限win。Linux上的：quasi-msys2，但不支持cygwin，优点是能利用msys2的仓库，如果只用编译器则没啥用
 
 ### 其他
