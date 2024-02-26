@@ -27,11 +27,12 @@ title: SQL
 
 * 如果存在同名的列，SELECT中要加表名，可用tb1.*表示第一个表的所有列
 * CROSS JOIN：笛卡尔积，参数只需加表名，无需on；MySQL允许有on但直接忽略
-* INNER JOIN tb2 ON tb1.col1 = tb2.col2：等价于老版本标准的FROM t1, t2 WHERE ...
+* INNER JOIN tb2 ON tb1.col1 = tb2.col2
+  * 等价于老版本标准的FROM t1, t2 WHERE ...。笛卡尔积等于无WHERE
+  * 不会把col1.NULL与col2.NULL看作相等，会忽略
 * LEFT/RIGHT/FULL JOIN：左外连接就是完全保留左边的，右边的如果没有就为NULL；LEFT时一般把小表放到左边。SQLite3.39前只支持LEFT
 * LEFT JOIN WHERE tb2.id IS NULL可查询仅存在于左边的，即减去共有部分
 * SELF JOIN：如选择来自于相同城市的人、时间间隔
-* 内连接不会把col1.NULL与col2.NULL看作相等，会忽略
 
 ### WHERE
 
@@ -270,7 +271,7 @@ e TEXT AS (substr(c,b,b+1)) STORED -- 插入此行时计算唯一一次，无法
 
 * 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句。创建时不能指定ORDERBY
 * 标准对于更新的限制：不能有GROUPBY、HAVING、DISTINCT，只能FROM一张表
-* MSSQL：不支持ORDERBY，不支持SELECT中用表达式
+* MSSQL：不支持SELECT中用表达式
 * SQLite：支持TEMP；不支持直接修改但能通过定义INSTEAD OF触发器修改
 * MySQL：不支持TEMP VIEW
 * TODO: 每次使用都会重新查询？索引？
