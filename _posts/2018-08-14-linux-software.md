@@ -19,6 +19,7 @@ category: linux
 * apt edit-sources
 * -s(simulation)/--dry-run
 * --no-install-recommends
+* 查询二进制来自于哪个包：dpkg -S
 
 ### 软件列表
 

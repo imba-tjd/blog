@@ -102,7 +102,7 @@ title: Linux命令
 
 * unar：自动正确解压非Unicode的zip，可惜最后更新时间2015年
 * unzip：不自带，最后更新时间2009年，不支持读取stdin，但支持-p表示输出到stdout
-* 分卷zip，先`cat test.zip* > ~/test.zip`合并起来再解压就好了
+* 分卷zip：先`cat test.zip* > ~/test.zip`合并起来再解压就好了。加密：zipcloak
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
 * unrar：是rar官方的，但在non-free中。不支持解压其它任何格式
 * upx --lzma
@@ -162,9 +162,11 @@ title: Linux命令
 
 ## 网络
 
+* 防火墙：ufw易用，有gufw图形界面，但yum里没有。firewalld较复杂。其它开源有GUI的：opensnitch portmaster SafeLine(国产WAF)
+
 ### dig
 
-* 在dnsutils包中，依赖一些bind9的东西
+* 在dnsutils包中，实际是bind9的客户端
 * `dig @dns.googlehosts.org www.baidu.com`
 * +vc：查询时使用tcp（不一定支持）
 * +short：只显示ip（但可能有多个）
@@ -178,8 +180,9 @@ title: Linux命令
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
 * ->>HEADER<<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
 * 查询EDNS状态：`dig edns-client-sub.net -t TXT @8.8.8.8`
-* host命令：默认只显示answer，第二个参数可指定服务器。-t指定请求的记录类型，-a效果和dig差不多
+* host命令（deprecated）：默认只显示answer，第二个参数可指定服务器。-t指定请求的记录类型，-a效果和dig差不多
 * kdig(knot-utils)：功能更多一点，支持DoT(+tls)但不支持DoH。zdns：快速查询大量记录。dnsenum：爆破子域名。doggo：Go写的多彩的解析器，支持Win
+* delv：dnsutils 9.10中dig的继任者，对DNSSEC的支持更好
 
 ### nmap
 
@@ -332,6 +335,27 @@ ip link
 * src如果以`/`结尾，就是传输文件夹里的内容，不是传输一个文件夹；不以斜杠结尾再加`-r`就能传输一个文件夹
 * 基于sftp协议
 
+### [nftables](https://wiki.nftables.org)
+
+* 代替iptables。ipset是与iptables配合使用的，而不是封装。bpfilter：作为daemon，将iptables或nftables作为前端，编译成eBPF
+* 先创建table
+  * family支持ip arp ip6 bridge inet netdev，其中ip仅指v4，也是省略时的默认值；不同family可以有同名table，因此一般不省
+  * nft add 族类型 table filter(表名)
+  * nft list tables、nft list table filter
+* 再创建chain
+  * nft add chain 族类型 表名 INPUT(链名) '{ type filter hook input priority 0; policy 默认accept或drop; }' 如果不加单引号就要转义分号或用交互模式
+  * type根据table的family不同而不同，一般就是filter
+  * hook对于ip有prerouting input forward output postrouting，就是对应iptables预定义的几个
+  * 优先级越小越优先，相同优先级的处理顺序未定义
+  * policy是rule未匹配时的行为
+* 再创建rule
+  * nft add rule 族类型 表名 链名 matches statements
+  * matches是对三四层协议属性的匹配
+  * statements：Verdict语句控制包的control flow，还预定义了一些其它功能如计数、限流
+* set：类似于ipset，定义好后再在chain里复用
+* nft -i进入交互模式。-f读取配置文件，里面的内容可以是交互模式的内容，或一种避免重复写table和chain的大括号方式。nft list ruleset将现有规则输出成配置
+* https://zhuanlan.zhihu.com/p/139678395
+
 ## 文本处理
 
 * wc：-l按行统计，-w按空白分隔的单词统计
@@ -483,7 +507,6 @@ ip link
 ### TODO
 
 * killall、kill -9
-* nftables：https://zhuanlan.zhihu.com/p/88981486 https://zhuanlan.zhihu.com/p/139678395 代替iptables。防火墙：ufw易用，但yum里没有。firewalld较复杂。ipset基于iptables
 * https://www.oschina.net/translate/useful-linux-commands-for-newbies
 * https://einverne.github.io/categories.html#每天学习一个命令
 * https://github.com/trimstray/the-book-of-secret-knowledge
