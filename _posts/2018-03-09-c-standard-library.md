@@ -59,7 +59,7 @@ putchar("0123456789ABCDEF"[value%16]);
 内存操作函数（位于string.h中）
 ------------------------------
 
-与字符串的那些函数类似，但是不会以'\0'来结束。
+与字符串的那些函数类似，但是不会以'\0'来结束。长度都是字节数
 
 * void* memcpy(void* dst, const void* src, size_t len); // 不能重叠否则未定义，可能会从后往前复制；如果类型相同，len可以为sizeof(src)；如果需要指定长度，count * sizeof(src[0])
 * void* memmove(void* dst, const void* src, size_t len); // 可以重叠（src会先复制到临时位置）
@@ -102,30 +102,6 @@ putchar("0123456789ABCDEF"[value%16]);
 * FLT_MIN_10_EXP：以10为底带全部有效数字的float类型的最小负指数
 * FLT_MIN：保留全部精度的float类型最小正数
 * FLT_EPSILON：1.00和比1.00大的最小float类型值之间的差值
-
-宽字符支持：wchar.h和wctype.h
------------------------------
-
-wchar.h提供类似stdio.h的函数，在标准输入输出返回EOF的时候返回WEOF，以及含有wchar_t类型：
-
-* fwprintf/fwscanf
-* swprintf/swscanf
-* wprintf/wscanf
-* wint_t fgetwc
-* wchar_t* fgetws
-* wint_t fputwc
-* getwc/getwchar/putwc/putwchar/ungetwc
-
-wchar.h参照string.h提供了字符串控制函数，一般而言，用wcs代替str。几个内存处理函数前加w。
-
-wctype.h提供与ctype.h类似的宽字符函数：
-
-* iswalpha
-* ...
-
-wtypes.h和WCHAR是Windows的头文件。
-
-在C++下，C的流是有“方向”的，最初流是无方向的，一旦使用了窄系函数，就会确定下来，就不能再用宽系函数了，只有freopen才能更改。
 
 ## TODO
 

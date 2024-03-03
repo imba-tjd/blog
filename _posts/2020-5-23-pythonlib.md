@@ -890,7 +890,7 @@ def myfile(_):
 * scope：scheme(https)、method(GET)、path(以/开头，不含域名和查询字符串，百分号编码)、headers((k,v)列表，bytes)、query_string(bytes，百分号编码)、client(有ip)，没有原始uri
 * abersheeran/a2wsgi：ASGI于WSGI的app互转
 * 默认是http的，直接请求https会报h11._util.RemoteProtocolError: illegal request line，curl为SSL_ERROR_SYSCALL
-* 只支持HTTP1.1，直接基于asyncio。hypercorn支持HTTP/2，Daphne依赖twisted
+* 只支持HTTP1.1，直接基于asyncio。hypercorn支持HTTP/2，Daphne依赖twisted。granian是rust实现的效率很高
 
 ```py
 async def app(scope, receive, send): # 必须是异步的，也可以是定义了__call__的类
@@ -1469,6 +1469,7 @@ COPY . . # 用上.dockerignore
 * pretty_errors：精简stacktrace，可全局安装
 * uwsgi：不支持Win，用了sys/socket.h，可考虑WSL。https://pypi.org/project/pyuwsgi/
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
+* 计算圈复杂度：https://github.com/terryyin/lizard 支持多种语言无需编译
 
 ## 参考
 

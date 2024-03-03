@@ -33,7 +33,7 @@ search.o files.o: buffer.h
 # 伪目标，不是文件，只是标签；不会因为存在一个叫做clean的文件而认为已是最新不执行，所有依赖总会被执行
 .PHONY: clean cleandiff
 clean: cleandiff
-	-rm prog $(objects) # 减号表示出现错误也继续执行。Win下也用rm
+	-rm prog $(objects) # 减号表示出现错误也继续执行
 
 TARGET = hello
 OBJ = lib.o
