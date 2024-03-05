@@ -73,11 +73,11 @@ title: SQL
 
 ### 窗口函数
 
-* <窗口函数> OVER ([PARTITION BY 列] ORDER BY 列)
+* <窗口函数> OVER ([PARTITION BY 列] ORDER BY 列 [范围])
 * PARTITION也是一种分组，但不是合并为一行，而是算作不同的组（窗口），不同组的窗口函数会“初始化”
-* 此处的ORDERBY后跟的是窗口函数计算顺序的基准，不是结果的排序
-* 专用窗口函数，直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同：RANK - 1,1,3、DENSE_RANK - 1,1,2、ROW_NUMBER - 1,2,3
-* 聚合函数：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。可在ORDERBY后可加ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
+* 此处的ORDERBY后跟的是窗口函数计算顺序的基准，不是结果的排序。如结果按姓名排序，排名按分数，则排名列可能是3,1,2
+* 专用窗口函数：直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同。RANK - 1,1,3、DENSE_RANK - 1,1,2、ROW_NUMBER - 1,2,3
+* 聚合函数（同名的函数）：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。或范围加ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
 * 只能用在SELECT中
 * TODO: https://www.sqlite.org/windowfunctions.html 另外SELECT中有WINDOW wnd AS wnd-def语句，在GROPUBY后
 * https://zhuanlan.zhihu.com/p/60226935
@@ -269,7 +269,9 @@ e TEXT AS (substr(c,b,b+1)) STORED -- 插入此行时计算唯一一次，无法
 
 ### VIEW
 
-* 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句。创建时不能指定ORDERBY
+* 取表或其他视图的一部分变成一个新的“表”，实际保存的是SELECT语句
+* 可方便配合DCL限制用户只能看表的一部分
+* 创建时不能指定ORDERBY
 * 标准对于更新的限制：不能有GROUPBY、HAVING、DISTINCT，只能FROM一张表
 * MSSQL：不支持SELECT中用表达式
 * SQLite：支持TEMP；不支持直接修改但能通过定义INSTEAD OF触发器修改
