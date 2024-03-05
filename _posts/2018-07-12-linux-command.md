@@ -46,7 +46,9 @@ title: Linux命令
   * htop
     * 支持用鼠标操作
     * 默认以线程而显示，导致出现很多重复的程序，按Shift+H隐藏
-    * F5以树状显示
+    * F5以树状显示，但就无法排序了
+    * RES表示占用的物理内存，无单位时是KB
+    * F2设置里可以调整上面的状态和筛选列。可以把宽度改为2:1，CPU改成Average
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
   * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
