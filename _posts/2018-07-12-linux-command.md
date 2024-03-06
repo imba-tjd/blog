@@ -49,6 +49,7 @@ title: Linux命令
     * F5以树状显示，但就无法排序了
     * RES表示占用的物理内存，无单位时是KB
     * F2设置里可以调整上面的状态和筛选列。可以把宽度改为2:1，CPU改成Average
+    * 显示过长的Command：w
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
   * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
@@ -268,7 +269,7 @@ title: Linux命令
 
 ### iproute2
 
-替代net-tools(ifconfig, arp, route, netstat)。
+替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它和NetworkManager被systemd-networkd替代。
 https://www.cnblogs.com/sparkdev/p/9253409.html
 https://www.cnblogs.com/sparkdev/p/9262825.html
 
@@ -449,12 +450,11 @@ ip link
 ## 持续运行
 
 * ctrl+z：相当于运行了suspend
-* fg：把ctrl+z挂起的程序恢复到前台
-* bg：让ctrl+z挂起的程序在后台运行
+* fg：把ctrl+z挂起的程序恢复到前台。bg：让ctrl+z挂起的程序在后台运行
 * jobs：显示后台挂起的任务
 * 使用`%1`指定目标任务，可以用kill杀掉
-* 输命令时在最后加个&会默认在后台运行，一般会用`>log.txt 2>&1 &`不让输出到屏幕上；如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样
-* 再在最前面加个nohup，则正常退出会话时命令不会结束（异常退出还是会结束）；~~但这样的程序无法用fg恢复~~好像可以。默认会自动把输出重定向到$HOME/nohup.out中，自动把stderr重定向到stdout
+* 输命令时就指定在后台运行：在最后加个&，一般用`>log.txt 2>&1 &`不让输出到屏幕上。如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样。推荐再加nice降低优先级
+* 再在前面（但在小括号里）加nohup，则正常退出会话时命令不会结束（异常退出还是会结束）。如果不手动重定向，默认会自动把输出都重定向到nohup.out中，但必须按一下回车交互
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
@@ -464,7 +464,7 @@ ip link
 * crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -d: -f1 | xargs -I {} crontab -l -u {}`
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
-* systemctl list-timers（systemd-timer）
+* systemctl list-timers
 * https://crontab.guru/
 * https://zhuanlan.zhihu.com/p/58719487
 
@@ -472,44 +472,10 @@ ip link
 
 分布式的：cronsun，国人开发的。
 
-### tmux
-
-* 新建会话：tmux new -s <sessio_name>
-* ctrl b + c：新窗口，ctrl b + p：切换到上一个窗口，ctrl b + n：下一个窗口；ctrl b + s：列出并切换窗口
-* ctrl b + %：竖分屏，ctrl b + "：横分屏，ctrl b + 方向键：切换panel
-* https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt
-* https://zhuanlan.zhihu.com/p/27915505
-* https://github.com/gpakosz/.tmux
-* https://github.com/tmux-python/tmuxp
-* https://pityonline.gitbooks.io/tmux-productive-mouse-free-development_zh/content/index.html
-* https://louiszhai.github.io/2017/09/30/tmux/
-* Rust写的终端复用器：Zellij
-
-## systemd
-
-配置文件存放位置：/lib/systemd/system/
-
-### systemctl
-
-* systemctl start（当前启动一次）、stop、enable（开机自启）、disable（禁止自启）、status、restart、try-restart（已启动才重启否则不做操作）、reload-or-restart、reload-or-try-restart、mask（禁止自动和手动启动）、unmask name.service
-* 查看已激活的服务：systemctl list-units --type=service；加-a显示所有的；查看所有服务的自启状态：systemctl list-unit-files -t service
-* systemctl show --property=Environment docker
-* systemctl daemon-reload
-* systemctl hibernate（休眠）、hybrid-sleep（交互式休眠）、rescue（进入单用户救援状态）
-* chkservice：交互式管理服务的程序 https://zhuanlan.zhihu.com/p/35264613
-* machinectl：取代su，polkit取代sudo
-
-### 其它
-
-* systemd-analyze：查看启动耗时；blame指令：查看每个服务的启动耗时；critical-chain [name.service]指令：显示瀑布状的启动过程流
-* journalctl：管理日志，取代syslog
-* crond 也被 systemd 的 timer 单元取代
-
 ## 参考
 
 * https://www.cnblogs.com/manong--/p/8012324.html
 * https://blog.csdn.net/aspirationflow/article/details/7694274
-* https://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
 * https://zhuanlan.zhihu.com/p/43687973
 
 ### TODO

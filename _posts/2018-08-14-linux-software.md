@@ -465,6 +465,19 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * https://www.activestate.com/products/perl/
   * https://strawberryperl.com/ 自带GCC还会加入PATH里，要手动去掉
 
+## tmux
+
+* 新建会话：tmux new -s sessio_name
+* ctrl b + c：新窗口，ctrl b + p：切换到上一个窗口，ctrl b + n：下一个窗口；ctrl b + s：列出并切换窗口
+* ctrl b + %：竖分屏，ctrl b + "：横分屏，ctrl b + 方向键：切换panel
+* https://github.com/skywind3000/awesome-cheatsheets/blob/master/tools/tmux.txt
+* https://zhuanlan.zhihu.com/p/27915505
+* https://github.com/gpakosz/.tmux
+* https://github.com/tmux-python/tmuxp
+* https://pityonline.gitbooks.io/tmux-productive-mouse-free-development_zh/content/index.html
+* https://louiszhai.github.io/2017/09/30/tmux/
+* Rust写的终端复用器：Zellij
+
 ## TODO
 
 * unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691
@@ -483,3 +496,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * nessus
 * https://github.com/wilfred/difftastic
 * https://github.com/superfly/litefs FUSE-based file system
+* polkit取代sudo
