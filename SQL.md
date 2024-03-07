@@ -60,6 +60,7 @@ title: SQL
 * 会把NULL算作一组
 * 有的DBMS支持 GROUPBY 表达式，感觉正常应该用CASE
 * 有的支持GROUPBY SELECT中的序号
+* GROUPING运算符：能用在GROUPBY语句中的ROLLUP() CUBE() GROUPING SETS()函数，MySQL只支持WITH ROLLUP。ROLLUP(col)效果是再增加一组等同于未分组的数据，可用于当计算了每组小计时也要算合计，ROLLUP(c1,c2)还会增加仅按c1分组的组，CUBE(c1,c2)还会增加仅按c2分组的组。GROUPING SETS可用于配合CASE从前两者中手动取出想要的。SELECT中还有个GROUPING()用于分辨超级分组记录中的NULL和原始数据本身的NULL
 
 ### ORDER BY
 
@@ -75,7 +76,7 @@ title: SQL
 
 * <窗口函数> OVER ([PARTITION BY 列] ORDER BY 列 [范围])
 * PARTITION也是一种分组，但不是合并为一行，而是算作不同的组（窗口），不同组的窗口函数会“初始化”
-* 此处的ORDERBY后跟的是窗口函数计算顺序的基准，不是结果的排序。如结果按姓名排序，排名按分数，则排名列可能是3,1,2
+* 此处的ORDERBY后跟的是窗口函数计算顺序的基准，不是结果的排序。如结果按姓名排序，排名按分数，则排名列可能是3,1,2，如果想按排名，之后再在ORDERBY中按SELECT的RANK列名排序
 * 专用窗口函数：直接无参调用，对一窗口内进行排名，遇到值相同时的行为不同。RANK - 1,1,3、DENSE_RANK - 1,1,2、ROW_NUMBER - 1,2,3
 * 聚合函数（同名的函数）：仍要指定列，关键是每一行的数据范围相当于从第一行到当前行。或范围加ROWS N PRECEDING M FOLLOWING指定范围为当前行的前N行和当前行和当前行的后M行
 * 只能用在SELECT中
