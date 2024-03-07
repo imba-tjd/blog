@@ -91,6 +91,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 * update --allowerase
 * search pkg 自动通配
 * provides 查询某个程序或so库是哪个包装上的
+* epel-release包：安装后就有更多包了
 
 ## PIP
 
@@ -478,6 +479,10 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://louiszhai.github.io/2017/09/30/tmux/
 * Rust写的终端复用器：Zellij
 
+## PM2和守护程序
+
+* pm2需node，但最好。supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434/what-is-the-advantage-of-using-supervisord-over-monit monit是C
+
 ## TODO
 
 * unattended-upgrades自动更新：https://www.cnblogs.com/sparkdev/p/11376560.html https://zhuanlan.zhihu.com/p/79215691
@@ -485,7 +490,6 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/robertdavidgraham/masscan
 * airflow 任务调度
 * pyload 离线下载
-* supervisor(python，还有fork的for Windows版)、PM2 (for node.js)
 * tasksel：用于安装一组软件
 * https://github.com/royhills/arp-scan。ntopng：网络的top，web界面。addrwatch
 * rustdesk：远程桌面

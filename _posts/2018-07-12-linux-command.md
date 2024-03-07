@@ -97,9 +97,9 @@ title: Linux命令
 * fd abc相当于`find -iname '*abc*'`，第二个参数指定开始搜索的根目录
 * 模式默认为正则，-g改为glob
 * 模式只存在小写字母时大小写不敏感，有大写字母时自动变为大小写敏感
-* 默认忽略点开头文件和gitignore中的文件，用-HI分别禁用前后者，小心禁用前者后能搜到.git中的文件
-* 无参使用会递归列出所有文件，模式用`.`仅列出当前文件夹
-* -t/--type指定type
+* 默认忽略点开头文件和gitignore中的文件，用-HI分别禁用前后者，其中禁用前者会搜到.git里的文件
+* 无参使用会递归列出所有文件，相当于模式用`.`
+* -t/--type
 * -e指定后缀，可多次使用
 * 默认只匹配文件名(基本名)，指定-p匹配路径
 * -x并行执行外部命令，每项都执行一次；-X执行一次外部命令，把所有项当作那一次的参数；-i交互模式每次执行前询问。占位符支持{.}路径去扩展，{/}文件名带扩展，{//}父目录，{/.}文件名无扩展；不存在时默认在最后加一个{}
@@ -269,7 +269,7 @@ title: Linux命令
 
 ### iproute2
 
-替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它和NetworkManager被systemd-networkd替代。
+替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它被NetworkManager(Cent)和systemd-networkd(Deb)替代。
 https://www.cnblogs.com/sparkdev/p/9253409.html
 https://www.cnblogs.com/sparkdev/p/9262825.html
 
@@ -417,7 +417,7 @@ ip link
 * -w：单词，相当于前后加了\b
 * --：使得之后以横杠开头的参数不看作选项
 * zgrep
-* 还有个ugrep貌似速度很快，但是社区不够好，也不稳定
+* ugrep(c++)：社区不够好，不稳定，但号称是普通grep的drop-in替代，而rg没有这个目标
 
 #### ripgrep(rg)
 
@@ -425,8 +425,18 @@ ip link
 * 文件名可指定目录，不指定时默认递归搜索CWD（grep默认等待用户输入stdin），且默认排除点开头文件和gitignore，-uu不忽略
 * -t指定后缀，-z搜索压缩包
 * -E指定编码，默认搜GBK的会乱码
+* -P使用PCRE2，支持lookaround和反向引用，但速度稍慢
 * -r/--replace替换内容，-or '$1'能得到取第一个捕获组的效果
 * -c -i -l -w -v -C：与grep相同
+
+#### fzf
+
+* 开启tui对stdin进行模糊匹配，按行划分，用tab选择多个，输出
+* 官方提供了热键：Alt+C运行cd，Ctrl+R匹配历史，Ctrl+T或两个星号加tab触发在当前位置补全。对于kill、ssh等做了额外适配。还能配合bat预览文件内容
+  * 通关包管理器安装的默认没有激活热键，要看不同包的说明
+  * 使用现有补全机制的第三方脚本：https://github.com/lincheney/fzf-tab-completion
+* 不用热键，按脚本的方式使用：xxx | fzf | xargs ...、xxx $(fzf)
+* 无参使用时用的是原版find，不会忽略.git，有配置可以调
 
 ### sed
 
