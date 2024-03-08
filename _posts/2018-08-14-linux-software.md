@@ -360,7 +360,6 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * --spider：只检测目标是否存在，可与-i配合批量检测书签
 * -b：转入后台下载，日志输出到wget-log文件中
 * -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
-* Win版：现在作者已经在Release里发Win的二进制了 https://www.lumito.net/2020/12/05/released-wget2-1-99-2-for-windows/ https://github.com/ibook86/wget2-windows。MSYS2的包直接下二进制无法运行
 
 ### youtube-dl
 

@@ -6,7 +6,7 @@ title: Linux命令
 
 * https://ss64.com/bash/
 * https://www.runoob.com/linux/linux-command-manual.html
-* https://tldr.ostera.io/
+* https://tldr.inbrowser.app/
 * https://cheat.sh/
 * http://bropages.org/
 * https://command-not-found.com/
@@ -46,15 +46,16 @@ title: Linux命令
   * htop
     * 支持用鼠标操作
     * 默认以线程而显示，导致出现很多重复的程序，按Shift+H隐藏
-    * F5以树状显示，但就无法排序了
+    * F5以树状显示，但就无法排序了，只按pid排序
     * RES表示占用的物理内存，无单位时是KB
     * F2设置里可以调整上面的状态和筛选列。可以把宽度改为2:1，CPU改成Average
     * 显示过长的Command：w
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
-  * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器
+  * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器。nmon、njmon(c)：社区为sourceforge较差，后者适合做二次开发。gtop(node)、bottom(rust)：比较类似于overview面板，能显示网速，有折线图显示CPU和内存历史
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
-  * pkill：根据ps的一些Filter来kill，一般就是pkill 进程名
+  * pkill：根据ps的一些Filter来kill，一般就是pkill -fe 进程名，f表示完全匹配防止误杀，e显示杀了的程序
   * pgrep：同理，另外查找进程时不会显示grep自身
+  * dalance/procs：rust的重写
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
 
 ## 文件处理
@@ -65,6 +66,7 @@ title: Linux命令
 * basename，dirname：取得路径的文件名或目录。前者第二个参数传后缀还会去掉它。后者支持任意数量的参数，处理后每个一行
 * mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
 * ls：-R递归，-r倒序，-t按日期降序，-S按文件大小降序，-d显示当前文件夹自己的信息，-A列出除.和..以外的所有文件
+  * ogham/exa、lsd：Rust的重写
 * cd -：切换到之前的目录
 * tail -f：持续输出指定文件，如果有变化立即显示；与less -F相同
 * which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件
@@ -416,6 +418,7 @@ ip link
 * -v：反向(invert)，输出不匹配的
 * -w：单词，相当于前后加了\b
 * --：使得之后以横杠开头的参数不看作选项
+* 输出文件夹中的每个文件：fgrep '' dir
 * zgrep
 * ugrep(c++)：社区不够好，不稳定，但号称是普通grep的drop-in替代，而rg没有这个目标
 
@@ -431,8 +434,11 @@ ip link
 
 #### fzf
 
-* 开启tui对stdin进行模糊匹配，按行划分，用tab选择多个，输出
-* 官方提供了热键：Alt+C运行cd，Ctrl+R匹配历史，Ctrl+T或两个星号加tab触发在当前位置补全。对于kill、ssh等做了额外适配。还能配合bat预览文件内容
+* 开启tui对stdin进行模糊匹配，按行划分，选中回车或鼠标双击，输出结果
+  * 搜索开头、结尾、排除：`^music .mp3$ !fire`
+  * Ctrl+JK或鼠标滚轮移动条目
+  * 多选模式：-m，然后Tab或鼠标右键选择多个
+* Bash热键：Alt+C运行cd，Ctrl+R匹配历史，Ctrl+T或两个星号加tab触发在当前位置补全。对于kill、ssh等做了额外适配。还能配合bat预览文件内容
   * 通关包管理器安装的默认没有激活热键，要看不同包的说明
   * 使用现有补全机制的第三方脚本：https://github.com/lincheney/fzf-tab-completion
 * 不用热键，按脚本的方式使用：xxx | fzf | xargs ...、xxx $(fzf)
@@ -496,7 +502,6 @@ ip link
 * https://github.com/trimstray/the-book-of-secret-knowledge
 * IPTraf-ng：监控网络流量
 * https://github.com/denisidoro/navi
-* fzf https://zhuanlan.zhihu.com/p/91873965 https://github.com/junegunn/fzf https://einverne.github.io/post/2019/08/fzf-usage.html
 * iface：查看网卡信息
 * https://github.com/google/cdc-file-transfer
 * open view see edit compose print：都是run-mailcap的alias，根据mime类型调用对应程序
