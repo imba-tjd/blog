@@ -8,9 +8,8 @@ category: linux
 
 ## APT
 
-* 使用`grep " install " /var/log/apt/history.log`可查看最近安装的软件，**不包含因为依赖装上的**
+* 查看最近安装的软件：`grep " install " /var/log/apt/history.log`，不包含因为依赖装上的
 * 清理已删除但保留配置的软件包：`sudo apt purge $(dpkg -l | awk '/^rc/ { print $2 }')`
-* 可以使用apt install ./xxx.deb直接安装本地的deb包
 * 查看更新记录：`cat /var/log/apt/history.log`，而`/var/lib/apt/periodic`中什么也没有
 * 查看安装了哪些：apt list -i、dpkg -l
 * 查询反向依赖：apt-cache rdepends -i -i理论上是只显示已安装的，但实际好像有些未安装的也显示了？
@@ -23,7 +22,6 @@ category: linux
 
 ### 软件列表
 
-* ifconfig：在net-tools中；但现在可用if替代
 * figlet：把文本转换为某些字符拼凑显示
 * software-properties-common：含有add-apt-repository
 * locate：安装后要手动sudo updatedb更新一下数据库，之后 在/etc/cron.daily/locate这个脚本每天自动更新
@@ -39,7 +37,6 @@ category: linux
 * pv：用于显示进度，放在两个管道之间，或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
 * ssl-cert：方便地自签证书
-* nmap
 * neofetch：显示一些基本信息，不过需要安装较多依赖。linuxlogo可替代一小部分
 * iotop
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
@@ -91,6 +88,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 * update --allowerase
 * search pkg 自动通配
 * provides 查询某个程序或so库是哪个包装上的
+* autoremove
 * epel-release包：安装后就有更多包了
 
 ## PIP
@@ -157,9 +155,6 @@ trusted-host = mirrors.aliyun.com
 * Glances：监控所有系统信息（类似于vmstat）
 * userpath：添加和验证PATH的程序，也能作为库使用
 * fierce：扫描域名，基本上是取附近IP的反查PTR；aiodnsbrute爆破查找域名
-* csvkit：一系列命令行工具，包括能把xlsx和json转换成csv。但依赖太多了，还需要装libicu-dev
-* harelba/q：在csv和sqlite上运行SQL语句，但没发布PyPI包
-* xsv：rust的csv处理工具
 
 ## APK
 
@@ -182,11 +177,6 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 
 * gem install lolcat：彩虹颜色的管道输出
 
-## Dnf
-
-* install/autoremove/update/search
-* list installed
-
 ## 不在包管理器中的软件
 
 * [chafa](https://github.com/hpjansson/chafa)：在终端中显示图像，支持gif，不过是像素化显示的
@@ -203,7 +193,7 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 * /usr/games/fortune
 * cowsay
 * gnome-tweak
-* 桌面版debian删除不用的程序：apt autoremove libreoffice* thunderbird smplayer smtube (不知有无mpv和vlc*和mplayer，有可能是smtube的依赖)
+* 桌面版debian删除不用的程序：apt autoremove libreoffice* thunderbird smplayer smtube
 
 ## Apache2
 

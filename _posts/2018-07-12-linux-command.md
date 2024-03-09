@@ -29,7 +29,7 @@ title: Linux命令
 ## xargs
 
 * 把标准输入按空白字符分隔变成指定命令的参数，默认命令是echo
-* 默认一次传所有参数，-n3一次传3个参数
+* 默认一次传所有参数，常用-n1一次传1个参数，多次执行
 * -d：指定分隔符
 * -0：以NUL字符分隔读取，但需要源程序配合
 * -t：先打印待执行的命令再执行，-p先询问再执行
@@ -69,7 +69,7 @@ title: Linux命令
   * ogham/exa、lsd：Rust的重写
 * cd -：切换到之前的目录
 * tail -f：持续输出指定文件，如果有变化立即显示；与less -F相同
-* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，whereis还在一些系统目录中找且可找大多数类型的文件
+* which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，默认只显示直接使用的那一个，用-a显示全部；whereis还在一些系统目录中找且可找二进制、源文件、文档
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * shasum/md5sum：指定文件时默认二进制模式，从stdin读取时默认文本模式，-c验证
 * base64：默认加密，-d解密，-w0加密时输出不换行，支持跟文件或从stdin读取
@@ -438,10 +438,10 @@ ip link
   * 搜索开头、结尾、排除：`^music .mp3$ !fire`
   * Ctrl+JK或鼠标滚轮移动条目
   * 多选模式：-m，然后Tab或鼠标右键选择多个
-* Bash热键：Alt+C运行cd，Ctrl+R匹配历史，Ctrl+T或两个星号加tab触发在当前位置补全。对于kill、ssh等做了额外适配。还能配合bat预览文件内容
+* Bash热键：Alt+C运行cd，Ctrl+R匹配历史，Ctrl+T或两个星号加tab触发在当前位置补全而不会运行。对于kill、ssh等做了额外适配。还能配合bat预览文件内容
   * 通关包管理器安装的默认没有激活热键，要看不同包的说明
   * 使用现有补全机制的第三方脚本：https://github.com/lincheney/fzf-tab-completion
-* 不用热键，按脚本的方式使用：xxx | fzf | xargs ...、xxx $(fzf)
+* 不用热键，按脚本的方式使用：xxx | fzf | xargs -n1 ...、xxx $(fzf)
 * 无参使用时用的是原版find，不会忽略.git，有配置可以调
 
 ### sed
@@ -474,6 +474,7 @@ ip link
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
+* 上一个后台运行的程序的PID：`$!`
 
 ### crontab
 
