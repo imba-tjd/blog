@@ -67,6 +67,7 @@ title: Linux命令
 * mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
 * ls：-R递归，-r倒序，-t按日期降序，-S按文件大小降序，-d显示当前文件夹自己的信息，-A列出除.和..以外的所有文件
   * ogham/exa、lsd：Rust的重写
+  * SUID和GUID权限：chmod u+s file，文件运行时会以owner的身份运行，是很大的安全问题，ll时以红底显示，代替x的位置
 * cd -：切换到之前的目录
 * tail -f：持续输出指定文件，如果有变化立即显示；与less -F相同
 * which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，默认只显示直接使用的那一个，用-a显示全部；whereis还在一些系统目录中找且可找二进制、源文件、文档
@@ -440,7 +441,7 @@ ip link
   * 多选模式：-m，然后Tab或鼠标右键选择多个
 * Bash热键：Alt+C运行cd，Ctrl+R匹配历史，Ctrl+T或两个星号加tab触发在当前位置补全而不会运行。对于kill、ssh等做了额外适配。还能配合bat预览文件内容
   * 通关包管理器安装的默认没有激活热键，要看不同包的说明
-  * 使用现有补全机制的第三方脚本：https://github.com/lincheney/fzf-tab-completion
+  * 普通地按TAB补全（不必输两个星号），但好像无法递归搜索，且无法用fd：https://github.com/lincheney/fzf-tab-completion
 * 不用热键，按脚本的方式使用：xxx | fzf | xargs -n1 ...、xxx $(fzf)
 * 无参使用时用的是原版find，不会忽略.git，有配置可以调
 

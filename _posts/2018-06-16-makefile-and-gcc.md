@@ -301,6 +301,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
   * 在msys2里调用windows原生程序时，以/开头的命令行参数会自动在前面添加msys2的安装路径，对于 /单个字母 会转换成盘符（如/c -> C:/）。环境变量里的值也会转换
   * 阻止：MSYS2_ARG_CONV_EXCL='要排除的参数前缀或*'、MSYS2_ENV_CONV_EXCL='环境变量名'。Git-for-Win：MSYS_NO_PATHCONV=1 或 //
   * 对于传递Windows路径给unix程序的情形（ls c:/），没有发生转换，只要程序调用了cygwin模拟的posix api，传递给winapi后就能正常处理了。如果程序对路径魔改了，用户可在传参前手动用cygpath程序转换
+  * 会将参数从u8转换成MBCS
 
 ### 其他
 
