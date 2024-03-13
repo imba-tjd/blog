@@ -453,11 +453,7 @@ collapsable content
 
 * 问答模式：前一行写//q: 问题，下一行就会回答
 * 多个任务：注释写1. 2.
-* https://platform.openai.com/examples?category=code
-* Py写docstring的效果更好
-* 创建测试用的sample代码
-* Create [an array of] xxx [from xxx]、Use xxx（项目中已有的东西）、Explain why the previous function doesn't work
-* 重构（属于edit，不知道是否支持）：Rewrite this as a React component、Refactor this function to be recursive
+* 行内快速问答：Ctrl+I
 * GitHub Copilot Labs：提供一些预定义场景的功能，如代码翻译（Convert this from A to B; A version ...; END; B version），TS自动声明变量类型，添加文档等
 
 ## GitHub Search
