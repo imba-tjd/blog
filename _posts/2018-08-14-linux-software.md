@@ -468,9 +468,17 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://louiszhai.github.io/2017/09/30/tmux/
 * Rust写的终端复用器：Zellij
 
-## PM2和守护程序
+## PM2
 
-* pm2需node，但最好。supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434/what-is-the-advantage-of-using-supervisord-over-monit monit是C
+* 有开源自部署版(称为Runtime)和商业版。单页文档：https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/
+* npm install pm2@latest -g
+* pm2 start app.js也支持其它任何程序 -- -传递给自己程序的参数。-i max以cpu核数运行副本。也支持从配置文件中运行，用pm2 init生成ecosystem.config.js
+* ls、monit（类似于top）、logs（默认放在~/.pm2里）
+* reload vs restart：前者在多个replica时会一个个重启
+* 开机自启：pm2 startup，会恢复之前save命令时的状态
+* 在docker中运行：用pm2-runtime命令代替node
+* 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434/what-is-the-advantage-of-using-supervisord-over-monit monit是C
+* 其它监控metric程序：https://github.com/topics/monitoring
 
 ## TODO
 
