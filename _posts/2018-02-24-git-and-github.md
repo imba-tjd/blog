@@ -483,3 +483,4 @@ collapsable content
 * Git Hooks https://github.com/typicode/husky
 * git fetch --deepen有啥区别，如何unshallow指定数量的提交
 * git grep
+* AI，根据自然语言找到所需的git命令：https://www.gitfluence.com

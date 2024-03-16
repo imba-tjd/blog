@@ -484,7 +484,7 @@ ip link
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
 * systemctl list-timers
-* https://crontab.guru/
+* https://crontab.guru/ https://cron-ai.vercel.app
 * https://zhuanlan.zhihu.com/p/58719487
 
 每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
