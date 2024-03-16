@@ -8,7 +8,7 @@
   * https://github.com/EpistasisLab/tpot2
   * https://github.com/automl/auto-sklearn 不更新了，还不支持sklearn 1.0。自动调超参数
   * https://github.com/microsoft/nni 不活跃，有中文文档
-* nlp：https://github.com/explosion/spaCy NLTK
+* CNN：用于图像和视频分析任务。RNN：顺序数据分析任务，自然语言处理、语音识别、时间序列分析。GAN：生成与给定数据集相似的新数据样本，用于图像合成、风格迁移和数据增强等任务。Transformer网络：自然语言处理
 
 ## pandas
 
@@ -173,3 +173,116 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * 中文文档：http://cw.hubwiz.com/card/c/streamlit-manual/
 * streamlit run xxx.py/URL
 * 其它项目：pynecone、gradio
+
+## NLP
+
+* https://github.com/explosion/spaCy
+* NLTK
+* https://github.com/microsoft/nlp-recipes NLP Best Practices，不维护了
+
+## 书签
+
+```
+https://i.am.ai/roadmap/
+https://github.com/microsoft/AI-For-Beginners
+https://github.com/microsoft/ML-For-Beginners
+https://github.com/microsoft/generative-ai-for-beginners
+
+pytorch和深度学习:
+用于语音、图像、文本(垃圾邮件)的识别、分类和预测(推荐系统)。容忍误差，有明确的输入和输出，有大量的数据集且不随时间快速变化（否则就要重新训练模型）。
+https://mlelarge.github.io/dataflowr-web/ https://mlelarge.github.io/dataflowr-web/cea_edf_inria.html
+https://github.com/amusi/PyTorch-From-Zero-To-One
+https://zhuanlan.zhihu.com/p/66543791
+https://zhuanlan.zhihu.com/p/99318332
+https://zhuanlan.zhihu.com/p/96237032
+https://zhuanlan.zhihu.com/p/87263048
+https://www.zhihu.com/question/55720139
+https://zhuanlan.zhihu.com/c_1176098426973106176
+https://github.com/PyTorchLightning/pytorch-lightning https://zhuanlan.zhihu.com/p/120331610 https://zhuanlan.zhihu.com/p/134291726
+https://pytorch.org/get-started/ ；https://pytorch.apachecn.org/ 1.4中文文档
+https://dev.fast.ai/tutorial https://dev.fast.ai/tutorial
+https://www.zhihu.com/question/384519338
+https://www.zhihu.com/question/388079431
+https://tangshusen.me/Deep-Learning-with-PyTorch-Chinese/#/ 一本书
+https://github.com/madewithml/basics
+https://github.com/MLEveryday/100-Days-Of-ML-Code
+https://www.bilibili.com/video/av50747658
+https://github.com/scutan90/DeepLearning-500-questions
+https://www.zhihu.com/question/375537442
+https://zhuanlan.zhihu.com/p/30011154
+https://github.com/d2l-ai/d2l-zh
+https://github.com/explosion/thinc
+https://github.com/awesomedata/awesome-public-datasets 各种数据源
+https://github.com/microsoft/recommenders
+https://github.com/AMAI-GmbH/AI-Expert-Roadmap
+https://github.com/MorvanZhou/PyTorch-Tutorial
+https://github.com/ShusenTang/Dive-into-DL-PyTorch
+https://huggingface.co/
+https://zhuanlan.zhihu.com/p/479795186
+https://github.com/datawhalechina/thorough-pytorch
+https://github.com/openxla/xla 加速编译的
+https://github.com/d2l-ai/d2l-zh 动手学深度学习
+https://github.com/lutzroeder/netron 神经网络可视化
+
+机器学习：
+https://github.com/rasbt/python-machine-learning-book-3rd-edition 据说很简单
+入门：https://zhuanlan.zhihu.com/p/24339995 https://zhuanlan.zhihu.com/p/29704017 https://www.zhihu.com/question/55949025
+https://github.com/Yorko/mlcourse.ai
+https://github.com/instillai/machine-learning-course
+https://github.com/apachecn/AiLearning 中文
+https://github.com/ML-course/master
+https://github.com/datawhalechina/pumpkin-book
+https://github.com/Jack-Cherish/Machine-Learning
+polyaxon 机器学习平台
+https://github.com/aialgorithm/Blog
+https://github.com/ethen8181/machine-learning
+
+一般来说，机器学习的课程涉及了很多数学、统计概率、以及优化方向的知识，大概包括：
+* 线性代数：矩阵/张量乘法、求逆，奇异值分解/特征值分解，行列式，范数等
+* 统计与概率：概率分布，独立性与贝叶斯，最大似然(MLE)和最大后验估计(MAP)等
+* 信息论：基尼系数，熵(Entropy)等
+* 优化：线性优化，非线性优化(凸优化/非凸优化)以及其衍生的求解方法如梯度下降、牛顿法、基因算法和模拟退火等
+* 数值计算：上溢与下溢，平滑处理，计算稳定性(如矩阵求逆过程)
+* 微积分：偏微分，链式法则，矩阵求导等
+吴恩达教授的在Coursera上的课程基本上完全没有触及这些数学知识。
+
+https://github.com/Tencent/ncnn
+https://github.com/geohot/tinygrad
+
+numpy:
+https://www.bilibili.com/video/BV19T4y127Z2
+https://zhuanlan.zhihu.com/p/27624814
+https://zhuanlan.zhihu.com/p/73785485
+https://zhuanlan.zhihu.com/p/76186124
+https://zhuanlan.zhihu.com/p/81815234
+https://cs231n.github.io/python-numpy-tutorial/
+https://mp.weixin.qq.com/s?__biz=MzIxMjM4MjkwMw==&mid=2247483920&idx=1&sn=96b11616cf48c83f54ac76c6687a20af
+https://zhuanlan.zhihu.com/p/32242331
+https://dafriedman97.github.io/mlbook/content/introduction.html
+https://github.com/nidhaloff/igel
+https://tianchi.aliyun.com/notebook-ai/detail?spm=5176.12282042.0.0.2fb62042wOBq7R&postId=5977
+https://mp.weixin.qq.com/s?__biz=MzU1NDk2MzQyNg==&mid=2247486254&idx=1&sn=c3a47f4bf72b1ca85c99190597e0c190
+
+pandas:
+https://pandas.pydata.org/docs/getting_started/intro_tutorials/01_table_oriented.html 官网教程
+https://www.zhihu.com/question/289788451
+https://zhuanlan.zhihu.com/p/43018099
+https://mp.weixin.qq.com/s?__biz=MzkxNDI3NjcwMw==&mid=2247493452&idx=1&sn=a253d3d34f4a776a6fa7f7be1f79b2a4
+https://mp.weixin.qq.com/s?__biz=MzIxMjM4MjkwMw==&mid=2247483970&idx=1&sn=8028f7582597e0023f0fa02f84db57f1
+https://blog.csdn.net/matrix_laboratory/article/details/50704160
+https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247493035&idx=1&sn=c916f32b29555ac2acba839efeb205ee
+NAN值的处理：https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247485455&idx=1&sn=2107a2efb5aebd8797356b335e35196d
+画图：https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247491730&idx=1&sn=a01fe6c3292f8dd00f20cd890d2601d5
+
+http://joyfulpandas.datawhale.club/Content/ch2.html
+https://www.pypandas.cn/docs/getting_started/overview.html
+https://github.com/hangsz/pandas-tutorial
+https://pandas.liuzaoqi.com/intro.html
+https://github.com/BrambleXu/pydata-notebook
+https://www.machinelearningplus.com/python/101-pandas-exercises-python/ 汉化：https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247490395&idx=1&sn=49215a3b51a6768802ba2eae3410e537 https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247490736&idx=1&sn=69c1805418951ff115776730e5f9af54
+https://github.com/guipsamora/pandas_exercises
+https://realpython.com/learning-paths/pandas-data-science/
+https://github.com/jvns/pandas-cookbook
+pandasgui
+https://realpython.com/learning-paths/pandas-data-science/
+```
