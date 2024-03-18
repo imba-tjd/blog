@@ -11,7 +11,7 @@ https://cn.vuejs.org/guide/essentials/forms.html
 
 * 单文件组件SFC：在一个.vue中写html css js
 * 使用者：import Cmp from './Comp.vue'，之后在template中就可以像使用HTML元素一样声明。组件命名规则一般为AxxBxx，HTML中对应axx-bxx
-* props：允许使用者传入参数给本组件
+* props：允许使用者传入参数给本组件。定义时用xxxYyy，使用时HTML attitude用xxx-yyy
 * event：组件内发出，使用者添加处理程序后相当于信息由组件传出去了
 * slot：使用者在content里的东西，会替换掉组件中的slot元素。创建者的slot如果有content则为默认值
   * 命名slot：创建者给slot加name attr，使用者在content里的template上加 v-slot:名称 或 #名称 对应
@@ -83,12 +83,6 @@ export default { // TS加defineComponent()
 
 ### 组合式API
 
-* 响应式状态
-  * 基础类型用ref；object array Map Set用reactive()，且是深层响应的
-  * 感觉上ref就是(reactive({value:v}))
-  * tempalte中当ref对象是顶层属性或作为最终表达式时会自动解包（相当于.value），如{{foo+1}}和{{obj.foo}}和@click="v => foo=v"，但{{obj.foo+1}}这种不会
-  * ref对象在reactive object里使用时会自动解包，但reactive数组或Map不会
-
 ```html
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, computed, watch } from 'vue'
@@ -111,7 +105,7 @@ interface Props {
   foo: string
   bar?: number
 }
-const props = defineProps<Props>() // 此函数无需导入。Props也可以行内写。定义默认值要再包一个withDefaults
+const props = defineProps<Props>() // 此函数无需导入。也可以写defineProps({...})。定义默认值要再包一个withDefaults
 
 const emit = defineEmits<{
   (e: 'event1', val: number): void
@@ -119,6 +113,15 @@ const emit = defineEmits<{
 function trigger_ev1(ev: Event) { emit('event1', 123) }
 </script>
 ```
+
+### 响应式
+
+* 基础类型用ref；object array Map Set用reactive()，且是深层响应的
+* 感觉上ref就是(reactive({value:v}))
+* tempalte中当ref对象是顶层属性或作为最终表达式时会自动解包（相当于.value），如{{foo+1}}和{{obj.foo}}和@click="v => foo=v"，但{{obj.foo+1}}这种不会
+* ref对象在reactive object里使用时会自动解包，但reactive数组或Map不会
+* 原理：当在被监控的函数中（如模板是render函数、computed、watch等）使用的ref或reactive对象变化时，会重新运行函数。如果将props.xxx传进另一个函数，则会失去响应式，因此一般许多函数都是传props和属性名字符串，内部props['属性名']
+* TODO: watchEffect
 
 ## 模板template
 

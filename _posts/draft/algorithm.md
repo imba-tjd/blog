@@ -10,10 +10,12 @@ title: 算法
 2. 保持：如果循环的某次迭代前为真，那么下次迭代前仍为真
 3. 终止
 
-### 渐进记号
+### 渐进记号Big O notation
 
 * O表示渐进上界，Ω表示渐进下界，Θ表示渐进确界
 * 求解递归式：代入法、递归树法、主方法
+* log(n)：如AVL搜索，每次判断抛弃一半的树，即缩小一半search space。2^n：斐波那契数列（空间O(n)）、01背包。n!：排列问题，一开始有n的规模，会产生(n-1)个子问题，如八皇后
+* Backtracking回溯问题：一些NP问题，像八皇后、背包。最坏复杂度就是无解的时候，因为想证明无解就得否定所有的解，即会考虑所有的可能成为解的情况。基本上就是指数或阶乘的复杂度
 
 #### 代入法
 
@@ -334,3 +336,9 @@ https://the-algorithms.com/zh_Hans
 
 题目中数据量很大(如10^9)时，也许要从另一个不那么大的数据量(如10^5)入手遍历，从总数中减去遍历计算的结果。
 二分法：如一个值n在小于M时满足要求，求M（或求满足要求的n的最大值）。1必定满足，再宽松确定一个n的不满足的上界，然后看n/2。
+
+面试：https://www.techinterviewhandbook.org/
+
+https://www.youtube.com/@BackToBackSWE/videos
+https://www.youtube.com/watch?v=ngCos392W4w https://www.youtube.com/watch?v=aPQY__2H3tE
+https://www.youtube.com/watch?v=8hly31xKli0 https://www.youtube.com/watch?v=oBt53YbR9Kk https://www.youtube.com/watch?v=2ZLl8GAk1X4 https://www.youtube.com/watch?v=RBSGKlAvoiM
