@@ -389,14 +389,14 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 自带json染色，但导致必须完全接收响应才输出，-S关闭缓冲但仍能单行染色；重定向时默认关染色
 * 默认请求gzip，UA为HTTPie/xxx
 * 默认显示header和body，相当于--print hb，H和B代表请求的；单独的-h或-b是--print h或b，不支持-hb；-h不会使用HEAD，但在接收完头之后就会关闭；-v相当于--all --print=bHBh
-* -a user:pass设置basic验证
 * -F跟随跳转，--all显示中间响应，--history-print h只显示中间响应的响应头
 * --session=./session.json明文保存和使用cookie等信息；如果不含斜杠，只有名字和“后缀”，就会保存到一个特定的httpie/sessions目录下；另有只读会话
 * -d下载模式，隐含-F，会在终端显示header但把body保存到文件中，且会显示用时和大小，-o另外指定文件名；单独-o也是只保存body，但不会显示头；-c断点续传；可连起来用-dco加文件名；PS上不要用重定向
 * --check-status如果请求失败，在命令行中返回错误代码；--ignore-stdin用户非交互式脚本使用
 * --timeout超时时间，默认为0即无限
-* http-prompt：同组织的另一个库，交互式的客户端
+* http-prompt：同组织的另一个库，交互式的客户端，但不更新了
 * https://pie.dev/ 自建的httpbin
+* https://github.com/ducaale/xh rust实现的类似风格的客户端
 
 ## FFmpeg
 
