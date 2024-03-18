@@ -183,6 +183,7 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ## 书签
 
 ```
+https://www.youtube.com/watch?v=i_LwzRVP7bg https://www.youtube.com/watch?v=bmmQA8A-yUA
 https://i.am.ai/roadmap/
 https://github.com/microsoft/AI-For-Beginners
 https://github.com/microsoft/ML-For-Beginners
