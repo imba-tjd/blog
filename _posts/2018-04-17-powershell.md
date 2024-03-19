@@ -315,3 +315,5 @@ $ErrorActionPreference：当有cmdlet往stderr里输出信息时如何动作，�
 保留byte进入管道：https://learn.microsoft.com/en-us/powershell/scripting/learn/experimental-features?view=powershell-7.4#psnativecommandpreservebytepipe
 
 split-path：-leaf取文件名带后缀，-leafbase不带后缀。支持由ls传入
+
+https://www.youtube.com/playlist?list=PLCGGtLsUjhm2k22nFHHdupAK0hSNZVfXi
