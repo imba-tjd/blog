@@ -93,6 +93,7 @@ title: Linux命令
 * -print0：与xargs -0配合用
 * -delete：直接删除找到的文件
 * -maxdepth：最大搜索深度
+* exec的结尾必须有\;或';'，这样设计是因为后面可以再加给find的参数，如可以有多个exec。fd保留了此行为，只不过如果确实只有一个-x且在最后则可省
 * 进入当前目录下所有子文件夹分别执行命令：`find . -maxdepth 1 -type d ! \( -name ".*" -o -name "System Volume Information" -o -name '$RECYCLE.BIN' \) -exec ./script.sh {} \;`
 * https://www.zhihu.com/question/487213837
 
