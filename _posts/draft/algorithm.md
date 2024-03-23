@@ -76,6 +76,13 @@ title: 算法
 3. 计算最优解的值，通常采用自底向上的方法。
 4. 利用计算出的信息构造一个最优解。
 
+或：
+
+1. What choice do we make at each call of the function. Recursion represents decision
+2. Constrain. When do we stop following a certain path.
+3. Goal. Target. When do we stop.
+4. Make a choice. Explore. Undo choinse.
+
 另一种自底向上的思路：先根据已知条件把显而易见的算出来，再按一种方向把剩余的填充。
 
 ### 例子
@@ -85,6 +92,23 @@ title: 算法
 * 0-1背包问题：价值 arr[重量]，arr[x]=max{arr[x-w(i)]+v(i)}；找钱问题：RMB可用贪心，但如面额只有11、5、1，找15时只能用DP，数量 arr[金额]
 * 最长公共子序列（LCS）：对于两个序列X和Y来说，如果最后一个元素相等，则LCS去掉最后一个元素形成的序列Z-1是X-1和Y-1的LCS；如果不等，则X和Y的LCS=max{(X-1,Y), (X,Y-1)}，它有重叠子问题(X-1,Y-1)。一直到(X,0)和(0,Y)=空
 * 最长递增子序列（LIS）：dp[x]表示**以第 x 元素为结尾的LIS**的长度，则=max{dp[i]+1, if arr[x]\>arr[i]}，这样复杂度为O(n^2)，还有[nlogn的做法](https://blog.csdn.net/joylnwang/article/details/6766317)；可以建树但想不清复杂度是多少
+
+### 编辑距离(Levenshtein Distance)
+
+* 两个字符串之间，由一个转换成另一个所需的最少编辑操作次数。允许的编辑操作包括：替换、插入、删除 一个字符
+* 以两个字符串A、B为例，A[0,5]表示闭区间
+* 自顶向下
+  * 当最后一个字符相同时不需要转换，相当于删除两者最后一个字符且不增加步数。abb ab 和 ab a 之间有相同的编辑距离，A[0,2] B[0,1] == A[0,1] B[0,0]
+  * 当最后一个字符不同时
+    * “替换”操作相当于删除A B两者最后一个字符，因为将两者最后一个字符替换统一后就变成了上一种情况
+    * 插入相当于删除B的最后一个字符，因为目标是从A变到B，给A插入B的最后一个字符就变成了上上种情况。删除是删除A的最后一个字符。此时两者最后一个字符仍可能不同，递归处理
+    * 当前步骤的最小编辑距离就是上面三种操作的最小值+1
+  * 出口条件：当A B任何一个为空时，编辑距离为另一个字符串的长度
+* 自底向上
+  * 以dp[i][j]表示从A[0,i]变换到B[0,j]的最小编辑距离
+  * 对于A[0,0]即空字符串变到B[0,j]，即dp[0,j]，每一步都是插入；对于A[0,i]变到B[0,0]，即dp[i,0]，每一步都是删除
+  * 对于dp[i][j]，当A[i]和B[j]相等时，取dp[i-1][j-1]，否则取min{左边，上面，左上角}+1
+  * 最后的结果就是dp[n][m]
 
 ## 贪心算法
 
@@ -342,3 +366,5 @@ https://the-algorithms.com/zh_Hans
 https://www.youtube.com/@BackToBackSWE/videos
 https://www.youtube.com/watch?v=ngCos392W4w https://www.youtube.com/watch?v=aPQY__2H3tE
 https://www.youtube.com/watch?v=8hly31xKli0 https://www.youtube.com/watch?v=oBt53YbR9Kk https://www.youtube.com/watch?v=2ZLl8GAk1X4 https://www.youtube.com/watch?v=RBSGKlAvoiM
+
+
