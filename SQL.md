@@ -117,6 +117,7 @@ INSERT INTO tb1 (
     col1_val, col2_val
 ), (col1_val2, col2_val2) -- 多条数据
 
+-- 当表中的某些列是由另一个表的数据计算出来时。不能在上一句中的Values里将某一val改成单值子查询
 INSERT INTO tb1 -- tb1必须已存在，否则应用CREATE TABLE AS
 SELECT * FROM ... -- ORDERBY无意义
 
