@@ -173,6 +173,7 @@ END
 * 全文索引：搜索引擎的关键技术，每个表只能有一个。MySQL用FULLTEXT(col)，查询时用WHERE MATCH (col) AGAINST('xxx')，关键词长度必须大于4
 * 哈希索引：好像只有内存数据库才支持，而且没法进行范围比较
 * 前缀索引(MySQL)：仅限字符串
+* 位图索引(Oracle)：某属性的相异基数(distinct cardinality)少又要过滤那一列时使用
 
 ### WHERE中索引失效
 
