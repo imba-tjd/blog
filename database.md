@@ -21,6 +21,12 @@ SELECT col0
 END AS col2
 FROM ...
 
+-- 模拟IF
+(CASE WHEN exp
+THEN true
+ELSE false
+END);
+
 -- 逻辑中的 x->y “蕴含”。注意x为假时结果为真，不只有x和y都为真时才为真，或者说只有x为真y为假时才为假
 CASE x
 WHEN a
