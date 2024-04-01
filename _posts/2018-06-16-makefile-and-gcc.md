@@ -67,8 +67,8 @@ $(filter 模式, 列表)
 * CMakeLists.txt
   * 参数（列表）也可以用分号隔开，分号和空格是等价的
 * cmake -B build -G "MinGW Makefiles"; cmake --build build -v/--verbose -j/--parallel -t/--target 子项目 -- -传递给make或ninja的参数
-  * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel，适用于Makefile。对于VS用--build --config Release
-  * -G -D等只要用第一次，之后会保留。如果要刷新，可删除CMakeCache.txt
+  * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel。对于VS用--build --config Release
+  * -G -D等只要用第一次，之后会保留。需刷新则删除CMakeCache.txt
   * --install build、-t clean
 * 另一种方式：mkdir build; cd build; cmake ..; make -j VERBOSE=1; make install; make clean
 * 项目组织形式：include与src同级。include/项目名/xxx.h放公开接口，被install后会放在/usr/local/include里因此要加项目名，使用者用<项目名/xxx.h>
