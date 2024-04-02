@@ -120,6 +120,7 @@ title: 浏览器
 ## Chrome
 
 * https://static.centbrowser.cn/win_stable/
+* 适用于老系统的：https://github.com/win32ss/supermium
 * Ctrl+M：在当前窗口新建隐私页
 
 ### about:flags

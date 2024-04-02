@@ -475,7 +475,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * pm2 start app.js也支持其它任何程序 -- -传递给自己程序的参数。-i max以cpu核数运行副本。也支持从配置文件中运行，用pm2 init生成ecosystem.config.js
 * ls、monit（类似于top）、logs（默认放在~/.pm2里）
 * reload vs restart：前者在多个replica时会一个个重启
-* 开机自启：pm2 startup，会恢复之前save命令时的状态
+* 开机自启：pm2 startup，会恢复之前save命令时的状态。Win版：pm2-installer
 * 在docker中运行：用pm2-runtime命令代替node
 * 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434/what-is-the-advantage-of-using-supervisord-over-monit monit是C
 * 其它监控metric程序：https://github.com/topics/monitoring
@@ -498,3 +498,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/wilfred/difftastic
 * https://github.com/superfly/litefs FUSE-based file system
 * polkit取代sudo
+* magika：谷歌出的，Py，用深度学习检测文件类型
