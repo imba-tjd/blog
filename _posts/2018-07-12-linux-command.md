@@ -81,6 +81,7 @@ title: Linux命令
 * iconv -f gbk -t utf-8 source-file或省略表示stdin -o target-file
 * less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 * split -b 50m huge_file分隔文件，合并用cat
+* lsof path：查看哪些进程在占用文件。-i显示端口信息
 
 ### find
 
@@ -485,7 +486,7 @@ ip link
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
 * systemctl list-timers
-* https://crontab.guru/ https://cron-ai.vercel.app
+* https://crontab.guru/ https://cron-ai.vercel.app https://crontab.cronhub.io/ http://www.cronmaker.com
 * https://zhuanlan.zhihu.com/p/58719487
 
 每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`

@@ -66,7 +66,7 @@ $(filter 模式, 列表)
 * pip install cmake ninja
 * CMakeLists.txt
   * 参数（列表）也可以用分号隔开，分号和空格是等价的
-* cmake -B build -G "MinGW Makefiles"; cmake --build build -v/--verbose -j/--parallel -t/--target 子项目 -- -传递给make或ninja的参数
+* cmake -B build -G "MinGW或Unix Makefiles"或Ninja; cmake --build build -v/--verbose -j/--parallel -t/--target 子项目 -- -传递给make或ninja的参数
   * -DCMAKE_BUILD_TYPE=Debug Release RelWithDebInfo MinSizeRel。对于VS用--build --config Release
   * -G -D等只要用第一次，之后会保留。需刷新则删除CMakeCache.txt
   * --install build、-t clean
@@ -223,8 +223,8 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
   * -fhardened 是其它几项的集合
   * -DFORTIFY_SOURCE 将memcpy等几个不安全函数替换为对应的_chk版本，=1时只在编译期检查，=2时在运行时检查，=3需gcc12消耗更多
   * -fstack-protector-strong 防止缓冲区溢出。默认--param ssp-buffer-size=8，只有缓冲区大小超过它时才会生成检查代码
-  * -Wl,-z,relro使得GOT部分只读，再加-z,now全部只读，会在启动时全部加载符号，可能影响性能
-  * -Wl,-z,noexecstack 对应Win下默认启用的DEP
+  * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，会在启动时全部加载符号，可能影响性能
+  * -Wl,-z,noexecstack 栈不可执行，exe和so都要使用，对应Win下默认启用的DEP
   * -fstack-clash-protection 代替-fstack-check
   * -ftrapv 使得整数溢出时触发core dump，性能损耗大。另一种选择是-fwrapv
   * -fanalyzer 启用一些静态检查项，不支持C++
