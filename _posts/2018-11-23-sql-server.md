@@ -28,7 +28,7 @@ title: SQL Server
 * -l 超时时间，默认8秒
 * -Z 新密码，更改后退出，-z不退出
 * -f 指定代码页
-* -A：使用专用管理员连接(DAC)登陆，或者用admin:*实例名*来连接；只能使用有限的资源，详情参考[文档](https://docs.microsoft.com/zh-cn/sql/database-engine/configure-windows/diagnostic-connection-for-database-administrators)
+* -A：使用专用管理员连接(DAC)登录，或者用admin:*实例名*来连接；只能使用有限的资源，详情参考[文档](https://docs.microsoft.com/zh-cn/sql/database-engine/configure-windows/diagnostic-connection-for-database-administrators)
 * –N –C：对通信加密并信任服务器证书
 * -M：在连接到 SQL Server 可用性组或 SQL Server 故障转移群集实例的可用性组侦听程序时，应始终指定此项，能更快检测和连接
 * [:]Reset：清空输入缓存，:List：显示输入缓存
@@ -165,8 +165,8 @@ Transact-SQL
 
 * 保存有所有数据库的基本信息的数据库：sys.databases
 * 字符串前加N表示NVARCHAR，系统自带的部分都是这样的？
-* 对象的标准写法是databasename.databaseownername.objectname，默认是当前数据库和登陆的用户，而每个数据库都会有一个叫dbo的schema，相当于全局的吧
-* 清除SSMS登陆的用户名和密码：删除%AppData%\Microsoft\SQL Server Management Studio\18.0\SqlStudio.bin
+* 对象的标准写法是databasename.databaseownername.objectname，默认是当前数据库和登录的用户，而每个数据库都会有一个叫dbo的schema，相当于全局的吧
+* 清除SSMS登录的用户名和密码：删除%AppData%\Microsoft\SQL Server Management Studio\18.0\SqlStudio.bin
 * 启用账户：alter login sa enable；修改密码：alter login sa with password='sa'，启用后要重启服务？
 * [查看或更改服务器属性](https://docs.microsoft.com/zh-cn/sql/database-engine/configure-windows/view-or-change-server-properties-sql-server)
 * 单用户模式连接，则本地所有用户都可作为sysadmin连接
