@@ -396,7 +396,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * --timeout超时时间，默认为0即无限
 * http-prompt：同组织的另一个库，交互式的客户端，但不更新了
 * https://pie.dev/ 自建的httpbin
-* https://github.com/ducaale/xh rust实现的类似风格的客户端
+* https://github.com/ducaale/xh rust实现的类似风格的客户端。默认会用Windows系统代理
 
 ## FFmpeg
 

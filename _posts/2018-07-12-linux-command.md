@@ -10,6 +10,7 @@ title: Linux命令
 * https://cheat.sh/
 * http://bropages.org/
 * https://command-not-found.com/
+* https://cheatography.com/
 
 ## 简单笔记
 
@@ -67,7 +68,7 @@ title: Linux命令
 * basename，dirname：取得路径的文件名或目录。前者第二个参数传后缀还会去掉它。后者支持任意数量的参数，处理后每个一行
 * mkdir -p：创建子目录时，如果父目录不存在，则自动创建；文件夹已存在也不会报错
 * ls：-R递归，-r倒序，-t按日期降序，-S按文件大小降序，-d显示当前文件夹自己的信息，-A列出除.和..以外的所有文件
-  * ogham/exa、lsd：Rust的重写
+  * eza、lsd：Rust的重写
   * SUID和GUID权限：chmod u+s file，文件运行时会以owner的身份运行，是很大的安全问题，ll时以红底显示，代替x的位置
 * cd -：切换到之前的目录
 * tail -f：持续输出指定文件，如果有变化立即显示；与less -F相同
@@ -124,8 +125,9 @@ title: Linux命令
 * zless：查看压缩文件内容
 * lzip：后缀 .lz，仅使用LZMA非2
 * lz4：压缩率很低，比zip低，默认级别为-1，解压速度非常快，用--best会大幅减慢压缩速度且压缩率一般但解压速度不变，-BD增大压缩率。官方CLI是单核的。一般内存压缩用lz4，磁盘文件压缩用zstd，因为IO慢限制lz4发挥不出优势。lzo：很老，比lz4压缩率高一点点，压缩速度类似，解压速度大幅落后，不考虑；lzo-rle：增加了一定的速度。lz4hc：其实就是高压缩级别的lz4，压缩速度非常慢，但解压速度不变。snappy：完全不如lz4
-* zstd：后缀 .zst，速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0
+* zstd：后缀 .zst，速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0。命令行程序也能处理gz xz lz4
 * brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点
+* 比lzma更高压缩率且速度差不多：lzham_codec_devel
 
 #### tar
 
