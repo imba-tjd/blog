@@ -29,7 +29,7 @@ category: linux
 * fpp：用管道传递给它可以自动把文件染色
 * cloc：代码统计工具，能够统计代码的空行数、注释行、编程语言
 * https://github.com/sharkdp/fd 现代版的find；https://github.com/sharkdp/bat：现代版的cat；https://github.com/dundee/gdu 快速的du
-* fail2ban(py)：自动禁止登陆失败次数过多的IP。Go替代：CrowdSec
+* fail2ban(py)：自动禁止登录失败次数过多的IP。Go替代：CrowdSec
 * authbind：允许普通用户绑定1024以下的端口
 * gparted：图形化的管理磁盘分区的工具
 * network-manager、network-manager-gnome：为了使网络配置尽可能简单而开发的网络管理软件包
