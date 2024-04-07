@@ -73,6 +73,7 @@ $(filter 模式, 列表)
 * 另一种方式：mkdir build; cd build; cmake ..; make -j VERBOSE=1; make install; make clean
 * 项目组织形式：include与src同级。include/项目名/xxx.h放公开接口，被install后会放在/usr/local/include里因此要加项目名，使用者用<项目名/xxx.h>
 * 各个版本新增的特性：https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/chapters/intro/newcmake.html
+* CMAKE_CXX_COMPILER_LAUNCHER=ccache 可以-D或用环境变量
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
@@ -198,6 +199,8 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 5. ar rcsv libname.a src.o ... 生成静态库。-t显示包含哪些.o
   * 静态库转动态库：-Wl,--whole-archive -lxxx。此参数本意是包含所有静态库中的符号，不管是否用到；默认使用静态库只会载入用到的
 
+gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
+
 ### 库
 
 * Linux
@@ -232,7 +235,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
 * 减少体积
   * -Wl,--as-needed
-  * -Wl,--strip-all或-s 去掉所有符号，相当于strip -s。-Wl,--strip-debug或-S去掉调试符号。gcc -s删除所有符号和重定向信息。strip还有一些其它自定义选择
+  * -Wl,--strip-all或-s 去掉所有符号和重定向信息，相当于strip -s。-Wl,--strip-debug或-S去掉调试符号
   * -Wl,-dead_strip 好像只有lld支持
   * -ffunction-sections -fdata-sections -Wl,--gc-sections 可能阻止一些优化
 * 不要用-lpthread，而是-pthread。TODO:mingw有个-mthreads，看起来是用的win运行库，且添加了线程安全异常处理，但会自动-lmingwthrd

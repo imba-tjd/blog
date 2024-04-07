@@ -193,6 +193,7 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 * /usr/games/fortune
 * cowsay
 * gnome-tweak
+* samba：设置后可以在同一局域网内从win ping linux
 * 桌面版debian删除不用的程序：apt autoremove libreoffice* thunderbird smplayer smtube
 
 ## Apache2

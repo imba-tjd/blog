@@ -124,10 +124,16 @@ title: Linux命令
 * upx --lzma
 * zless：查看压缩文件内容
 * lzip：后缀 .lz，仅使用LZMA非2
-* lz4：压缩率很低，比zip低，默认级别为-1，解压速度非常快，用--best会大幅减慢压缩速度且压缩率一般但解压速度不变，-BD增大压缩率。官方CLI是单核的。一般内存压缩用lz4，磁盘文件压缩用zstd，因为IO慢限制lz4发挥不出优势。lzo：很老，比lz4压缩率高一点点，压缩速度类似，解压速度大幅落后，不考虑；lzo-rle：增加了一定的速度。lz4hc：其实就是高压缩级别的lz4，压缩速度非常慢，但解压速度不变。snappy：完全不如lz4
+* lz4
+  * 压缩率很低，比zip低，默认级别为-1，解压速度非常快，用--best会大幅减慢压缩速度且压缩率一般但解压速度不变，-BD增大压缩率
+  * 官方CLI是单核的。一般内存压缩用lz4，磁盘文件压缩用zstd，因为IO慢限制lz4发挥不出优势
+  * lzo：很老，比lz4压缩率高一点点，压缩速度类似，解压速度大幅落后，不考虑；lzo-rle：增加了一定的速度
+  * lz4hc：其实就是高压缩级别的lz4，压缩速度非常慢，但解压速度不变
+  * snappy：完全不如lz4
 * zstd：后缀 .zst，速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0。命令行程序也能处理gz xz lz4
 * brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点
 * 比lzma更高压缩率且速度差不多：lzham_codec_devel
+* gzip -9
 
 #### tar
 
@@ -481,6 +487,7 @@ ip link
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
 * 上一个后台运行的程序的PID：`$!`
+* https://github.com/Nukesor/pueue 用于交互式运行后台任务。分布式任务框架：SchedMD/slurm
 
 ### crontab
 
@@ -492,8 +499,6 @@ ip link
 * https://zhuanlan.zhihu.com/p/58719487
 
 每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
-
-分布式的：cronsun，国人开发的。
 
 ## 参考
 
