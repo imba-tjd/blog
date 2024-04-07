@@ -352,7 +352,7 @@ https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
 
 算法知识集合网站：
 https://www.hello-algo.com/
-https://labuladong.github.io/algo/
+https://labuladong.online/algo/
 https://the-algorithms.com/zh_Hans
 
 打点标记法处理整数区间：如24小时对应int[24]，未公开对应0，公开且空闲对应1，占用中对应2。
