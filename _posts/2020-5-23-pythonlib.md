@@ -850,7 +850,7 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 * 自带一些中间件：gzip、httpsredirect
 * Config封装了.env的读取
 * taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖太多，这么重不如用别的框架，也不活跃
-* TODO：https://github.com/Redocly/redoc https://github.com/swagger-api/swagger-ui https://www.starlette.io/schemas/
+* TODO：https://www.starlette.io/schemas/
 
 ```py
 from starlette.applications import Starlette
@@ -1349,7 +1349,7 @@ ffi.cast("int", 2)
 * 缓存：python-diskcache cacheout rafalp/async-caches cachetools（提供支持TTL的类dict）
 * mkdocs mkdocs-material
 * ansible
-* Brython 在浏览器中运行的Py，支持一部分标准库；~~Transcrypt Py2JS编译器~~；pyodide 编译到WA，支持第三方纯Py库；PyScript 基于Pyodide
+* Brython 在浏览器中运行的Py，支持一部分标准库；~~Transcrypt Py2JS编译器~~；pyodide 编译到WA，支持第三方纯Py库；PyScript 基于Pyodide；PythonMonkey：互调py和js的库
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium crawlee
 * pyinstrument：使用简单的profile工具

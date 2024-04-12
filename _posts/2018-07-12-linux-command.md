@@ -364,7 +364,7 @@ ip link
 * 先创建table
   * family支持ip arp ip6 bridge inet netdev，其中ip仅指v4，也是省略时的默认值；不同family可以有同名table，因此一般不省
   * nft add 族类型 table filter(表名)
-  * nft list tables、nft list table filter
+  * nft list tables、nft -nn list table filter 其中-nn阻止将ip解析为域名和将端口转换为服务名
 * 再创建chain
   * nft add chain 族类型 表名 INPUT(链名) '{ type filter hook input priority 0; policy 默认accept或drop; }' 如果不加单引号就要转义分号或用交互模式
   * type根据table的family不同而不同，一般就是filter
