@@ -152,22 +152,23 @@ w - v, wet - vet, worse - verse(诗), while - vile(糟糕的), west - vest(背�
 ## 不符合发音规律的
 
 * anxiety /æŋˈzaɪəti/
-* asked：/ɑːskt/或非正式/ɑːst/
+* asked /ɑːskt/或非正式/ɑːst/
 * biscuit /bɪskɪt/
+* build /bɪld/ 不是
 * Chicago：/ʃ/，和chef一样，不是/tʃ/
-* February：音标确实是/februəri/，但是听上去却有/j/的音；或者说现在的人一般不读它第一个r
+* February：音标是/februəri/，但一般读成/febjuəri/即第一个r跟没有一样
 * fortune /fɔːtʃuːn/，fortunate /fɔːtʃənət/
 * interesting：第一个e就跟没有一样
 * iron：r不发音；iran：/ɪˈrɑːn/注意重音
 * island
-* journal：/dʒɜːnl/
+* journal /dʒɜːnl/
 * machine - mechanical - mechanism
 * months，实际上读/ts/；clothes，实际上读/z/和close一样；pizza/piːtsə/，其中的t变为停顿
 * receipt：p不发音，/rɪˈsiːt/
-* sean：/ʃɔ:n/
-* suite：/swiːt/
+* sean /ʃɔ:n/
+* suite /swiːt/
 * sword
-* tongue：/tʌŋ/
+* tongue /tʌŋ/
 * wander /wɒndə/，wonder /wʌndə/
 * vehicle：h不发音
 
