@@ -265,7 +265,7 @@ END
 * 查询服务器属性：select SERVERPROPERTY('collation')
 * 查询数据库属性：select DATABASEPROPERTYEX('db1','collation')
 * 更改会话语言：SET LANGUAGE 'Simplified Chinese'可更改datetime和货币的表示方式，以及报错信息
-* 升级大版本后，已存在的数据库的版本不会自动升级，需要修改它们的COMPATIBILITY_LEVEL
+* 升级大版本后，已存在的数据库的版本不会自动升级，需要修改它们的COMPATIBILITY_LEVEL（ALTER DATABASE CURRENT SET ~ = 130;）
 * GO命令：不是T-SQL语句，而是用于分隔sql文件的标记，有些语句要在第一行执行就要再在前面用GO。后面不能跟分号，可以跟数字表示执行上一段多少遍
 * exec sp_rename 'a', 'b'：重命名表、索引、列等对象；db用renamedb
 * sp_spaceused 查看占用空间
@@ -274,14 +274,22 @@ END
 * sp_helpdb
 * CREATE DATABASE db1 ON/LOG ON filespec；ALTER DATABASE db1 ADD/MODIFY/REMOVE FILE/LOG FILE filespec
 * sp_helptext：显示定义对象的SQL语句
-* ALTER SERVER CONFIGURATION SET MEMORY_OPTIMIZED TEMPDB_METADATA = ON;对TempDB启用内存中OLTP
-* ALTER DATABASE ... SET DELAYED_DURABILITY = FORCED：延迟事务持续性，IO太重又可容忍丢失部分数据可以启用；若设为ALLOWED就必须每次事务手动控制
 * 价格
   * Express版：单实例数据库核心限制利用4核、1.4G内存、10G储存。但可运行多个实例绕过
   * Developer版：全功能，但只能用于非生产环境。其中生产环境指最终用户访问的环境，包括生产环境的灾难恢复备份。非生产指用于测试和收集反馈
   * Server+CAL授权方式：每个运行数据库的服务器需要Server授权$989，且每个访问数据库服务器的“客户端”需CAL授权$230
   * Azure SQL Edge：仅Linux，同样使用MSSQL引擎，有开发版和正式版，无免费版
 * 版本号：2022对应16.x
+
+### 数据库调优选项
+
+* https://learn.microsoft.com/zh-cn/sql/t-sql/statements/alter-database-transact-sql-set-options
+* ALTER DATABASE ... SET DELAYED_DURABILITY = FORCED：延迟事务持续性，IO太重又可容忍丢失部分数据可以启用；若设为ALLOWED就必须每次事务手动控制
+* 内存中OLTP
+  * 类似于把表里的数据都放进内存里，但同时也保留了硬盘上的数据，只是断电时要重载；也有选项不保留硬盘数据
+  * 启用：https://github.com/microsoft/sql-server-samples/blob/master/samples/features/in-memory-database/in-memory-oltp/t-sql-scripts/enable-in-memory-oltp.sql
+    * 之后创建表时加 WITH(MEMORY_OPTIMIZED=ON)
+  * ALTER SERVER CONFIGURATION SET MEMORY_OPTIMIZED TEMPDB_METADATA = ON; 对TempDB启用内存中OLTP
 
 ### LocalDB
 
