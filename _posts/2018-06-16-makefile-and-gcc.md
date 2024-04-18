@@ -228,7 +228,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -fstack-protector-strong 防止缓冲区溢出。默认--param ssp-buffer-size=8，只有缓冲区大小超过它时才会生成检查代码
   * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，会在启动时全部加载符号，可能影响性能
   * -Wl,-z,noexecstack 栈不可执行，exe和so都要使用，对应Win下默认启用的DEP
-  * -fstack-clash-protection 代替-fstack-check
+  * -fstack-clash-protection 代替-fstack-check 只在多线程时需要
   * -ftrapv 使得整数溢出时触发core dump，性能损耗大。另一种选择是-fwrapv
   * -fanalyzer 启用一些静态检查项，不支持C++
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
