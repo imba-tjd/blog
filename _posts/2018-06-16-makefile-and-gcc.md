@@ -231,6 +231,9 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -fstack-clash-protection 代替-fstack-check 只在多线程时需要
   * -ftrapv 使得整数溢出时触发core dump，性能损耗大。另一种选择是-fwrapv
   * -fanalyzer 启用一些静态检查项，不支持C++
+* sanitizer
+  * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
+  * ASan和TSan在MinGW上不可用
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
 * 减少体积
@@ -284,6 +287,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
 * https://musl.cc/
 * https://www.ed-x.cc/manual.html 优化了某些工具的性能
+* https://github.com/skeeto/w64devkit/releases
 * __MINGW64_VERSION_STR定义了它自己的版本
 * 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads
 * Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc

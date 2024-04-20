@@ -59,6 +59,7 @@ title: Linux命令
   * pgrep：同理，另外查找进程时不会显示grep自身
   * dalance/procs：rust的重写
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
+* nethogs、nload：显示网速
 
 ## 文件处理
 
