@@ -183,11 +183,14 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ## 书签
 
 ```
+https://colab.research.google.com/github/huggingface/education-toolkit/blob/main/03_getting-started-with-transformers.ipynb#scrollTo=vcuDLUYdBV5w
+https://huggingface.co/learn
 https://www.youtube.com/watch?v=i_LwzRVP7bg https://www.youtube.com/watch?v=bmmQA8A-yUA
 https://i.am.ai/roadmap/
 https://github.com/microsoft/AI-For-Beginners
-https://github.com/microsoft/ML-For-Beginners
-https://github.com/microsoft/generative-ai-for-beginners
+https://github.com/microsoft/ML-For-Beginners/blob/main/translations/README.zh-cn.md
+https://github.com/microsoft/generative-ai-for-beginners/tree/main/translations/cn
+https://microsoft.github.io/ai-edu/ 中文教程
 
 pytorch和深度学习:
 用于语音、图像、文本(垃圾邮件)的识别、分类和预测(推荐系统)。容忍误差，有明确的输入和输出，有大量的数据集且不随时间快速变化（否则就要重新训练模型）。
@@ -200,8 +203,8 @@ https://zhuanlan.zhihu.com/p/87263048
 https://www.zhihu.com/question/55720139
 https://zhuanlan.zhihu.com/c_1176098426973106176
 https://github.com/PyTorchLightning/pytorch-lightning https://zhuanlan.zhihu.com/p/120331610 https://zhuanlan.zhihu.com/p/134291726
-https://pytorch.org/get-started/ ；https://pytorch.apachecn.org/ 1.4中文文档
-https://dev.fast.ai/tutorial https://dev.fast.ai/tutorial
+https://pytorch.org/get-started/ ；https://pytorch.apachecn.org/ 中文文档
+https://course.fast.ai/
 https://www.zhihu.com/question/384519338
 https://www.zhihu.com/question/388079431
 https://tangshusen.me/Deep-Learning-with-PyTorch-Chinese/#/ 一本书
@@ -211,14 +214,12 @@ https://www.bilibili.com/video/av50747658
 https://github.com/scutan90/DeepLearning-500-questions
 https://www.zhihu.com/question/375537442
 https://zhuanlan.zhihu.com/p/30011154
-https://github.com/d2l-ai/d2l-zh
 https://github.com/explosion/thinc
 https://github.com/awesomedata/awesome-public-datasets 各种数据源
 https://github.com/microsoft/recommenders
 https://github.com/AMAI-GmbH/AI-Expert-Roadmap
 https://github.com/MorvanZhou/PyTorch-Tutorial
 https://github.com/ShusenTang/Dive-into-DL-PyTorch
-https://huggingface.co/
 https://zhuanlan.zhihu.com/p/479795186
 https://github.com/datawhalechina/thorough-pytorch
 https://github.com/openxla/xla 加速编译的
@@ -286,4 +287,7 @@ https://realpython.com/learning-paths/pandas-data-science/
 https://github.com/jvns/pandas-cookbook
 pandasgui
 https://realpython.com/learning-paths/pandas-data-science/
+
+https://the-turing-way.netlify.app/ 数据科学的书，英文
+https://jakevdp.github.io/PythonDataScienceHandbook/ numpy pandas Matplotlib sklearn
 ```
