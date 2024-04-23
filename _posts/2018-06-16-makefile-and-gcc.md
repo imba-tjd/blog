@@ -194,7 +194,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 2. gcc -S 或 cc1 生成汇编（称为编译）
 3. gcc -c 或 as 生成目标文件(.o)二进制代码
 4. 生成动态库：gcc -shared -fPIC 或 ld
-  * fPIC是必须的，其实应在-c时使用。fpic产生的代码更小更快但在某些平台有限制一般不用，或者好像x86_64上二者相同PowerPC上才不同。fPIE用于可执行文件，可在编译时都用pic，只在最后链接时用pie
+  * fPIC是必须的，其实应在-c时使用。fpic产生的代码更小更快但在某些平台有限制一般不用，或者好像x86_64上二者相同PowerPC上才不同。fPIE用于可执行文件，可在编译时都用pic，只在最后链接时用pie。Linux的gcc默认用了pie
   * Win下-mdll或--dll现在与shared相同，简化起见永远使用shared。Win下是默认PIC的，不需要加
 5. ar rcsv libname.a src.o ... 生成静态库。-t显示包含哪些.o
   * 静态库转动态库：-Wl,--whole-archive -lxxx。此参数本意是包含所有静态库中的符号，不管是否用到；默认使用静态库只会载入用到的

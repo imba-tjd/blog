@@ -704,7 +704,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 ### [魔法命令](https://ipython.readthedocs.io/en/latest/interactive/magics.html)
 
 * 单个%是行魔法，回车就执行，默认开启了%automagic，使得无歧义时不加%也能执行命令；两个%%是cell魔法
-* 命令的结果可以赋值给Python变量，此时无法省略%；命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`到shell
+* 命令的结果可以赋值给Python变量，此时无法省略%，另一种方式是%%capture var。命令的参数支持用`$`或者大括号嵌入Python变量，用`$$`转义一个`$`到shell
 * quickref：显示所有命令的简要参考；lsmagic：显示所有支持的命令；?加命令：显示指定命令的参考
 * timeit：统计语句运行的时间，自动多次运行取最好的5次结果，-n指定运行次数，有%%；单次运行是time；prun显示每个语句的执行时间，有%%
 * who：显示定义了的所有变量，后可跟筛选的变量类型，whos信息更丰富，who_ls返回列表
