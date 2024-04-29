@@ -354,6 +354,7 @@ https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
 https://www.hello-algo.com/
 https://labuladong.online/algo/
 https://the-algorithms.com/zh_Hans
+https://algo.itcharge.cn/
 
 打点标记法处理整数区间：如24小时对应int[24]，未公开对应0，公开且空闲对应1，占用中对应2。
 区间合并，如(1,2),(3,4)->(1,4)：先按起始值排序，遍历数据更新“当前区间”，当取出的和当前无交集时则当前的处理完毕。
@@ -367,4 +368,4 @@ https://www.youtube.com/@BackToBackSWE/videos
 https://www.youtube.com/watch?v=ngCos392W4w https://www.youtube.com/watch?v=aPQY__2H3tE
 https://www.youtube.com/watch?v=8hly31xKli0 https://www.youtube.com/watch?v=oBt53YbR9Kk https://www.youtube.com/watch?v=2ZLl8GAk1X4 https://www.youtube.com/watch?v=RBSGKlAvoiM
 
-
+整数的ceiling：(a + b - 1) / b
