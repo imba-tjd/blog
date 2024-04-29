@@ -260,6 +260,13 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 #pragma GCC diagnostic pop
 ```
 
+### glibc
+
+* 不被设计成能被静态链接的。musl可以
+* 高版本兼容低版本；在低版本上编译的软件可以在高版本上运行
+* 查看当前系统中的版本：ldd --version
+* 解决glibc版本冲突：源码在本机重新编译、在老版本机器上编译、升级本机版本（一般不可行）、Docker
+
 ## 编译器
 
 * 平台：指令集体系结构(ISA) - os - libc（一般只有Linux区分，其它os自带）。如x86_64-linux-gnu。ISA还有aarch64。libc还有musl、android(bionic)。Win下libc分为gnu和msvc。不同平台之间的程序不通用
