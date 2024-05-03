@@ -251,6 +251,8 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 3. 需要用的时候必须git commit -S
 4. TODO：https://zhuanlan.zhihu.com/p/34318369 https://zhuanlan.zhihu.com/p/76861431
 
+使用asc文件验证完整性：gpg --verify file.asc file
+
 ### SSH
 
 1. ssh-keygen -t ed25519 -C "email@example.com"

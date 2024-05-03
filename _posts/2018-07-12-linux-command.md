@@ -11,6 +11,8 @@ title: Linux命令
 * http://bropages.org/
 * https://command-not-found.com/
 * https://cheatography.com/
+* https://explainshell.com/
+* https://devhints.io/
 
 ## 简单笔记
 

@@ -37,7 +37,7 @@ category: linux
 * pv：用于显示进度，放在两个管道之间，或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
 * ssl-cert：方便地自签证书
-* neofetch：显示一些基本信息，不过需要安装较多依赖。linuxlogo可替代一小部分
+* neofetch：显示一些基本信息，不过需要安装较多依赖。替代可用fastfetch、linuxlogo
 * iotop
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
 * virt-what：查看VPS使用了哪种虚拟化技术，如kvm
@@ -420,16 +420,29 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 合并：-i videos.txt -f concat。其中输入文件必须为每一行`file '片段名'`
 * 为Web优化，将元数据放在开头：-movflags +faststart
 * Filter：-vf 参数。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度
+* DeMuxer：如文件含有视频和音频，把它们分解出来就叫它。之后再Decode、按需要Filter、Encode
 * AAC
   * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要加--enable-nonfree。aac_at更好，但只有mac有
   * 默认的aac，比特率默认128，高质量的考虑加-b:a 192k。可变比特率质量差不考虑
   * 格式：AAC-LC比HE-AAC好。默认的aac只支持LE
-* DeMuxer：如文件含有视频和音频，把它们分解出来就叫它。之后再Decode、按需要Filter、Encode
 * 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
 * 第三方图形化配置：https://ffmpeg.guide/graph/demo
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
 * 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
 * 视频容器：webm u2b支持，无声
+* 硬件加速
+  * 解码器分为internal和external(standalone)，前者用-hwaccel xxx指定，后者以及编码器用-c:v指定，如h264_nvenc
+  * 列出可用的：-hwaccels
+  * qsv：Intel Quick Sync Video 是一个宣传名字，不同代cpu支持不同特性。4代支持编解码H.264 MPEG-2，13代AV1
+  * dxva2(D3D9)，d3d11va：只支持Win，解码H.264 MPEG-2 WMV3 AV1 HEVC
+  * cuda(NVENC/NVDEC/CUVID)：支持编解码。编译选项中要有--enable-cuda-llvm且编译环境中装了ffmpeg修改过的nv-codec-headers
+  * vulkan：只支持解码H.264 HEVC AV1
+  * vaapi：Video Acceleration API，是intel qsv和AMD UVD/VCE的包装。好像只支持Linux
+* 视频编码格式：AV1是比较好的。MPEG4 AVC和H264是一个东西，HEVC是H265，VVC是H266，MPEG2是H262。MPEG-5(EVC)也比较新但可能没有硬件加速
+* 封装格式
+  * AVI：只能封装一条视频和一条音频，不能封装字幕，没有流媒体功能（不能在线播放）
+  * WMV后缀，ASF封装：具有“数字版权保护”功能。其音频编码为WMA
+  * MP4：H264的标准封装格式，3GP是MP4的一种简化版本。MKV和MP4差不多但有流媒体功能
 
 ## iperf3
 

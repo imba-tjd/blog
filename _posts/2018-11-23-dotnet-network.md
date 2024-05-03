@@ -180,3 +180,4 @@ string content = reader.ReadToEnd();
 * var client = new System.Net.WebClient(); client.DownloadString()、DownloadFile()
 * 代理：https://docs.microsoft.com/zh-cn/dotnet/framework/network-programming/accessing-the-internet-through-a-proxy
 * https://github.com/tmenier/Flurl 依赖Newtonsoft.Json
+* https://github.com/reactiveui/refit
