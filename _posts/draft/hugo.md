@@ -1,3 +1,4 @@
+https://gohugo.io/
 
 ## CLI
 
@@ -51,3 +52,5 @@ slug: xxx # 永久链接，默认等于文件名
 https://github.com/marketplace/actions/hugo-setup
 https://github.com/marketplace/actions/hugo-to-gh-pages
 https://lab.github.com/githubtraining/github-pages https://help.github.com/en/github/working-with-github-pages/about-github-pages
+
+其他人的搭建经验：https://zhuanlan.zhihu.com/p/105021100 https://zhuanlan.zhihu.com/p/150173525 https://zhuanlan.zhihu.com/p/165271155 https://zhuanlan.zhihu.com/p/27552299 https://zhuanlan.zhihu.com/p/110137145

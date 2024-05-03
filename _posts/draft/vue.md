@@ -188,7 +188,7 @@ function trigger_ev1(ev: Event) { emit('event1', 123) }
 ### 使用
 
 * 在浏览器中直接使用：不支持SFC，因为module强制检查MIME只能是JS类型，而SFC算text/html，无法导入
-  * v-cloak：当所在元素被挂载后移除，配合`[v-cloak] { display: none; }`避免“未编译模板闪现”
+  * v-cloak：当所在元素被挂载后移除，配合`[v-cloak] { display: none; }`避免“未编译模板闪现”。另一种普通处理白屏方式：在#app里写骨架屏，vue加载后会替换内容
 * 构建：index.html有script引入main.js module，js里面import App.vue和css，调用createApp()
 
 ```html
