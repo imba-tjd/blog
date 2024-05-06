@@ -501,8 +501,6 @@ ip link
 * https://crontab.guru/ https://cron-ai.vercel.app https://crontab.cronhub.io/ http://www.cronmaker.com
 * https://zhuanlan.zhihu.com/p/58719487
 
-每次有计划任务运行都会往`/var/log/auth.log`里写一条`pam_unix(cron:session)...`。解决方法：打开`/etc/pam.d/common-session-noninteractive`，往`session required pam_unix.so`前加`session [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid`
-
 ## 参考
 
 * https://www.cnblogs.com/manong--/p/8012324.html
