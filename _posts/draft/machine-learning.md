@@ -9,6 +9,8 @@
   * https://github.com/automl/auto-sklearn 不更新了，还不支持sklearn 1.0。自动调超参数
   * https://github.com/microsoft/nni 不活跃，有中文文档
 * CNN：用于图像和视频分析任务。RNN：顺序数据分析任务，自然语言处理、语音识别、时间序列分析。GAN：生成与给定数据集相似的新数据样本，用于图像合成、风格迁移和数据增强等任务。Transformer网络：自然语言处理
+* 训练集(train)、验证集(verify)、测试集(test)：训练用于拟合模型。验证用于调整超参数，一般由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试用于最终模型的无偏评估
+* early stop：训练过程中，训练集的loss不断下降，但验证的loss上升，说明模型过拟合。此时停止训练，选择最好的模型
 
 ## pandas
 
