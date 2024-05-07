@@ -374,3 +374,5 @@ https://www.youtube.com/watch?v=ngCos392W4w https://www.youtube.com/watch?v=aPQY
 https://www.youtube.com/watch?v=8hly31xKli0 https://www.youtube.com/watch?v=oBt53YbR9Kk https://www.youtube.com/watch?v=2ZLl8GAk1X4 https://www.youtube.com/watch?v=RBSGKlAvoiM
 
 整数的ceiling：(a + b - 1) / b
+
+多路归并排序：划分k路，每路分别排序。合并时，每次选出k路各第一个元素中的最小值。如果普通遍历，每次都要遍历k次。优化做法：小顶堆。进一步优化：败者树。其实堆、胜者树、败者树没有O的复杂度区别，但胜者树的比较次数是堆的一半。
