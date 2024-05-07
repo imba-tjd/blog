@@ -18,7 +18,7 @@ category: linux
 * apt edit-sources
 * -s(simulation)/--dry-run
 * --no-install-recommends
-* 查询二进制来自于哪个包：dpkg -S
+* 查询文件来自于哪个包：dpkg -S file。查询包中含有哪些文件：dpkg -L pkgname。第三方程序支持搜索未安装的包：：apt-file update、find file或search pattern、list pkgname
 
 ### 软件列表
 
@@ -38,7 +38,6 @@ category: linux
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
 * ssl-cert：方便地自签证书
 * neofetch：显示一些基本信息，不过需要安装较多依赖。替代可用fastfetch、linuxlogo
-* iotop
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
 * virt-what：查看VPS使用了哪种虚拟化技术，如kvm
 * ncdu：带有进度条的du
@@ -87,7 +86,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 * install -y pkg-ver
 * update --allowerase
 * search pkg 自动通配
-* provides 查询某个程序或so库是哪个包装上的
+* provides(或whatprovides) 查询某个程序或so库是哪个包装上的，或rpm -qf。查询指定包内含有的文件：repoquery -l pkgname或rpm -qi
 * autoremove
 * epel-release包：安装后就有更多包了
 
