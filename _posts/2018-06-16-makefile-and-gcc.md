@@ -175,7 +175,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 
 * gcc -o如果没有后缀，会自动加exe；touch也是这样
 * 链接过程中，需要进行符号解析，并且是按照顺序解析；如果库链接在前，就可能出现库中的符号不会被需要，链接器不会把它加到未解析的符号集合中，那么后面引用这个符号的目标文件就不能解析该引用，导致最后链接失败。因此链接库的一般准则是将它们放在命令行的结尾
-* [ccache](https://github.com/ccache/ccache)可以缓存编译信息
+* [ccache](https://github.com/ccache/ccache)缓存编译信息
 * -Ofast可开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
 * -flto：编译和链接都要用，与make -j同时用或自动多线程时加=auto，-fno-fat-lto-objects能减少生成时间但无法进行普通链接，只需在编译时用，没看懂默认是否启用。clang支持=thin比普通的更好
@@ -279,21 +279,22 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 
 * 安装：https://apt.llvm.org/
 * Win: https://github.com/mstorsjo/llvm-mingw 有ucrt，但支持太多的target导致可执行文件有点多
+* winlib的
 * https://gitee.com/qabeowjbtkwb/windows-hosted-llvm-clang
 
 ### MinGW
 
-* https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer，有ucrt
+* https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer(#2)，有ucrt cmake objc
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，因为内部用了bzip2，env文件控制自动添加PATH
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
-* https://github.com/niXman/mingw-builds-binaries https://github.com/RoEdAl/ucrt-mingw-builds
+* https://github.com/niXman/mingw-builds-binaries https://github.com/RoEdAl/ucrt-mingw-builds 后者不更新了
 * https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3
 * https://nuwen.net/mingw.html
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
 * https://musl.cc/
-* https://www.ed-x.cc/manual.html 优化了某些工具的性能
+* https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能
 * https://github.com/skeeto/w64devkit/releases
 * __MINGW64_VERSION_STR定义了它自己的版本
 * 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads

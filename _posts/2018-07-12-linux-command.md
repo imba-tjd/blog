@@ -312,6 +312,7 @@ ip link
 * expression过滤ip和端口：`ss src :22`，冒号前填IP，Peer地址用dst，其它一些过时记法略；可以用and和or连接多个条件，则需要再在外面加个单引号；IP可以用`192.168.0/24`这种形式；运算符可用==、=、!=、ge、le、gt、lt
 * Local Address指的是本机，既可以是Listen的，也可以是发出的；Peer Address是“另一端”
 * 监听地址为*的是双栈，`[::]`只是V6
+* 统计数据（打开的TCP数、状态处于tw的数）：cat /proc/net/sockstat
 
 ### curl
 
