@@ -498,11 +498,13 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 
 ## PostgreSQL
 
-* 默认端口5433
-* 命令行：psql "host=xxx port=xxx dbname=xxx user=xxx"
-* 具有jsonb类型
-* Linux下安装：https://www.postgresql.org/download/linux/debian/ 仅客户端为postgresql-client
-* Win下客户端可用pipx install pgcli
+* 默认端口5432
+* 命令行客户端：psql "host=xxx port=xxx dbname=xxx user=xxx"
+* 安装
+  * Debian：postgresql。仅客户端：postgresql-client
+  * Win下客户端：pipx install pgcli
+  * 会自动创建postgres用户
+  * 查看状态：pg_lsclusters。启动：pg_ctlcluster 版本 main start
 * Citus：分布式PG
 
 ## Access
