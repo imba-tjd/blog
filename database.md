@@ -498,13 +498,14 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 
 ## PostgreSQL
 
-* 默认端口5432
-* 命令行客户端：psql "host=xxx port=xxx dbname=xxx user=xxx"
+* 默认监听localhost:5432
+* 命令行客户端：psql "host=xxx port=xxx dbname=xxx user=xxx"。本地：sudo -u postgres psql
 * 安装
-  * Debian：postgresql。仅客户端：postgresql-client
+  * Debian：postgresql，每个系统大版本仅对应一个PG版本，如不介意则可正常用；安装目录：/var/lib/postgresql/版本/main。仅客户端：postgresql-client。运维工具：postgresql-contrib
   * Win下客户端：pipx install pgcli
-  * 会自动创建postgres用户
-  * 查看状态：pg_lsclusters。启动：pg_ctlcluster 版本 main start
+  * 安装后会自动创建`postgres`Linux用户、数据库用户(PG也称ROLE角色)、“数据库”。本地登录Peer验证方式必须要Linux用户与数据库用户匹配，无需数据库用户密码。创建新用户：createuser --interactive
+  * 查看状态：pg_lsclusters。启动：pg_ctlcluster 版本 main start。是Debian特有的，是pg_ctl的包装
+  * 配置文件：/etc/postgresql/版本/main/postgresql.conf。客户端验证配置：pg_hba.conf
 * Citus：分布式PG
 
 ## Access
