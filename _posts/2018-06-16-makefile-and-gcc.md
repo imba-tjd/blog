@@ -233,7 +233,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -fanalyzer 启用一些静态检查项，不支持C++
 * sanitizer
   * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
-  * ASan和TSan在MinGW上不可用
+  * ASan和TSan在MinGW上不可用，但MSYS的clang/llvm支持ASan
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
 * 减少体积
@@ -296,6 +296,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://musl.cc/
 * https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能
 * https://github.com/skeeto/w64devkit/releases
+* https://github.com/mmozeiko/build-gcc-mingw 比较小
 * __MINGW64_VERSION_STR定义了它自己的版本
 * 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads
 * Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc

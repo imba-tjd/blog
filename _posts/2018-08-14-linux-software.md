@@ -13,7 +13,7 @@ category: linux
 * 查看更新记录：`cat /var/log/apt/history.log`，而`/var/lib/apt/periodic`中什么也没有
 * 查看安装了哪些：apt list -i、dpkg -l
 * 查询反向依赖：apt-cache rdepends -i -i理论上是只显示已安装的，但实际好像有些未安装的也显示了？
-* apt-mark hold/unhold <pkgname>：锁定/解锁版本，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
+* apt-mark hold/unhold <pkgname>：锁定/解锁版本，也能阻止新安装，可一次指定多个，showhold显示哪些锁定了；还可以编辑`/etc/apt/preferences[.d]`，注意apt-mark不是它的前端
 * 使用前最好安装一下gnupg2（apt-key需要）、apt-transport-https、ca-certificates
 * apt edit-sources
 * -s(simulation)/--dry-run
@@ -86,7 +86,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 * install -y pkg-ver
 * update --allowerase
 * search pkg 自动通配
-* provides(或whatprovides) 查询某个程序或so库是哪个包装上的，或rpm -qf。查询指定包内含有的文件：repoquery -l pkgname或rpm -qi
+* provides(或whatprovides) 查询某个程序或so库是哪个包装上的，或rpm -qf。查询指定包内含有的文件：repoquery -l pkgname或rpm -qi --filesbypkg pkgname
 * autoremove
 * epel-release包：安装后就有更多包了
 

@@ -10,6 +10,7 @@ title: Git/GitHub笔记
 * git status；加-uno会不检测未跟踪的文件加快执行速度；-s显示简单信息，在工作区干净时没有任何输出
 * git commit -am "message"
 * git push -u origin master
+* @：相当于HEAD
 
 ## Branch
 
