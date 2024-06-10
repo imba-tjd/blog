@@ -182,6 +182,14 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * NLTK
 * https://github.com/microsoft/nlp-recipes NLP Best Practices，不维护了
 
+## 声音
+
+* https://github.com/babysor/MockingBird
+
+## pytorch
+
+* intel_extension_for_pytorch(IPEX)：对于支持avx512的CPU能加速训练。https://huggingface.co/docs/transformers/main/en/perf_train_cpu
+
 ## 书签
 
 ```
