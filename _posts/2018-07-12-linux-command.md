@@ -54,6 +54,7 @@ title: Linux命令
     * F2设置里可以调整上面的状态和筛选列。可以把宽度改为2:1，CPU改成Average
     * 显示过长的Command：w
     * 选择内容：按住Shift
+    * 一次性杀掉多个进程：c选择条目，k相当于F9
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
   * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器。nmon、njmon(c)：社区为sourceforge较差，后者适合做二次开发。gtop(node)、bottom(rust)：比较类似于overview面板，能显示网速，有折线图显示CPU和内存历史。iotop
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
