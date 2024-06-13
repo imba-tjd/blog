@@ -191,6 +191,19 @@ title: Linux命令
 
 * 防火墙：ufw易用，有gufw图形界面，但yum里没有。firewalld较复杂。其它开源有GUI的：opensnitch portmaster SafeLine(国产WAF)
 
+### ping
+
+* apt install ping会出来两个结果：iputils-ping和inetutils-ping，应该使用第一个
+* ping -O也显示失败信息，-c指定发包数量。ping6略
+* `connect: Cannot assign requested address`：可能是本机没有ipv6地址
+* sysctl中加`net.ipv4.icmp_echo_ignore_all=1`可禁止ping本机，但ipv6好像没有，且这样连自己ping自己都不行了；宽松一点可用`icmp_echo_ignore_broadcasts`。一般不推荐完全禁止ICMP，因为它有报告错误的功能如目的不可达和超时
+* iputils-arping：不支持WSL1
+* hping3：可用于洪水攻击，支持伪造源地址大量发包；支持TCP。完全不支持ipv6，最后一次更新是2014年
+* fping：能快速检测大量地址。-g加CIDR或开始结束，-c次数默认为1，多个IP时最好用-C合并；-a仅显示在线的，-u仅显示不在线的。支持IPV6，不支持WSL1
+* ThomasHabets/arping：不支持Win。APT安装arping就是它
+* zmap：能快速扫描大范围的IP，不支持Win
+* 简单tcping：echo >/dev/tcp/ip/port
+
 ### dig
 
 * 在dnsutils包中，实际是bind9的客户端
@@ -287,7 +300,7 @@ title: Linux命令
 
 ### iproute2
 
-替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它被NetworkManager(Cent)和systemd-networkd(Deb)替代。
+替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它被NetworkManager(Cent, nmcli)和systemd-networkd(Deb)替代。
 https://www.cnblogs.com/sparkdev/p/9253409.html
 https://www.cnblogs.com/sparkdev/p/9262825.html
 

@@ -720,7 +720,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * alias：显示预定义的shell命令，也可设置自己的，不过直接设置不能持久化；rehashx：把path里的可执行文件都导入alias中，使用时就不用加叹号了
 * pycat：语法高亮地显示文件
 * bookmark、pwd、pushd、popd、dhist、ls、cd：与路径有关的一些操作。不能用!cd因为那些程序执行完就终止了
-* env：显示或设置环境变量
+* env：显示或设置环境变量。load_ext dotenv;dotenv：配合python-dotenv库
 * !xxx：执行shell命令，等价于system()，但Win下默认是CMD，且可能有编码问题；!!：捕获输出，看起来!赋给变量也是一样的，返回列表一行一条
 * ?加命令：显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
 * ?加带*的对象名：显示匹配的对象名；其实是psearch命令
