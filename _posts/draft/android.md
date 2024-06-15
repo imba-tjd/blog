@@ -29,3 +29,7 @@
 ## 桌面
 
 * https://github.com/LawnchairLauncher/lawnchair
+
+## 播放器
+
+* https://github.com/anilbeesetti/nextplayer
