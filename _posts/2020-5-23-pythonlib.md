@@ -6,42 +6,27 @@ title: 第三方 Python 库
 
 ### requirements.txt
 
-* pipreqs能从import产生本文件，替代freeze；pip-tools能从setup或一个.in产生本文件并能同步版本更新；pigar支持notebook；基本上只有需要锁定依赖时才用
-
 ```bash
-pip freeze > requirements.txt # 需在venv中运行否则会把全局的写进去；类似于pip list --format=freeze，只是verb不同，freeze参数少
-pip install -Ur requirements.txt
+pip freeze > requirements.txt # 第三方freeze库：pipreqs能从import产生。pip-tools能从setup或一个.in产生。pigar支持notebook
+pip install -r requirements.txt
 
 SomeProject==1.4
-SomeProject>=1,<2 # 逗号为且；在CLI中运行需加引号否则大于号会被认为是重定向
-SomeProject~=1.4.2 # install any version “==1.4.*” that’s also “>=1.4.2”
+SomeProject>=1,<2 # 逗号为且
+SomeProject~=1.4.2 # “==1.4.*” that’s also “>=1.4.2”
+upper bound限定：不会修改最左边的非0数字，^0.1.11能更新到0.1.19但不会到0.2.0
 -e . # 相当于pip install -e .
 ```
 
 ### venv
 
-* pip install 不需要--user
-* 不能脱离本机环境，会在`venv/pyvenv.cfg`中硬编码Python的版本和home位置；如果Python是in-place升级了版本，可用venv --upgrade .venv，之后记得更新venv里的包；但如果Python自己的路径变化了，就只能手动改了；手动改之前shell就不要进venv了，否则报Permission denied
-* `--system-site-packages`使得虚拟环境可访问系统的包，install仍不影响系统，freeze的时候就要加--local
-* 对于同一窗口的Windows Terminal，激活venv，新建Tab，虽然提示符没变，仍处在venv中
-* Win下不会创建python3的链接，无法理解，是BUG吗？Linux下有
-
-```bash
-python3 -m venv .venv
-
-alias activate=". .venv/bin/activate"
-
-if not exist .venv python -m venv .venv --upgrade-deps
-.venv\Scripts\activate.bat
-
-if(!(Test-Path .venv)) {python -m venv .venv --upgrade-deps}
-& .venv\Scripts\activate.ps1
-```
+* 不能脱离本机环境，会在`venv/pyvenv.cfg`中硬编码Python的版本和home位置
+* 如果Python in-place升级了版本，可用venv --upgrade .venv，之后记得更新venv里的包(--upgrade-deps)。但如果Python自己的路径变化了，就只能手动改了
+* `--system-site-packages`使得虚拟环境可访问系统的包
 
 ### Docker镜像
 
 ```dockerfile
-FROM python:3.11-slim # 或单纯的slim。没有git
+FROM python:3.11-slim # 不含git
 ENV PIP_NO_CACHE_DIR 1
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONUNBUFFERED 1
@@ -49,7 +34,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY . . # 用上.dockerignore
+COPY . . # 一般配合.dockerignore
 ```
 
 ### 包和模块
@@ -62,12 +47,13 @@ COPY . . # 用上.dockerignore
 * 不用-m会把目标所在的文件夹加到sys.path中，然后按路径直接执行目标，目标就是顶级模块；用-m会把cwd加到sys.path中，按模块名先一层层执行`__init__.py`再执行目标，会先编译成.pyc，会把`__package__`设为模块名的前一部分，cwd是顶级模块；该sys.path与环境变量的path无关，对于环境变量修改PYTHONPATH可更改搜索地点
 * 不要自己创建名为`runpy.py`的文件，因为系统存在runpy这个包；site.py类似
 * VSC的lint默认是从工作区开始的，在子文件夹中运行存在绝对导入的py时能正常运行，但lint却会报错
-* 还存在命名空间包的概念，把多个位置不想关的包算进一个命名空间方便使用
+* 还存在命名空间包的概念，把多个位置不相关的包算进一个命名空间方便使用
 * `runpy.run_module('xxx', run_name='__main__', alter_sys=True)`相当于命令行中-m xxx；不加后两个参数就是在不import那个模块的时候使用它
 * `__file__`是当前文件名的绝对路径(3.9+)；命名空间包没有此属性
 * 直接运行的目标模块是`__main__`，在其它地方也可以import它，且可用它的`__file__`。但注意通过uvicorn等非直接运行时就不能依赖了
 * 没有一种表示“项目根目录”的方法
-* pip uninstall不支持--user，默认就会先卸载user的
+* `__all__`：在被import *时如果存在此字段，只会导入它指定的，help也只能看到这些。下划线开头变量也不会被导入
+* 如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
 
 ```py
 # 绝对import，以sys.path中的目录开始搜索
@@ -87,131 +73,64 @@ except ImportError:
     import json
 ```
 
-### setuptools
+### 构建前端
 
-* 一般结构为：仓库根目录下`setup.py`, `setup.cfg`, `readme`, `tests`, `mypkg/__init__.py`, `mypkg/data/xxx.json`, `mypkg/xx.py`。装好后就能`import mypkg`和`import mypkg.xx`了。如果有子目录却没有init文件，在作为系统包时无法import那里面的内容
-* python3 setup.py bdist_wheel：需先装好wheel包，生成过程在build文件夹里，生成的东西在dist文件夹里；install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install，命令行接口还会产生可能存在编码问题的xxx-script.py；不存在--static-deps参数
-* twine upload [--repository testpypi] dist/*；pypa/gh-action-pypi-publish
-* pip install .：仍需wheel包；可以识别setup.py和那个toml，已安装了也能覆盖；加-e可以在编辑源文件后无需install即时生效，仅用于开发，原理是软链接，但setup.py自己改变后还是要重装；setup.py develop [--uninstall]效果类似一样但后者不会删入口点exe；pip install --force-reinstall才是重新安装，不能用-f，那是另一个参数的简写
-* pip wheel . [-w outdir] 默认在当前目录下生成wheel，还是需要setup.py和wheel包，-v显示依赖安装过程，-vv显示pyx处理过程；注意不是python -m wheel
-* pip download：理论功能是下载包及其依赖方便离线安装，实际遇到非whl又需要构建的包时会去构建但最后结果却又是源码包，最好干脆不用
-* 检查wheel存在的问题的项目：https://github.com/jwodder/check-wheel-contents
-* MANIFEST.in额外控制sdist的内容，一般就是`include 文件名; recursive-include 文件夹名 *`：https://packaging.python.org/guides/using-manifest-in/#how-files-are-included-in-an-sdist
-* 使用包内数据：importlib.resources.files("mypkg")/"data/data.csv" https://importlib-resources.readthedocs.io/en/latest/using.html；单个py_modules无法使用
-* 使用内嵌的distutils：设置环境变量SETUPTOOLS_USE_DISTUTILS=local
-* 显示详细的构建信息：设置环境变量DISTUTILS_DEBUG=1
+* wheel包
+* pip wheel . 在当前目录（或用-w outdir）下生成wheel。-vv显示详细过程
+* python -m build：相当于setup.py bdist_wheel和pip wheel --no-deps。不过也能--sdist
+* pip install .
+  * -e 使得编辑源文件后无需install即时生效，仅用于开发，原理是软链接
+* python3 setup.py bdist_wheel：生成过程在build文件夹里，生成的东西在dist文件夹里。install生成egg并安装，也会自动安装依赖但不会走pip自定义的源，实际用的是easy_install
+* pip download --only-binary :all: 下载包及其依赖方便离线安装
+* 上传：twine upload [--repository testpypi] dist/*。pypa/gh-action-pypi-publish
+* 检查wheel存在的问题的工具：https://github.com/jwodder/check-wheel-contents
 * --global-option "-a" --install-option "-b"相当于setup.py -a install -b。现在global-option被pip废弃了，改用--config-settings
 * --no-build-isolation：目前版本的pip在构建时会自动创建虚拟环境，导致即使系统中存在满足依赖的包也不会去使用，此参数禁用这一行为
-* 当setup.py不存在时，可使用python -m build --sdist生成压缩包，但build这个包不自带
+
+### setuptools
+
+* 目录结构自动发现
+  * src布局：pyproject.toml或setup.py、src/mypkg{`__init__.py`, module.py, subpkg}
+  * flat布局：没有src目录，其它不变。但会自动排除某些目录，如bin docs utils test
+  * 单模块：根下只有一个.py
+  * 手动指定：[tool.setuptools] packages或py_modules = ["mypkg"]
+* 显示详细的构建信息：DISTUTILS_DEBUG=1
 
 ```py
-# __init__.py；必须有此文件才能自动发现
-from impl import fun
-__version__ = '0.0.1'
-__all__ = ('fun',) # 在被import *时如果存在此字段，只会导入它指定的，help也只能看到这些
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
-# __main__.py
-from . import xxx
-def _main(): # 即使不存在__all__也不会被import *
-    xxx()
-if __name__ == '__main__':
-    _main()
+[project]
+name = "mypkg"
+#version = "0.0.1"
+description = "one-line text"
+url= 'homepage'
+dynamic = ["version", "readme"]
 
-# setup.py：https://packaging.python.org/guides/distributing-packages-using-setuptools/
-import setuptools
-setuptools.setup( # 也可无参调用，参数能覆盖cfg，写错没有警告
-    name = 'xxx',
-    packages=['mypkg'], # 也可用find_packages()自动搜索存在__init__.py的文件夹
-    package_dir={'mypkg': 'src/mypkg'}, # 如果位置不对可以手动映射，key也可以是''则用最后一部分作为包名
-    package_data={'mypkg': ['data/*.dat']}, # 即src/mypkg/data/*.dat，key必须是包名或''即任意包，*.dat只会包含mypkg同级目录下的，或者用*/*.dat
-    py_modules=['test'], # 对应与setup.py同级的module.py，对于sub.test也可用且不会flat；或用[x.stem for x in Path().glob('*.py')]动态获取
-    entry_points={"console_scripts": ["foo = foo.__main__:_main"],},
-)
-setuptools.sandbox.run_setup('setup.py', [args]/sys.argv[1:]) # 非命令行运行，好像不能写在setup.py自己里面否则就循环引用了
+requires-python = ">=3.8"
+dependencies = [
+    "requests",
+    'importlib-metadata; python_version<"3.10"', # platform_system=='Windows' platform_machine=='x86_64'
+]
 
-# setup.cfg：https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html
-[global]
-verbose=1
+[tool.setuptools.dynamic]
+version = {attr = "mypkg.__version__"}
+readme = {file = ["README.md"], content-type = "text/markdown"}
 
-[metadata]
-name =
-version = attr: mypkg.__version__
-author =
-author_email =
-description =
-long_description = file: README # long_description_content_type = text/markdown
-keywords = one, two
-license = MIT # license_file = LICENSE 3rdparty/*.txt （多个需换行）
-url =
-platform = any
-classifiers = # https://pypi.org/pypi?%3Aaction=list_classifiers
-    Development Status :: 5 - Production/Stable # 3 - Alpha
-    License :: OSI Approved :: MIT License
-    Operating System :: OS Independent
-    Programming Language :: Python :: 3 :: Only
-    Topic :: Internet :: WWW/HTTP
-project_urls =
-    Bug Tracker = https://github.com/user/repo/issues
-    Changelog = https://github.com/user/repo/blob/master/CHANGELOG.md
+[project.scripts]
+cli-name = "mypkg.mymodule:some_func" # 若用proj:_main，用的是init中的对象
 
-[options]
-packages = find: # 还有一种find_namespace:
-package_dir = # 假设包的目录在src下，find:会在指定目录下寻找
-    = src
-install_requires =
-    requests;python_version<'3.4' # https://www.python.org/dev/peps/pep-0508/
-    pywin32 >= 1.0;platform_system=='Windows' # 还有platform_machine=='x86_64'
-python_requires = >=3.8
-scripts =
-    bin/script
-    scripts/script
-zip_safe = False # setup.py install默认启用，作为.egg压缩包安装。对wheel无影响
-# setup_requires可以加一个wheel；test_suite = tests；tests_require废弃了
+包内数据文件 https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+①使用MANIFEST.in：`include src/mypkg/*.txt、recursive-include 文件夹名 *`
+②[tool.setuptools.package-data] mypkg或"*" = ["*.txt"]
+使用包内数据：importlib.resources.files("mypkg")/"data/data.csv"
+数据文件必须要在py包内（有init），否则不受支持，如单个py_modules无法使用
 
-[options.entry_points]
-console_scripts = # 还支持gui_scripts，关闭父console还能运行；如果某一项需要额外的依赖，用方括号声明名字并在extras里写内容
-    myexe = proj.__main__:_main # 若用proj:_main，得到的是init中的对象，而不是__main__.py的
-
-[options.extras_require] # pip安装时或entry_points用中括号和逗号才会装上
-tests = tox; pytest # 不明白为什么列表变成分号了但是就是这样，也可分行写
-
-[options]
-include_package_data = True # 不清楚和manifest.in的关系
-[options.packages.find]
-where = src
-include = pkg*
-exclude = tests
-[options.package_data] # 更精细化管理，不要与include_package_data共用；data_files弃用了，本来也对wheel无效
-* = *.txt, *.rst
-hello = *.msg
-
+---
+TODO: setup.cfg
 [bdist_wheel] # 对应verb的开关
 [build_ext]
-
-# pyproject.toml
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-https://setuptools.pypa.io/en/latest/userguide/quickstart.html
-https://betterprogramming.pub/a-pyproject-toml-developers-cheat-sheet-5782801fb3ed
-https://godatadriven.com/blog/a-practical-guide-to-setuptools-and-pyproject-toml/
-https://pypa-build.readthedocs.io/en/latest/ 相当于sdist和bdist_wheel，只不过不限于setuptools
-版本支持upper bound限定，不会修改最左边的非0数字：^0.1.11能更新到0.1.19但不会到0.2.0
-
-# ~/.pypirc；chmod 600
-[distutils]
-index-servers =
-    pypi
-    pypitest
-
-[pypi]
-username:
-password:
-
-[pypitest]
-repository: https://test.pypi.org/legacy/
-username:
-password:
 ```
 
 ## Scrapy
@@ -1101,27 +1020,29 @@ depth=2 # 调用其它函数的跟踪深度，默认为1
 
 ## Cython
 
-* pip install Cython [--install-option="--no-cython-compile"] 在无预编译的包的环境或CI中可用未编译的版本
 * 纯Python模式
   * 第一种是在对应名字的pxd中写cpdef但不实现，类似于pyi，完全不影响本来的py
   * 也支持直接写type hint，但int要写cython.int否则仍视为object不会有任何提升，且与其它使用typing的库有冲突
-  * 还可以用装饰器声明locals(a=xxx), returns, exceptval, cfunc(等价于cdef), inline, ccall(等价于cpdef)
-* Jupyter：%load_ext Cython之后在需要的块中%%cython [--annotate/-a]，可直接用于非函数定义块；--compile=-Ofast --link-args=xxx
-* mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
-* 与C++交互：pybind11或同作者后出的nanobind，后者必须修改C++部分的代码以适应库，前者相反；把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
-* 如果确实加速了很多，可用gc.set_threshold()使得gc更少，默认值是700,10,10，不知道会不会自动调整
+  * 还可以用装饰器声明locals(a=xxx), returns, exceptval(-1, check=True), cfunc(等价于cdef), inline, ccall(等价于cpdef)
+* Jupyter：%load_ext Cython之后在需要的块中%%cython [-a]，可直接用于非函数定义块；--compile=-O3 --link-args=xxx
+* 其它库
+  * mypyc：基本类型有运行时类型检查，多继承必须用trait特性，对dataclass优化，尽量隐式用slots
+  * 与C++交互：pybind11或同作者后出的nanobind，后者必须修改C++部分的代码以适应库，前者相反
+  * 把简单的py编译到可读性强的c：pyccel，win下使用非常麻烦
 * 详细教程：https://www.cnblogs.com/traditional/tag/Cython/
 
 ### 构建
 
-* pyximport.install()后能不编译就import pyx_modname。但只能用于开发环境因为需要环境里有Cython和编译器，且当本地目录已有对应模块时会失效什么也不做而不报错。当依赖多个文件时要用modename.pyxdep指定依赖，但实测无效。构建结果放在~/.pyxblx中
-* Linux下的默认构建参数：`gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/opt/python/3.8.6/include/python3.8`
+* pyximport.install()后能不编译就import pyx模块，但只能用于开发因为需要环境里有Cython和编译器，依赖额外的.h时也很麻烦。构建结果在~/.pyxblx
+* 在CI中为多个系统编译：cibuildwheel库
 
 ```py
+[build-system] requires = ["setuptools", "cython"]
+
 # setup.py
 from Cython.Build import cythonize
-setup(ext_modules=cythonize('**/*.pyx'))
-setuptools.Extension("demo", sources=["demo.pyx"], libraries=["m"], extra_compile_args=额外的编译参数包括-D定义宏)
+setup(ext_modules=cythonize('demo.pyx' 或下一行))
+setuptools.Extension("*", sources=["**/*.pyx"], libraries=["m"], library_dirs=numpy.get_include(), include_dirs, define_macros=[(k,v)], extra_compile_args)
 
 from mypyc.build import mypycify
 setup(ext_modules=mypycify(['xxx.py'])) 或 list(set(glob('*.py'))-{'setup.py','main.py'})，不支持自动递归包含
@@ -1133,40 +1054,38 @@ cythonize -i xxx.pyx # 生成so/pyd，也会产生对应的.c .o .def临时文�
 mypyc xxx.py --ignore-missing-imports # 很干净，只有so/pyd。默认会递归处理导入了的，如果那条忽略还不够就再加--follow-imports=skip
 
 # 手动编译
-$pybase = $(python -c "print(__import__('sys').base_prefix+'\\')");
-gcc -shared -DMS_WIN64 -I ($pybase+"include") -L $pybase -lpython39 src.c
+$pybase = $(python -c "print(__import__('sys').base_prefix+'/')");
+gcc -shared -pthread -fPIC -fwrapv -fno-strict-aliasing -O3 -I ($pybase+"include") -L $pybase -lpython312 src.c
 生成可执行文件，仍依赖整个Py环境：先用cython --embed，再用gcc -municode且不能有-shared，好像可以不用-D_UNICODE和UNICODE
 ```
 
 ### 语法
 
-* 类型强转用尖括号，<T?>好像能进行检查是否能强转，否则强转失败时还是原值
-* 不能用*p对指针解引用，只能用p[0]。访问结构体指针的成员可用点，无需->
 * nogil时不能使用任何Py对象。Py侧函数中可以用with nogil: 调用nogil的函数，否则也能调用但不会释放gil
 * 整除默认用的Py的语义，用`# cython: cdivision=True`或`with cython.cdivision(True)`改成C的语义
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
 ```py
 cimport cython # 导入pyx
-from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库，可在源码的Includes里看到
-def primes(int nb_primes): ... # def的函数只能在Py侧调用，但里面可以调用cdef的；cdef的只能在pyx中用，cpdef就都能用
-cdef inline int add(int a, int b) nogil: return a+b # 返回值若省略则默认为object
+from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库。查看：源码的Includes
+
+def primes(int nb_primes): ... # def的函数只能在Py侧调用，但里面可以调用cdef的。cdef的只能在pyx中用，cpdef就都能用
+cdef inline int add(int a, int b) nogil: return a+b # 返回值若省略则默认为object。不支持static
 预处理指令：DEF、IF、ELIF、ELSE
 
 cdef: # 一次性声明多个变量
     int n = 3 # 不会自动初始化
     int arr[100] # 不支持VLA
-    int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般放在finally里
-    object o # Py_Object
-    char* s = "abc" # 对应bytes。指针可用assert p is not NULL
+    int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般用finally。类型转换：尖括号；TODO:<T?>好像能进行检查是否能强转，否则强转失败时还是原值
+    char* s = 'abc' # 对应bytes
     bint b # 对应Py的bool
-cdef struct S: int n # 之后能用S(123)或cdef S s={'n':123}创建实例。还支持cdef packed struct、cdef enum
+    object o # Py_Object
+    指针：声明和&n与C一样，但不能用*p解引用，要用p[0]。访问结构体指针变量的成员用点，不是->。支持assert p is not NULL
+cdef struct S: int n # 创建实例：S(123)或cdef S s={'n':123}。还有cdef packed struct、cdef enum
 cdef class: # 能在Py侧使用
 
 @cython.boundscheck/wraparound/cdivision/initializedcheck(False) # 关闭下标越界/负索引/除零/内存视图初始化检查；也可注释在开头#cython: xxx=False 用于整个文件，也可用在with中
-@cython.infer_types(True) # 自动推断变量未声明的类型，默认也会以安全方式自动推测一部分
-cython.address()等于&，但好像也支持直接用。cython.operator.dereference()等于*，不能直接用但可用[0]替代
-无论是通过结构体变量还是指针，访问结构体成员用.
+cython.address()等于&，cython.operator.dereference()等于*
 
 # 数组和内存视图
 from cpython cimport array
@@ -1209,17 +1128,6 @@ cdef class Queue:
     cdef extend_ints(self, int* values, size_t count): ... # Py不支持int*，显然不能用cpdef
     cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明，否则会打印异常并忽略。此语法表示返回值是-1时会自动检查是不是出现了异常，应选一个小概率出现的值作为异常值
     # 支持Callbacks传递函数，但太复杂略。如果可能发生异常要加except*
-
-# C++
-%%cython --cplus # distutils: language=c++
-from libcpp.string cimport string
-from libcpp.vector cimport vector # 还有set map，能在返回时自动转换为Py的对应类型
-cdef string s = b'Hello world!'
-cdef vector[int] v; v.reserve(9); v.push_back()
-cdef extern from "xxx.hh" namespace "xxx":
-    cdef cppclass XXX:
-        def __cinit__(): Py的init可能由于子类不主动调用而不执行，此方法一定会执行
-        def __dealloc__(): del xxx
 ```
 
 ## cffi

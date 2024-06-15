@@ -176,7 +176,7 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * gcc -o如果没有后缀，会自动加exe；touch也是这样
 * 链接过程中，需要进行符号解析，并且是按照顺序解析；如果库链接在前，就可能出现库中的符号不会被需要，链接器不会把它加到未解析的符号集合中，那么后面引用这个符号的目标文件就不能解析该引用，导致最后链接失败。因此链接库的一般准则是将它们放在命令行的结尾
 * [ccache](https://github.com/ccache/ccache)缓存编译信息
-* -Ofast可开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
+* -Ofast开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
 * -flto：编译和链接都要用，与make -j同时用或自动多线程时加=auto，-fno-fat-lto-objects能减少生成时间但无法进行普通链接，只需在编译时用，没看懂默认是否启用。clang支持=thin比普通的更好
 * -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
@@ -210,6 +210,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * 一般库都以lib开头，-l时省略前缀和后缀。-l:可精确指定名字
   * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath=.`，即Linux默认不会寻找CWD的链接库。另外还可用LD_LIBRARY_PATH和LD_PRELOAD
   * 假如两个库ab，a依赖b，在编译a时可以完全不管b，只在编译可执行文件时再去指定b；也可以编译a时链接b，则编译可执行文件时就不再需要指定b
+  * 编译期环境变量LIBRARY_PATH相当于-L，C_INCLUDE_PATH相当于-I但仅对C有效，CPLUS_INCLUDE_PATH仅对C++有效，CPATH对两者均有效
 * Windows
   * .lib是静态库，.dll是动态库
   * 另有一种dll，函数符号在lib中，虽然类型为T但没有实现，还会再生成一个`__imp_`开头的I符号，实现在dll中。MinGW产生用-o example.dll -Wl,--out-implib=libexample.a。使用时将它当作.o编译
