@@ -545,7 +545,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://gethue.com Py+Web，主要支持一些大数据的数据库，虽然提交数很多贡献者也很多，但Star很少，估计就是公司自己在用
 * Microsoft Azure Data Studio：感觉不如直接VSC，反正功能都少
 * DataGrip：JB的，收费
-* Navicat：https://www.navicat.com.cn/products/navicat-premium-lite
+* Navicat：https://www.navicat.com.cn/products/navicat-premium-lite 连接MSSQL要装NativeClient
 * SequelPro/Ace：仅Mac
 * https://squirrel-sql.sourceforge.io/ JAVA，活着，只release JAR包
 * https://www.oracle.com/database/sqldeveloper/ 官方客户端，需要登录才能下。还有个instant client不是GUI
