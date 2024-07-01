@@ -208,9 +208,10 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * .so是动态库，需要-L指定库存在的文件夹，当前目录也不可省，再-l库名
   * -l也支持静态库但优先用动态的，可在前面加-Wl,-Bstatic优先用静态的
   * 一般库都以lib开头，-l时省略前缀和后缀。-l:可精确指定名字
-  * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath=.`，即Linux默认不会寻找CWD的链接库。另外还可用LD_LIBRARY_PATH和LD_PRELOAD
+  * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath='$ORIGIN'`，此变量表示可执行文件的目录，Linux默认不会寻找；若用.或:列表中为空则表示CWD。另外还可用LD_LIBRARY_PATH和LD_PRELOAD
   * 假如两个库ab，a依赖b，在编译a时可以完全不管b，只在编译可执行文件时再去指定b；也可以编译a时链接b，则编译可执行文件时就不再需要指定b
   * 编译期环境变量LIBRARY_PATH相当于-L，C_INCLUDE_PATH相当于-I但仅对C有效，CPLUS_INCLUDE_PATH仅对C++有效，CPATH对两者均有效
+  * so的链接顺序是有要求的，被依赖的要放在前面，相互依赖要用--start-group；允许存在同名符号，会使用先找到的
 * Windows
   * .lib是静态库，.dll是动态库
   * 另有一种dll，函数符号在lib中，虽然类型为T但没有实现，还会再生成一个`__imp_`开头的I符号，实现在dll中。MinGW产生用-o example.dll -Wl,--out-implib=libexample.a。使用时将它当作.o编译
@@ -288,18 +289,18 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer(#2)，有ucrt cmake objc
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，因为内部用了bzip2，env文件控制自动添加PATH
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
-* https://github.com/niXman/mingw-builds-binaries https://github.com/RoEdAl/ucrt-mingw-builds 后者不更新了
+* https://github.com/niXman/mingw-builds-binaries https://github.com/RoEdAl/ucrt-mingw-builds 有ucrt。后者不更新了
 * https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3
 * https://nuwen.net/mingw.html
-* https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
 * https://musl.cc/
 * https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能
-* https://github.com/skeeto/w64devkit/releases
-* https://github.com/mmozeiko/build-gcc-mingw 比较小
+* https://github.com/skeeto/w64devkit/releases 解压后很小，只有c c++，有busybox
+* https://github.com/mmozeiko/build-gcc-mingw 比较小，有lto
+* https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * __MINGW64_VERSION_STR定义了它自己的版本
-* 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads
+* 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads但可以静态链接。win32版没有这些功能
 * Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc
 
 ### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
@@ -337,7 +338,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * gdb a.out [coredump]。-q不显示startup-text，--args 命令行参数（也可以run时传），-ex一进入就执行的命令
 * run(r)、continue(c)
 * breakpoint(br) src.c:line/func if(...)、delete bp_n、clear line
-* step(s)、s func、next(n)、finish
+* step(s)、s func、next(n)、finish(fin)
 * print(p) 'src.c'::arr 支持字符串、数组
   * /x以十六进制显示值
   * 打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素
