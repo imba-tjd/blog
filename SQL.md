@@ -88,9 +88,9 @@ title: SQL
 * UNION [ALL]：直接附加第二个查询的结果；无ALL会自动剔除重复行，性能也更差
 * INTERSECT：交集。MySQL需8.0.31
 * EXCEPT：差集。MySQL需8.0.31，Oracle为MINUS
-* 只能在最后使用一次ORDERBY
 * 结构必须相同（名字除外）
 * 位于两个SELECT之间，中间不用加分号
+* 只能在最后使用一次ORDERBY和LIMIT。绕过：包一层无意义的子查询 select * from (真正需要limit的查询) 无意义别名 union all ...
 
 ### WITH 通用表语句(Common Table Expression)
 
