@@ -58,8 +58,9 @@ title: SQL
   * 有的DBMS支持SELECT不在GROUPBY中的列，但没啥意义
 * 分组后一行就相当于一组，聚合函数会对每一组用一遍
 * 会把NULL算作一组
-* 有的DBMS支持 GROUPBY 表达式，感觉正常应该用CASE
-* 有的支持GROUPBY SELECT中的序号
+* 支持GROUPBY SELECT中的别名
+  * 有的DBMS支持 GROUPBY 表达式，感觉正常应该用CASE
+  * 有的支持GROUPBY SELECT中的序号
 * GROUPING运算符：能用在GROUPBY语句中的ROLLUP() CUBE() GROUPING SETS()函数，MySQL只支持WITH ROLLUP。ROLLUP(col)效果是再增加一组等同于未分组的数据，可用于当计算了每组小计时也要算合计，ROLLUP(c1,c2)还会增加仅按c1分组的组，CUBE(c1,c2)还会增加仅按c2分组的组。GROUPING SETS可用于配合CASE从前两者中手动取出想要的。SELECT中还有个GROUPING()用于分辨超级分组记录中的NULL和原始数据本身的NULL
 
 ### ORDER BY
