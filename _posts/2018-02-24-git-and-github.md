@@ -127,16 +127,17 @@ title: Git/GitHub笔记
 * 彻底重命名且不会丢失历史：`git filter-branch -f --tree-filter 'git mv -k 原文件名 新文件名' --prune-empty HEAD`；-k忽略文件不存在时报错失败；会修改本分支所有提交；https://stackoverflow.com/questions/3142419 给了一个用index-filter的示例；如果要移动到之前不存在的文件夹中，命令要加`mkdir -p xxx;`
 * git clone --depth=1指的不是只clone根文件夹，而是不clone之前的记录，当前提交还是完整的
 * git diff
-  * 无参：比较local和staged之间的内容，即工作区内未提交的内容，但不会显示未跟踪的
-  * --cached/--staged：比较add了的与HEAD
-  * master [patch]：比较 当前分支/patch 与 master/目标分支 的差别
-  * 可以重定向到.patch中，用git apply恢复。Win下必须先chcp 65001
+  * 目标
+    * 无参：比较local和staged之间的内容，即工作区内未提交的内容，但不会显示未跟踪的
+    * --cached/--staged：比较add了的与HEAD
+    * master [patch]：比较 当前分支/patch 与 master/目标分支 的差别
+  * 可以重定向到.patch中，用git apply恢复
   * 默认会把修改了的内容都显示出来，用--stat只显示文件和变化行数，用于获取比git status更多的信息
   * --check：检查行尾有没有多余的空白
   * --name-only --diff-filter=U显示冲突文件列表
   * git diff-index --stat HEAD 显示更改了的文件，增加删除数
 * `git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"; git fetch origin`：恢复--single-branch
-* git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录
+* git format-patch HEAD^：生成最近一次提交的patch；sha1..sha2生成从前者到后者的patch，每次commit都会对应一个，自动命名；--root可以把整个仓库都patch上。之后可以用git am依次打上，apply的没有记录。如果没提交，见git diff
 * git bundle create repo.bundle HEAD/master可以把当前分支（可同时指定多个分支）整个打包成一个二进制文件，之后路径可以直接当作仓库fetch和clone
 
 ## Pull,Push,Fetch
@@ -364,19 +365,41 @@ collapsable content
 
 ## License
 
-* http://www.bewindoweb.com/224.html Github协议详解
+* 各种协议对比 https://choosealicense.com/appendix/ 首页是按需求选择协议的Guide
+* 开源理论
+  * https://www.gnu.org/licenses/gpl-faq.zh-cn.html
+  * https://opensource.org/faq
+  * Selling Exception(Richard Stallman)：如mysql，只有一个GPL协议，允许使用者付费遵守非GPL的条款，不是双重许可
+  * copyleft：要求软件的修改版必须同样以自由软件的形式发布，这条限制与四条核心自由并不冲突。如GPL就是copyleft的，MIT不是。与之相对的是permissive，如MIT，允许任何人进行专有再分发。它们都是开源许可证
+  * free software和open source理论上指的是同一件事，都指自由开放，而不只是可以看源代码而不能改。但实践中人们觉得开源只需源代码可用，GNU反对用开源这个词。可用FLOSS
+  * proprietary software(works)专有软件：是非自由软件的子集。专有软件的所有者可以决定是否可以分发该软件，而自由软件可以被任何持有者随意分发
+    * 最终用户许可协议(EULA)中列出使用条款
+    * CC的NC不是专有软件，是非自由软件。专有软件可以是闭源软件，也可以是源代码可用软件
+  * attribution/giving credit：署名
+* https://fossa.com/developers-guide-open-source-software-licenses
+* 修改license：经过所有contributors（copyright author）同意即可，无论改成更宽容的还是更严格的，也可以双重许可
+* TODO：什么是专利，开源协议和专利之间的关系
+
+### 具体协议
+
+* GPL
+  * 中文翻译：https://jxself.org/translations/gpl-3.zh.shtml
+  * AGPL：如果能通过网络访问某软件，那就应该要能获得它的源代码。如果只是使用AGPL软件，没有修改它，那可以不公开自己的源代码
+  * LGPL：按GNU的理论，如果一个库的功能不是独特的，如libc，则可以选择使用它。否则使用者会去使用其他的库代替
+  * 避免GPL传染
+    * 二进制隔离：不链接，只通过系统调用来共享数据
+    * 可选依赖：某一软件可包含GPL库来增强功能，在不使用此库时也是独立软件，此时该软件不必是GPL的，但不能发布包含GPL库的完整软件
+  * FOSS许可例外：https://zhuanlan.zhihu.com/p/38444122 如果自己开发的项目用了OSI批准的开源协议则可以自己选，否则那个库将视为GPL
+  * 兼容和不兼容GPL的协议列表，还包括非代码协议：https://www.gnu.org/licenses/license-list.zh-cn.html
+    * 兼容意思是在GPL项目中可以使用这些协议的代码。理论上那些宽松许可证的代码仍然保持原有许可证，只有修改和新增的才是GPL的；甚至修改宽松的可以仍然保持。但实践上如果只需使用宽松许可证部分的代码，则没必要用此混合代码库，用它一定是用了GPL的部分，整个程序是GPL的
+* MPL：修改了MPL下的代码，必须把修改后的开源，且必须也用MPL。但允许把MPL的代码单独作为一些文件，与非MPL的一起使用，且不用开源，因此与GPL不“兼容”
+* SSPL：AGPL的改版，只针对云服务提供商，如果将MongoDB作为服务提供给其他人用，包括搭建管理面板，则必须开源
+* MIT：明确允许sublicense，实际上允许任意使用；没有任何保证，出了问题也不负责。条件是将许可证放到程序中。BSD：明确允许专利
+* ISC：限制和MIT一样。用的很少，连创造者都不用了。0BSD：和其他BSD系列无关，是ISC的替代，没有要求attribution
+* Apache 2.0：GNU推荐说是permissive中最好的，包含了处理专利的内容
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
 * CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（包括不允许翻译），NC是不用于商业目的
-* 选择开源协议：https://choosealicense.com/，放在一起对比https://choosealicense.com/appendix/
-* 所有协议：https://opensource.org/licenses/category
-* https://www.gnu.org/licenses/gpl-faq.zh-cn.html https://opensource.org/faq
-* https://fossa.com/developers-guide-open-source-software-licenses
-* AGPL：如果能通过网络访问某软件，那就应该要能获得它的源代码。如果只是使用AGPL软件，没有修改它，那可以不公开自己的源代码
-* MPL：修改了MPL下的代码，必须把修改后的开源，且必须也用MPL。但允许把MPL的代码单独作为一些文件，与非MPL的一起使用，且不用开源
-* 避免GPL传染：二进制隔离：不链接，只通过系统调用来共享数据。可选依赖：某一软件可包含GPL库来增强功能，在不使用此库时也是独立软件，此时该软件不必是GPL的，但不能发布包含GPL库的完整软件
-* ISC：限制和MIT一样。用的很少，连创造者都不用了
-* SSPL：AGPL的改版，只针对云服务提供商，如果将MongoDB作为服务提供给其他人用，包括搭建管理面板，则必须开源
-* copyleft：自由软件相关，如GPL就是copyleft的，MIT不是。与之相对的是permissive
+  * CC0：放弃著作权（公有领域），原著作权持有者无法再对其他人如何使用该作品施加任何法律上的限制，二次创作品则在法律上享有完整的著作权。Unlicense：有人说写得很差，在欧洲不允许放弃所有权利；如果不涉及专利，PD/Unlicense/CC0/0BSD是等效的
 
 ## bare和mirror
 

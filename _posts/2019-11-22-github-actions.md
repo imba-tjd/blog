@@ -140,3 +140,4 @@ ${{ github.workspace }}
 * actions/github-script
 * crazy-max/ghaction-github-pages
 * lycheeverse/lychee-action 检查链接有效性
+* crate-ci/typos 检查拼写错误

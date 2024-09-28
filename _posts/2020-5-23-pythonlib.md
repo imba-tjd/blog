@@ -124,8 +124,9 @@ cli-name = "mypkg.mymodule:some_func" # 若用proj:_main，用的是init中的�
 包内数据文件 https://setuptools.pypa.io/en/latest/userguide/datafiles.html
 ①使用MANIFEST.in：`include src/mypkg/*.txt、recursive-include 文件夹名 *`
 ②[tool.setuptools.package-data] mypkg或"*" = ["*.txt"]
-使用包内数据：importlib.resources.files("mypkg")/"data/data.csv"
+使用包内数据：importlib.resources.files("mypkg")/"data/data.csv"。遍历文件名：importlib.metadata.files("mypkg")，读取：read_text()
 数据文件必须要在py包内（有init），否则不受支持，如单个py_modules无法使用
+读取dist-info中的版本信息：importlib.metadata.version('mypkg')
 
 ---
 TODO: setup.cfg
@@ -481,9 +482,9 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 ### urllib
 
 * 自带，但urlopen明确不支持keep-alive，无法大量使用。结束时会发RST而不是FIN
-* http.client更加底层
+* 底层是http.client
 * UA默认为Python-urllib/3.9
-* POST x-www-form-urlencoded：给urlopen传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
+* POST x-www-form-urlencoded：给urlopen或req传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
 * 似乎没有办法做出浏览器的URL编码的方式：把空格编码为%20，把中文用UTF8编码后每个加上%，其余的特殊字符不变。urllib3 requests不会对URL自动编码
 * 支持HTTP_PROXY
 * 默认超时20秒
@@ -491,9 +492,9 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 ```py
 req = urllib.request.Request(url, headers={...})
 with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
-text = resp.read().decode(); resp.getcode()
+text = resp.read().decode();
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
-resp.info().get_content_charset()
+resp.getcode()、resp.info().get_content_charset()
 urllib.request.urlretrieve(url, outfilename) # 直接下载为文件
 
 urllib.parse：
@@ -727,7 +728,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * conda自己可以用来创建虚拟环境，可以很轻松地管理多个版本的python
 * conda会检查当前环境下所有包之间的依赖关系，比pip更严格
 * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
-* conda create -n venv python=3.8; conda info -e; conda activate venv; conda remove -n venv --all
+* conda create -n myvenv python=3.11 -y; conda info -e; conda activate myvenv; conda remove -n myvenv --all
 * mamba用c++重新实现了一遍conda
 
 ## Web Server
@@ -844,7 +845,7 @@ async def app(scope, receive, send): # 必须是异步的，也可以是定义�
         'body': b'Hello, world!',
     })
 
-if __name__ == "__main__":  # 若与app在同一文件中，当心全局变量二次执行，如打开了文件未关闭，因为下一句内部重新运行了main.py。可以把那些内容放在else里
+if __name__ == "__main__":  # 若与app在同一文件中，当心全局变量二次执行，如打开了文件未关闭，因为下一句内部重新运行了main.py。可以把那些内容放在else里；或传app对象
     uvicorn.run("main:app", reload=True)
 
 class App: # 使用类定义的方式，指定运行目标是类名而不是实例；也可以定义一个只有scope的函数，返回参数为receive和send的异步函数
@@ -1168,8 +1169,8 @@ ffi.cast("int", 2)
 
 ## 定时任务和任务队列
 
-* threading.Timer(秒数, fun[,args,kwargs]).start()：自带，非阻塞，只执行一次，不易管理
-* sched：自带，使用麻烦
+* threading.Timer(秒数, fn, args=None).start()：自带，非阻塞，只执行一次，不易管理
+* sched：自带，能管理多个注册的回调。s=sched.scheduler(); s.enter(5秒延迟, 0优先级一般没用, fn, argument=(123,)); s.run(blocking=默认True表示等所有事件执行完后再继续)
 * dbader/schedule：every(10).minutes/every().hour.do(fun) 轻量无额外依赖，用法相对简单，有装饰器用法。支持秒级任务，阻塞，有一定管理作业的功能，有日志记录。无自动异常处理，会直接抛出，导致后续所有的作业都中断执行
 * celery：分布式任务队列，功能强大 https://zhuanlan.zhihu.com/p/22304455 。kombu：也是celery出的，messaging
 * rq：使用redis的任务队列，比celery简单
