@@ -1,6 +1,15 @@
 # 经典机器学习
 
 * 算法：线性/逻辑回归、决策树、随机森林、SVM支持向量机、隐马尔可夫模型、KNN(K近邻)、K-均值
+  * 可学的：随机森林、Gradient Boosting Machines (GBM)、逻辑回归
+    * 如果不进行超参调节，可能随机森林比GBM好。随机森林只要调max_depth, n_estimators, class_weight。GBM峰值性能好，但要调的参数多，也相对容易过拟合
+  * 不学的
+    * 支持向量机SVM：分类和回归都不行。需要选择核函数，如果选得好则有效，可以处理高维数据和非线性可分数据，但对于大量数据不行
+    * 朴素贝叶斯分类器(Naive Bayes)：用于文本分类、垃圾邮件过滤。它假设特征之间相互独立，现实世界中往往不是
+    * 线性回归和逻辑回归(Logistic Regression)：深度学习的基础，可理解为单层的神经网络。对于非线性可分(linearly separable)数据不行。在推荐系统，CTR点击率预估领域，还是以LR为主
+    * 隐马尔科模型HLM：文本任务，用深度学习
+    * KNN（K临近）：算法简单，但当数据量大时计算花费大。替代用局部敏感哈希LSH和树结构如KD树
+    * Principal Component Analysis主成分分析：用于降维有点用
 * 任务：分类classification（一般有监督，目标是预测新的数据的标签）、回归regression、聚类clustering（一般无监督，就是区分一批数据）、降维、模型选择、预处理
 * 适合表格型数据
 * gradient-boosting梯度提升：XGBoost、LightGBM、CatBoost、AdaBoost https://neptune.ai/blog/when-to-choose-catboost-over-xgboost-or-lightgbm https://www.kaggle.com/code/faressayah/xgboost-vs-lightgbm-vs-catboost-vs-adaboost
@@ -152,6 +161,55 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 Input contains NaN, infinity or a value too large：存在空值
 ```
 
+## gradio
+
+```py
+gradio xxx.py 会自动reload
+import gradio as gr
+
+app = gr.Interface(fn=处理函数, inputs=[输入控件], outputs=[输出控件])
+app.launch()
+
+每个输入控件对应fn的参数
+控件有对应的literal便捷使用默认样式，如'text'等价于gr.Textbox()
+Audio和Video和Image可以网页采集或上传文件，后端接收默认是内存中的numpy数组，可改为服务器磁盘上的临时文件路径；Image还可以是PIL.Image。File可用'binary'表示bytes
+控件基本上都有label参数
+
+输出除了那些控件外，还可以配合pandas画图，且具有交互性而不是单纯的图片；也接受matplotlib对象。
+data = pd.DataFrame({'a':[1,2,3], 'b':[4,5,6]})
+gr.BarPlot(data, x='a', y='b')
+
+gr.Json(dict)、gr.HTML(value='xxx')、gr.Markdown()
+会话属性：inputs加gr.State(初始值)，fn处理后返回给outputs，fn里对它的使用就好像使用它包裹的对象
+
+launch：
+share=True 启动免费内网穿透
+server_name 默认127.0.0.1。端口默认7860
+auth=("username", "passwd")
+title、description
+allow_flagging='never' 默认有一个在服务器上保存输出内容的Flag按钮用于报告错误
+
+交互基本都要靠事件触发回调
+
+自定义界面：
+with gr.Blocks() as app:
+    c = gr.控件。默认竖向布局
+    with gr.Row():
+        横向布局
+        
+    btn.click(fn,inputs=[前面布局创建的控件变量],outputs)
+with gr.Accordion('Advanced options', open=False): 相当于html的details
+
+聊天机器人：
+bot=gr.Chatbot(height=240)
+msg=gr.Textbox()
+def respond(msg, bot):
+    for (usermsg, botmsg) in bot: 处理每一条历史纪录
+    msg是当前输入，就是文本框控件的值。与历史记录一起送给模型
+    bot.append((msg, ret)) bot是引用对象，往里面添加内容
+    return '', bot 第一个返回值用于清空输入框，第二个将聊天内容输出
+```
+
 ## BigQuery
 
 ```py
@@ -185,10 +243,6 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ## 声音
 
 * https://github.com/babysor/MockingBird
-
-## pytorch
-
-* intel_extension_for_pytorch(IPEX)：对于支持avx512的CPU能加速训练。https://huggingface.co/docs/transformers/main/en/perf_train_cpu
 
 ## 书签
 
