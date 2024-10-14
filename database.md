@@ -551,6 +551,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://www.oracle.com/database/sqldeveloper/ 官方客户端，需要登录才能下。还有个instant client不是GUI
 * https://dbgate.org/ Electron，常见的都支持，但Star和贡献者较少，感觉不太靠谱
 * https://github.com/dbgate/dbgate
+* https://popsql.com/
 
 ### 在线测试
 
