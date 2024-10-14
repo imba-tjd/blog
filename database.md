@@ -552,6 +552,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://dbgate.org/ Electron，常见的都支持，但Star和贡献者较少，感觉不太靠谱
 * https://github.com/dbgate/dbgate
 * https://popsql.com/
+* https://www.sqlgate.com/ 韩国的
 
 ### 在线测试
 
