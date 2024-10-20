@@ -33,3 +33,9 @@
 ## 播放器
 
 * https://github.com/anilbeesetti/nextplayer
+
+## 模块
+
+* HyperCeiler 集成了许多功能的MIUI优化
+
+dhizuku会影响系统自带双开

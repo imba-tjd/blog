@@ -104,7 +104,9 @@ plt.rcParams['font.sans-serif']=['SimHei'] # 解决不显示中文
 plt.show() # 终端里也能用，但会显示在窗口中
 plt.savefig('img.svg') # 格式自动根据文件名的后缀设置
 
-fig, ax = plt.subplots() # 在一个figure中绘制多个图
+# 在一个figure中绘制多个图
+fig, axs = plt.subplots(n) # 单参数为一列n行，(1, 2)为1行2列，行列都大于1时返回二维数组
+axs[0].plot...
 ```
 
 ## scikit-learn

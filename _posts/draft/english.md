@@ -178,7 +178,9 @@ TODO
   * 一般加ing：playing, studying
   * 以不发音的e结尾的去e加ing：making, having
   * 以ie结尾的变y加ing：lying, tying
-  * 以一个单独发音的元音字母加一个辅音字母结尾的重读闭音节双写结尾字母加ing：running, swimming, shopping, beginning
+  * 以一个单独发音的元音字母加一个辅音字母结尾的重读闭音节双写结尾字母加ing：running, swimming, shopping, beginning。非重读不加：offering, visiting；例外：travelling
+  * c -> ck：panic - panicking
+  * write - writing - written / bite - biting - bitten
 
 ### 情态动词
 
