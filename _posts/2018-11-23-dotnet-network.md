@@ -14,6 +14,7 @@ title: ".NET网络编程"
 * GetByteArrayAsync、GetStreamAsync、GetStringAsync：只接受Uri对象或字符串，编码不清楚
 * PostAsync、PutAsync、PatchAsync、SendAsync、DeleteAsync、GetAsync：发送对应的请求，都支持取消；其中前三者需要HttpContent，Send就是自定义其它所有请求，需要HttpRequestMessage；返回都是`Task<HttpResponseMessage>`
 * System.Net.ServicePointManager.DefaultConnectionLimit：限制最大并发数，默认是两个
+* Win10上内部用了Windows.Web.Http和WinINet
 
 ### HttpClientHandler
 

@@ -83,7 +83,7 @@ category: windows
 
 ### 虚拟驱动器
 
-`ls 驱动器名加冒号`可打印内部的值，创建用New-Item(ni)，删除用ri/del/rm，注意此时无需加`$`。key可用dos通配符。只有使用里面的变量内容的时候才用`$`，如`$env:path`。使用Get-PSDrive可看到所有的驱动器，Get-Volume只看实际的卷。如果key中也含有变量，需用Set-Item。
+`ls 驱动器名加冒号`可打印内部的值，创建用New-Item(ni)，删除用ri/del/rm，注意此时无需加`$`。key可用dos通配符。只有使用里面的变量内容的时候才用`$`，如`$env:path`。获得所有驱动器：Get-PSDrive，只看实际的卷Get-Volume。如果key中也含有变量，需用Set-Item。
 
 * env：环境变量，其中修改path要用+=且记得加分号。永久修改需要用`[environment]::SetEnvironmentvariable`
 * alias：所有的别名。仅仅打印，要执行用&
@@ -171,7 +171,6 @@ category: windows
 * Start-Job -ScriptBlock {...} ; $JobResponse = Get-Job | Receive-Job
 * Compress-Archive、Expand-Archive
 * Enter-PSSession -ComputerName RemoteComputer; Exit-PSSession
-* Stop-Computer
 * Move-Item(mv)：目标已存在时不会静默覆盖，要加-Force
 
 ### meta
@@ -235,6 +234,14 @@ category: windows
 * Out-Printer: 将输出发送到打印机。不一定要真实的打印机，可以用Microsoft Print to PDF这种
 * Out-Host -Paging：分页显示，惰性处理管道内容，经过它之后就变成字符串了。more.exe是非流的
 * 编码：对于Core，读取外部程序的GBK输出（注意有些程序输出到控制台跟重定向用的编码不同），之后进入管道或输出到文件都是U8-no-BOM。另一种治标方式是用cmd，因为它不会改变编码。PS5.1输出到文件用的U16LE
+
+## 管理系统的功能
+
+* 用户、ACL、进程、服务、日志
+* 磁盘：PhysicalDisk物理磁盘，StoragePool存储池将多个物理磁盘聚合，VirtualDisk虚拟磁盘在存储池中分割而成可指定raid，Partition分区由物理或虚拟磁盘分割而成，Volume卷格式化了文件系统的分区
+* 防火墙：Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+* Get-ComputerInfo
+* Stop-Computer
 
 ## 模块
 

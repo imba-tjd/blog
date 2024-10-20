@@ -13,6 +13,8 @@ title: Linux命令
 * https://cheatography.com/
 * https://explainshell.com/
 * https://devhints.io/
+* https://cn.x-cmd.com/ 对原生命令的增强
+* https://github.com/denisidoro/navi
 
 ## 简单笔记
 
@@ -190,6 +192,7 @@ title: Linux命令
 ## 网络
 
 * 防火墙：ufw易用，有gufw图形界面，但yum里没有。firewalld较复杂。其它开源有GUI的：opensnitch portmaster SafeLine(国产WAF)
+* firewall-cmd --add-port=8080/tcp --permanent; firewall-cmd --reload
 
 ### ping
 
@@ -207,7 +210,7 @@ title: Linux命令
 ### dig
 
 * 在dnsutils包中，实际是bind9的客户端
-* `dig @dns.googlehosts.org www.baidu.com`
+* `dig @dns_server www.baidu.com`
 * +vc：查询时使用tcp（不一定支持）
 * +short：只显示ip（但可能有多个）
 * +trace：显示解析过程。其实是自己主动迭代解析
@@ -220,9 +223,14 @@ title: Linux命令
 * AUTHORITY SECTION显示最终解析指定域名的dns服务器，ADDITIONAL SECTION显示那些dns服务器的ip
 * ->>HEADER<<-中的status: NXDOMAIN表示不存在，此时一般会返回SOA；SERVFAIL表示上游DNS服务器响应超时（用于递归DNS服务器）；flags:QR表示为响应报文，AA表示是权威DNS回应的，RD表示DNS服务器必须递归处理该报文，RA表示该DNS支持递归查询
 * 查询EDNS状态：`dig edns-client-sub.net -t TXT @8.8.8.8`
-* host命令（deprecated）：默认只显示answer，第二个参数可指定服务器。-t指定请求的记录类型，-a效果和dig差不多
-* kdig(knot-utils)：功能更多一点，支持DoT(+tls)但不支持DoH。zdns：快速查询大量记录。dnsenum：爆破子域名。doggo：Go写的多彩的解析器，支持Win
-* delv：dnsutils 9.10中dig的继任者，对DNSSEC的支持更好
+* 其他软件
+  * delv：dnsutils 9.10中dig的继任者，对DNSSEC的支持更好
+  * kdig(knot-utils)：功能更多一点，支持DoT(+tls-ca)但不支持DoH
+  * host命令（deprecated）：默认只显示answer，第二个参数可指定服务器。-t指定请求的记录类型，-a效果和dig差不多
+  * zdns：快速批量大量查询
+  * dnsenum：爆破子域名
+  * mr-karan/doggo：Go多彩，支持Win
+  * ameshkov/dnslookup GO
 
 ### nmap
 
@@ -505,6 +513,7 @@ ip link
 * wait命令可以等待后台任务执行完
 * 还有一种setsid，格式和nohup类似，不过原理不同，且必须加重定向输出
 * 上一个后台运行的程序的PID：`$!`
+* 其他选择：systemd、pm2、docker
 * https://github.com/Nukesor/pueue 用于交互式运行后台任务。分布式任务框架：SchedMD/slurm
 
 ### crontab
@@ -529,7 +538,6 @@ ip link
 * https://einverne.github.io/categories.html#每天学习一个命令
 * https://github.com/trimstray/the-book-of-secret-knowledge
 * IPTraf-ng：监控网络流量
-* https://github.com/denisidoro/navi
 * iface：查看网卡信息
 * https://github.com/google/cdc-file-transfer
 * open view see edit compose print：都是run-mailcap的alias，根据mime类型调用对应程序

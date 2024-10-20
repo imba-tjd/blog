@@ -36,13 +36,14 @@ category: linux
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
 * pv：用于显示进度，放在两个管道之间，或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
-* ssl-cert：方便地自签证书
 * neofetch：显示一些基本信息，不过需要安装较多依赖。替代可用fastfetch、linuxlogo
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
 * virt-what：查看VPS使用了哪种虚拟化技术，如kvm
 * ncdu：带有进度条的du
 
 ### Debian阿里源
+
+* 自动化脚本：https://linuxmirrors.cn/
 
 ```
 # 使用stable可避免手动更新代号
@@ -448,19 +449,27 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 服务端：-s [-u]
 * 客户端：-c <serverip> -P 5多线程 -b 100M -t 60
 
-## VNC和RDP
+## VNC和远程桌面
 
-* https://www.tightvnc.com/ 使用简单，仅Win
-* https://github.com/TigerVNC/tigervnc Tight的fork
-* https://turbovnc.org/ Tight的fork，想在画面速度上更快，比Tight大很多，且无Win下的服务端
+* VNC使用的RFB协议不支持声音
+* https://www.tightvnc.com/ C，仅Win。包含客户端(Viewer)和服务端。实测卸载要用msi安装包，控制面板里没有
+* https://tigervnc.org/ Tight的09年fork，改用了C++和java，全平台，界面美观。客户端可单独下载单exe无需安装
+* https://turbovnc.org/ Tight的fork，实测画面大面积变化时帧率更高。用了java比Tight大很多；无Win服务端
 * https://uvnc.com/
-* https://remmina.org/ 不支持Win
-* https://github.com/quasar/Quasar
-* https://github.com/moonlight-stream
-* https://www.nomachine.com/
 * https://github.com/FreeRDP/FreeRDP
-* teamviewer、rustdesk、todesk、parsec、向日葵、RayLink（全免费）
-* 异地组网，之后可用微软远程桌面：蒲公英、ZeroTier、Tailscale
+* https://remmina.org/ 不支持Win，但可用WSL
+* https://www.nomachine.com/ 不开源
+* 游戏串流，支持NV显卡编码
+  * Sunshine：https://app.lizardbyte.dev/Sunshine/?lng=zh-CN
+    * “基地版”，自带虚拟显示器（连好后类似副屏） https://github.com/qiin2333/Sunshine
+    * 是服务端。客户端用 https://moonlight-stream.org/
+    * 闭源fork，可能挂了：https://open-stream.net/
+  * parsec：不开源。多个设备下载客户端登录同一个账户即可，也能分享，但必须登录现在被q了。如有NAT必须要打洞成功，一般来说至少要有一个有公网IP
+  * gameviewer：网易出的，目前免费。不支持文件传输
+* 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控
+  * rustdesk：开源。它的服务端是用于各客户端交流的，设置里填“ID/中继服务器”；不部署也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行；修改文件名可预置服务器信息
+* 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
+* 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
 
 ## perl
 
@@ -490,7 +499,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * reload vs restart：前者在多个replica时会一个个重启
 * 开机自启：pm2 startup，会恢复之前save命令时的状态。Win版：pm2-installer
 * 在docker中运行：用pm2-runtime命令代替node
-* 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434/what-is-the-advantage-of-using-supervisord-over-monit monit是C
+* 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434 monit是C
 * 其它监控metric程序：https://github.com/topics/monitoring
 
 ## TODO

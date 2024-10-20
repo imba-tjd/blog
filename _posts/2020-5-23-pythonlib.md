@@ -864,6 +864,7 @@ await response(scope, receive, send)
 * env是一个dict。它包含os.environ的副本。还加了REQUEST_METHOD、REMOTE_ADDR，除了Content-Type和Length以外的HTTP头以HTTP_的方式提供
 * body：env['wsgi.input'] 是filelike
 * wsgiref.util.request_uri(environ, include_query=True)
+* 服务器：gunicorn、uwsgi（pypi上叫pyuwsgi，不原生支持Win）、phusion/passenger（C++写的，好像带有监控功能）
 
 ```py
 from wsgiref.simple_server import make_server
@@ -1210,7 +1211,6 @@ ffi.cast("int", 2)
   * https://github.com/pytransitions/transitions FSM
   * https://github.com/dabeaz/sly 源于lex和yacc，作者不维护了
 * pretty_errors：精简stacktrace，可全局安装
-* uwsgi：不支持Win，用了sys/socket.h，可考虑WSL。https://pypi.org/project/pyuwsgi/
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
 * 计算圈复杂度：https://github.com/terryyin/lizard 支持多种语言无需编译
 
