@@ -388,6 +388,10 @@ long_query_time=3
   * sync_binlog=0 默认为1表示每次事务都同步binlog，设为0完全交给操作系统刷新，设为N表示经过N个事务后同步
 * undo log：保证事务的原子性。redo log保证事务的持久性
 
+### 相关软件
+
+* https://github.com/sysown/proxysql
+
 ## SQLite
 
 * 没有GRANT和INVOKE、不支持输出参数
@@ -426,11 +430,12 @@ long_query_time=3
 * 其他工具
   * rqlite：Go，使用SQLite作为储存，与原版SQLiteAPI完全不同，本身是HTTP API，官方提供了多种语言的库
   * dqlite：只支持Linux，官方只有Go的库，没看懂怎么启服务端。由Ubuntu的公司维护
-  * Litestream：在线流式备份，方便损坏时恢复。LiteFS：同作者，只支持Linux，基于fuse文件系统同步SQLite数据库，建立好后可使用原版命令行，非主节点的写入会自动forward到主节点来写入。postlite：同作者，支持pg的通信协议，使用sqlite作为存储，但维护状态极差，不考虑
+  * Litestream：在线流式备份，方便损坏时恢复。LiteFS：同作者，只支持Linux，基于fuse文件系统同步SQLite数据库，建立好后可使用原版命令行，非主节点的写入会自动forward到主节点来写入。postlite：同作者，支持pg的通信协议，使用sqlite作为存储，已经archived了
   * cr-sqlite：支持分布式多写入。可以作为原版的扩展加载
   * mvsqlite：分布式，基于FoundationDB。客户端是drop-in替代sqlite，设定LD_PRELOAD注入原版sqlite即可；但服务端部署有点麻烦，需要FoundationDB集群和mvstore无状态实例，不考虑。它表示rqlite和dqlite是replicated数据库而非分布式的，会把所有数据每台机器上都放一份
   * FTS5：全文搜索引擎
   * realm：mongodb出的嵌入式数据库
+  * 以sqlite为后端，用mysql协议：https://github.com/metallkopf/mysqlite https://github.com/mergestat/go-mysql-sqlite-server
 
 ### CLI
 
@@ -553,6 +558,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://github.com/dbgate/dbgate
 * https://popsql.com/
 * https://www.sqlgate.com/ 韩国的
+* MySQL Shell for VS Code 插件，Oracle官方出的，也能连接sqlite
 
 ### 在线测试
 
