@@ -362,6 +362,8 @@ long_query_time=3
 
 #skip_name_resolve  客户端连接时默认会对ip反向解析，指定此项能加速，但会影响root@localhost登录
 #shared_memory  仅限Win，只有cli .NET mariadb connector/j支持，mysql connector/j不支持
+#innodb-buffer-pool-instances：size大于1G时会自动调整
+join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会话中适当增大，如1MB。不要全局设置，因为每个会话都会分配，而且太大没用。类似的还有sort_buffer_size、read_rnd_buffer_size、tmp_table_size
 ```
 
 ### CLI
