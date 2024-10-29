@@ -468,7 +468,8 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * database_list 显示附加了的数据库文件；table_list 显示存在哪些表(3.37,2021.11)；table_info(tb1) 显示表的列信息，每项一行
 * integrity_check quick_check 进行错误和约束检查，前者更完整，后者更快
 * auto_vacuum FULL 默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
-* PRAGMA mmap_size=xxx字节 能提高IO效率，但发生IO错误时无法捕获，Win下无法VACUUM
+* mmap_size=xxx字节 能提高IO效率，但发生IO错误时无法捕获，Win下无法VACUUM
+* foreign_keys=1
 * 查询当前选项值：SELECT * FROM pragma_xxx。查询所有可用的pragma选项：pragma pragma_list
 
 ### 编译
