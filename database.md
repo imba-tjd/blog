@@ -446,7 +446,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * .mode/m box -ww：更适合人类阅读的展现方式，还能显示列名，但只适合列不多的情况；调整宽度用--wrap 列数。-ww表示按单词换行；qbox是预设的60宽度非ww。还支持json、insert
 * .databases或da/tables或ta/indexes或in：列出所有数据库/表/索引；.schema/sch [tb1]：显示创建指定表的SQL语句；.dbinfo能看到有多少个表索引视图，其他信息用处不大；这些都可以跟LIKE语句的模式匹配
 * .open data.db：关闭当前文件并打开另一个；.backup/.save data.db：另存main数据库
-* .dump/d [tb1]：输出创建表的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
+* .dump/d [tb1]：输出创建表及数据的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
 * .timeout：等待加锁的时间
 * 查询schema元数据
