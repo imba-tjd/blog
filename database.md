@@ -449,8 +449,9 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * .dump/d [tb1]：输出创建表及数据的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
 * .timeout：等待加锁的时间
+* .expert：后续再运行select时会显示建议创建的索引
 * 查询schema元数据
-  * .shema
+  * .shema 显示创建表的语句
   * SELECT name, sql FROM sqlite_schema WHERE type='table/index'
   * 版本：SELECT sqlite_version()
 * 另一种备份：sqlite3 db "VACUUM INTO '/path/to/backup'"
