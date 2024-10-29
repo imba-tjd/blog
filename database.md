@@ -443,7 +443,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 
 * 一定要用sqlite3进入，否则默认是2；命令行的第三个参数也可以是下列这些命令，一般用.dump；这些命令都不需要加分号，尤其是文件名
 * Ctrl+U清除当前行的输入，CMD下是ESC；.exit和Ctrl+C退出程序；.help显示帮助；.version/.v显示版本和编译器版本；.stats显示当前连接消耗的内存
-* .mode/m box -ww：更适合人类阅读的展现方式，还能显示列名，但只适合列不多的情况；调整宽度用--wrap 列数。-ww表示按单词换行。还支持json
+* .mode/m box -ww：更适合人类阅读的展现方式，还能显示列名，但只适合列不多的情况；调整宽度用--wrap 列数。-ww表示按单词换行；qbox是预设的60宽度非ww。还支持json、insert
 * .databases或da/tables或ta/indexes或in：列出所有数据库/表/索引；.schema/sch [tb1]：显示创建指定表的SQL语句；.dbinfo能看到有多少个表索引视图，其他信息用处不大；这些都可以跟LIKE语句的模式匹配
 * .open data.db：关闭当前文件并打开另一个；.backup/.save data.db：另存main数据库
 * .dump/d [tb1]：输出创建表的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
