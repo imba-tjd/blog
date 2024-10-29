@@ -450,6 +450,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * .shell/sh 运行shell命令；.cd：略
 * .timeout：等待加锁的时间
 * 查询schema元数据
+  * .shema
   * SELECT name, sql FROM sqlite_schema WHERE type='table/index'
   * 版本：SELECT sqlite_version()
 * 另一种备份：sqlite3 db "VACUUM INTO '/path/to/backup'"
