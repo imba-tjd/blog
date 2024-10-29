@@ -448,7 +448,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * .open data.db：关闭当前文件并打开另一个；.backup/.save data.db：另存main数据库
 * .dump/d [tb1]：输出创建表及数据的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
-* .timeout：等待加锁的时间
+* .timeout：等待加锁的时间。SQL修改：pragma busy_timeout
 * .expert：后续再运行select时会显示建议创建的索引和创建后的查询计划
 * 查询schema元数据
   * .shema 显示创建表的语句
@@ -459,7 +459,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 
 ### PRAGMA
 
-* 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错；几乎所有设置都限于连接非持久，下次连接还要设置
+* 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错。几乎所有设置都限于连接非持久，下次连接还要设置，例外：日志模式
 * optimize 推荐关闭连接时使用，或长时间连接每隔几小时用一次，用于内部优化查询性能
 * journal_mode = DELETE/TRUNCATE/PERSIST/WAL/MEMORY。默认DELETE完成事务后就删除日志，TRUNCATE不删除日志文件只是清空，PERSIST在日志头部写零；这三种性能依次少量提升，这日志不在临时文件夹而是在数据库同级目录；MEMORY不安全但也算能用，OFF无法ROLLBACK无意义
 * synchronous = 默认是FULL/2，在WAL下可安全用NORMAL/1
@@ -469,7 +469,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * integrity_check quick_check 进行错误和约束检查，前者更完整，后者更快
 * auto_vacuum FULL 默认关闭，当删除数据时不会真的删除，磁盘空间占用不缩小。FULL全自动，INCREMENTAL要定期用pragma incremental_vacuum。对于已存在表的数据库，修改为FULL后要运行一遍VACUUM命令才能生效
 * PRAGMA mmap_size=xxx字节 能提高IO效率，但发生IO错误时无法捕获，Win下无法VACUUM
-* 查询当前选项值：SELECT * FROM pragma_xxx
+* 查询当前选项值：SELECT * FROM pragma_xxx。查询所有可用的pragma选项：pragma pragma_list
 
 ### 编译
 
