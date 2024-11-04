@@ -42,6 +42,7 @@ IMySettings settings = new ConfigurationBuilder<IMySettings>()
 
 ## UWP
 
+* 官方示例：https://github.com/microsoft/Windows-universal-samples
 * 内存流：InMemoryRandomAccessStream
 
 ### Windows.Networking.Sockets

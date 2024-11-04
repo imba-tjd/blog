@@ -88,7 +88,7 @@ title: Linux命令
 * iconv -f gbk -t utf-8 source-file或省略表示stdin -o target-file
 * less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 * split -b 50m huge_file分隔文件，合并用cat
-* lsof path：查看哪些进程在占用文件。-i显示端口信息
+* lsof path：查看哪些进程在占用文件。-i显示端口信息。根据占用的端口杀掉程序：kill $(lsof -t -i:端口)
 
 ### find
 
@@ -277,6 +277,7 @@ title: Linux命令
   * 一定程度上支持IPV6，根据过去的经验，要用`--tcp-connect -6`，addr无需也不能用中括号因为端口单独指定。--tcp没有回显
 * 有空的时候更新一下中文文档：https://github.com/nmap/nmap/blob/master/docs/man-xlate/nmap-man-zh.xml
 * https://nmap.org/book/toc.html 读到3
+* https://www.advanced-ip-scanner.com/cn/ https://www.advanced-port-scanner.com/cn/
 
 ### netcat/nc
 

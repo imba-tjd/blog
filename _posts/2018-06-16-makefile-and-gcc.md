@@ -229,13 +229,20 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -DFORTIFY_SOURCE 将memcpy等几个不安全函数替换为对应的_chk版本，=1时只在编译期检查，=2时在运行时检查，=3需gcc12消耗更多
   * -fstack-protector-strong 防止缓冲区溢出。默认--param ssp-buffer-size=8，只有缓冲区大小超过它时才会生成检查代码
   * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，会在启动时全部加载符号，可能影响性能
-  * -Wl,-z,noexecstack 栈不可执行，exe和so都要使用，对应Win下默认启用的DEP
+  * -Wl,-z,noexecstack,-z,noexecheap 栈不可执行，exe和so都要使用，对应Win的DEP。好像有人说默认开了
+  * -Wl,--dynamicbase,--high-entropy-va,--nxcompat Win的ALSR和DEP，前者对应pie和pic
   * -fstack-clash-protection 代替-fstack-check 只在多线程时需要
   * -ftrapv 使得整数溢出时触发core dump，性能损耗大。另一种选择是-fwrapv
   * -fanalyzer 启用一些静态检查项，不支持C++
+  * -fvtable-verify=std和preinit
+  * -fomit-frame-pointer 使得反编译和调试更困难
+  * -z,nodlopen和nodump
+  * -mmitigate-rop
 * sanitizer
   * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
   * ASan和TSan在MinGW上不可用，但MSYS的clang/llvm支持ASan
+  * -fsanitize=thread 检测数据竞争
+  * -fsanitize=cfi Control Flow Integrity
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
 * 减少体积

@@ -574,7 +574,6 @@ tag.prettify(formatter=)：带有缩进的格式化；普通输出：str(tag)；
 * upx如果在Path里会自动使用，Linux程序还可用-s选项strip
 * 会在 %LocalAppData%\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\Local\pyinstaller 中产生垃圾文件
 * 使用multiprocessing时要调用freeze_support()，但好像它已经patch过了
-* pywin32-ctypes：用纯Py重新实现的pywin32，但只有一小部分API
 * 报错LoadLibrary找不到python312.dll：不要运行build里的文件，运行dist里的
 
 ### 其它打包项目
@@ -981,6 +980,7 @@ z['huey']; z[:'mickey']; z[-2:]; z[-2:, True] # 分别为取/赋、比mickey小�
   * 另一种选择是装ODBC驱动，还有Linux和macOS的版本
   * Access驱动的32/64位必须与Py对应，且若系统中有Office也要对应，不同位的Access创建的mdb也无法混用
   * 列出所有可用驱动：pyodbc.drivers()。或开始菜单搜索odbc
+  * 其他相关：https://github.com/mdbtools/mdbtools  https://jackcess.sourceforge.io/ https://ucanaccess.sourceforge.net/site.html
 * autocommit默认为False，但只是cursor层级没有，cnn层级是有的，connect的时候打开，cnn.commit时提交，with connect也会提交
 * cur.fetchval()：非标准API，适合返回单一值，等于fetchone判断不为None再取0
 * row可直接按名称访问列
@@ -1057,32 +1057,33 @@ mypyc xxx.py --ignore-missing-imports # 很干净，只有so/pyd。默认会递�
 
 # 手动编译
 $pybase = $(python -c "print(__import__('sys').base_prefix+'/')");
-gcc -shared -pthread -fPIC -fwrapv -fno-strict-aliasing -O3 -I ($pybase+"include") -L $pybase -lpython312 src.c
+gcc -shared -pthread -fPIC -fwrapv -fno-strict-aliasing -O3 -I ($pybase+"include") -L $pybase -lpython313 _lib.c -o _lib.pyd # TODO: Win版好像没有pthread，如果py有就要有
 生成可执行文件，仍依赖整个Py环境：先用cython --embed，再用gcc -municode且不能有-shared，好像可以不用-D_UNICODE和UNICODE
 ```
 
 ### 语法
 
-* nogil时不能使用任何Py对象。Py侧函数中可以用with nogil: 调用nogil的函数，否则也能调用但不会释放gil
-* 整除默认用的Py的语义，用`# cython: cdivision=True`或`with cython.cdivision(True)`改成C的语义
+* nogil时不能使用任何Py对象。Py侧函数中用with nogil: 调用nogil的函数。否则也能调用但不会释放gil
+* 整除默认用的Py的语义。改成C的语义：`# cython: cdivision=True`或`with cython.cdivision(True)`
 * TODO: https://cython.readthedocs.io/en/latest/src/tutorial/strings.html 做字符串拼接时要声明中间变量 、Fused Types（类似模板/泛型）
 
 ```py
 cimport cython # 导入pyx
-from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库。查看：源码的Includes
+from libc.stdlib cimport malloc, free # 自带C标准库和一些posix库和cpython。查看：源码的Includes
+预处理指令：DEF、IF、ELIF、ELSE
 
 def primes(int nb_primes): ... # def的函数只能在Py侧调用，但里面可以调用cdef的。cdef的只能在pyx中用，cpdef就都能用
 cdef inline int add(int a, int b) nogil: return a+b # 返回值若省略则默认为object。不支持static
-预处理指令：DEF、IF、ELIF、ELSE
 
 cdef: # 一次性声明多个变量
     int n = 3 # 不会自动初始化
-    int arr[100] # 不支持VLA
+    int[10] arr # 不支持VLA
     int* arr2 = <int*>malloc(100*cython.sizeof(int)) # 要free，一般用finally。类型转换：尖括号；TODO:<T?>好像能进行检查是否能强转，否则强转失败时还是原值
     char* s = 'abc' # 对应bytes
     bint b # 对应Py的bool
     object o # Py_Object
     指针：声明和&n与C一样，但不能用*p解引用，要用p[0]。访问结构体指针变量的成员用点，不是->。支持assert p is not NULL
+    如果变量类型能安全地推断出来，则可不写类型。一般运算中的整数要写，因为可能溢出。设置infer_types=True可改变
 cdef struct S: int n # 创建实例：S(123)或cdef S s={'n':123}。还有cdef packed struct、cdef enum
 cdef class: # 能在Py侧使用
 
@@ -1102,21 +1103,25 @@ cdef int value; for value in values[:count]: ... # 使用for遍历int*；数组�
 ### 使用库
 
 ```py
-# 最简单的使用C函数的方式
+# 最简单的使用C函数的方式，已有.c无需先编译。文档说必须是static的
 int fun(int a) { return a; } # test.c
-# testmod.pyx；必须不能是test.pyx，因为它俩在同一目录，而.pyx会编译成.c，就会冲突
+# _test.pyx。必须不能是test.pyx，因为它俩在同一目录，而.pyx会编译成.c，冲突
 cdef extern from "test.c":
     cpdef int fun(int a) # 可以不写参数名称，但就无法用命名参数了
+    # 隐式cdef extern，字段也是。对于宏，如果当作函数用，就声明函数，当作变量用，就声明变量
 
 # C库封装示例。在cqueue.pxd中，对应C语言的头文件，把原内容重写一遍，这样不容易导致命名冲突；不能有def函数；宏定义普通地声明变量：
 cdef extern from "queue.h":
-    ctypedef struct Queue: pass # 对应typedef struct _Queue Queue;
-    Queue* queue_new() # 隐式cdef extern
+    ctypedef struct Queue: pass # 对应typedef struct _Queue Queue; 如果想使用里面的字段，必须也声明
+    Queue* queue_new()
     void queue_free(Queue* queue)
+
 # 在queue.pyx中写包装类，目的是把C风格的函数变成Py风格的类；基本名必须不同于那个.pxd
-# distutils: sources = lib/queue.c, another.c # 静态链接时必须指定
+# distutils: sources = lib/queue.c, another.c # 静态链接
 # distutils: include_dirs = lib # 头文件所在文件夹，如果不在同一目录就也是必须的
-# distutils: define_macros=A=1 B # 定义宏
+# 使用动态库：libraries=xxx无需dll后缀。但无法直接指定-L和rpath，本意是用系统里install了的动态库
+# 其他指令：define_macros=A=1 B、extra_compile/link_args=-fopenmp
+
 cimport cqueue # 导入pxd
 cdef class Queue:
     cdef cqueue.Queue* _c_queue
@@ -1124,8 +1129,7 @@ cdef class Queue:
         self._c_queue = cqueue.queue_new()
         if self._c_queue is NULL: raise MemoryError()
     def __dealloc__(self):
-        if self._c_queue is not NULL:
-            cqueue.queue_free(self._c_queue)
+        if self._c_queue is not NULL: cqueue.queue_free(self._c_queue)
 
     cdef extend_ints(self, int* values, size_t count): ... # Py不支持int*，显然不能用cpdef
     cdef int peek(self) except? -1: ... # 当函数体会主动抛异常时必须这样声明，否则会打印异常并忽略。此语法表示返回值是-1时会自动检查是不是出现了异常，应选一个小概率出现的值作为异常值
@@ -1190,6 +1194,46 @@ ffi.cast("int", 2)
 * pdf2docx：基于PyMuPDF，生成的docx能在一定程度上保留格式
 * PyPDF2：曾经不维护了，现在复活了
 * 不维护的：pdfrw pdfminer
+
+## pywin32
+
+* 官方推荐全局安装
+* pypiwin32是老版的pywin32
+* pywin32-ctypes：用纯Py重新实现的pywin32，但只有一点点API
+* 对于out参数：如f(out, out, in)，用(x,y)=f(0或pythoncom.Missing,0,in)
+
+### COM
+
+* COM browser，但没有Filter不好用：python -m win32com.client.combrowse
+* 自动生成相关COM代码：python -m win32com.client.makepy "ProgID"，会生成到临时文件夹中，之后Dispatch会自动使用，常量会添加到win32com.client.constants
+
+### http客户端
+
+```py
+import win32com.client
+hc = win32com.client.Dispatch("WinHttp.WinHttpRequest.5.1") # 一般用with。如果已经创建了对象，不会重复创建。对于多线程，每次都要用pythoncom.CoInitialize
+req = hc.Open("GET", strURL, false)
+hc.SetRequestHeader('k', 'v')
+hc.Send()
+ret = hc.ResponseText
+```
+
+* WinAPI的直接封装：https://github.com/zooba/winhttp
+* INet（支持URL缓存、持久性Cookie、FTP）的pywin32封装：https://timgolden.me.uk/pywin32-docs/win32inet.html
+
+### [pywinrt](https://github.com/pywinrt/pywinrt)
+
+* 安装：pypi上分成多个包 winrt-命名空间
+* 使用
+  * 类型名按大写，方法名按蛇形
+  * WinSDK包名按 winrt.windows.命名空间小写，另外还能使用Windows App SDK如Microsoft.UI.Xaml
+  * 事件的订阅变为add_xxx()和remove_xxx()，参数为lambda s, e: evloop.call_soon_threadsafe(handler, s, e)，evloop为asyncio.get_running_loop()。退出前必须remove，因为执行是在WinRT后台线程中的，py程序退出了还可能继续执行
+  * from winrt.system import Array; a1 = Array("I", 10)
+
+### [py-win32more](https://github.com/ynkdir/py-win32more)
+
+* 也具有winrt的API
+* 也有Win32的API：win32more.Windows.Win32。具体可以看site-packages，pip安装时会编译出文件夹
 
 ## 杂项
 

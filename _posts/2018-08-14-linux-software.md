@@ -36,7 +36,7 @@ category: linux
 * axel：多线程下载工具，-n指定线程数，其他的基本没有要设置的
 * pv：用于显示进度，放在两个管道之间，或放到最前面起cat的作用
 * checkinstall：在make后运行，可能是替代make install的，用于生成deb，方便出问题时卸载
-* neofetch：显示一些基本信息，不过需要安装较多依赖。替代可用fastfetch、linuxlogo
+* neofetch：显示一些基本信息，不过需要安装较多依赖。替代可用fastfetch、linuxlogo、macchina
 * sudo strace -p 17187 2>&1：记录指定PID进程进行的系统调用
 * virt-what：查看VPS使用了哪种虚拟化技术，如kvm
 * ncdu：带有进度条的du
@@ -65,6 +65,8 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted u
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
 ```
+
+更新大版本的脚本：do-release-upgrade
 
 ### 其它源
 
@@ -351,6 +353,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * --spider：只检测目标是否存在，可与-i配合批量检测书签
 * -b：转入后台下载，日志输出到wget-log文件中
 * -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
+* 官方发布了64位exe
 
 ### youtube-dl
 
@@ -376,6 +379,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * 维护一个local copy：rsync -rlptzv --progress --delete --exclude=.git "user@hostname:/remote/source/code/path" .
 * 多线程的管理脚本：https://github.com/pigsboss/toolbox/blob/master/pfetch.py
 * TODO：https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps https://zhuanlan.zhihu.com/p/331838860
+* 对于单次复制，CPU消耗显著多于scp，如果U不够还会增加耗时。只有增量才考虑rsync
 
 ### httpie
 
@@ -442,12 +446,10 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 封装格式
   * AVI：只能封装一条视频和一条音频，不能封装字幕，没有流媒体功能（不能在线播放）
   * WMV后缀，ASF封装：具有“数字版权保护”功能。其音频编码为WMA
-  * MP4：H264的标准封装格式，3GP是MP4的一种简化版本。MKV和MP4差不多但有流媒体功能
-
-## iperf3
-
-* 服务端：-s [-u]
-* 客户端：-c <serverip> -P 5多线程 -b 100M -t 60
+  * MP4：H264的标准封装格式，音频可用AAC。3GP是MP4的一种简化版本。MKV和MP4差不多但有流媒体功能
+  * WebM：开放的格式，里面支持AV1 VP9。但音频是不常见的两种
+* 图片：包括是否无损、静态动态。WebP是JPEG的替代，也支持无损，也支持动画（VP8比特流）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
+* 其他编码工具：https://www.videolan.org/developers/x264.html `x264 --crf 18 -preset ultrafast --output outfilename.mp4 infile`
 
 ## VNC和远程桌面
 
@@ -466,7 +468,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
     * 闭源fork，可能挂了：https://open-stream.net/
   * parsec：不开源。多个设备下载客户端登录同一个账户即可，也能分享，但必须登录现在被q了。如有NAT必须要打洞成功，一般来说至少要有一个有公网IP
   * gameviewer：网易出的，目前免费。不支持文件传输
-* 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控
+* 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控、RadminLAN
   * rustdesk：开源。它的服务端是用于各客户端交流的，设置里填“ID/中继服务器”；不部署也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行；修改文件名可预置服务器信息
 * 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
 * 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
@@ -511,7 +513,6 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * pyload 离线下载
 * tasksel：用于安装一组软件
 * https://github.com/royhills/arp-scan。ntopng：网络的top，web界面。addrwatch
-* rustdesk：远程桌面
 * https://github.com/Cyan4973/xxHash xxhsum -H3
 * cloc、boyter/scc：分析repo由哪些语言组成
 * croc GO，传输文件，需要服务端
@@ -522,3 +523,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * polkit取代sudo
 * magika：谷歌出的，Py，用深度学习检测文件类型
 * https://github.com/draios/sysdig
+* 终端文件管理：https://github.com/jarun/nnn https://github.com/sxyazi/yazi https://github.com/Canop/broot https://github.com/gokcehan/lf https://github.com/yorukot/superfile https://github.com/kamiyaa/joshuto
