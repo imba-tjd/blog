@@ -437,6 +437,11 @@ https://labuladong.online/algo/
 https://the-algorithms.com/zh_Hans
 https://algo.itcharge.cn/
 
+https://education.github.com/pack/redeem/interviewcake-student
+面试相关内容，算法、流程、穿衣等 1 week for FREE激活练习题，知识可以之间免费看。首页也有“1周”但只是每天一封邮件
+https://education.github.com/pack/redeem/algoexpert-student
+Free access to 20 coding interview questions
+
 可视化：
 https://visualgo.net/zh
 https://algorithm-visualizer.org/
