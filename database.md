@@ -507,6 +507,11 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * quote() 进行某些转义，如字符串两边加引号
 * format() 类似于printf
 
+### 其他功能
+
+* 使用SQL查询csv：.load csv; CREATE TEMPORARY TABLE temp.t1 USING csv(filename="data.csv", header=true);
+* generate_series(0, 100, 5)：一个虚拟表，里面是[0,100]步长5的值。某些时候可以代替窗口函数
+
 ## PostgreSQL
 
 * 默认监听localhost:5432
