@@ -356,7 +356,7 @@ ip link
   * -F k=@f 类型指定为 multipart/form-data
   * --json '{"tool": "curl"}' 只是设置一些头，不更改或验证内容，官方推荐配合jo -p k=v | curl --json @- | jq。需7.82
   * -G配合-d拼接url参数
-* -k忽略证书错误。--ssl-no-revoke不进行ocsp检查，此检查好像不受--proxy的影响，也可能是WinAPI的缘故
+* -k忽略证书错误。--ssl-no-revoke不进行ocsp检查，此检查好像不走--proxy，至少在Schannel下如此
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md
 * url通配：`[1-10]`、`[01-10]`、`[1-10:2]`、`[a-z]`、`{asdf,zxcv}`，-g禁用这一行为；别用bash的展开，因为某些选项如-O只针对随后的一个；在-o的文件名中可用`#1`对应通配变量

@@ -86,6 +86,7 @@ except ImportError:
 * 检查wheel存在的问题的工具：https://github.com/jwodder/check-wheel-contents
 * --global-option "-a" --install-option "-b"相当于setup.py -a install -b。现在global-option被pip废弃了，改用--config-settings
 * --no-build-isolation：目前版本的pip在构建时会自动创建虚拟环境，导致即使系统中存在满足依赖的包也不会去使用，此参数禁用这一行为
+* delvewheel repair xxx.whl 将dll添加到whl里。Linux用auditwheel
 
 ### setuptools
 
@@ -133,6 +134,21 @@ TODO: setup.cfg
 [bdist_wheel] # 对应verb的开关
 [build_ext]
 ```
+
+### 其他包管理和构建工具
+
+* poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
+* multibuild：用于产生多平台的wheel
+* https://hatch.pypa.io/latest/
+* meson(meson-python)
+  * 默认会使用gcc(mingw)，如果找不到会自动用vs。显式指定：--vsenv。或在pyproject中`[tool.meson-python.args] setup = ['--vsenv']`
+* [uv](https://docs.astral.sh/uv/)
+  * 代替pip pip-tools pipx poetry pyenv twine virtualenv
+  * uv init . 会生成readme pyproject gitignore。用-p指定python版本，但第一次用不会自动下载，等到用后续命令发现没有才会下
+  * uv add dep 自动生成.venv
+  * uv run venv中的命令
+  * uv python install 3.11 显式下载，不是从py官方下的，是indygreg/python-build-standalone
+  * uv pip sync requirements.txt
 
 ## Scrapy
 
@@ -695,7 +711,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ### 快捷键(H显示所有)
 
-* F在上方添加代码块，B在下方，DD是删除，X是剪切，C是复制，V是在下面粘贴，Z撤销删除
+* A在上方添加代码块，B在下方，DD删除，X剪切，C复制，V在下面粘贴，Z撤销删除
 * J上移聚焦代码块，K下移，Shift-K选取扩展到下一个代码块，空格向下滚动，Shift-空格向上滚动
 * Ctrl-Enter运行当前代码块，Shift-Enter运行当前并移动到下一块，Alt-Enter运行当前并在下方添加代码块
 * Enter编辑当前块，Esc返回一般模式（命令模式）
@@ -1277,10 +1293,9 @@ ret = hc.ResponseText
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/ https://zhuanlan.zhihu.com/p/385619511
 * PyNaCl https://github.com/pyca/cryptography pyOpenSSL pycryptodome
 * 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
-* poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
 * https://github.com/gevent/gevent https://www.gevent.org/
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
-* https://github.com/serge-sans-paille/pythran AOT，不支持类
+* https://github.com/serge-sans-paille/pythran AOT，不支持类，Win下要VS。shedskin：Py转译到C++。https://github.com/lcompilers/lpython
 * https://github.com/mahmoud/boltons 纯Py utils大集合，不过社区贡献并不太多
 * https://github.com/rthalley/dnspython
 * https://github.com/scrapinghub/splash 具有HTTP API的轻型浏览器js渲染引擎
@@ -1298,7 +1313,6 @@ ret = hc.ResponseText
 * Pyarmor：混淆源代码，但有运行时依赖
 * fuzzywuzzy：字符串模糊匹配
 * https://github.com/jpadilla/pyjwt
-* memcached：pymemcache pylibmc
 * 缓存：python-diskcache cacheout rafalp/async-caches cachetools（提供支持TTL的类dict）
 * mkdocs mkdocs-material
 * ansible
@@ -1306,14 +1320,11 @@ ret = hc.ResponseText
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium crawlee
 * pyinstrument：使用简单的profile工具
-* multibuild：用于产生多平台的wheel
 * birdseye：调试工具，与pysnooper是同类的
 * https://github.com/JaidedAI/EasyOCR
 * wrapt：方便写装饰器，自动处理方法
 * https://github.com/Z4nzu/hackingtool
 * joblib：有三个功能，一是透明硬盘缓存，二是并行计算，三是快速二进制序列化
 * pyupgrade：自动把老版本语法更新到新版本，但条目不多
-* https://hatch.pypa.io/latest/ 包管理
 * https://tox.wiki/en/latest/
 * https://github.com/charliermarsh/ruff An extremely fast Python linter, written in Rust. 代替Flake8 Black isort
-* https://github.com/lcompilers/lpython 编译器

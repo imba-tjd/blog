@@ -440,12 +440,13 @@ collapsable content
 
 ## Git客户端
 
+* https://mirrors.huaweicloud.com/git-for-windows/
 * GitHub Desktop：添加多个repo时，启动后会自动全部fetch，导致电脑很卡
 * TortoiseGit：与右键菜单集成紧密
 * Sourcetree
 * VSC
 * https://github.com/gitextensions/gitextensions 与Windows Explorer集成
-* https://github.com/jesseduffield/lazygit Terminal UI
+* TUI：https://github.com/jesseduffield/lazygit https://github.com/extrawurst/gitui
 * https://github.com/FredrikNoren/ungit JS写的，网页界面
 * https://aurees.com/ 不开源
 * https://www.cycligent.com/git-tool 不开源
