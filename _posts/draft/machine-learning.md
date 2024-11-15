@@ -53,6 +53,7 @@ df.loc  若按数字索引访问，与iloc相比为闭区间。实际用于基�
 df.A == 'xxx'  广播运算，返回一个全为True/False的长度相同的Series。还有A.isin([x,y])、A.notnull()、(...).any(...)进一步过滤。(data.A == 'xxx') & (data.B > 10) 逻辑或用|，一定要加括号
 df.A + df.B;  df.A - df.B.mean();  df.A = Iterable对象
 df.at/iat：取单个值性能更高
+df.values 转换成np.array
 
 df1.append(df2)  合并行
 pd.merge([df1, df2], on='key')  合并列
@@ -198,7 +199,7 @@ with gr.Blocks() as app:
     c = gr.控件。默认竖向布局
     with gr.Row():
         横向布局
-        
+
     btn.click(fn,inputs=[前面布局创建的控件变量],outputs)
 with gr.Accordion('Advanced options', open=False): 相当于html的details
 
@@ -235,6 +236,44 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 * 中文文档：http://cw.hubwiz.com/card/c/streamlit-manual/
 * streamlit run xxx.py/URL
 * 其它项目：pynecone
+
+## milvus向量数据库
+
+* sdk版本与服务端版本具有严格对应关系，必须看发行文档
+
+```py
+# 连接
+from pymilvus import MilvusClient
+client = MilvusClient(uri='http://host:port', token='user:passwd') # 可指定本地文件会自动创建，又称MilvusLite，有工具将数据导出方便迁移到独立版
+# 也有一种数据库的概念，里面放集合，支持RBAC多租户。connections.connect()连接服务器，默认db_name='default'。但是似乎具有某些全局状态，感觉不太好
+
+# Collections：一个Collection中的所有向量嵌入具有相同的维度和距离度量相似性
+client.create_collection(collection_name="demo", dimension=384)
+# 主键和向量字段使用默认名称（"id "和 "vector"），默认不自动递增。指定类型：MilvusClient.create_schema; schema.add_field
+# list_collections()、has、drop、describe
+# 有“加载”的概念，加载后读取到了内存中，之后不用了要释放。理论上应该是加载到服务器的内存里
+# Collection.construct_from_dataframe
+
+# 插入
+doc = ['aaa', 'bbb']
+vec = [[ np.random.uniform(-1, 1) for _ in range(384) ] for _ in range(len(docs)) ] # 演示用，随机生成embedding
+data = [ {"id": i, "vector": vectors[i], "text": docs[i], "subject": "history"} for i in range(len(vectors)) ]
+client.insert(collection_name="demo_collection", data=data)
+
+# 搜索
+res = client.search(
+    collection_name="demo_collection",
+    data=[vectors[0]], # query_vectors 按向量查询
+    filter="subject == 'biology'", # 排除标量字段。默认无索引
+    limit=2,
+    output_fields=["text", "subject"], # 不加则默认只有id和distance
+)
+client.query( # 按标量查询。delete类似
+    collection_name="demo_collection",
+    filter="subject == 'history'", # 符合的。还可按ids=[0, 2]
+    output_fields=["text", "subject"],
+)
+```
 
 ## NLP
 

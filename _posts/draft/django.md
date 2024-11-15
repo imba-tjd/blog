@@ -5,10 +5,11 @@
   * 会在当前目录下创建manage.py和mysite文件夹
   * mysite含有settings和urls。asgi如果用不到可以删，wsgi在runserver时会用到
 * 运行：manage.py runserver [addrport] 会自动重载
-  * VSC调试：目标是manage.py，参数是runserver，再加"django": true
-* 创建应用。业务上的子模块，也可以打包复用。会在manage.py的同级创建：manage.py startapp 应用名。
+  * VSC调试：目标manage.py，参数runserver，再加"django": true
+* 创建应用。业务上的子模块，也可以打包复用。会在manage.py的同级创建：manage.py startapp 应用名
 * 交互式命令行，代替普通的PyREPL，因为它会读取必要的设置：manage.py shell
 * 部署前的设置检查：manage.py check --deploy
+* 版本信息：https://upgradedjango.com/ 变更：https://docs.djangoproject.com/zh-hans/5.1/internals/deprecation/
 
 ## App
 
@@ -33,7 +34,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 def index(request):
     return HttpResponse('Hello world')
-
 def year_archive(request, year):
     a_list = Article.objects.filter(pub_date__year=year)
     context = {'year': year, 'article_list': a_list}
@@ -144,7 +144,7 @@ LANGUAGE_CODE 默认en-us。只有启用USE_I18N此项才有效果。启用语�
 * 官方支持PG MySQL
 * 会自动创建名为id的bigint主键
 * 字段：https://docs.djangoproject.com/zh-hans/4.1/ref/models/fields
-  * 类型：DateField() ForeignKey(Reporter, on_delete=models.CASCADE) IntegerField(default=0)
+  * 类型：DateTimeField(default=django.utils.timezone.now) ForeignKey(AnotherModel, on_delete=models.CASCADE) IntegerField(default=0)
   * 选项：null默认False blank用于表单验证默认False default unique help_text随表单显示 choices=models.TextChoices('选项1','选项2').choices
   * ManyToManyField OneToOneField
 
