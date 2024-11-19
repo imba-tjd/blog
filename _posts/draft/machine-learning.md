@@ -13,80 +13,120 @@
 * 任务：分类classification（一般有监督，目标是预测新的数据的标签）、回归regression、聚类clustering（一般无监督，就是区分一批数据）、降维、模型选择、预处理
 * 适合表格型数据
 * gradient-boosting梯度提升：XGBoost、LightGBM、CatBoost、AdaBoost https://neptune.ai/blog/when-to-choose-catboost-over-xgboost-or-lightgbm https://www.kaggle.com/code/faressayah/xgboost-vs-lightgbm-vs-catboost-vs-adaboost
-* 自动机器学习
-  * https://github.com/EpistasisLab/tpot2
-  * https://github.com/automl/auto-sklearn 不更新了，还不支持sklearn 1.0。自动调超参数
-  * https://github.com/microsoft/nni 不活跃，有中文文档
+* 自动机器学习，自动调超参数：https://github.com/automl/auto-sklearn 不活跃，不支持sklearn 1.0，见 #1371
+  * https://github.com/nidhaloff/igel
 * CNN：用于图像和视频分析任务。RNN：顺序数据分析任务，自然语言处理、语音识别、时间序列分析。GAN：生成与给定数据集相似的新数据样本，用于图像合成、风格迁移和数据增强等任务。Transformer网络：自然语言处理
 * 训练集(train)、验证集(verify)、测试集(test)：训练用于拟合模型。验证用于调整超参数，一般由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试用于最终模型的无偏评估
 * early stop：训练过程中，训练集的loss不断下降，但验证的loss上升，说明模型过拟合。此时停止训练，选择最好的模型
 
 ## pandas
 
-* 大部分运算都是非原地的，且可指定inplace=True
-* axis=0指行，1指列；许多函数有index和column的命名参数，优先用这个，除非想应用于所有
+* https://pandas.pydata.org/docs/
+* axis=0指行，1指列。许多函数有index和column的命名参数，优先用这个，除非想应用于所有
 * Series具有广播特性：赋单个值就全变成该值，赋list/range/Series就依次改变。与比较运算符计算会产生值都为bool的Series，与另一个Series运算就依次处理，不会变成两列的df。但是不支持'xxx' in S1，要自己用map。长度不可变
 * 如果是自动生成的行名，第0列不为行名
-* pandas-bokeh：简单做出交互图
-* modin：目的是作为pd的原地替代库，速度更快资源消耗更小。类似的库还有swifter pandarallel Dask Ray Vaex
+* 有许多处理时间序列的方法
+* 其他项目：
+  * modin 作为pd的原地替代库，速度更快资源消耗更小。类似的还有swifter pandarallel Dask Ray Vaex
 
 ```py
 import pandas as pd
-data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True)/excel/json/sql/sql_table/sql_query(sql语句, con)，编码默认u8，支持网络url
-df.to_xxx()保存，索引无意义时一般指定index=False，其中to_sql(table_name('xxx'),con=c)能直接保存到数据库连接中，to_markdown(tablefmt="pipe")，to_pickle/feather以二进制格式保存；指定sep=None可自动检测分隔符，文件名以gz/xz/zst结尾可自动压缩保存且读取时自动识别
-pd.DataFrame({'A': [1, 2], 'B': [3, 4]})  两列AB，两行，第0行数据是13；index=['row1', 'row2']指定行名
-pd.DataFrame([[1,3], [2,4]], columns=['A', 'B'])  另一种创建方式，按行输入数据
-pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id
+读取：
+data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True) 编码默认u8，支持网络url
+read_excel('file.xlsx', sheet_name='Sheet1') / json / sql / sql_table / sql_query(sql语句, con)
+保存：
+df.to_csv('data.csv.gz', index=False)
+to_sql('table', con=c, if_exists='默认fail可选append和replace') / to_markdown(tablefmt="pipe") / to_pickle/feather 二进制格式
+df.to_numpy()  返回底层的np.array，是view。不推荐df.values
+df.copy(deep=True)
+
+创建：
+pd.DataFrame({'A':[1,2], 'B':[3,4]})  两列AB，两行，第0行数据是13。指定行名：index=['row1', 'row2']
+pd.DataFrame([ [1,3], [2,4] ], columns=['A','B'])  另一种创建方式，按行输入数据
+pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id。也可传dict
 pd.Series([1,2], name='A')  一列数据，A是列名，行id自动编号
-columns=pd.MultiIndex.from_product([['one', 'two'], ['first', 'second']])  产生one下的两个和two下的两个，使用时用.loc[:, ('one', 'second')]
-df.columns/index
-df.shape行列数
+columns = pd.MultiIndex.from_product([ ['one','two'], ['first','second'] ])  产生one下的两个和two下的两个，使用时用.loc[:, ('one', 'second')]
+rows = pd.MultiIndex.from_tuples([ ('A', 1), ('A', 2), ('B', 1) ])
+
+基本信息：
+df.columns / index
+df.shape  (行数, 列数)
+df.size  元素总数
+df.dtypes  各列数据类型
 df.head(n=5)/tail()  显示最开始/后面的几行
-df.describe()  以8*n的表格显示各列的count、平均值、最大最小值等，只显示数字列
-df.info()  显示所有列的名称类型占用空间
-
-df.A/df['A']  获取一列，保留行名，再用[]能取出指定行的值；后一种方式适用于列名含空格
-df.[['A','B']]  获取多列，仍为DataFrame，不能用小括号
-df[0:2]/[1:]  获取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使只有一行
-df.iloc[0] / [1:3,0] / [:,0] / [(0,1,2),0]  第一个索引是行范围，用:就是选择所有行，第二个索引是选择列；单索引时类型为Series，且index变为原columns的内容因此可用.A
-df.loc  若按数字索引访问，与iloc相比为闭区间。实际用于基于名称的范围选择，以及支持非数字的index范围：loc['A':'C']代替loc['A','B','C']。df.loc[df.Sex=='male', 'Height']取出所有男性的身高
-df.A == 'xxx'  广播运算，返回一个全为True/False的长度相同的Series。还有A.isin([x,y])、A.notnull()、(...).any(...)进一步过滤。(data.A == 'xxx') & (data.B > 10) 逻辑或用|，一定要加括号
-df.A + df.B;  df.A - df.B.mean();  df.A = Iterable对象
-df.at/iat：取单个值性能更高
-df.values 转换成np.array
-
-df1.append(df2)  合并行
-pd.merge([df1, df2], on='key')  合并列
-df1.join(df2, on='key')
-pd.concat([rows1, rows2])  合并行，设定axis=1变为合并列
-df.assign(new_col=df.A+df.B)  添加列
-
-df.A.value_counts()  计算某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序
-df.sort_values(by = 'A')  默认ascending=True，by可以是[]；还有sort_index()在groupby后可能用到
-df.A.str.xxx  把数据看作字符串广播使用对应的函数；splite()有个expand=True
-df.A.unique()、isnull()/notnull()、max()、idxmax()返回最大值的index常见于loc中以获取那一行
-df.A.map(lambda)
-df.apply(lambda row: ..., axis=1)  用于整个df，默认按列，设定axis=1后按行，类型是Series，用.A可获取列的值。df.applymap处理单个元素
-df.agg([max, min])  对每一列都调用对应的函数，产生以max和min为index的聚合结果；Series也适用
-df.sum()  返回以列名为index的Series
-
-df.filter(regex='^L')
-df.rename(columns={'old': 'new'}, index=...)  也可df.index = [...]
-df.dropna() 删除包含空值的行，设置how='all'只处理全为空的；fillna(x) 用x填充空值，drop_duplicates() 删除重复值
-df.drop([xxx])  删除行；删列还能用del或axis=1，且是原地的
-df.set_index(['col1','col2'], verify_integrity=True)
-df.stack().rename_axis
-df.index.set_levels(frame.index.levels[-1].astype(int), level=-1)
-
-df.groupby(['A']).B.max()  按A分组后把对应范围的B聚合，产生以A为index的Series
-groupby多个列时，会产生MultiIndex，一般用reset_index()去掉命名变成编号
-groupby后的结果可看作含有df的Series，可.apply(lambda df: ...)，但必须返回一行或一个值，即需要聚合
-df.pivot_table(index=col1,columns=col2,values=[col3,col4],aggfunc=max)  数据透视表，以col1为行，col2为列，取col3和col4的最大值
-
+df.info()  所有列的名称类型占用空间，可选memory_usage='deep'
 pd.set_option("display.max.columns", None)  列过多时不隐藏
-df.plot(x='xxx',y=[...])  默认是折线图，plot.pie()画其它图。还要开%matplotlib inline
-pd.to_numeric
-A.str好像对本来是int的会报错
+
+选取(view)：
+df.A/df['A']  选取一列，保留行名，再用[]能取出指定行的值
+df.[['A','B']]  选取多列，仍为DataFrame
+df[0:2]/[1:]  选取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使结果只有一行
+df.iloc[0] / [1:3,0] / [:,0] / [(0,1,2),0]  第一个索引是行范围，用:选择所有行；第二个索引选择列。单索引时类型为Series，且index变为原columns的内容因此可用.A
+  df.A.idxmax() 返回A里最大的那一行的index
+df.loc  闭区间，一般不用数字访问
+  基于标签的范围选择，条件过滤：df.loc[df.A > 5]、loc[df.Sex=='male', 'Height'] 取出所有男性的身高
+    实际上是广播运算，返回一个全为True/False的长度相同的Series，又称为mask
+    更多逻辑运算：(df.A == 'xxx') & (df.B > 10) 逻辑或用|，一定要加括号。A.isin([x,y])、A.isna()/notna()、any
+    字符串方式：df.query('A > 5 and B < 10') 支持用`@val`访问变量，如果列名有空格用反引号
+  非数字的index范围（假设为Series）：loc['A':'C'] 代替 loc['A','B','C']
+df.iat[索引]/at[标签]：取单个值性能更高
+根据标签的子串或正则选取：df.filter(like或regex, axis=默认1)
+迭代：
+  按行迭代整个df，返回副本：for i, row in df.iterrows()。按列：for col, series in df.items()
+  for val in df.A
+
+运算：基本都是非原地的，有些可指定inplace=True
+df.A + df.B、df.A - df.B.mean()  广播运算
+df.add(other, fill_value=0)
+df.eval('C = A + B')
+数据转换：
+df.where(df > 0, other=0)  替换不满足条件的值。反向操作，替换满足条件的：mask(df < 0, other=0)
+df.map(lambda 单个元素) / map({映射})  如果只想处理某一列就先取列。以前的applymap废弃了
+df.apply(lambda row_series: ..., axis=1)  用于整个df，默认axis=0却是每次取一列，=1才是每次取一行
+df.A.str.strip()  广播调用字符串函数
+  split()有个expand=True拆分为多列
+  contains('pattern', 默认regex=True)
+  extract('reg_capture_pattern') 将捕获组拆分成多列
+  replace(r'\s+', ' ', regex=True)
+  cat(sep=',')
+df.astype({'A': 'int32', 'B': 'float64'})、df.A.astype('string')  类型转换。另有pd.to_numeric(df.A)转换成float64或int64
+df.replace({'A': {'old': 'new'}})
+df.clip(lower=0, upper=100)  限制值范围
+df.round(2)  四舍五入
+合并：
+pd.concat([df1, df2, rows], ignore_index=True)  合并行，ignore_index重置索引。设定axis=1变为合并列。之前的append废弃了
+df.merge和join() on='列'  类数据库join，根据文档merge默认inner，suffixes=('_1','_2')指定重复列名后缀；join默认left
+df1.combine_first(df2)  用df2填充df1的缺失值。update(df2)：用df2的非空值覆盖
+重复行、空行：
+df.dropna()  删除包含空值的行；只处理全为空的：how='all'
+fillna(x)  用x填充空值，或method='ffill或bfill'用前后值填充。df.interpolate(method=默认'linear') 插值填充
+df.drop_duplicates(keep=默认'first')
+其他修改：
+df.drop([xxx])  删除行；删列用axis=1或column=，还能用del且是原地的
+df.columns = ['new_A', 'new_B']  重命名列。按映射重命名：df.rename(columns={'old': 'new'}, index=...)
+df.set_index('col', verify_integrity=True检查重复值)  去掉数字index，将某一列改为index，原列里的值变为index的值。如果只想普通的重建数字：reset_index(drop=True)
+df.stack(future_stack=True)  将df“压缩”成Series，原来的行列变成多维索引
+
+统计：在df上调用聚合函数基本是返回以列名为index的Series
+df.describe()  以8*n的表格显示各列的count、平均值、最大最小值等。默认只显示数字列，改变：include='all'
+平均值mean() 中位数median() 分位数quantile([0.25, 0.75]) 标准差std() 方差var() 和sum() 累计和cumsum() 累计积cumprod()
+df.A.value_counts()  某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序。显示百分比而非次数：normalize=True。dropna默认True
+df.agg(['max', 'min'])  对每一列都调用对应的函数，产生以max和min为index的聚合结果；Series也适用。不同列使用不同聚合：agg({'A':'max',...})
+df.A.unique()唯一值列表、nunique()唯一值数量
+df.rolling(window=3).mean()  滑动窗口
+df.nlargest(5, 'A')  最大的n行。sample() 随机抽样
+
+排序和分组：
+df.sort_values('A', ascending=默认True) 多列：(['A','B'], ascending=[True,False])。na_position默认'last'，kind默认快排，改为稳定排序用'stable'
+df.groupby(['A']).B.max()  按A分组后把对应范围的B聚合，产生以A为index的Series
+  groupby多个列时，会产生MultiIndex，一般用reset_index()去掉命名变成编号
+  groupby后的结果可看作含有df的Series，可.apply(lambda df: ...)，但必须返回一行或一个值，即需要聚合
+  .filter(lambda x: len(x) > 2)、.transform(lambda x: x - x.mean())、.sort_index()
+  高级操作：groupby('A').agg({ 'B':{'B_max':'max','B_min':'min'} }).flatten_names()、滚动计算.rolling(window=3).mean()、累计计算.expanding().sum()
+df.pivot_table(index='col1',columns='col2',values=['col3','col4'],aggfunc='max'或{不同值对应的处理方式},margins=True汇总,fill_value=0)  数据透视表，以col1为行，col2为列，取col3和col4的最大值，聚合后还空的值填0
+
+画图：要开%matplotlib inline
+df.plot(x='xxx',y=[...])  默认折线图。bar(stacked=True)堆叠条形图，scatter(x='A', y='B', c='C')散点图，hist(bins=50)直方图
 ```
 
 ## matplotlib
@@ -103,7 +143,7 @@ plt.title()
 plt.ylabel('Y轴名称'); plt.xlabel()
 plt.rcParams['font.sans-serif']=['SimHei'] # 解决不显示中文
 plt.show() # 终端里也能用，但会显示在窗口中
-plt.savefig('img.svg') # 格式自动根据文件名的后缀设置
+plt.savefig('img.svg' / bytesio) # 格式自动根据文件名的后缀设置
 
 # 在一个figure中绘制多个图
 fig, axs = plt.subplots(n) # 单参数为一列n行，(1, 2)为1行2列，行列都大于1时返回二维数组
@@ -117,7 +157,7 @@ axs[0].plot...
 * 损失函数：衡量模型的预测值与sample真实值的区别，一般就是相减再平方
 * 另一种评判好坏的方法：bias(偏差)和variance(方差)，两者形成4种组合。高bias为离目标远，低bias为离目标近，高variance为分散，低variance为集中。低bias+高variance为overfitting，高bias+低variance为underfitting
 * 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
-* 决策树：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错。这类模型(GBDT)不需要归一化
+* 决策树(DecisionTree)：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错。这类模型(GBDT)不需要归一化
 * 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X).transform(X)
 * pipeline：把pre-processors和estimators连起来自动依次使用
 * sklearn.tree.DecisionTreeRegressor：需要调参
@@ -126,9 +166,9 @@ axs[0].plot...
 
 ```py
 y = data.Price # 选择一个列作为预测目标target。小数则为回归，整数或其它离散量则为分类，无监督学习不需要
-X = data[['col1','col2']] # 选择一些列作为“features”。也支持用普通list，如[[1,2,3],[4,5,6]]表示2个sample，3个feature
+X = data[['col1','col2']] # 选择一些列作为“features”，另一种选择方式是去掉不要的drop(columns=['Price'])。如[[1,2,3],[4,5,6]]表示2个sample，3个feature
 
-from sklearn.model_selection import train_test_split # 把源数据分成训练的和验证的两部分，此处测试的占10%
+from sklearn.model_selection import train_test_split # 把源数据分成 训练 和 验证 两部分，此处测试的占10%
 train_X, val_X, train_y, val_y = train_test_split(X, y, test_size=0.1, random_state=0)
 
 from sklearn.ensemble import RandomForestRegressor/RandomForestClassifier # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换普通决策树
@@ -138,6 +178,7 @@ val_predicted_prices = dt_model.predict(val_X) # 预测结果，类型是numpy.n
 
 from sklearn.metrics import mean_absolute_error, accuracy_score # MAE平均绝对误差，等于avg(abs(预测值-真实值))
 mean_absolute_error(val_y, val_predicted_prices)
+
 
 from sklearn.impute import SimpleImputer # 填充空值，用已有的数据模拟，当空值较少时可以使用，如果较多，应drop那一列
 imputed_X_train = pd.DataFrame(imputer.fit_transform(X_train))
@@ -240,6 +281,7 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ## milvus向量数据库
 
 * sdk版本与服务端版本具有严格对应关系，必须看发行文档
+* 其他向量数据库收集：https://cookbook.openai.com/examples/vector_databases/readme
 
 ```py
 # 连接
@@ -288,16 +330,14 @@ client.query( # 按标量查询。delete类似
 ## 书签
 
 ```
-https://colab.research.google.com/github/huggingface/education-toolkit/blob/main/03_getting-started-with-transformers.ipynb#scrollTo=vcuDLUYdBV5w
-https://huggingface.co/learn
-https://www.youtube.com/watch?v=i_LwzRVP7bg https://www.youtube.com/watch?v=bmmQA8A-yUA
+https://www.youtube.com/watch?v=bmmQA8A-yUA
 https://i.am.ai/roadmap/
 https://github.com/microsoft/AI-For-Beginners
 https://github.com/microsoft/ML-For-Beginners/blob/main/translations/README.zh-cn.md
-https://github.com/microsoft/generative-ai-for-beginners/tree/main/translations/cn
 https://microsoft.github.io/ai-edu/ 中文教程
 
 pytorch和深度学习:
+https://pytorch.org/get-started/ ；https://pytorch.apachecn.org/ 中文文档
 用于语音、图像、文本(垃圾邮件)的识别、分类和预测(推荐系统)。容忍误差，有明确的输入和输出，有大量的数据集且不随时间快速变化（否则就要重新训练模型）。
 https://mlelarge.github.io/dataflowr-web/ https://mlelarge.github.io/dataflowr-web/cea_edf_inria.html
 https://github.com/amusi/PyTorch-From-Zero-To-One
@@ -308,20 +348,18 @@ https://zhuanlan.zhihu.com/p/87263048
 https://www.zhihu.com/question/55720139
 https://zhuanlan.zhihu.com/c_1176098426973106176
 https://github.com/PyTorchLightning/pytorch-lightning https://zhuanlan.zhihu.com/p/120331610 https://zhuanlan.zhihu.com/p/134291726
-https://pytorch.org/get-started/ ；https://pytorch.apachecn.org/ 中文文档
 https://course.fast.ai/
 https://www.zhihu.com/question/384519338
 https://www.zhihu.com/question/388079431
 https://tangshusen.me/Deep-Learning-with-PyTorch-Chinese/#/ 一本书
 https://github.com/madewithml/basics
 https://github.com/MLEveryday/100-Days-Of-ML-Code
-https://www.bilibili.com/video/av50747658
 https://github.com/scutan90/DeepLearning-500-questions
 https://www.zhihu.com/question/375537442
 https://zhuanlan.zhihu.com/p/30011154
 https://github.com/explosion/thinc
 https://github.com/awesomedata/awesome-public-datasets 各种数据源
-https://github.com/microsoft/recommenders
+https://github.com/recommenders-team/recommenders Best Practices on Recommendation Systems
 https://github.com/AMAI-GmbH/AI-Expert-Roadmap
 https://github.com/MorvanZhou/PyTorch-Tutorial
 https://github.com/ShusenTang/Dive-into-DL-PyTorch
@@ -330,6 +368,8 @@ https://github.com/datawhalechina/thorough-pytorch
 https://github.com/openxla/xla 加速编译的
 https://github.com/d2l-ai/d2l-zh 动手学深度学习
 https://github.com/lutzroeder/netron 神经网络可视化
+https://github.com/Tencent/ncnn 前向推理框架
+https://github.com/tinygrad/tinygrad
 
 机器学习：
 https://github.com/rasbt/python-machine-learning-book-3rd-edition 据说很简单
@@ -344,17 +384,13 @@ polyaxon 机器学习平台
 https://github.com/aialgorithm/Blog
 https://github.com/ethen8181/machine-learning
 
-一般来说，机器学习的课程涉及了很多数学、统计概率、以及优化方向的知识，大概包括：
+机器学习的课程涉及了很多数学、统计概率、以及优化方向的知识，大概包括：
 * 线性代数：矩阵/张量乘法、求逆，奇异值分解/特征值分解，行列式，范数等
 * 统计与概率：概率分布，独立性与贝叶斯，最大似然(MLE)和最大后验估计(MAP)等
 * 信息论：基尼系数，熵(Entropy)等
 * 优化：线性优化，非线性优化(凸优化/非凸优化)以及其衍生的求解方法如梯度下降、牛顿法、基因算法和模拟退火等
 * 数值计算：上溢与下溢，平滑处理，计算稳定性(如矩阵求逆过程)
 * 微积分：偏微分，链式法则，矩阵求导等
-吴恩达教授的在Coursera上的课程基本上完全没有触及这些数学知识。
-
-https://github.com/Tencent/ncnn
-https://github.com/geohot/tinygrad
 
 numpy:
 https://www.bilibili.com/video/BV19T4y127Z2
@@ -366,16 +402,11 @@ https://cs231n.github.io/python-numpy-tutorial/
 https://mp.weixin.qq.com/s?__biz=MzIxMjM4MjkwMw==&mid=2247483920&idx=1&sn=96b11616cf48c83f54ac76c6687a20af
 https://zhuanlan.zhihu.com/p/32242331
 https://dafriedman97.github.io/mlbook/content/introduction.html
-https://github.com/nidhaloff/igel
-https://tianchi.aliyun.com/notebook-ai/detail?spm=5176.12282042.0.0.2fb62042wOBq7R&postId=5977
-https://mp.weixin.qq.com/s?__biz=MzU1NDk2MzQyNg==&mid=2247486254&idx=1&sn=c3a47f4bf72b1ca85c99190597e0c190
+
 
 pandas:
-https://pandas.pydata.org/docs/getting_started/intro_tutorials/01_table_oriented.html 官网教程
 https://www.zhihu.com/question/289788451
 https://zhuanlan.zhihu.com/p/43018099
-https://mp.weixin.qq.com/s?__biz=MzkxNDI3NjcwMw==&mid=2247493452&idx=1&sn=a253d3d34f4a776a6fa7f7be1f79b2a4
-https://mp.weixin.qq.com/s?__biz=MzIxMjM4MjkwMw==&mid=2247483970&idx=1&sn=8028f7582597e0023f0fa02f84db57f1
 https://blog.csdn.net/matrix_laboratory/article/details/50704160
 https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247493035&idx=1&sn=c916f32b29555ac2acba839efeb205ee
 NAN值的处理：https://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247485455&idx=1&sn=2107a2efb5aebd8797356b335e35196d
@@ -390,7 +421,6 @@ https://www.machinelearningplus.com/python/101-pandas-exercises-python/ 汉化�
 https://github.com/guipsamora/pandas_exercises
 https://realpython.com/learning-paths/pandas-data-science/
 https://github.com/jvns/pandas-cookbook
-pandasgui
 https://realpython.com/learning-paths/pandas-data-science/
 
 https://the-turing-way.netlify.app/ 数据科学的书，英文
