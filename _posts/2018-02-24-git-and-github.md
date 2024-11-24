@@ -162,6 +162,7 @@ title: Git/GitHub笔记
 * git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支，无参使用显示所有分支和tag，包括远端的
 * git worktree add -B gh-pages public upstream/gh-pages：在当前分支的一个文件夹中checkout另一个分支
 * git rev-list --all | xargs git fgrep "xxx"：搜索所有历史中指定文字出现地点。git log -S/-G搜索指定内容在哪个提交中变动
+* 下载单个文件：https://graphite.dev/guides/git-clone-single-file
 
 ## git stash
 
@@ -394,11 +395,11 @@ collapsable content
     * 兼容意思是在GPL项目中可以使用这些协议的代码。理论上那些宽松许可证的代码仍然保持原有许可证，只有修改和新增的才是GPL的；甚至修改宽松的可以仍然保持。但实践上如果只需使用宽松许可证部分的代码，则没必要用此混合代码库，用它一定是用了GPL的部分，整个程序是GPL的
 * MPL：修改了MPL下的代码，必须把修改后的开源，且必须也用MPL。但允许把MPL的代码单独作为一些文件，与非MPL的一起使用，且不用开源，因此与GPL不“兼容”
 * SSPL：AGPL的改版，只针对云服务提供商，如果将MongoDB作为服务提供给其他人用，包括搭建管理面板，则必须开源
-* MIT：明确允许sublicense，实际上允许任意使用；没有任何保证，出了问题也不负责。条件是将许可证放到程序中。BSD：明确允许专利
+* MIT：明确允许sublicense，实际上允许任意使用；没有任何保证，出问题不负责。条件是将许可证放到the Software中。BSD：明确允许专利
 * ISC：限制和MIT一样。用的很少，连创造者都不用了。0BSD：和其他BSD系列无关，是ISC的替代，没有要求attribution
 * Apache 2.0：GNU推荐说是permissive中最好的，包含了处理专利的内容
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
-* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（包括不允许翻译），NC是不用于商业目的
+* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（如翻译），NC是不用于商业目的
   * CC0：放弃著作权（公有领域），原著作权持有者无法再对其他人如何使用该作品施加任何法律上的限制，二次创作品则在法律上享有完整的著作权。Unlicense：有人说写得很差，在欧洲不允许放弃所有权利；如果不涉及专利，PD/Unlicense/CC0/0BSD是等效的
 
 ## bare和mirror

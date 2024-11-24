@@ -694,7 +694,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## jupyter
 
-* pip install jupyter 目前7正在开发，安装时加--pre。之前只装notebook的依赖较少，现在仍会装上jupyterlab。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了。VSC只要装ipykernel即可
+* pip install jupyter 目前7正在开发，安装时加--pre。之前只装notebook的依赖较少，现在仍会装上jupyterlab。官方还在开发基于wasm的jupyterlite，纯网页端的Lab，但运行Py效率太低了。VSC只要装ipykernel即可；如果想显示进度条，装ipywidgets，否则会报警告`TqdmWarning: IProgress not found`
 * jupyter notebook --no-browser; jupyer run xxx.ipynb
 * 会往`%AppData%\jupyter`里写东西，但在商店版Python里会装到隔离区里
 * Docker映像：https://jupyter-docker-stacks.readthedocs.io/
@@ -718,7 +718,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * F查找和替换，S保存
 * M把当前代码块的类型改为MD，Y改为Code
 * Shift-M把选中的多个块合为一块，Ctrl-Shift-减号为编辑模式下从光标处分隔成两块
-* 编辑模式（用Monaco编辑器时不同，如谷歌Colab）：Tab补全，Shift-Tab提示文档（多按几次更详细），Ctrl-D删除整行
+* 编辑模式（用Monaco编辑器时不同）：Tab补全，Shift-Tab提示文档（多按几次更详细），Ctrl-D删除整行
 * Kaggle：Z撤销，Shift+Z重做。选中一段内容后用鼠标点执行能只执行片段，但撤销时有bug
 
 ### 扩展
@@ -737,13 +737,15 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 
 ## Conda
 
-* conda是一款软件管理软件，相当于windows里面的应用商店。miniconda和anaconda中都包含了conda。miniconda只包含了conda、python、和一些必备的软件工具；anaconda包含了数据科学和机器学习要用到的很多软件
-* pip只用来安装python的whl和源码，后者有时需要编译器，有的需要操作系统的包管理器安装依赖
-* conda用来安装conda package二进制包，大部分是python的，但也支持了不少非python语言的依赖项如mkl、cuda这种c/c++写的包；可以安装gcc且不需要root权限；有些包只能用conda，比如rdkit；但包的总数远少于PyPI
-* conda自己可以用来创建虚拟环境，可以很轻松地管理多个版本的python
-* conda会检查当前环境下所有包之间的依赖关系，比pip更严格
-* conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+* 特点
+  * conda是一款软件管理软件，相当于windows里面的应用商店。miniconda和anaconda中都包含了conda。miniconda只包含了conda、python、和一些必备的软件工具；anaconda包含了数据科学和机器学习要用到的很多软件
+  * conda用来安装conda package二进制包，大部分是python的，但也支持了不少其他语言的依赖项如mkl、cuda。可以安装gcc且不需要root权限。有些包只能用conda，比如rdkit。但包的总数远少于PyPI
+  * conda可以创建虚拟环境、管理多个版本的python
+  * conda会检查当前环境下所有包之间的依赖关系，比pip更严格
+* conda config --add default_channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main 还可选ustc nju
 * conda create -n myvenv python=3.11 -y; conda info -e; conda activate myvenv; conda remove -n myvenv --all
+  * 在当前目录下创建：-p .venv。激活：activate ./.venv。如果一开始没有装py，激活后当作普通包install
+* conda install pkg; conda list; conda update --all
 * mamba用c++重新实现了一遍conda
 
 ## Web Server
@@ -1248,6 +1250,7 @@ ret = hc.ResponseText
 
 ### [py-win32more](https://github.com/ynkdir/py-win32more)
 
+* import要导入直到函数之前的命名空间，无法只导入win32more然后一层层访问
 * 也具有winrt的API
 * 也有Win32的API：win32more.Windows.Win32。具体可以看site-packages，pip安装时会编译出文件夹
 

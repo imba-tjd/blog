@@ -101,7 +101,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 * 依赖安装位置，用pip show xxx或者python -m site能看到：/usr/local/lib/python3.7/site-packages；~/.local/lib/python3.7/site-packages
 * pip cache purge清除缓存；dir显示缓存文件夹，info显示占用大小，list显示缓存了哪些包
 * 许多包也能从apt获得，以`python3-`加包名获得；若用pip卸载时提示：`Not uninstalling xxx at /usr/lib/python3/dist-packages, outside environment /usr`，这表明此包是用apt装的
-* 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。可用--upgrade-strategy eager全部更新，或--force-reinstall
+* 对于已经装好的包，只要依赖仍然满足，-U只会更新本体。全部更新用--upgrade-strategy eager，或--force-reinstall
 
 ```bash
 python3 -m ensurepip --upgrade --default-pip # 一般用不到，除非安装python时没有装pip

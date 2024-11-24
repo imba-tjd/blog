@@ -15,6 +15,7 @@ title: Linux命令
 * https://devhints.io/
 * https://cn.x-cmd.com/ 对原生命令的增强
 * https://github.com/denisidoro/navi
+* https://explainshell.com/ 输入一整条命令（可含有|），显示对应选项的帮助
 
 ## 简单笔记
 
@@ -376,14 +377,15 @@ ip link
 
 ### scp
 
-* scp -rpC src dest，user@host_or_ip:/path/filename
-* r为递归，p为保留日期等，C为压缩
+* scp -rp src dest，user@host_or_ip:/path/filename
+* r递归，p保留日期等，C压缩
 * -P指定端口，默认22
 * src可有多个文件，如果dest为相对路径则相对于~
 * win下的好像无法识别中文路径
 * -3可以（通过本机）在两个服务器之间传文件
 * src如果以`/`结尾，就是传输文件夹里的内容，不是传输一个文件夹；不以斜杠结尾再加`-r`就能传输一个文件夹
 * 基于sftp协议
+* 不支持断点续传
 
 ### [nftables](https://wiki.nftables.org)
 
