@@ -39,3 +39,5 @@
 * HyperCeiler 集成了许多功能的MIUI优化
 
 dhizuku会影响系统自带双开
+
+https://github.com/timschneeb/awesome-shizuku

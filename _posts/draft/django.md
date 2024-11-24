@@ -2,7 +2,7 @@
 
 * manage.py与django-admin命令行和python -m django做的事一样，只是manage.py还设定了settings的位置。当使用单一项目只有一个设置时，用manage.py更方便。否则要用--settings指定
 * 创建项目：django-admin startproject mysite .
-  * 会在当前目录下创建manage.py和mysite文件夹
+  * 会在CWD创建manage.py和mysite文件夹
   * mysite含有settings和urls。asgi如果用不到可以删，wsgi在runserver时会用到
 * 运行：manage.py runserver [addrport] 会自动重载
   * VSC调试：目标manage.py，参数runserver，再加"django": true
@@ -21,7 +21,7 @@ from django.db import models
 class Article(models.Model):
     name = models.CharField(max_length=10)
     text = models.TextField()
-    def __str__(self):
+    def __str__(self): # 在Admin中能友好显示
         return self.name
 
 # news/admin.py 添加Model进管理面板
@@ -42,10 +42,10 @@ def year_archive(request, year):
 # news/urls.py 子路由
 from django.urls import path
 from . import views
-app_name = 'news' # 可选，若有，则urlpatterns中的路由名将添加 news: 前缀
+#app_name = 'news' # 若有，则会在path的name里自动添加 news: 前缀
 urlpatterns = [
-    path('', views.index, name='路由名'),
-    path('articles/<int:year>/', views.year_archive [, {行内指定参数}])
+    path('', views.index),
+    path('articles/<int:year>/', views.year_archive, name='detail', {inline_context})
     转换器还支持str、slug(如a-b_1)、path(匹配非空字段，包括/)、命名正则捕获组re_path('^prefix/(?P<name>pattern)$')
     默认值：给view的参数加。两个路由规则都指向它，一个有路由参数，一个没有
 ]
@@ -55,12 +55,12 @@ from django.contrib import admin
 from django.urls import include, path
 urlpatterns = [
     path('news/', include('news.urls')), 若捕获了参数，会传递给子路由。include还可接收list[path]，用于处理公共前缀
-    path('admin/', admin.site.urls), admin是唯一不需要include()的
+    path('admin/', admin.site.urls), 仅admin无需include
 ]
 handler404 = 自定义视图对象或'mysite...'
 
 # mysite/settings.py
-INSTALLED_APPS = ['news.apps.NewsConfig'] # 必须手动注册，否则就和没有一样
+INSTALLED_APPS = ['news.apps.NewsConfig'] # 必须手动注册
 # 也可以写'news'和删掉app.py
 ```
 
@@ -98,26 +98,25 @@ LANGUAGE_CODE 默认en-us。只有启用USE_I18N此项才有效果。启用语�
 ## [模板](https://docs.djangoproject.com/zh-hans/4.1/ref/templates/builtins/)
 
 * 放在mysite/appname/templates/appname/下。不推荐不再写一遍appname，因为不同应用的tempalte没有区分，只有再写一遍才能保持前缀
-* VSC：支持极差
 * 变量：{{ xxx }}
   * dict和list可用d.key和l.0代替[]
   * “点”运算符也支持无参方法不加括号
 * 注释：{# #}、{% comment %} 多行注释 {% endcomment %}
 * 循环
-  * {% for e in arr %} e.prop {% empty %} arr为Falsy时输出 {% endfor %}
+  * {% for e in arr %} {{e.prop}} {% empty %} arr为Falsy时输出 {% endfor %}
   * 解包：for a,b in arr
-  * forloop变量：counter表示从1开始的索引，counter0从0开始
+  * 循环中额外可用的变量：counter表示从1开始的索引，counter0从0开始
   * ifchanged：检查一个值是否在循环的最后一次迭代中发生了变化
 * 判断：{% if xxx %} {% else %} {% endif %}
   * xxx可以先使用filter：if messages|length >= 100
   * 不支持 a > b > c
   * 输出第一个不是Falsy的值：firstof var1 var2 "fallback"
 * 模板继承
-  * base.html：{% block 块名 %} 默认内容 {% endblock (可选块名) %}
-  * 子模板：第一行 extends "base.html"，body里用 block 相同的块名 重写内容
+  * appname/base.html：{% block 块名 %} 默认内容 {% endblock (可选块名) %}。可以有多个block
+  * 子模板：{% extends "appname/base.html" %} {% block 相同的块名 %} 重写内容 {% endblock %}
 * 模板组合：include "xxx.html" 会自动传递context；可用with k=v k2=v2传递额外的，only表示仅使用行内提供的
 * tag：{% xxx arg1 arg2 %}
-  * url '路由名' 路由参数：URL反向解析，读取路由名，生成对应的链接，用在href中避免模板中硬编码应用名。Py代码中用django.urls.reverse()
+  * url 'path的name' path参数：URL反向解析，读取路由名生成对应的链接，用在href中避免模板里硬编码。Py代码中用django.urls.reverse()
   * load a b 加载自定义tag集
   * now "pattern" 规则见模板参考的date部分。可用"DATE_FORMAT"等四项表示从设置里取预定义的
   * csrf_token：放在form里，原生只用于表格POST。view如果开了缓存要在@cache_page下面加@csrf_protect
@@ -136,7 +135,7 @@ LANGUAGE_CODE 默认en-us。只有启用USE_I18N此项才有效果。启用语�
   * urlencode 将: ? & = 中文 进行URL编码
   * json_script:"id" 将对象输出为JSON放到script id="id"中。JS中用JSON.parse(document.getElementById('id').textContent)
   * safe 避免自动转义> < ' " &
-* 设置的OPTIONS的context_processors：给context添加一些属性
+* settings的OPTIONS的context_processors：给context添加一些属性
 
 ## ORM
 
@@ -148,12 +147,14 @@ LANGUAGE_CODE 默认en-us。只有启用USE_I18N此项才有效果。启用语�
   * 选项：null默认False blank用于表单验证默认False default unique help_text随表单显示 choices=models.TextChoices('选项1','选项2').choices
   * ManyToManyField OneToOneField
 
+```
 p = Article(name=xxx); p.save() 或 Article.objects.create()
 Article.objects.all() / get(id=1/name__startswith=xxx/name__contains=xxx) / filter() / order_by(减号表示反向排序)
 get()不存在时抛 那个Model类.DoesNotExist
-o = django.shortcuts.get_object_or_404(Person, pk=art_id) get_list_or_404() 如果不存在则自动返回404
+如果不存在则自动返回404：o = django.shortcuts.get_object_or_404(Person, pk=art_id) / get_list_or_404()
 
 values_list
+```
 
 ### [设置](https://docs.djangoproject.com/zh-hans/4.1/ref/databases/)
 
@@ -268,11 +269,18 @@ LOGGING = {
 
 ## Admin
 
-* 创建管理员账号：manage.py createsuperuser --user admin --email admin@example.com
-* 会产生静态文件，也需要迁移数据库
+* 交互式创建管理员账号：manage.py createsuperuser [--user admin --email admin@example.com]
+* 会产生静态文件，也需要migrate
 * 依赖auth
 * https://docs.djangoproject.com/zh-hans/4.1/intro/tutorial07/
 * https://docs.djangoproject.com/zh-hans/4.1/ref/contrib/admin/
+
+```
+class MovieAdmin(admin.ModelAdmin):
+    list_display = ('id', '想在查询页面显示的属性')
+    fields = 想在表单创建页面显示的属性；或 exclude = 不显示的
+admin.site.register(Movie, MovieAdmin)
+```
 
 ## Auth
 
@@ -417,6 +425,9 @@ urlpatterns = [
 
 * browsable API：urlpatterns加path('api-auth/', include('rest_framework.urls'))
 
+## https://github.com/django-tastypie/django-tastypie
+
+* 侵入较小的RESTAPI框架
 
 ## TODO
 

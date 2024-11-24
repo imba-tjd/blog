@@ -32,8 +32,8 @@
 ```py
 import pandas as pd
 读取：
-data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True) 编码默认u8，支持网络url
-read_excel('file.xlsx', sheet_name='Sheet1') / json / sql / sql_table / sql_query(sql语句, con)
+data = pd.read_csv('data.csv', index_col=0 指定第一列为行id, header=None若第一行不是列名, parse_dates=True, error_bad_lines=False遇到错误跳过但不包括空值) 编码默认u8，支持网络url
+read_excel('file.xlsx', sheet_name=默认0支持str) / json / sql / sql_table / sql_query(sql语句, con)
 保存：
 df.to_csv('data.csv.gz', index=False)
 to_sql('table', con=c, if_exists='默认fail可选append和replace') / to_markdown(tablefmt="pipe") / to_pickle/feather 二进制格式
@@ -59,9 +59,9 @@ pd.set_option("display.max.columns", None)  列过多时不隐藏
 
 选取(view)：
 df.A/df['A']  选取一列，保留行名，再用[]能取出指定行的值
-df.[['A','B']]  选取多列，仍为DataFrame
+df[['A','B']]  选取多列，仍为DataFrame
 df[0:2]/[1:]  选取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使结果只有一行
-df.iloc[0] / [1:3,0] / [:,0] / [(0,1,2),0]  第一个索引是行范围，用:选择所有行；第二个索引选择列。单索引时类型为Series，且index变为原columns的内容因此可用.A
+df.iloc[0] / [[0,2]] / [1:] / [:,0]  第一个索引是行范围，用:选择所有行；第二个索引选择列。单索引时类型为Series，且index变为原columns的内容因此可用.A
   df.A.idxmax() 返回A里最大的那一行的index
 df.loc  闭区间，一般不用数字访问
   基于标签的范围选择，条件过滤：df.loc[df.A > 5]、loc[df.Sex=='male', 'Height'] 取出所有男性的身高
