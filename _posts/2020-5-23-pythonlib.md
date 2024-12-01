@@ -746,6 +746,7 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * conda create -n myvenv python=3.11 -y; conda info -e; conda activate myvenv; conda remove -n myvenv --all
   * 在当前目录下创建：-p .venv。激活：activate ./.venv。如果一开始没有装py，激活后当作普通包install
 * conda install pkg; conda list; conda update --all
+  * 其他Channel：conda install conda-forge::transformers，或-c conda-forge
 * mamba用c++重新实现了一遍conda
 
 ## Web Server
