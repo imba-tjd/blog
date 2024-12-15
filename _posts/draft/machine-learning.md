@@ -109,12 +109,13 @@ df.stack(future_stack=True)  将df“压缩”成Series，原来的行列变成�
 
 统计：在df上调用聚合函数基本是返回以列名为index的Series
 df.describe()  以8*n的表格显示各列的count、平均值、最大最小值等。默认只显示数字列，改变：include='all'
-平均值mean() 中位数median() 分位数quantile([0.25, 0.75]) 标准差std() 方差var() 和sum() 累计和cumsum() 累计积cumprod()
+平均值mean() 中位数median() 分位数quantile([0.25, 0.75]) 标准差std() 方差var() 和sum() 累计和cumsum() 累计积cumprod() 众数mode()
 df.A.value_counts()  某列的唯一值及其出现次数，相当于groupby再size()或再.A.count()，再从大到小排序。显示百分比而非次数：normalize=True。dropna默认True
 df.agg(['max', 'min'])  对每一列都调用对应的函数，产生以max和min为index的聚合结果；Series也适用。不同列使用不同聚合：agg({'A':'max',...})
 df.A.unique()唯一值列表、nunique()唯一值数量
 df.rolling(window=3).mean()  滑动窗口
 df.nlargest(5, 'A')  最大的n行。sample() 随机抽样
+df.corr()  皮尔逊相关系数。假定前提：两个变量之间是线性关系，或正态分布
 
 排序和分组：
 df.sort_values('A', ascending=默认True) 多列：(['A','B'], ascending=[True,False])。na_position默认'last'，kind默认快排，改为稳定排序用'stable'
@@ -169,7 +170,7 @@ y = data.Price # 选择一个列作为预测目标target。小数则为回归，
 X = data[['col1','col2']] # 选择一些列作为“features”，另一种选择方式是去掉不要的drop(columns=['Price'])。如[[1,2,3],[4,5,6]]表示2个sample，3个feature
 
 from sklearn.model_selection import train_test_split # 把源数据分成 训练 和 验证 两部分，此处测试的占10%
-train_X, val_X, train_y, val_y = train_test_split(X, y, test_size=0.1, random_state=0)
+train_X, val_X, train_y, val_y = train_test_split(X, y, test_size=0.1, random_state=42)
 
 from sklearn.ensemble import RandomForestRegressor/RandomForestClassifier # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换普通决策树
 dt_model = RandomForestRegressor(random_state=0) # 设定random_state使得每次运行结果一样

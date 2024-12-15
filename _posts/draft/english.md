@@ -311,6 +311,12 @@ TODO
 * Grammarly wordtune prowritingaid paperrater sapling.ai
 * 无需登录：https://demo.grammarly.com/ https://hemingwayapp.com https://languagetool.org 中文不太行， https://writer.com/grammar-checker https://www.gingersoftware.com/grammarcheck 也有桌面版，https://www.reverso.net/spell-checker 原本只是翻译软件，https://www.slickwrite.com/ ，https://sentencecheckup.com/ 目测不太行
 
+## 标点符号
+
+* 单引号：apostrophe
+* &：ampersand
+* 角形引号« »：guillemet
+
 ## 参考
 
 * 《新高必读 初升高衔接教程》
