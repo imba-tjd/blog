@@ -69,7 +69,7 @@ category: windows
 * 强类型变量即使赋字符串也会自动进行强转
 * 声明变量还可以用New-Variable，具体见cmdlet的笔记
 * 验证变量、虚拟驱动器、文件是否存在：Test-Path variable:变量名、驱动器名和冒号
-* 清除变量：del variable:变量名或Remove-Variable(rv)，注意不能用del $变量名，这样会删除变量的内容指向的东西
+* 删除变量：del variable:变量名或Remove-Variable(rv)，注意不能用del $变量名，这样会删除变量的内容指向的东西
 * 查看（所有）变量：Get-Variable(gv)
 
 ### 预定义变量

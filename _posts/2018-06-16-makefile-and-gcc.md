@@ -247,7 +247,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
 * 减少体积
   * -Wl,--as-needed
-  * -Wl,--strip-all或-s 去掉所有符号和重定向信息，相当于strip -s。-Wl,--strip-debug或-S去掉调试符号
+  * -s或-Wl,--strip-all 去掉所有符号和重定向信息，相当于strip -s。-Wl,--strip-debug或-S去掉调试符号
   * -Wl,-dead_strip 好像只有lld支持
   * -ffunction-sections -fdata-sections -Wl,--gc-sections 可能阻止一些优化
 * 不要用-lpthread，而是-pthread。TODO:mingw有个-mthreads，看起来是用的win运行库，且添加了线程安全异常处理，但会自动-lmingwthrd

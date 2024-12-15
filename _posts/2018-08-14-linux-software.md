@@ -464,12 +464,12 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 游戏串流，支持NV显卡编码
   * Sunshine：https://app.lizardbyte.dev/Sunshine/?lng=zh-CN
     * “基地版”，自带虚拟显示器（连好后类似副屏） https://github.com/qiin2333/Sunshine
-    * 是服务端。客户端用 https://moonlight-stream.org/
+    * Sunshine是服务端。客户端用 https://moonlight-stream.org/ 最后支持32位的版本：6.0.1
     * 闭源fork，可能挂了：https://open-stream.net/
   * parsec：不开源。多个设备下载客户端登录同一个账户即可，也能分享，但必须登录现在被q了。如有NAT必须要打洞成功，一般来说至少要有一个有公网IP
-  * gameviewer：网易出的，目前免费。不支持文件传输
+  * gameviewer(网易UU远程)：目前免费。不支持文件传输
 * 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控、RadminLAN
-  * rustdesk：开源。它的服务端是用于各客户端交流的，设置里填“ID/中继服务器”；不部署也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行；修改文件名可预置服务器信息
+  * rustdesk：开源。它的服务端是用于各客户端交流的，设置里填“ID/中继服务器”；不部署也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行；修改文件名可预置服务器信息。支持32位
 * 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
 * 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
 

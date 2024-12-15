@@ -239,7 +239,7 @@ title: Linux命令
 * 目标范围
   * IP范围可以用-和/和逗号和星号，其中-和,在每一分段都能用，单纯的-与星号一样
   * 端口范围可以用-和逗号，且可在前面加U:和T:表示UDP和TCP
-  * 默认扫描TOP1000的端口，-F扫TOP100的
+  * 默认扫描TOP 1000 TCP，-F扫TOP100的
   * 从文件中读取目标：-iL
   * 启用IPV6扫描：-6
 * 模式
@@ -251,6 +251,7 @@ title: Linux命令
   * 端口扫描
     * -sS/sT/sA/sW/sM/sN/sF/sX分别为TCP SYN/Connect()/ACK/Window/Maimon/Null/FIN/Xmas。后三种比较隐蔽，但不支持Win因为某些系统不完全遵循某个RFC
     * 默认是SYN，但非root使用默认Connect()，且好像指定其它模式会静默无效
+    * 如果发送SYN收到RST，说明端口是closed；如果没有收到，说明被防火墙过滤了filtered
     * -sU为UDP。如果没有响应，状态为open|filtered。如果端口关闭了，目标默认会返回ICMP端口不可达，但Linux限制了此消息对一个客户端一秒只能发一次，导致扫描非常慢
   * 服务与版本侦测-sV：用于确定端口上运行的具体的应用程序及版本信息，--version-all尝试使用所有的探测手段进行侦测
   * 操作系统扫描：-O
@@ -279,6 +280,7 @@ title: Linux命令
 * 有空的时候更新一下中文文档：https://github.com/nmap/nmap/blob/master/docs/man-xlate/nmap-man-zh.xml
 * https://nmap.org/book/toc.html 读到3
 * https://www.advanced-ip-scanner.com/cn/ https://www.advanced-port-scanner.com/cn/
+* 其他扫描工具：https://github.com/RustScan/RustScan
 
 ### netcat/nc
 
