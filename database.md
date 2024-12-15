@@ -570,6 +570,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://popsql.com/
 * https://www.sqlgate.com/ 韩国的
 * MySQL Shell for VS Code 插件，Oracle官方出的，也能连接sqlite
+* https://github.com/outerbase/studio 纯Web
 
 ### 在线测试
 
