@@ -153,7 +153,9 @@ axs[0].plot...
 
 ## scikit-learn
 
-* https://scikit-learn.org.cn/lists/8.html https://scikit-learn.org.cn/lists/2.html https://sklearn.apachecn.org。https://zhuanlan.zhihu.com/p/88729124 https://zhuanlan.zhihu.com/p/103136609 https://zhuanlan.zhihu.com/p/99618155 https://zhuanlan.zhihu.com/p/29649128 https://zhuanlan.zhihu.com/p/190049765
+* 教程
+  * 中文文档：https://scikit-learn.org.cn/lists/8.html 教程 https://scikit-learn.org.cn/lists/2.html 用户指南 https://sklearn.apachecn.org 另一个中文站
+  * https://zhuanlan.zhihu.com/p/88729124 https://zhuanlan.zhihu.com/p/103136609 https://zhuanlan.zhihu.com/p/99618155 https://zhuanlan.zhihu.com/p/29649128 https://zhuanlan.zhihu.com/p/190049765
 * 树的层数太浅会导致underfitting，无论是训练还是验证都具有较大误差；层数太多会导致overfitting，能非常好的匹配训练，但验证却有很大误差；应处于中间，一种控制方法是创建model时设定max_leaf_nodes，另一种仅解决of的方法是指定regularization
 * 损失函数：衡量模型的预测值与sample真实值的区别，一般就是相减再平方
 * 另一种评判好坏的方法：bias(偏差)和variance(方差)，两者形成4种组合。高bias为离目标远，低bias为离目标近，高variance为分散，低variance为集中。低bias+高variance为overfitting，高bias+低variance为underfitting
@@ -162,26 +164,28 @@ axs[0].plot...
 * 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X).transform(X)
 * pipeline：把pre-processors和estimators连起来自动依次使用
 * sklearn.tree.DecisionTreeRegressor：需要调参
-* 部署：pickle、joblib.dump第三方二进制序列化库、treelite编译决策树的库
+* 序列化持久保存：pickle、joblib.dump(m, 'filename')第三方二进制序列化库内部基于pickle格式加载时会用mmap、treelite编译决策树的库
 * 其他库：yellowbrick图形化，mlxtend工具类，dtreeviz可视化，scikit-optimize，m2cgen把模型转换为其它语言，featuretools，Sacred能保存各种参数用于复现
 
 ```py
 y = data.Price # 选择一个列作为预测目标target。小数则为回归，整数或其它离散量则为分类，无监督学习不需要
-X = data[['col1','col2']] # 选择一些列作为“features”，另一种选择方式是去掉不要的drop(columns=['Price'])。如[[1,2,3],[4,5,6]]表示2个sample，3个feature
+X = data[['col1','col2']] # 选择一些列作为“features”。另一种选择方式：去掉不要的drop(columns=['Price'])。如[[1,2,3],[4,5,6]]表示2个sample，3个feature
 
-from sklearn.model_selection import train_test_split # 把源数据分成 训练 和 验证 两部分，此处测试的占10%
-train_X, val_X, train_y, val_y = train_test_split(X, y, test_size=0.1, random_state=42)
+from sklearn.model_selection import train_test_split # 把源数据分成 训练 和 测试 两部分，此处0.1表示10%
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
 from sklearn.ensemble import RandomForestRegressor/RandomForestClassifier # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换普通决策树
-dt_model = RandomForestRegressor(random_state=0) # 设定random_state使得每次运行结果一样
-dt_model.fit(train_X, train_y) # 填充数据
-val_predicted_prices = dt_model.predict(val_X) # 预测结果，类型是numpy.ndarray
+model = RandomForestRegressor(random_state=0) # 设定random_state使得每次运行结果一样
+model.fit(X_train, y_train) # 填充数据
+val_predicted_prices = model.predict(X_test) # 预测结果，返回类型是np.ndarray
 
-from sklearn.metrics import mean_absolute_error, accuracy_score # MAE平均绝对误差，等于avg(abs(预测值-真实值))
-mean_absolute_error(val_y, val_predicted_prices)
+from sklearn.metrics import mean_absolute_error
+mean_absolute_error(y_test, val_predicted_prices)
+model.score(X_test, y_test) # accuracy
 
 
-from sklearn.impute import SimpleImputer # 填充空值，用已有的数据模拟，当空值较少时可以使用，如果较多，应drop那一列
+# 填充空值，用已有的数据模拟，当空值较少时可以用；如果较多，应drop那一列
+from sklearn.impute import SimpleImputer 
 imputed_X_train = pd.DataFrame(imputer.fit_transform(X_train))
 imputed_X_valid = pd.DataFrame(imputer.transform(X_valid))
 imputed_X_train.columns = X_train.columns; imputed_X_valid.columns = X_valid.columns # Imputation会移除列名，此操作加回去
@@ -322,11 +326,19 @@ client.query( # 按标量查询。delete类似
 
 * https://github.com/explosion/spaCy
 * NLTK
+* Gensim：实现了常用的主题模型，文档相似度计算
+* CoreNLP：Java的
+* 中文：哈工大LTP、中科院大学NLPIR、清华THULAC、北大pkuseg
 * https://github.com/microsoft/nlp-recipes NLP Best Practices，不维护了
+* https://github.com/hankcs/HanLP
 
 ## 声音
 
 * https://github.com/babysor/MockingBird
+
+## 其他项目
+
+* https://www.ray.io/ 分布式
 
 ## 书签
 
@@ -342,9 +354,8 @@ https://pytorch.org/get-started/ ；https://pytorch.apachecn.org/ 中文文档
 用于语音、图像、文本(垃圾邮件)的识别、分类和预测(推荐系统)。容忍误差，有明确的输入和输出，有大量的数据集且不随时间快速变化（否则就要重新训练模型）。
 https://mlelarge.github.io/dataflowr-web/ https://mlelarge.github.io/dataflowr-web/cea_edf_inria.html
 https://github.com/amusi/PyTorch-From-Zero-To-One
-https://zhuanlan.zhihu.com/p/66543791
-https://zhuanlan.zhihu.com/p/99318332
-https://zhuanlan.zhihu.com/p/96237032
+https://zhuanlan.zhihu.com/p/66543791 60分钟快速入门 PyTorch
+https://zhuanlan.zhihu.com/p/99318332 60题PyTorch简易入门指南
 https://zhuanlan.zhihu.com/p/87263048
 https://www.zhihu.com/question/55720139
 https://zhuanlan.zhihu.com/c_1176098426973106176
