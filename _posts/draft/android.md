@@ -34,9 +34,14 @@
 
 * https://github.com/anilbeesetti/nextplayer
 
+## ADB
+
+* https://aya.liriliri.io/
+
 ## 模块
 
 * HyperCeiler 集成了许多功能的MIUI优化
+* https://github.com/JingMatrix/LSPatch
 
 dhizuku会影响系统自带双开
 

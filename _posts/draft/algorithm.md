@@ -184,7 +184,7 @@ void add(int p, int x) {
   * 当最后一个字符相同时不需要转换，相当于删除两者最后一个字符且不增加步数。abb ab 和 ab a 之间有相同的编辑距离，A[0,2] B[0,1] == A[0,1] B[0,0]
   * 当最后一个字符不同时
     * “替换”操作相当于删除A B两者最后一个字符，因为将两者最后一个字符替换统一后就变成了上一种情况
-    * 插入相当于删除B的最后一个字符，因为目标是从A变到B，给A插入B的最后一个字符就变成了上上种情况。删除是删除A的最后一个字符。此时两者最后一个字符仍可能不同，递归处理
+    * 插入相当于删除B的最后一个字符，因为目标是从A变到B，给A插入B的最后一个字符后就变成了上上种情况。删除是删除A的最后一个字符。操作完后，两者最后一个字符仍可能不同，递归处理
     * 当前步骤的最小编辑距离就是上面三种操作的最小值+1
   * 出口条件：当A B任何一个为空时，编辑距离为另一个字符串的长度
 * 自底向上
@@ -432,6 +432,10 @@ TimSort：
 https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
 
 算法知识集合网站：
+https://oi-wiki.org
+https://github.com/hzwer/shareOI
+https://algorithm-essentials.soulmachine.me/
+
 https://www.hello-algo.com/
 https://labuladong.online/algo/
 https://the-algorithms.com/zh_Hans
