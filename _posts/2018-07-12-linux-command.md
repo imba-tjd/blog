@@ -125,7 +125,9 @@ title: Linux命令
 
 * unar：自动正确解压非Unicode的zip，可惜最后更新时间2015年
 * unzip：不自带，最后更新时间2009年，不支持读取stdin，但支持-p表示输出到stdout
-* 分卷zip：先`cat test.zip* > ~/test.zip`合并起来再解压就好了。加密：zipcloak
+* zip -r -j archive.zip 多个待压缩文件
+  * 分卷zip：先`cat test.zip* > ~/test.zip`合并起来再解压就好了
+  * 加密：zipcloak
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
 * unrar：是rar官方的，但在non-free中。不支持解压其它任何格式
 * upx --lzma

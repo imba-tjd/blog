@@ -655,9 +655,9 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * pastebin：自动把东西上传到GitHub的gist里并返回链接
 * alias：显示预定义的shell命令，也可设置自己的，不过直接设置不能持久化；rehashx：把path里的可执行文件都导入alias中，使用时就不用加叹号了
 * pycat：语法高亮地显示文件
-* bookmark、pwd、pushd、popd、dhist、ls、cd：与路径有关的一些操作。不能用!cd因为那些程序执行完就终止了
+* bookmark、pwd、pushd、popd、dhist、ls、cd：与路径有关的一些操作。!cd 不会持久化
 * env：显示或设置环境变量。load_ext dotenv;dotenv：配合python-dotenv库
-* !xxx：执行shell命令，等价于system()，但Win下默认是CMD，且可能有编码问题；!!：捕获输出，看起来!赋给变量也是一样的，返回列表一行一条
+* !xxx：执行shell命令，等价于system()，但Win下默认是CMD，且可能有编码问题。!!：捕获输出，看起来!赋给变量也是一样的，返回列表一行一条
 * ?加命令：显示docstring但与help()的格式不同，且不会显示函数文档，只显示函数名；??两个问号：还会显示源代码
 * ?加带*的对象名：显示匹配的对象名；其实是psearch命令
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出(_)输进终端中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
@@ -739,16 +739,22 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 ## Conda
 
 * 特点
-  * conda是一款软件管理软件，相当于windows里面的应用商店。miniconda和anaconda中都包含了conda。miniconda只包含了conda、python、和一些必备的软件工具；anaconda包含了数据科学和机器学习要用到的很多软件
+  * conda是个包管理器，类似于apt。miniconda和anaconda中都包含了conda
+  * miniconda只包含了conda、python、和一些必备的软件工具；实现上是个包含了二进制数据的sh，大概130MB，交互式安装。anaconda包含了数据科学和机器学习要用到的很多软件
   * conda用来安装conda package二进制包，大部分是python的，但也支持了不少其他语言的依赖项如mkl、cuda。可以安装gcc且不需要root权限。有些包只能用conda，比如rdkit。但包的总数远少于PyPI
   * conda可以创建虚拟环境、管理多个版本的python
   * conda会检查当前环境下所有包之间的依赖关系，比pip更严格
-* conda config --add default_channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main 还可选ustc nju
-* conda create -n myvenv python=3.11 -y; conda info -e; conda activate myvenv; conda remove -n myvenv --all
+* 设置镜像。还可选ustc nju
+  * conda config --add default_channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  * conda config --set custom_channels.conda-forge https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+  * conda clean -i; conda config
+* 操作虚拟环境：conda create -n myvenv python=3.11 -y; conda info -e; conda activate myvenv; conda remove -n myvenv --all
   * 在当前目录下创建：-p .venv。激活：activate ./.venv。如果一开始没有装py，激活后当作普通包install
-* conda install pkg; conda list; conda update --all
-  * 其他Channel：conda install conda-forge::transformers，或-c conda-forge
-* mamba用c++重新实现了一遍conda
+* 操作包：conda install pkg; conda list; conda update --all
+  * 其他Channel：conda install conda-forge::transformers 或 -c conda-forge
+  * conda-lock
+* mamba用c++重新实现了一遍conda。micromamba：静态链接单文件
+* miniforge：类似于miniconda，也是用来安装conda的sh，预设了默认channel为conda-forge。曾有Mambaforge但现在合并了
 
 ## Web Server
 
@@ -1275,6 +1281,7 @@ ret = hc.ResponseText
   * https://github.com/neogeny/TatSu EBNF，3.8，star很少
   * https://github.com/pytransitions/transitions FSM
   * https://github.com/dabeaz/sly 源于lex和yacc，作者不维护了
+  * 真实语言的语法解析器都是递归下降+LL(1)+手动处理左递归。玩具语言有一部分是表驱动的LR，其中综合性能和功能最好的是LALR(1)
 * pretty_errors：精简stacktrace，可全局安装
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
 * 计算圈复杂度：https://github.com/terryyin/lizard 支持多种语言无需编译

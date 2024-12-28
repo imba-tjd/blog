@@ -238,6 +238,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -fomit-frame-pointer 使得反编译和调试更困难
   * -z,nodlopen和nodump
   * -mmitigate-rop
+  * MSVC：/guard:cf。扩展了/GS缓冲区安全检查、数据执行防护DEP、地址空间布局随机化ASLR。GCC不支持，LLVM16支持
 * sanitizer
   * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
   * ASan和TSan在MinGW上不可用，但MSYS的clang/llvm支持ASan
@@ -283,6 +284,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * 构建(build) - 宿主(host) - 目标(target)。host是运行编译器的平台，target是编译器生成的程序运行的平台
   * build和host不同，称为加拿大编译(Canadian)。host和target不同，称为交叉编译。当构建和目标相同但host不同时又称为反向编译(Crossback)
   * clang（在编译编译器本身时）不区分target
+* CC="zig cc -target x86_64-linux-gnu" zig的c语言编译器，交叉编译比较方便，支持musl
 
 ### Clang
 

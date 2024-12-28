@@ -320,7 +320,7 @@ max-connection-per-server=5 或-x5 # 单个域名最多几个连接，默认1，
 split=5 或-s5 #【默】单个任务最多分多少块。文件太大速度又慢的时候可考虑也调这个
 file-allocation=falloc # 当使用ext4 NTFS时此项最好，但需要管理员权限。否则就用默认值
 min-split-size=20M #【默】进行多线程的最小块，此处只有文件大于40M才会启用两个线程
-#max-concurrent-downloads 或-j 是同时下载多个任务，默认5不用改
+#max-concurrent-downloads 或-j 同时下载多个任务，默认5不用改
 # BT
 # 当下载的文件是.torrent时，自动开始BT任务
 bt-enable-lpd=true
@@ -501,7 +501,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * reload vs restart：前者在多个replica时会一个个重启
 * 开机自启：pm2 startup，会恢复之前save命令时的状态。Win版：pm2-installer
 * 在docker中运行：用pm2-runtime命令代替node
-* 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434 monit是C
+* 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434 Go的重写：ochinchina/supervisord。monit是C
 * 其它监控metric程序：https://github.com/topics/monitoring
 
 ## TODO

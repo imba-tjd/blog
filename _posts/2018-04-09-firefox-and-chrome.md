@@ -108,6 +108,7 @@ title: 浏览器
 * https://github.com/Noitidart/Chrome-Store-Foxified：让FF使用Chrome的扩展商店
 * History Master：统计历史访问的网页的数据
 * 云盘万能钥匙
+* https://github.com/lqzhgood/wechat-need-web 让微信网页版可用
 
 ### 主题
 
