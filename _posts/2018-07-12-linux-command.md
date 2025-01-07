@@ -355,12 +355,13 @@ ip link
 * -L跟随30x跳转
 * body
   * -d 'k1=v1&k2=v2' -d p3=v3 使用POST方式请求，类型为 x-www-form-urlencoded
-  * -d @file 从file文件中读取，一行一个。支持-表示stdin
-  * --data-raw @符号也作为普通字符串，不作为读取文件名的标志
-  * --data-urlencode 自动对v做URL编码，但key不变。k=@f从文件中读取v并编码
-  * -F k=@f 类型指定为 multipart/form-data
+    * -d @file 从file文件中读取kv，一行一个。用-表示stdin
+    * --data-urlencode 自动对v做URL编码，但key不变。k=@f从文件中读取v并编码
+    * --data-raw 不特殊处理@符号，不作为读取文件名的标志。一般没用
+  * -F k=@file 设定Content-Type为 multipart/form-data，可上传二进制文件
   * --json '{"tool": "curl"}' 只是设置一些头，不更改或验证内容，官方推荐配合jo -p k=v | curl --json @- | jq。需7.82
-  * -G配合-d拼接url参数
+  * -T file 以PUT上传整个文件
+* -G：配合-d拼接url参数，且仅为GET
 * -k忽略证书错误。--ssl-no-revoke不进行ocsp检查，此检查好像不走--proxy，至少在Schannel下如此
 * --compressed：自动添加Accept-Encoding: deflate, gzip, br并自动解码；如果头里手动指定了AE，也必须加此项；Win不支持
 * -c/--cookie-jar加文件名保存cookie；-b/-cookie加@文件名读取cookie，-b加"key1=val1;key2=val2"发送在命令行中指定的cookie；文件格式见https://github.com/curl/curl/blob/master/docs/HTTP-COOKIES.md

@@ -1285,6 +1285,7 @@ ret = hc.ResponseText
 * pretty_errors：精简stacktrace，可全局安装
 * amazing-qr：虽然star数很多，但依赖太多，要numpy和Pillow。segno：作者好像水平很高
 * 计算圈复杂度：https://github.com/terryyin/lizard 支持多种语言无需编译
+* MoviePy, pyav：不基于ffmpeg的视频处理
 
 ## 参考
 
@@ -1304,7 +1305,6 @@ ret = hc.ResponseText
 
 * PyTest https://realpython.com/learning-paths/test-your-python-apps/ https://zhuanlan.zhihu.com/p/385619511
 * PyNaCl https://github.com/pyca/cryptography pyOpenSSL pycryptodome
-* 数据可视化：Seaborn(基于matplotlib) bokeh plotly.py plotly/dash(基于plotly.js，用于构建网页) matplotlib altair
 * https://github.com/gevent/gevent https://www.gevent.org/
 * 自动化任务工具invoke：https://zhuanlan.zhihu.com/p/105263640；Fabric https://zhuanlan.zhihu.com/p/107633056
 * https://github.com/serge-sans-paille/pythran AOT，不支持类，Win下要VS。shedskin：Py转译到C++。https://github.com/lcompilers/lpython

@@ -370,9 +370,9 @@ collapsable content
 * 开源理论
   * https://www.gnu.org/licenses/gpl-faq.zh-cn.html
   * https://opensource.org/faq
-  * Selling Exception(Richard Stallman)：如mysql，只有一个GPL协议，允许使用者付费遵守非GPL的条款，不是双重许可
+  * Selling Exception(Richard Stallman)：如mysql和x264.org/licensing，开源版只有一个GPL协议，也允许使用者付费选择专有许可证。RMS说这不是双重许可(dual licensing)，后者一般指软件中带有两种协议，使用者可以任意选择一种或都传递
   * copyleft：要求软件的修改版必须同样以自由软件的形式发布，这条限制与四条核心自由并不冲突。如GPL就是copyleft的，MIT不是。与之相对的是permissive，如MIT，允许任何人进行专有再分发。它们都是开源许可证
-  * free software和open source理论上指的是同一件事，都指自由开放，而不只是可以看源代码而不能改。但实践中人们觉得开源只需源代码可用，GNU反对用开源这个词。可用FLOSS
+  * free software和open source理论上指的是同一件事，都指自由开放，而不只是可以看源代码而不能改。但实践中人们觉得开源只需源代码可用，GNU反对用开源这个词，说它们指同一类软件，但对于运动，它们关注的重点不同
   * proprietary software(works)专有软件：是非自由软件的子集。专有软件的所有者可以决定是否可以分发该软件，而自由软件可以被任何持有者随意分发
     * 最终用户许可协议(EULA)中列出使用条款
     * CC的NC不是专有软件，是非自由软件。专有软件可以是闭源软件，也可以是源代码可用软件
