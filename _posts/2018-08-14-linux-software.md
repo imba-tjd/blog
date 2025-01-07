@@ -405,36 +405,53 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 
 ## FFmpeg
 
+* 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
+  * win 32位：https://github.com/defisym/FFmpeg-Builds-Win32/releases
 * ffmpeg 全局参数 输入文件的参数 -i 输入文件 调整的参数 输出文件
+  * -y 覆盖
   * 不加输出文件，可只查看元数据
   * -hide_banner隐藏编译参数，可用alias默认加上
-  * -formats、-codecs
-  * -h encoder=xxx 列出xxx的详细参数
-  * -y 覆盖
+  * 显示支持的格式：-formats、-codecs、-encoders（对应-c）
+    * -h encoder=xxx 列出xxx的详细参数
+* 内部流程：文件首先用libavformat进行demuxing。如果需要进一步处理，用libavcodec进行decoding和libavfilter应用effect。用libavcodec进行encoding，再用libavformat进行muxing
+  * 处理时的speed：如0.5x，表示每处理原视频1s需要花费2s
 * 转换视频编码（指定编码器）：-c:v libx265 -c:a copy
-  * copy表示不重新编码加快速度，a表示音频
+  * copy表示不重新编码加快速度，a表示音频。剪辑或仅更改容器时不要重新编码
   * 老版参数：-vcodec
-* 转换容器会根据输出文件后缀自动处理。支持将srt转换为ass
-  * 视频转音频（去除视频流）：-vn -c:a copy，也可以直接保存成音频文件。去除音频流：-an
+* 转换容器会根据输出文件后缀自动处理，编码也会自动猜测。支持将srt转换为ass
+  * 视频转音频（去除视频流）：-vn -c:a copy，也可以直接保存成音频文件，还可以-map 0:a。去除音频流：-an
 * 压缩
-  * 码率(比特率)：-minrate 964K -maxrate 3856K -bufsize 2000K。固定码率：-b:v xxxk
-  * 分辨率：-vf scale=480:-1。或-s
-  * TODO: -r帧率。以及现在更推荐用preset和tune，先选定CRF，0代表最好，默认23。u2b推荐配置：https://support.google.com/youtube/answer/1722171
-* 裁剪一段：-ss [start] -to [end]
+  * “恒定质量”预设
+    * -crf按某种比率调整质量。x264默认23推荐18-28；x265默认28推荐24-34。数字越小质量越好文件越大，每±6差不多减半或加倍码率
+      * 实测x264 23 1080p30f 半小时 码率约1Mb 大小约250MB
+    * -preset主要影响速度和压缩率（质量理论上不变），默认medium，可选slow和fast等，直播用ultrafast，长期储存选慢一点的
+    * -tune film代表高质量/animation/stillimage用于ppt/zerolatency用于直播
+    * u2b推荐配置：https://support.google.com/youtube/answer/1722171
+  * 码率(比特率)：-minrate 964K -maxrate 3856K -bufsize 2000K
+    * 平均码率(abr)/目标码率：-b:v xxxk。不应直接使用，因为编码器只能猜测；一种解决办法是配合-pass 1和2。不是固定码率(cbr)，仍是vbr
+  * 分辨率：-vf scale=480:-1 其中-1表示保持原比例。另一种参数：-s:v 854x480 
+  * 帧率：-r 24
+* 裁剪一段：-ss start -to end 或 -t 经过。时间格式默认为秒，还可以是 00:01:30.500
+  * 截图：-ss 秒 -vframes 1 output.jpg
 * 合并：-i videos.txt -f concat。其中输入文件必须为每一行`file '片段名'`
 * 为Web优化，将元数据放在开头：-movflags +faststart
-* Filter：-vf 参数。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度
+* Filter：-filter:v或-vf "filter1=option1=value1:o2=v2,filter2"。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度、画文字
 * DeMuxer：如文件含有视频和音频，把它们分解出来就叫它。之后再Decode、按需要Filter、Encode
 * AAC
-  * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要加--enable-nonfree。aac_at更好，但只有mac有
-  * 默认的aac，比特率默认128，高质量的考虑加-b:a 192k。可变比特率质量差不考虑
-  * 格式：AAC-LC比HE-AAC好。默认的aac只支持LE
-* 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
-* 第三方图形化配置：https://ffmpeg.guide/graph/demo
-* 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
-* 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
-* 视频容器：webm u2b支持，无声
-* 硬件加速
+  * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要--enable-nonfree；高质量用-vbr 4(约128k)，最大5。aac_at更好，但只有mac有
+  * 默认的内置aac，比特率默认128k，高质量的考虑加-b:a 192k。它的vbr比cbr质量差
+  * 格式：AAC-LC比HE-AAC好，只有码率<=32kb才用HE。内置aac只支持LE
+  * 其他音频格式：Vorbis比FLAC和Opus好。不要用"vorbis"编码器，用"libvorbis"
+* 视频编码格式：AV1是比较好的，是VP9的继任，无版权问题。MPEG4 AVC和H264是一个东西，HEVC是H265，VVC是H266。MPEG-5(EVC)也比较新但可能没有硬件加速
+  * H264又叫MPEG-4 Part 10。H262又叫MPEG-2 Part H
+  * H264 Profile：不同设备的能力不同，有些功能也许难支持，比如10bit色深就要用Hi10P。老设备选Constrained Baseline或Main，设定用-profile:v baseline，ffmpeg默认High
+  * libaom: AV1 encoder
+* 封装格式（容器）
+  * AVI：只能封装一条视频和一条音频，不能封装字幕，没有流媒体功能（不能在线播放）。属于MPEG-4 Part 2
+  * WMV后缀，ASF封装：具有“数字版权保护”功能。其音频编码为WMA
+  * MP4：H264的标准封装格式，音频默认AAC。3GP是MP4的一种简化版本。MKV(Matroska video)和MP4差不多但有流媒体功能
+  * WebM：开放的格式，MKV的子集，里面支持AV1 VP9。但音频是不常见的两种。u2b支持，无声。可用于“自适应流”
+* [硬件加速](https://trac.ffmpeg.org/wiki/HWAccelIntro)
   * 解码器分为internal和external(standalone)，前者用-hwaccel xxx指定，后者以及编码器用-c:v指定，如h264_nvenc
   * 列出可用的：-hwaccels
   * qsv：Intel Quick Sync Video 是一个宣传名字，不同代cpu支持不同特性。4代支持编解码H.264 MPEG-2，13代AV1
@@ -442,14 +459,17 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * cuda(NVENC/NVDEC/CUVID)：支持编解码。编译选项中要有--enable-cuda-llvm且编译环境中装了ffmpeg修改过的nv-codec-headers
   * vulkan：只支持解码H.264 HEVC AV1
   * vaapi：Video Acceleration API，是intel qsv和AMD UVD/VCE的包装。好像只支持Linux
-* 视频编码格式：AV1是比较好的。MPEG4 AVC和H264是一个东西，HEVC是H265，VVC是H266，MPEG2是H262。MPEG-5(EVC)也比较新但可能没有硬件加速
-* 封装格式
-  * AVI：只能封装一条视频和一条音频，不能封装字幕，没有流媒体功能（不能在线播放）
-  * WMV后缀，ASF封装：具有“数字版权保护”功能。其音频编码为WMA
-  * MP4：H264的标准封装格式，音频可用AAC。3GP是MP4的一种简化版本。MKV和MP4差不多但有流媒体功能
-  * WebM：开放的格式，里面支持AV1 VP9。但音频是不常见的两种
+  * 对于x264+CPU，默认就会用SSE
 * 图片：包括是否无损、静态动态。WebP是JPEG的替代，也支持无损，也支持动画（VP8比特流）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
-* 其他编码工具：https://www.videolan.org/developers/x264.html `x264 --crf 18 -preset ultrafast --output outfilename.mp4 infile`
+* 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
+  * 教程：https://github.com/leandromoreira/ffmpeg-libav-tutorial/blob/master/README-cn.md https://slhck.info/posts/
+* 带有解码器的mpchc：https://www.codecguide.com/download_kl.htm
+* 视频转换工具（ffmpeg的GUI）：https://handbrake.fr/ staxrip Medlexo魔力玄（闭源，小）
+  * 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
+  * 第三方图形化配置：https://ffmpeg.guide/graph/demo 至少从24年12月挂了
+  * 剪辑软件：https://www.shotcut.org/ QT https://www.shutterencoder.com/ Java avidemux2不太活跃
+  * https://www.videohelp.com/software/clever-FFmpeg-GUI
+  * https://mkvtoolnix.org/
 
 ## VNC和远程桌面
 
@@ -472,6 +492,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * rustdesk：开源。它的服务端是用于各客户端交流的，设置里填“ID/中继服务器”；不部署也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行；修改文件名可预置服务器信息。支持32位
 * 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
 * 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
+* Sysinternal的Remote Desktop Connection Manager：添加了TAB，适合需要切换多个服务器时使用
 
 ## perl
 
