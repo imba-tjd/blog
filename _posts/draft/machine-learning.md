@@ -93,6 +93,7 @@ df.astype({'A': 'int32', 'B': 'float64'})、df.A.astype('string')  类型转换�
 df.replace({'A': {'old': 'new'}})
 df.clip(lower=0, upper=100)  限制值范围
 df.round(2)  四舍五入
+将字符串代表的类别转换为序数：A.astype('category').cat.codes。哑编码(OneHot)：pd.get_dummies(data)；处理训练数据中不存在但生产中有的类别：配合pd.Categorical
 合并：
 pd.concat([df1, df2, rows], ignore_index=True)  合并行，ignore_index重置索引。设定axis=1变为合并列。之前的append废弃了
 df.merge和join() on='列'  类数据库join，根据文档merge默认inner，suffixes=('_1','_2')指定重复列名后缀；join默认left
@@ -132,8 +133,9 @@ df.plot(x='xxx',y=[...])  默认折线图。bar(stacked=True)堆叠条形图，s
 
 ## matplotlib
 
-* line折线图，hist直方图，pie饼图，scatter散点图，bar柱状图
-  * 柱状图和直方图的区别：柱状图的x轴是分类，不同类可以随意交换；而直方图的x轴是数据的范围，且矩形条之间没有间隙
+* line折线图，stack面积图，hist直方图，pie饼图，scatter散点图，bar柱状图，box箱形图
+  * 柱状图和直方图的区别：柱状图的x轴是分类，不同类可以随意交换；y可以用不同颜色横向分出更多类，值表示汇总；另一种方式：每个x具有多个柱。而直方图的x轴是数据的范围，且矩形条之间没有间隙
+  * 面积图：一种与折线图类似只是下方染色，另一种类似于地图占满整个图形
 
 ```py
 %matplotlib inline
@@ -151,6 +153,8 @@ fig, axs = plt.subplots(n) # 单参数为一列n行，(1, 2)为1行2列，行列
 axs[0].plot...
 ```
 
+其他可视化库：Seaborn(基于matplotlib，用起来更简单，但只支持2D) bokeh plotly功能最多可以画地图 plotly/dash(基于plotly.js，用于构建网页) altair Plotnine pyecharts
+
 ## scikit-learn
 
 * 教程
@@ -161,9 +165,8 @@ axs[0].plot...
 * 另一种评判好坏的方法：bias(偏差)和variance(方差)，两者形成4种组合。高bias为离目标远，低bias为离目标近，高variance为分散，低variance为集中。低bias+高variance为overfitting，高bias+低variance为underfitting
 * 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
 * 决策树(DecisionTree)：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错。这类模型(GBDT)不需要归一化
-* 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X).transform(X)
+* 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X_train).transform(X_train) 应只在训练集上放缩
 * pipeline：把pre-processors和estimators连起来自动依次使用
-* sklearn.tree.DecisionTreeRegressor：需要调参
 * 序列化持久保存：pickle、joblib.dump(m, 'filename')第三方二进制序列化库内部基于pickle格式加载时会用mmap、treelite编译决策树的库
 * 其他库：yellowbrick图形化，mlxtend工具类，dtreeviz可视化，scikit-optimize，m2cgen把模型转换为其它语言，featuretools，Sacred能保存各种参数用于复现
 
@@ -193,7 +196,7 @@ imputed_X_train.columns = X_train.columns; imputed_X_valid.columns = X_valid.col
 pd.get_dummies(data) # 自动把数据中非整数的离散值变成整数
 data.select_dtypes(exclude=['object']) # 直接去掉非数字列
 object_cols = [col for col in X_train.columns if X_train[col].dtype == "object"] # 提取非数字列的列名
-from sklearn.preprocessing import OrdinalEncoder # 也是把非数字编码为数字，但可能存在X_train和X_valid里有不同值的情形，此时要drop掉差异部分，太复杂略。还有一种OneHotEncoder用起来太复杂了
+from sklearn.preprocessing import OrdinalEncoder # 也是把非数字编码为数字，但可能存在X_train和X_valid里有不同值的情形，此时要drop掉差异部分，太复杂略。还有一种OneHotEncoder，转换后toarray()
 label_X_train[object_cols] = ordinal_encoder.fit_transform(X_train[object_cols])
 label_X_valid[object_cols] = ordinal_encoder.transform(X_valid[object_cols])
 

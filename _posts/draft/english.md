@@ -71,6 +71,7 @@ title: 英语
 * in+大地点(Shanghai)，at+小地点；be in,on,to the east of ...分别表示境内、接壤、不接壤
 * to：跟在没有宾语的及物动词后或表目的就是不定式to do，否则就是介词，后要用动名词doing或名词：answer to, key to, refer to, look forward to, devote to, belong to, object to, pay attention to, get used to, make contributions to, apply oneself to
 * 主谓宾中的宾特指动宾短语，介词后面的宾语即介宾短语不能单独划分成分，而是合起来当作形容词或副词作定语或状语；介词后必接名词，只不过有的介词也有副词的词性
+* of所有格：用于 "which" 的情形，与“的”不完全一样。如 a friend of mine，不是me。而answer to question，因为answer不是后者的其中一部分，所以不能用of
 
 ## 连词 Conjunctions
 

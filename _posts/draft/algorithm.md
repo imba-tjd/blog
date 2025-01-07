@@ -427,29 +427,37 @@ normalize (a, b) = (x, y)
     y = div b' gcd'
 ```
 
-TimSort：
-最好O(n)，最差O(nlogn)，但空间需求O(n)
-https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
+## 算法知识集合网站
 
-算法知识集合网站：
-https://oi-wiki.org
-https://github.com/hzwer/shareOI
-https://algorithm-essentials.soulmachine.me/
+* https://oi-wiki.org
+* https://programmercarl.com/ 代码随想录
+* https://www.hello-algo.com/
+* https://www.youtube.com/@BackToBackSWE/videos
 
-https://www.hello-algo.com/
-https://labuladong.online/algo/
-https://the-algorithms.com/zh_Hans
-https://algo.itcharge.cn/
-
-https://education.github.com/pack/redeem/interviewcake-student
-面试相关内容，算法、流程、穿衣等 1 week for FREE激活练习题，知识可以之间免费看。首页也有“1周”但只是每天一封邮件
-https://education.github.com/pack/redeem/algoexpert-student
-Free access to 20 coding interview questions
-
-可视化：
+### 可视化
 https://visualgo.net/zh
 https://algorithm-visualizer.org/
 https://www.cs.usfca.edu/~galles/visualization/Algorithms.html
+
+### 面试
+
+* https://education.github.com/pack/redeem/interviewcake-student 面试相关内容，算法、流程、穿衣等 1 week for FREE激活练习题，知识可以之间免费看。首页也有“1周”但只是每天一封邮件
+* https://education.github.com/pack/redeem/algoexpert-student Free access to 20 coding interview questions
+* https://www.techinterviewhandbook.org/
+
+### 不太重要的
+
+* https://github.com/hzwer/shareOI
+* https://algorithm-essentials.soulmachine.me/
+* https://algo.itcharge.cn/
+* https://labuladong.online/algo/ 网友评价：https://www.zhihu.com/question/436840528
+* https://the-algorithms.com/zh_Hans 各种算法的收集和实现，无题目
+
+---
+
+TimSort：
+最好O(n)，最差O(nlogn)，但空间需求O(n)
+https://zhuanlan.zhihu.com/p/50451255 https://www.zhihu.com/question/36280272
 
 打点标记法处理整数区间：如24小时对应int[24]，未公开对应0，公开且空闲对应1，占用中对应2。
 区间合并，如(1,2),(3,4)->(1,4)：先按起始值排序，遍历数据更新“当前区间”，当取出的和当前无交集时则当前的处理完毕。
@@ -457,12 +465,13 @@ https://www.cs.usfca.edu/~galles/visualization/Algorithms.html
 题目中数据量很大(如10^9)时，也许要从另一个不那么大的数据量(如10^5)入手遍历，从总数中减去遍历计算的结果。
 二分法：如一个值n在小于M时满足要求，求M（或求满足要求的n的最大值）。1必定满足，再宽松确定一个n的不满足的上界，然后看n/2。
 
-面试：https://www.techinterviewhandbook.org/
 
-https://www.youtube.com/@BackToBackSWE/videos
+
 https://www.youtube.com/watch?v=ngCos392W4w https://www.youtube.com/watch?v=aPQY__2H3tE
 https://www.youtube.com/watch?v=8hly31xKli0 https://www.youtube.com/watch?v=oBt53YbR9Kk https://www.youtube.com/watch?v=2ZLl8GAk1X4 https://www.youtube.com/watch?v=RBSGKlAvoiM
 
 
 
 多路归并排序：划分k路，每路分别排序。合并时，每次选出k路各第一个元素中的最小值。如果普通遍历，每次都要遍历k次。优化做法：小顶堆。进一步优化：败者树。其实堆、胜者树、败者树没有O的复杂度区别，但胜者树的比较次数是堆的一半。
+
+单调栈：如保证栈顶到底是递增的，如果新元素大于栈顶，则pop处理。一般存放索引。两种思想：可以存放“未计算”的对象，往后遍历时如果能够处理了，则弹出；第二种思想：存放“已遍历”的内容，继续后续处理时看能不能用上
