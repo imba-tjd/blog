@@ -353,7 +353,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * --spider：只检测目标是否存在，可与-i配合批量检测书签
 * -b：转入后台下载，日志输出到wget-log文件中
 * -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
-* 官方发布了64位exe
+* 官方发布了64位exe：https://github.com/rockdaboot/wget2/releases/latest/download/wget2.exe
 
 ### youtube-dl
 
@@ -524,6 +524,11 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 在docker中运行：用pm2-runtime命令代替node
 * 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434 Go的重写：ochinchina/supervisord。monit是C
 * 其它监控metric程序：https://github.com/topics/monitoring
+
+## 面板
+
+* https://1panel.cn/
+* https://github.com/tnb-labs/panel
 
 ## TODO
 

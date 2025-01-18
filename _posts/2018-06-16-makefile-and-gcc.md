@@ -352,11 +352,12 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * /x以十六进制显示值
   * 打印指针对应的数组：p *arrp@n，先解引用，再显示那个地址往后n个元素
   * 打印指针变量的值及其指向的值，或打印地址里的值：x p/add。有选项修改打印的数量和格式
-* list(l) line/func 显示源码，无参默认为当前函数的
-* info(i) registers(r)/functions/locals等
+* list(l) line/func 显示源码，无参显示当前位置
+* info(i) registers(r)/locals(lo)，大量信息会分页：functions/variables
 * quit(q)
-* backtrace(bt)
-* set var=v
+* backtrace(bt) full 显示调用栈、局部变量、函数参数
+  * frame(f) 切换栈帧到n号，0是顶层。无参显示当前位置，效果是bt和l各只显示一行
+* set var=v 也能用来调整gdb设置
 * watch(wa)变量被写入时中断，rwatch被读取时中断，awatch读写
 * !xxx 执行shell命令
 * 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用

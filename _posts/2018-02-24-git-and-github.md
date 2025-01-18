@@ -361,7 +361,7 @@ collapsable content
 ```
 直接从PR获得文本diff/patch：https://github.com/<user>/<repo>/pull/<id>.diff/patch
 以tar.gz下载源代码：https://github.com/<user>/<repo>/tarball/master
-下载最新版release，但文件名需固定；如果是访问页面就去掉download：https://github.com/<user>/<repo>/releases/download/latest/<filename>
+下载最新版release，但文件名需固定；如果是访问页面就去掉download；注意不是把具体文件里的版本号改成latest（顺序刚好反了）：https://github.com/<user>/<repo>/releases/download/latest/<filename>
 ```
 
 ## License
@@ -370,7 +370,7 @@ collapsable content
 * 开源理论
   * https://www.gnu.org/licenses/gpl-faq.zh-cn.html
   * https://opensource.org/faq
-  * Selling Exception(Richard Stallman)：如mysql和x264.org/licensing，开源版只有一个GPL协议，也允许使用者付费选择专有许可证。RMS说这不是双重许可(dual licensing)，后者一般指软件中带有两种协议，使用者可以任意选择一种或都传递
+  * Selling Exception(Richard Stallman)：如mysql和x264.org/licensing和Qt，开源版只有一个GPL协议，也允许使用者付费选择专有许可证。RMS说这不是双重许可(dual licensing)，后者一般指软件中带有两种协议，使用者可以任意选择一种或都传递
   * copyleft：要求软件的修改版必须同样以自由软件的形式发布，这条限制与四条核心自由并不冲突。如GPL就是copyleft的，MIT不是。与之相对的是permissive，如MIT，允许任何人进行专有再分发。它们都是开源许可证
   * free software和open source理论上指的是同一件事，都指自由开放，而不只是可以看源代码而不能改。但实践中人们觉得开源只需源代码可用，GNU反对用开源这个词，说它们指同一类软件，但对于运动，它们关注的重点不同
   * proprietary software(works)专有软件：是非自由软件的子集。专有软件的所有者可以决定是否可以分发该软件，而自由软件可以被任何持有者随意分发
@@ -399,7 +399,7 @@ collapsable content
 * ISC：限制和MIT一样。用的很少，连创造者都不用了。0BSD：和其他BSD系列无关，是ISC的替代，没有要求attribution
 * Apache 2.0：GNU推荐说是permissive中最好的，包含了处理专利的内容
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
-* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/ https://github.com/creativecommons/creativecommons.org/tree/master/docroot/legalcode；BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（如翻译），NC是不用于商业目的
+* CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/  https://chooser-beta.creativecommons.org/。BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（如翻译），NC是不用于商业目的
   * CC0：放弃著作权（公有领域），原著作权持有者无法再对其他人如何使用该作品施加任何法律上的限制，二次创作品则在法律上享有完整的著作权。Unlicense：有人说写得很差，在欧洲不允许放弃所有权利；如果不涉及专利，PD/Unlicense/CC0/0BSD是等效的
 
 ## bare和mirror

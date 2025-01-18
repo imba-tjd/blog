@@ -736,26 +736,6 @@ c.StoreMagics.autorestore = False # 开启后store能自动持久化
 * `https://mybinder.org/v2/gh/<user>/<repo>/HEAD?urlpath=nteract`
 * repo2docker构建时自动处理requirements.txt apt.txt postBuild（只会运行一次的脚本） start（相当于EntryPoint） runtime.txt（指定Python-3.9）；或只处理Dockerfile
 
-## Conda
-
-* 特点
-  * conda是个包管理器，类似于apt。miniconda和anaconda中都包含了conda
-  * miniconda只包含了conda、python、和一些必备的软件工具；实现上是个包含了二进制数据的sh，大概130MB，交互式安装。anaconda包含了数据科学和机器学习要用到的很多软件
-  * conda用来安装conda package二进制包，大部分是python的，但也支持了不少其他语言的依赖项如mkl、cuda。可以安装gcc且不需要root权限。有些包只能用conda，比如rdkit。但包的总数远少于PyPI
-  * conda可以创建虚拟环境、管理多个版本的python
-  * conda会检查当前环境下所有包之间的依赖关系，比pip更严格
-* 设置镜像。还可选ustc nju
-  * conda config --add default_channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
-  * conda config --set custom_channels.conda-forge https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
-  * conda clean -i; conda config
-* 操作虚拟环境：conda create -n myvenv python=3.11 -y; conda info -e; conda activate myvenv; conda remove -n myvenv --all
-  * 在当前目录下创建：-p .venv。激活：activate ./.venv。如果一开始没有装py，激活后当作普通包install
-* 操作包：conda install pkg; conda list; conda update --all
-  * 其他Channel：conda install conda-forge::transformers 或 -c conda-forge
-  * conda-lock
-* mamba用c++重新实现了一遍conda。micromamba：静态链接单文件
-* miniforge：类似于miniconda，也是用来安装conda的sh，预设了默认channel为conda-forge。曾有Mambaforge但现在合并了
-
 ## Web Server
 
 ### FastAPI
