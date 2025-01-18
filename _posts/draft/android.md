@@ -37,6 +37,7 @@
 ## ADB
 
 * https://aya.liriliri.io/
+* https://jamcz.com/gjgjx/ 搞机工具箱
 
 ## 模块
 
