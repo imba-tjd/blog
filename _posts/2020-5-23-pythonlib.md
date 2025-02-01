@@ -485,9 +485,14 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib3
 
-* urllib3.request('GET',url,fields={'k':'v'}); r.data.decode()
-* POST和PUT：fields自动编码为body，类型默认为multipart。上传文件：fields={'filefield':('filename', str/bytes [,"text/plain"])}。上传二进制内容：设置body参数和Content-Type
-* Headers：UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
+* urllib3.request('GET',url,fields={'k':'v'},headers={}); r.data.decode()
+* POST和PUT
+  * fields自动编码为body，类型multipart。传json：v2新增json参数
+  * 上传文件：fields={'filefield':('filename', str/bytes [,"text/plain"])}
+  * 上传二进制内容：设置body参数和Content-Type
+* Headers
+  * UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
+  * AUTH：make_headers(basic_auth='user:pw')。相当于requests的auth参数
 * 支持自动gzip解码，但默认AE是identity，且Content-Length是解压前的
 * 默认retries=3，重定向3次，timeout无限
 * 流式处理，可看成io.BytesIO，超时异常在read()处发生：preload_content=False; resp.read(4); resp.release_conn()
@@ -506,12 +511,11 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * 默认超时20秒
 
 ```py
-req = urllib.request.Request(url, headers={...})
+req = urllib.request.Request(url, headers={...}) # 应可复用
 with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私有变量无法自动推断，经测试是http.client.HTTPResponse
 text = resp.read().decode();
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.getcode()、resp.info().get_content_charset()
-urllib.request.urlretrieve(url, outfilename) # 直接下载为文件
 
 urllib.parse：
 quote() 用于编码?k=v中的v，会编码所有特殊字符除了斜杠；逆过程为unquote()；还有quote_plus()会把空格编码为+而非%20

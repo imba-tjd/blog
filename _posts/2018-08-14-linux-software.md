@@ -158,6 +158,10 @@ trusted-host = mirrors.aliyun.com
 * userpath：添加和验证PATH的程序，也能作为库使用
 * fierce：扫描域名，基本上是取附近IP的反查PTR；aiodnsbrute爆破查找域名
 
+## ARCH
+
+* AUR助手：paru，是yay的维护者之一创建的替代
+
 ## APK
 
 * apk info：列出安装了的包，加包名显示指定包的描述信息，再加-a显示依赖 被依赖 二进制 大小
@@ -484,7 +488,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 游戏串流，支持NV显卡编码
   * Sunshine：https://app.lizardbyte.dev/Sunshine/?lng=zh-CN
     * “基地版”，自带虚拟显示器（连好后类似副屏） https://github.com/qiin2333/Sunshine
-    * Sunshine是服务端。客户端用 https://moonlight-stream.org/ 最后支持32位的版本：6.0.1
+    * Sunshine是服务端。客户端用 https://moonlight-stream.org/ 最后支持32位的版本：6.0.1。手机端：https://github.com/Axixi2233/moonlight-android
     * 闭源fork，可能挂了：https://open-stream.net/
   * parsec：不开源。多个设备下载客户端登录同一个账户即可，也能分享，但必须登录现在被q了。如有NAT必须要打洞成功，一般来说至少要有一个有公网IP
   * gameviewer(网易UU远程)：目前免费。不支持文件传输
