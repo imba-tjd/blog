@@ -552,11 +552,9 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * phpMyAdmin：Php+Web，仅MySQL，有中文，一般在数据库服务器本身上搭建
 * MySQL WorkBench：官方客户端，大小也不大
 * pgAdmin：官方客户端，163MB
-* https://sqlitebrowser.org/ C++，目标是让普通用户也能用，有中文
 * https://www.devart.com/free-products.html 闭源不跨平台，有MSSQL MySQL PG Oracle，企业版试用过后自动变为免费版，下载需要注册，曾经有单独的Express版还更小
 * https://www.dbvis.com Java，闭源，有免费版
 * https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
-* https://sqlitestudio.pl/ C+Qt，仅SQLite，有中文但很多条目还是未翻译
 * ~~https://sqlectron.github.io/~~ 感觉相比beekeeper唯一优势是有32位，大小都差不多。最后更新22年
 * https://gethue.com Py+Web，主要支持一些大数据的数据库，虽然提交数很多贡献者也很多，但Star很少，估计就是公司自己在用
 * Microsoft Azure Data Studio：感觉不如直接VSC，反正功能都少
@@ -571,6 +569,9 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://www.sqlgate.com/ 韩国的
 * MySQL Shell for VS Code 插件，Oracle官方出的，也能连接sqlite
 * https://github.com/outerbase/studio 纯Web
+* 仅SQLite
+  * https://sqlitebrowser.org/ C++，目标是让普通用户也能用，有中文。有32位
+  * https://sqlitestudio.pl/ C+Qt，有中文但很多条目还是未翻译。有32位
 
 ### 在线测试
 
