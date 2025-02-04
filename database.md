@@ -557,7 +557,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://www.dbvis.com Java，闭源，有免费版
 * https://github.com/webyog/sqlyog-community 仅MySQL，贡献者极少
 * https://sqlitestudio.pl/ C+Qt，仅SQLite，有中文但很多条目还是未翻译
-* https://sqlectron.github.io/ 感觉相比beekeeper唯一优势是有32位，大小都差不多
+* ~~https://sqlectron.github.io/~~ 感觉相比beekeeper唯一优势是有32位，大小都差不多。最后更新22年
 * https://gethue.com Py+Web，主要支持一些大数据的数据库，虽然提交数很多贡献者也很多，但Star很少，估计就是公司自己在用
 * Microsoft Azure Data Studio：感觉不如直接VSC，反正功能都少
 * DataGrip：JB的，收费
