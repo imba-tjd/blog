@@ -113,17 +113,18 @@ END
 
 ### SQLite
 
-* INTEGER、REAL、TEXT、BLOB
-* BOOL内部用0和1存，能识别TRUE和FALSE
-* 日期有三种储存方式，默认TEXT
+* 数据类型
+  * 存储类：INTEGER（物理上2-8B自适应）、REAL、TEXT、BLOB、NULL
+  * BOOL内部用0和1存，能识别TRUE和FALSE
+  * 日期有三种表示方式，一般是ISO8601 TEXT，若是整数则是Unix时间戳。各日期函数能接收它们，返回其中一种
 * Type Affinity/Manifest typing/Flexible Typing
-  * 创建表的时候指定的类型只是一种建议，甚至可以不指定类型
+  * 默认非STRICT时，创建表时指定列的类型只是建议，甚至可以不指定类型
   * 插入数据时如果值能转换成那种类型就转换，否则不会报错而是就按值的类型存，这导致一列可以有不同类型
   * 能把其它DBMS的类型名识别为自己的类型，这导致可以往VARCHAR(50)里插入1000长度的字符串
-  * 3.37(2021.11)：在定义完表的回小括号后加STRICT能禁用Flexible Typing且不允许不加类型，又引入了ANY类型；ANY在非STRICT表中会优先转换成整数，与不加类型行为不同
-* 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名；非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL，现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
+* STRICT：3.37(2021.11)，在定义完表的回小括号后加。禁用Flexible Typing且不允许不加类型；又引入了ANY类型，且在非STRICT表中用ANY会优先转换成整数，与不加类型行为不同
+* 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名。非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL。现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
+  * 同时指定STRICT和WITHOUT ROWID：逗号
 * 定义表的字符串或WHERE和ORDERBY时可指定COLLATE RTRIM/NOCASE
-* 若想同时指定STRICT和WITHOUT ROWID，加逗号
 
 ### MySQL
 
