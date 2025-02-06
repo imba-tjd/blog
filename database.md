@@ -114,7 +114,7 @@ END
 ### SQLite
 
 * 数据类型
-  * 存储类：INTEGER（物理上0-8B自适应，读取后为8B有符号）、REAL、TEXT、BLOB、NULL
+  * 存储类：INTEGER（物理上0-8B自适应，读取后为8B有符号）、REAL、TEXT、BLOB（它俩最大2GB）、NULL
   * BOOL内部用0和1存，能识别TRUE和FALSE
   * 日期有三种表示方式，一般是ISO8601 TEXT，若是整数则是Unix时间戳。各日期函数能接收它们，返回其中一种
 * Type Affinity/Manifest typing/Flexible Typing
