@@ -421,7 +421,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * 并发和线程安全
   * THREADSAFE=1下，官方说是“线程安全”的；=2时官方说只要没有两个线程同时使用同一个连接就是安全的
   * 各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。我认为不是这样，=1下单个连接可以同时使用多个游标，只是没有隔离
-  * =0时不应用在多线程程序中，官方CLI就是=0，所以应该仍可以多进程使用同一个数据库文件
+  * =0时不应用在多线程程序中，官方CLI就是=0，可以多进程使用同一个数据库文件
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
   * Shared-Cache：官方文档表示不应使用。单进程多连接都指定cache=shared，能表现得类似于一个连接、减少内存占用；内部再自动序列化，减少了与其他进程的连接的冲突的可能。但增加了内部复杂性，好像会降低性能
 * WAL
@@ -473,7 +473,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * foreign_keys=1
 * 查询当前选项值：SELECT * FROM pragma_xxx。查询所有可用的pragma选项：pragma pragma_list
 
-### 编译
+### [编译](https://www.sqlite.org/compile.html)
 
 * 显示编译选项：pragma compile_options
 
@@ -487,17 +487,19 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 -DSQLITE_OMIT_DEPRECATED \
 -DSQLITE_OMIT_LOAD_EXTENSION \  # 不指定此项则要加-ldl -lm
 -DSQLITE_OMIT_PROGRESS_CALLBACK \  # 不再汇报进度
+-DSQLITE_OMIT_SHARED_CACHE \
 -DSQLITE_UNTESTABLE \
 -DSQLITE_USE_ALLOCA \
--DSQLITE_WIN32_MALLOC \
 -DSQLITE_DEFAULT_FOREIGN_KEYS \
 -DSQLITE_DEFAULT_AUTOVACUUM \
 -DSQLITE_DEFAULT_MEMSTATUS=0 \  # 会禁用.dbinfo和.stats
 -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
 -DSQLITE_DQS=0 \  # 禁用双引号表示字符串
 -DSQLITE_MAX_EXPR_DEPTH=0 \  # 不再检查表达式深度
--DSQLITE_POWERSAFE_OVERWRITE \
--DSQLITE_TEMP_STORE=2 \
+-DSQLITE_POWERSAFE_OVERWRITE=1 \
+-DSQLITE_TEMP_STORE=2 \  # 临时表存内存
+-DSQLITE_STRICT_SUBTYPE=1 \
+-DSQLITE_WIN32_MALLOC \
 -DSQLITE_THREADSAFE=0  # 编译dll时不加，不为0时Linux下要-lpthread
 ```
 
