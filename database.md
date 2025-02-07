@@ -504,6 +504,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 ```
 
 * SQLITE_SECURE_DELETE：删除后填充0
+* SQLITE_OMIT_AUTOINIT：默认sqlite3_open()等一些函数内部会调用sqlite3_initialize()初始化。此选项将初始化责任交给使用者，避免多次检查初始化的开销
 
 ### 内置函数
 
