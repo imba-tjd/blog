@@ -197,8 +197,7 @@ LOAD DATA LOCAL INFILE 'data.txt' INTO TABLE tb1;
 * 自增
   * MSSQL：IDENTITY、IDENTITY(from, step)
   * MySQL：AUTO_INCREMENT和表级的AUTO_INCREMENT_OFFSET/INCREMENT
-  * SQLite：AUTOINCREMENT。整数主键插入NULL也会自增。两者有一点区别，后者是取最大值+1，如果删除了最后的行再插入就会出现用过的值。其实也可以不定义主键
-  * 自增主键用完了可以改BigInt，但其实int43亿行数据早就慢了，SQlite也改不了
+  * SQLite：推荐不定义主键列，会自动隐式生成ROWID列。定义了的整数主键，插入NULL也会自动自增。这两种情况都是最大值+1，如果删除了最大值，将会重复出现以前出现过的。如果需要不重复，用AUTOINCREMENT。已知MySQL的自增是不重复的
   * PG：id serial PRIMARY KEY
 * 外键
   * 假设B(b)引用A(a)，A称为ParentTable，a称为ParentKey，B称为Child，A是外键refer to的，B是外键apply to的
