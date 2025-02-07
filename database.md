@@ -503,6 +503,8 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 -DSQLITE_ENABLE_ATOMIC_WRITE  # 在不支持的文件系统上启用会检查是否可用而降低性能，经测试NTFS不支持
 ```
 
+* SQLITE_SECURE_DELETE：删除后填充0
+
 ### 内置函数
 
 * likely() unlikely() 给优化器提示大概率为真/假，默认WHERE中没有索引的大概率为真
