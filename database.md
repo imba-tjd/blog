@@ -403,10 +403,9 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * ATTACH DATABASE 'url' AS data
 * Linux下默认的权限是都能读但只有创建者能写
 * URI文件名
-  * file:data.db?cache=shared&mode=ro/rw/rwc
+  * file:data.db?mode=ro/rw/rwc
   * 文件名用:memory:为内存数据库，默认仍会在tmp中产生处理临时表的文件；文件名用空的则为临时文件数据库
   * 如果也不会被其它进程改变可用immutable=1
-  * cache=shared：单进程多连接都启用此参数能类似于一个连接减少内存占用，内部再自动序列化，但会降低性能，专门有一个推荐的编译参数忽略共享缓存
   * 打开已存在的数据库时小心别打错字，否则就自动创建了一个新的，或者mode不用rwc就能避免
 * 读写锁和事务
   * 事务一开始，单纯的BEGIN是没有加锁的。开始读取了会加SHARED锁，允许有多个，能同一时间多个连接并发读取
@@ -424,6 +423,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
   * 各种非官方文章说即使=1下也不能重用连接，只是能多线程使用此模块，因为存在全局状态。我认为不是这样，=1下单个连接可以同时使用多个游标，只是没有隔离
   * =0时不应用在多线程程序中，官方CLI就是=0，所以应该仍可以多进程使用同一个数据库文件
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
+  * Shared-Cache：官方文档表示不应使用。单进程多连接都指定cache=shared，能表现得类似于一个连接、减少内存占用；内部再自动序列化，减少了与其他进程的连接的冲突的可能。但增加了内部复杂性，好像会降低性能
 * WAL
   * 隔离性表现为Snapshot，开始读取事务后另一连接能并发写且能提交，本连接始终读到的是旧数据；如果之后本连接又要写，则会报错，因为数据不是最新的，解决办法是一开始BEGIN IMMEDIATE。释放完本连接所有读锁后再读到的是新数据，或者新连接读到的也是新数据
   * 每个数据库会生成对应多个文件，正常退出后会删除
@@ -449,7 +449,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * .open data.db：关闭当前文件并打开另一个；.backup/.save data.db：另存main数据库
 * .dump/d [tb1]：输出创建表及数据的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
-* .timeout：等待加锁的时间。SQL修改：pragma busy_timeout。注意超时只能处理SQLITE_BUSY，在多连接时发生。对于单连接的操作冲突，或多连接但用了shared cache，会报SQLITE_LOCKED
+* .timeout：等待加锁的时间。SQL修改：pragma busy_timeout。注意超时只能处理SQLITE_BUSY（错误文本为 database is locked），在多连接时发生。对于单连接的操作冲突，如一个在读，另一个删表，会报SQLITE_LOCKED（错误文本为 database table is locked）
 * .expert：后续再运行select时会显示建议创建的索引和创建后的查询计划
 * 查询schema元数据
   * .shema 显示创建表的语句
