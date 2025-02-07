@@ -426,7 +426,6 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
   * Linux下一定不能打开连接、fork()、再在子进程中用原来的连接
 * WAL
   * 隔离性表现为Snapshot，开始读取事务后另一连接能并发写且能提交，本连接始终读到的是旧数据；如果之后本连接又要写，则会报错，因为数据不是最新的，解决办法是一开始BEGIN IMMEDIATE。释放完本连接所有读锁后再读到的是新数据，或者新连接读到的也是新数据
-
   * 每个数据库会生成对应多个文件，正常退出后会删除
   * 对应数据库级别或者所有连接，不是单个连接级别，且是持久的，关闭连接重新打开后还是此模式
   * 不支持NFS
@@ -450,7 +449,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * .open data.db：关闭当前文件并打开另一个；.backup/.save data.db：另存main数据库
 * .dump/d [tb1]：输出创建表及数据的SQL语句到stdout，.recover：对于受损的数据库尽可能dump数据；.read file.sql：执行SQL文件；.import data.csv tb1：导入csv的数据；输出到csv：.headers on; .mode csv; .once/.output data.csv; select ...
 * .shell/sh 运行shell命令；.cd：略
-* .timeout：等待加锁的时间。SQL修改：pragma busy_timeout
+* .timeout：等待加锁的时间。SQL修改：pragma busy_timeout。注意超时只能处理SQLITE_BUSY，在多连接时发生。对于单连接的操作冲突，或多连接但用了shared cache，会报SQLITE_LOCKED
 * .expert：后续再运行select时会显示建议创建的索引和创建后的查询计划
 * 查询schema元数据
   * .shema 显示创建表的语句
