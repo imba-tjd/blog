@@ -49,6 +49,7 @@ END
   * CAST(原数据 AS 新类型) 标准写法，MySQL必须指明SIGNED
   * CONVERT()：MySQL第一个参数是数据，第二个参数是类型；MSSQL刚好相反；PG SQLite不支持
   * SQLite MySQL在处理字符串和数字之间运算时会隐式转换成数字，如'1.1'+'+1'->2.1，'a1'也是转换成1
+  * 1='1'：SQLite是0，MySQL是1，PG是t，MSSQL报错
 * 获得表达式的类型：SQLite typeof()，PG pg_typeof()，MySQL创造临时表再查看表结构：`drop temporary table if exists tp; create temporary table tp select @v; desc tp;`
 
 ### 字符串
