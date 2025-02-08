@@ -160,7 +160,7 @@ END
 ### 索引
 
 * 相当于本身就排序好了，因此会影响DML性能，能提高SELECT、WHERE、JOIN的性能
-* 有助于两种功能：搜索（WHERE）、排序。每个FROM最多使用一个索引（除非OR子句优化生效，将OR变成多次查询再UNION）
+* 有助于两种功能：搜索（WHERE）、排序（ORDERBY，某些时候的GROUPBY和DISTINCT）。每个FROM最多使用一个索引（除非OR子句优化生效，将OR变成多次查询再UNION）
 * 数据结构
   * MSSQL MySQL的InnoDB用B+树
   * PG用B树但支持其它几种策略，关键是它的表结构用堆储存，区分两者意义不大
