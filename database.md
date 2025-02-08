@@ -467,7 +467,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 ### PRAGMA
 
 * 每项前可以跟`schema名.`指定附加的数据库，省略则可能为main也可能为所有数据库；后面要加分号；打错字了不会报错。几乎所有设置都限于连接非持久，下次连接还要设置，例外：日志模式
-* optimize 推荐关闭连接时使用，或长时间连接每隔几小时用一次，用于内部优化查询性能
+* optimize 推荐在关闭连接前使用，或长时间连接每隔几小时用一次，或更改了SCHEMA如创建索引后运行一次，用于内部优化查询性能（ANALYZE指令）
 * journal_mode = DELETE/TRUNCATE/PERSIST/WAL/MEMORY。默认DELETE完成事务后就删除日志，TRUNCATE不删除日志文件只是清空，PERSIST在日志头部写零；这三种性能依次少量提升，这日志不在临时文件夹而是在数据库同级目录；MEMORY不安全但也算能用，OFF无法ROLLBACK无意义
 * synchronous = 默认是FULL/2，在WAL下可安全用NORMAL/1
 * secure_delete = FAST/2 默认为off，开启后删除时会写0
