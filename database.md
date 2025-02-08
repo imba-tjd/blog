@@ -512,6 +512,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * SQLITE_SECURE_DELETE：删除后填充0
 * SQLITE_OMIT_AUTOINIT：默认sqlite3_open()等一些函数内部会调用sqlite3_initialize()初始化。此选项将初始化责任交给使用者，避免多次检查初始化的开销
 * SQLITE_ENABLE_ATOMIC_WRITE：在不支持的文件系统上启用会检查是否可用而降低性能，经测试NTFS不支持
+* SQLITE_ENABLE_STAT4：有助于ANALYZE
 
 ### 内置函数
 
