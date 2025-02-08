@@ -511,7 +511,6 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 
 ### 内置函数
 
-* likely() unlikely() 给优化器提示大概率为真/假，默认WHERE中没有索引的大概率为真
 * quote() 进行某些转义，如字符串两边加引号
 * format() 类似于printf
 
