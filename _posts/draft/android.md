@@ -36,8 +36,12 @@
 
 ## ADB
 
-* https://aya.liriliri.io/
+* https://aya.liriliri.io/zh/
 * https://jamcz.com/gjgjx/ 搞机工具箱
+
+## 系统自带应用包名
+
+* realme：https://tieba.baidu.com/p/7404872902
 
 ## 模块
 
