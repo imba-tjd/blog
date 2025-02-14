@@ -183,7 +183,6 @@ install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-instal
 * -g等于-g2，-g3还会包含宏定义体积更大，-g0禁用前面的-g，-ggdb(3)产生仅限于gdb的信息，-Og保留调试信息且优化。-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度，但无法与-flto一起使用
 * -###为dry-run，能显示具体编译用到的命令
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
-* -fuse-ld=gold比普通的ld快，MinGW不自带
 * -s：去掉符号信息
 * --include：相当于`#include`，与-I无关
 * -rdynamic：使得可执行程序也导出符号，只在Linux下有效
@@ -311,6 +310,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * __MINGW64_VERSION_STR定义了它自己的版本
 * 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads但可以静态链接。win32版没有这些功能
 * Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc
+* v12 默认UCRT
 
 ### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
 
@@ -362,6 +362,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * !xxx 执行shell命令
 * 在VSC的Cpptools的DebugConsole中，要在前面加-exec或反引号才能调用
 * ulimit -c unlimited后才会产生dump。systemd运行的另有方式
+* 跳过步入某些文件：https://stackoverflow.com/questions/72894675 https://github.com/microsoft/vscode-cpptools/issues/3725
 
 ## 参考
 

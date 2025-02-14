@@ -308,3 +308,4 @@ Calliope o-- SpindlerBattery
 
 * https://refactoringguru.cn/design-patterns/catalog
 * https://blog.csdn.net/zhengzhb/category_9260995.html
+* JS实现：https://www.patterns.dev
