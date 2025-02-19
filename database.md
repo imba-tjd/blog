@@ -138,7 +138,7 @@ END
 * CHAR(0-255), VARCHAR(0-65535), BINARY, VARBINARY：后两者也存字符串但是没有字符集
 * [TINY/无/MEDIUM/LONG]BLOB/TEXT：分别为255字节、64KB、16MB、4GB
 * BIT(n)：值用`b'111'`表示
-* ENUM(x,y,z)
+* ENUM(x,y,z) 当用在ORDERBY中时按定义顺序，当用在min max中时按值（至少对于字符串是如此）
 * SET：与ENUM类似，相当于位域。字符串自动对应数字，使用时可用数字相加，或一个以逗号分隔多个值的字符串
 * MySQL5后，一个char就代表一个字符，无论中英文
 * 标识符使用反引号。若要用双引号，需SET GLOBAL/SESSION sql_mode='ANSI'或'ANSI_QUOTES'或在配置中sql-mode="ANSI"
