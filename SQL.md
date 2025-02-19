@@ -345,6 +345,7 @@ AS SELECT/INSERT ...
 * 下列语句不能创建触发器：create/alter/drop/load/restore database、disk init/resize、load/restore log、reconfigure
 * 每个触发器有两个特殊的表：inserted和deleted，数据插入和删除的时候会复制一份到表中，update触发器同时使用者两个
 * 比如保证学生往选课表里添加记录时，学号必须存在于学生基本信息表里
+* MySQL：当一个外键列的数据被动删除时（删除了对应表里的主键，外键变为NULL），不会触发trigger。导致基本不用trigger
 
 ```
 CREATE TRIGGER tg AFTER DELETE ON tb1 BEGIN
