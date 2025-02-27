@@ -200,7 +200,7 @@ beforeCreated -> 注入 -> created -> 模板编译 -> beforeMount 无真实DOM -
   * 解构：{id, content} in arr
   * 范围：n in 10，从1开始
   * 遍历object的属性：(val, key, ndx) in {k1:1, k2:2}
-* 若item是object如 {id:不重复数字, content:内容}，要加 :key="item.id"，默认是arr的index。更新时会用到，否则会重新渲染整个迭代对象
+* 若item是object如 {id:稳定不重复数字, content:内容}，要加 :key="item.id"，默认是arr的index。更新时会用到，否则会重新渲染整个迭代对象
 * 如要配合v-if，不应放在同一级，根据需要配合template元素
 
 ### 事件
