@@ -228,7 +228,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -DFORTIFY_SOURCE 将memcpy等几个不安全函数替换为对应的_chk版本，=1时只在编译期检查，=2时在运行时检查，=3需gcc12消耗更多
   * -fstack-protector-strong 防止缓冲区溢出。默认--param ssp-buffer-size=8，只有缓冲区大小超过它时才会生成检查代码
   * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，会在启动时全部加载符号，可能影响性能
-  * -Wl,-z,noexecstack,-z,noexecheap 栈不可执行，exe和so都要使用，对应Win的DEP。好像有人说默认开了
+  * -Wl,-z,noexecstack,-z,noexecheap 栈不可执行，exe和so都要使用，对应Win的DEP。好像有人说默认开了，用ProcessExplorer能看到
   * -Wl,--dynamicbase,--high-entropy-va,--nxcompat Win的ALSR和DEP，前者对应pie和pic
   * -fstack-clash-protection 代替-fstack-check 只在多线程时需要
   * -ftrapv 使得整数溢出时触发core dump，性能损耗大。另一种选择是-fwrapv

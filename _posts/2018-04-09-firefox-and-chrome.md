@@ -120,6 +120,10 @@ title: 浏览器
 * https://github.com/jlesage/docker-firefox
 * https://hub.docker.com/r/linuxserver/firefox
 
+### 不使用扩展禁止访问URL
+
+* https://mozilla.github.io/policy-templates/#websitefilter 查看：about:policies。但实测只能禁止直接访问
+
 ## Chrome
 
 * https://static.centbrowser.cn/win_stable/

@@ -140,7 +140,7 @@ title: Linux命令
   * lz4hc：其实就是高压缩级别的lz4，压缩速度非常慢，但解压速度不变
   * snappy：完全不如lz4
 * zstd：后缀 .zst，速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0。命令行程序也能处理gz xz lz4
-* brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点
+* brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点。但字典中专门为HTML、CSS设计了
 * 比lzma更高压缩率且速度差不多：lzham_codec_devel
 * gzip -9
 
