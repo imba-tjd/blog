@@ -42,7 +42,7 @@ title: SQL
 * [NOT] BETWEEN 1 AND 9：测试的几个都为闭区间。支持日期类型
 * IN (1,2,3或单列子查询)、NOT IN：相当于多个判断等于的OR。`3 IN (1,2,NULL)`和NOT IN结果都是NULL，用子查询时尤其注意
 * [NOT] LIKE：默认不区分大小写，PG除外用ilike不区分。用%表示任意字符，用_表示单个字符；只有MSSQL支持`[]`。正则匹配：MySQL用RLIKE，PG用SIMILAR TO，MSSQL不支持，SQLite只内置了接口默认没实现
-* ANY、ALL：前加比较运算符，后跟子查询。用比较运算符（不等号）时可分情况改成聚合函数MIN和MAX，=ANY和!=ALL可换成IN和NOT IN，但=ALL和!=ANY没有等价的
+* ANY、ALL：前加比较运算符，后跟子查询。用比较运算符（不等号）时可分情况改成聚合函数MIN和MAX，如>ANY表示大于最小值。=ANY和!=ALL可换成IN和NOT IN。=ALL和!=ANY一般无意义
 * [NOT] EXISTS：前面不跟列，后跟子查询，判断是否返回至少一行数据，注意NULL也算存在
 * 拼接时常加`WHERE 1=1`，方便之后加AND
 * MySQL SQLite对于非空支持truthy，即WHERE A等价于WHERE A IS NOT NULL，WHERE 1永远为真
