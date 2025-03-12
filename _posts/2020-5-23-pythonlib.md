@@ -138,6 +138,7 @@ TODO: setup.cfg
 ### 其他包管理和构建工具
 
 * poetry，替代pip+venv：https://zhuanlan.zhihu.com/p/81025311 https://python-poetry.org/
+* flit：简单的构建工具，只考虑纯py+资源，不进行编译。只需指定顶级包。支持上传pypi
 * multibuild：用于产生多平台的wheel
 * https://hatch.pypa.io/latest/
 * meson(meson-python)

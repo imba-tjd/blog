@@ -328,10 +328,9 @@ min-split-size=20M #【默】进行多线程的最小块，此处只有文件大
 #max-concurrent-downloads 或-j 同时下载多个任务，默认5不用改
 # BT
 # 当下载的文件是.torrent时，自动开始BT任务
-bt-enable-lpd=true
-enable-peer-exchange=true
+bt-tracker=https://a/announce,udp://b/announce
+bt-enable-lpd=true # 从局域网中发现，没啥用
 bt-save-metadata=true # 保存磁力链接元数据为种子文件
-bt-tracker=https://cdn.staticaly.com/gh/XIU2/TrackersListCollection/master/best_aria2.txt
 
 # 运行为服务
 daemon=true # Win无效，WSL有效

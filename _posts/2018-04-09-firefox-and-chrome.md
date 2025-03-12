@@ -129,9 +129,12 @@ title: 浏览器
 * https://static.centbrowser.cn/win_stable/
 * 适用于老系统的：https://github.com/win32ss/supermium
 * Ctrl+M：在当前窗口新建隐私页
+* 禁止自动更新：C:\Program Files\Google\Update文件夹 改名
+* 便携版：https://github.com/henrypp/chrlauncher
 
 ### about:flags
 
+* 没有方法找出Default对应哪个选项
 * https://bbs.kafan.cn/thread-2133336-1-1.html
 * Password import
 * Experimental JavaScript
