@@ -1,0 +1,45 @@
+# Spark
+
+## 安装
+
+* 目前最高支持jdk17，再高会报错
+* Win下会提示要 https://github.com/steveloughran/winutils 放到%HADOOP_HOME%\bin里但好像只有hadoop2要
+
+## 体系结构、角色
+
+* Driver：具有main()和SparkContext对象，连接集群提交Job。应与工作结点在同一局域网内；如果其他网络的程序要提交任务应让那些程序和Driver RPC，而不是把Driver放到别的网络
+* Manager：资源管理器，支持多种实现，包括standalone YARN k8s
+* Worker：一个Application在每一个worker里都有一个Executor（里面有一个Cache），可以运行多个Task
+* Application：用户代码，包括依赖项，一般是uber jar。概念上包括Driver和Executor
+* Job：如save、collect，会产生多个Task并行计算。Stage：比Task大比Job小，是一组Task，类似于map和reduce的概念
+* 主要API：之前叫 弹性分布式数据集 Resilient Distributed Dataset(RDD) 不推荐用了。现在叫Dataset（在pyspark中也叫DataFrame），要看“SQL programming guide”。都是强类型的，但后者性能更好
+
+## 服务端
+
+* SPARK_HOME、SPARK_DAEMON_JAVA_OPTS
+* ./sbin/start-master.sh  日志输出 spark://HOST:7077
+* ./sbin/start-worker.sh master-spark-URL
+* Web UI：start-master是8080，worker是8081，REPL是4040
+* spark-shell运行的是scala环境，pyspark是py REPL。会自动临时启动服务端，或用--master spark://IP:PORT
+* standalone集群启动脚本：在master结点上的conf/workers文件里一行一个worker主机名，必须先建立好免密ssh认证，之后start-all.sh。不支持win
+
+## Application
+
+* 可以用pyspark-submit。如果安装了pyspark包，可以直接运行
+* 示例：examples/src/main/python/pi.py
+* 文档：https://spark.apache.org/docs/latest/api/python/getting_started/index.html
+
+```py
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as sf
+
+spark = SparkSession.builder.appName("SimpleApp").getOrCreate()
+
+textFile = spark.read.text("README.md").cache()
+linesWithSpark = textFile.filter(textFile.value.contains("Spark"))
+print(linesWithSpark.count())
+
+spark.stop()
+```
+
+提交任务：https://spark.apache.org/docs/latest/submitting-applications.html

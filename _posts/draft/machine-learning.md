@@ -54,7 +54,7 @@ df.shape  (行数, 列数)
 df.size  元素总数
 df.dtypes  各列数据类型
 df.head(n=5)/tail()  显示最开始/后面的几行
-df.info()  所有列的名称类型占用空间，可选memory_usage='deep'
+df.info()  所有列的 名称 类型 占用空间，可选memory_usage='deep'
 pd.set_option("display.max.columns", None)  列过多时不隐藏
 
 选取(view)：
@@ -100,7 +100,7 @@ df.merge和join() on='列'  类数据库join，根据文档merge默认inner，su
 df1.combine_first(df2)  用df2填充df1的缺失值。update(df2)：用df2的非空值覆盖
 重复行、空行：
 df.dropna()  删除包含空值的行；只处理全为空的：how='all'
-fillna(x)  用x填充空值，或method='ffill或bfill'用前后值填充。df.interpolate(method=默认'linear') 插值填充
+df.fillna(x)  用x填充空值，或method='ffill或bfill'用前后值填充。df.interpolate(method=默认'linear') 插值填充
 df.drop_duplicates(keep=默认'first')
 其他修改：
 df.drop([xxx])  删除行；删列用axis=1或column=，还能用del且是原地的
@@ -128,7 +128,7 @@ df.groupby(['A']).B.max()  按A分组后把对应范围的B聚合，产生以A�
 df.pivot_table(index='col1',columns='col2',values=['col3','col4'],aggfunc='max'或{不同值对应的处理方式},margins=True汇总,fill_value=0)  数据透视表，以col1为行，col2为列，取col3和col4的最大值，聚合后还空的值填0
 
 画图：要开%matplotlib inline
-df.plot(x='xxx',y=[...])  默认折线图。bar(stacked=True)堆叠条形图，scatter(x='A', y='B', c='C')散点图，hist(bins=50)直方图
+df.plot(x='xxx',y=[...])  默认折线图，kind='bar'改为其他图。.bar(stacked=True)堆叠条形图，scatter(x='A', y='B', c='C')，hist(bins=50)
 ```
 
 ## matplotlib
@@ -144,13 +144,35 @@ import matplotlib.pyplot as plt
 plt.plot([xpoints], [ypoints], label='折线名')
 plt.title()
 plt.ylabel('Y轴名称'); plt.xlabel()
-plt.rcParams['font.sans-serif']=['SimHei'] # 解决不显示中文
+
 plt.show() # 终端里也能用，但会显示在窗口中
 plt.savefig('img.svg' / bytesio) # 格式自动根据文件名的后缀设置
 
 # 在一个figure中绘制多个图
 fig, axs = plt.subplots(n) # 单参数为一列n行，(1, 2)为1行2列，行列都大于1时返回二维数组
 axs[0].plot...
+
+plt.tight_layout()
+
+subplot2grid
+
+fig = plt.figure()
+subplot1 = fig.add_subplot(121)
+subplot1.plot(x,y)
+subplot2 = fig.add_subplot(122)
+subplot2.plot(y,x)
+fig.tight_layout()
+```
+
+解决英文系统上不显示中文的问题。实测无法用Noto Sans CJK SC(fonts-noto-cjk)。
+
+```py
+! apt-get install fonts-wqy-microhei -qq && rm -rf ~/.cache/matplotlib && fc-list :lang=zh family
+from matplotlib import rcParams, font_manager
+font_manager.fontManager.addfont('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc')
+font_manager.findfont('WenQuanYi Micro Hei', fallback_to_default=False)
+rcParams['font.family']=['WenQuanYi Micro Hei']
+#rcParams['axes.unicode_minus'] = False 已知wqy不需要此项，不知雅黑是否需要
 ```
 
 其他可视化库：Seaborn(基于matplotlib，用起来更简单，但只支持2D) bokeh plotly功能最多可以画地图 plotly/dash(基于plotly.js，用于构建网页) altair Plotnine pyecharts
