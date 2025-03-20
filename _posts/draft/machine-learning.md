@@ -1,27 +1,337 @@
 # 经典机器学习
 
-* 算法：线性/逻辑回归、决策树、随机森林、SVM支持向量机、隐马尔可夫模型、KNN(K近邻)、K-均值
   * 可学的：随机森林、Gradient Boosting Machines (GBM)、逻辑回归
     * 如果不进行超参调节，可能随机森林比GBM好。随机森林只要调max_depth, n_estimators, class_weight。GBM峰值性能好，但要调的参数多，也相对容易过拟合
-  * 不学的
-    * 支持向量机SVM：分类和回归都不行。需要选择核函数，如果选得好则有效，可以处理高维数据和非线性可分数据，但对于大量数据不行
-    * 朴素贝叶斯分类器(Naive Bayes)：用于文本分类、垃圾邮件过滤。它假设特征之间相互独立，现实世界中往往不是
-    * 线性回归和逻辑回归(Logistic Regression)：深度学习的基础，可理解为单层的神经网络。对于非线性可分(linearly separable)数据不行。在推荐系统，CTR点击率预估领域，还是以LR为主
     * 隐马尔科模型HLM：文本任务，用深度学习
-    * KNN（K临近）：算法简单，但当数据量大时计算花费大。替代用局部敏感哈希LSH和树结构如KD树
-    * Principal Component Analysis主成分分析：用于降维有点用
-* 任务：分类classification（一般有监督，目标是预测新的数据的标签）、回归regression、聚类clustering（一般无监督，就是区分一批数据）、降维、模型选择、预处理
-* 适合表格型数据
 * gradient-boosting梯度提升：XGBoost、LightGBM、CatBoost、AdaBoost https://neptune.ai/blog/when-to-choose-catboost-over-xgboost-or-lightgbm https://www.kaggle.com/code/faressayah/xgboost-vs-lightgbm-vs-catboost-vs-adaboost
 * 自动机器学习，自动调超参数：https://github.com/automl/auto-sklearn 不活跃，不支持sklearn 1.0，见 #1371
   * https://github.com/nidhaloff/igel
 * CNN：用于图像和视频分析任务。RNN：顺序数据分析任务，自然语言处理、语音识别、时间序列分析。GAN：生成与给定数据集相似的新数据样本，用于图像合成、风格迁移和数据增强等任务。Transformer网络：自然语言处理
-* 训练集(train)、验证集(verify)、测试集(test)：训练用于拟合模型。验证用于调整超参数，一般由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试用于最终模型的无偏评估
 * early stop：训练过程中，训练集的loss不断下降，但验证的loss上升，说明模型过拟合。此时停止训练，选择最好的模型
+* 数据挖掘任务：①预测：分类、回归。②描述：关联（相似度计算）、聚类、异常
+* 寻找简单模型和复杂模型平衡点的方式：正则化(regularization)、提升法(boosting)、自主聚合法(bagging)
+* 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
 
-## pandas
+fit是否支持df？
 
-* https://pandas.pydata.org/docs/
+---
+
+## 术语
+
+* 均值 EX、μ、mean
+* 方差 variance σ²：一种测量分散程度(variation)的方式，低方差为集中。DX=EX²-(EX)²。协方差：conv(X,Y)
+* 标准差 Standard Deviation σ：又称均方差、均方根值（RMS），是方差的算术平方根。在统计学上，S是样本的标准差，σ是总体（真实）的标准差
+* SS(mean) - sum of squares around the mean 均值周围平方和：计算y的平均值m，再将每个y计算(y-m)^2，求和
+  * SSR - sum of the squared residuals。也称为L2损失
+* Var(mean) - variance around the mean 方差 = SS(mean) / n
+  * 概率论上是除以n-1，是每个样本值与全体样本值的平均数之差的平方值的平均数，也叫样本方差、抽样方差、无偏估计、无偏方差
+* MSE, Mean Squared Error 均方误差, Var(residual)：是常见的损失函数。也叫总体方差、有偏估计。再开方称为均方根误差
+  * （在线性回归中）MSE对于离群值的损失计算更大，为了减小损失，模型相对于MAE会更偏向于离群值，即会受异常值影响
+* MAE 平均绝对误差：不可导，无法梯度下降，DL中不用。不除以n称为L1损失
+* 残差 residual：对于某个点，预测值到真实值的距离。只有线性模型才有此概念
+* 偏差 bias：宏观上表示简化的ML模型无法捕捉数据的真实关系。如用直线拟合曲线关系则具有高bias
+* bias 和 variance：前者表示在训练集上的拟合程度，后者表示在测试集上的拟合程度。低bias+高variance为过拟合overfitting，高bias+低variance为欠拟合underfitting
+* 斜率：slope。截距：intercept
+* Nominal标称 和 Ordinal有序：值的顺序是否有意义
+* Mode众数：出现频率最高的值
+* Discrete Data 离散数据：定性 qualitative，如各个城市的名字。连续数据：定量 quantitative，数字，可测量。预处理数据时一般要把二者分开
+* CARTs：分类和回归树
+* TODO: 除以n和除以n-1的区别
+
+## 数据预处理
+
+* TODO：顺序。是不是有些训练和测试都要用，有些只用于训练
+* pipe = sklearn.pipeline.make_pipeline(预处理器, 转换器, 可选模型)：pipe.fit(X_train, y_train)自动对于数据先fit再transform，对于模型仅fit。y_pred = pipe.predict(X_test)自动依次transform，最后predict。能用统一的方式处理训练数据和测试数据
+
+### 清理
+
+#### 缺失值
+
+* 直接删除：如果一列缺太多可以删列，一行如果只缺一个一般不删
+* 代替法：如用0填充
+* 插值法SimpleImputer：平均数（非数值如str用不了）、众数、先聚类再平均。KNNImputer
+* 模型预测法IterativeImputer：用其他属性预测。但实际上如果其他属性和缺失值无关，则预测结果毫无意义；如果预测得准，说明这个缺失的属性没必要纳入数据集中
+* 有的模型如LR不接受空值：Input contains NaN, infinity or a value too large
+
+```py
+查看：df.isna().sum()
+一行只有3个及以下有效数据时删除：df.dropna(thresh=4) 当指定列存在NaN时删除那些行：subset=['C']
+用均值填充：df.fillna(df.mean())，用前后值填充：method='ffill或bfill'。插值填充：df.interpolate(method=默认'linear')
+df.drop_duplicates(keep=默认'first')  # TODO: 处理重复值，还可以聚合（如求和、平均）。现笔记应该只有一整行完全相同时才行，可能还要排序
+
+from sklearn.impute import SimpleImputer
+imputed_X_train = imputer.fit_transform(X_train)
+imputed_X_valid = imputer.transform(X_valid)
+imputed_X_train_pd = pandas.DataFrame(imputed_X_train, columns=X_train.columns) # 如果转回pd，加上列名
+
+对不同列使用不同的填充方法：ColumnTransformer
+```
+
+#### 异常值（偏离值、离群点）
+
+* 检测：箱线图、Z-score、IQR法。孤立森林sklearn.ensemble.IsolationForest，假定异常样本的比例低
+* 处理：删除、修正为阈值
+
+#### 其它处理
+
+```py
+df.select_dtypes(include=['object']).columns # 查看非数字列的列名
+df.select_dtypes(exclude=['object']) # 去掉非数字列
+```
+
+### 变换
+
+#### 编码分类变量
+
+* 线性模型假设特征之间存在线性关系，要将分类变量转换为数值 。如果使用标签编码Label Encoding，如性别编码为0 1，模型可能错误地认为“1比0大”
+* 无序分类变量用独热编码One-Hot Encoding，有序用标签编码（如教育程度：小学<中学<大学）
+* 类别数量极大时，独热编码会导致维度爆炸。此时需选择其他方法：目标编码Target Encoding（用类别目标均值替代）、嵌入Embedding、频率编码
+* 树模型不需要转换，或可用参数自动转换，如categorical_feature、enable_categorical=True
+
+```py
+dummies_C = pd.get_dummies(df['C'], prefix='C') # TODO: 直接pd.get_dummies(df)是什么效果
+df = pd.concat([df, dummies_C], axis=1)
+df.drop(columns=['C'], inplace=True)
+
+from sklearn.preprocessing import OrdinalEncoder # 可能存在X_train和X_valid里有不同值的情形，此时要drop掉差异部分，太复杂略。还有一种OneHotEncoder，转换后toarray()
+label_X_train[object_cols] = ordinal_encoder.fit_transform(X_train[object_cols])
+label_X_valid[object_cols] = ordinal_encoder.transform(X_valid[object_cols])
+```
+
+离散化：将连续变量分箱。
+
+#### 样本不均衡
+
+* 过抽样(上采样)增加少数类样本数量，包括简单复制、SMOTE算法添加随机噪声和kNN原理合成、GMM高斯混合模型生成同分布的
+* 欠抽样(下采样)减少多数类样本，可能丢失重要信息
+* 模型法：有的算法能自动调整
+* sklearn的resample实现了过采样和欠采样，通过n_samples参数控制
+
+#### 平滑（阶梯状）
+
+贝塞尔曲线变换、窗口卷积。简单算法：分箱后用某个统计量代替
+
+#### 标准化
+
+* 归一化、标准化、正则化
+* 标准化变换：(x-mean)/std 一般用于数据符合正态分布的情况。如果处理后>2说明存在异常值
+* 如果最终输出，要反向还原到原区间
+* 决策树不需要归一化，因为每次只考虑一个条件，不受其他不同量级的影响，关心变量的分布和变量之间的条件概率。Adaboost SVM LR KNN KMeans等最优化问题需要归一化
+* sklearn.preprocessing.StandardScaler().fit_transform(X_train) 应只在训练集上放缩
+
+### 特征工程
+
+* 特征选择
+  * 过滤法：基于统计指标（如方差、卡方检验、相关系数）选择重要特征
+  * 包裹法：通过模型评估特征重要性（如随机森林、LASSO）
+  * 嵌入法：模型内置特征选择（如XGBoost的特征得分）
+* 特征创建：如 总收入=工资+奖金、面积×房价
+
+#### 降维（特征提取）
+
+* 减少特征数或数据集的维度且保持结果良好，一般处理相关性高的（冗余），将两个feature合并为一个，如减少图片像素用池化
+* PCA主成分分析
+将数据集绘制成点，用类似于线性回归的方式找到一个方向，称为PC，保留了最大数据方差。二维下与之正交的就可以去掉，多维下就寻找正交且继续具有最大方差的
+  * 会“旋转坐标轴”，产生新坐标
+  * 使用前应对数据放缩
+  * 只能线性降维，需要数据基本线性可分。如果不是，可用流形学习算法如t-SNE，它也能用于聚类，但不可解释
+  * sklearn.decomposition.PCA 用户指定处理后的维数或百分比或mle算法自动猜测
+* 因子分析：是前者的扩展。还能分类
+* 非线性方法：t-SNE、UMAP
+* TF-IDF、Word2Vec
+    
+### 样本切分
+
+训练集(train)、验证集(verify)、测试集(test)：训练用于拟合模型。验证用于调整超参数，由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试用于最终模型的无偏评估
+
+```py
+# 把源数据分成 训练 和 测试 两部分。此处0.1表示10%。shuffle默认？还有分层切分
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+```
+
+### 模型评价
+
+```py
+from sklearn.metrics import *
+
+y_pred = model.predict(X_test)
+print("MSE: %.2f" % mean_squared_error(y_test, y_pred))
+print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred)) 
+
+# 以上是分开predict和获得score。还有一种通用的集成方式。对于不同模型，分数的意义不同，如LR的score就是R^2
+model.score(X_test, y_test)
+```
+
+#### 超参选择 交叉验证
+
+* holdout交叉验证：把训练集划分出验证集，反复调整超参，以在验证集上获得更高分数。一般不用
+* K折 K-Fold：避免验证集过拟合。把训练集分成K份，每次取其中一份作为验证集，其余训练。一共训练K次，得到K个模型超参相同及其在验证集上的得分；调整超参后重新训练K次
+* 留一法 Leave One Out：每一份测试集的大小是1条数据，即上面的K=数据量n
+* Grid Search CV：方便测试多个超参。提前一次性手动提供待测试的各超参和未设定超参的model，得到的对象可视为model的装饰器，fit(数据)会自动依次组合测试且选取最佳的值
+
+```py
+# 自动K折验证：cv就是K。返回分数列表，一般再计算mean和std。当用于寻找超参时，需在前面手动循环超参创建model。n_jobs=-1在所有核心上并行处理
+sklearn.model_selection.cross_val_score(model或pipe, X_train, y_train, cv=5, n_jobs=-1)
+
+# 手动K折验证
+kfold = sklearn.model_selection.StratifiedKFold(n_splits=5).split(X_train, y_train) # 返回值表示一些下标
+for k, (train, vrf) in enumerate(kfold): model.fit(X_train[train], y_train[train]); print(model.score(X_train[vrf], y_train[vrf]))
+```
+
+#### 混淆矩阵 Confusion Matrix
+
+```
+      预测值Predicted
+       -----------
+真实值  | TP | FN |
+Actual |---------|
+ True  | FP | TN |
+        -----------
+```
+        
+* 又称可能性矩阵、错误矩阵。用于评估分类任务
+* 其中Actual和Predicted的组合就是符合直觉的那种。但在某些时候，ML中，用True来存放模型的输出，Predicted存放验证数据
+* True Positive(TP)、FN（预测没有实际有，又叫二类错误，如漏诊）、FP（预测有实际没有，又叫一类错误，如误诊）、TN（预测没有实际也没有）。对角线是预测正确的
+* 样例总数 M = TP + FP + TN + FN。MP = TP + FN，MN = FP + TN
+* 准确率(Accuracy,ACC)：识别正确的个数/样本总个数 (TP+TN) / n。若样本类别不平衡，单纯提高它，不利于发现少数类低正确率
+* 精确率(Precision) / PPV：预测为正类别的样本中，真正的正类别是多少 TP / (TP+FP)
+* 召回率(Recall) / 敏感性/灵敏度(Sensitivity) / TPR / 查全率：在实际正类别中，模型能预测出(预测为正)多少 TP / (TP+FN)。与实际负类别无关，将所有数据全预测为正（降低阈值，会导致FP增加）就能达到100%
+* 特异性(Specificity) / TNR：在实际为负类别的样本中，模型能够正确预测为负类别的比例 TN / (FP+TN)
+* F1分数(F1-score)：精确率和召回率的调和平均数。取值范围[0, 1]，越接近1表示模型的性能越好
+* 接受者操作特性(ROC)图：调整分类阈值（超参），达到增加TP（纵轴）、减少FP（横轴）的目的。纵横轴值域都为1，一开始阈值设为0表示模型都预测为P，导致TP和FP都为1，随着调整逐步往左上角移动，之后再往下移动直到TP和FP都为0即都预测为N。左上角的点代表较好的阈值
+* 曲线下面积(AUC)：将ROC的点连接起来，与横轴之间的面积就是AUC，更换不同的模型算法，也绘制ROC和计算AUC，AUC更大代表更好。AUC的值也能通过计算得到：依次各取一个P和一个N，进行 MP × MN 次比较，将P类的模型得分高于N类模型的次数记为H，则AUC = H / (MP × MN)。如果AUC=1，则可以完美区分；如果=0.5，则没有任何区分度；如果<0.5，则比随机猜还差
+* sklearn.metrics.confusion_matrix(y_test,y_pred)、classification_report(y_pred,y_test)
+
+## 线性回归
+
+* 用于预测连续值。也能用于判断变量之间是否相关
+* 用最小二乘法(least squares method, LSM)将数据拟合到直线。数学上可以求导得到正规方程直接得到参数值，但工程上一般用迭代的方式
+* R^2 = ( Var(mean) - Var(fit) ) / Var(mean) = 1 - Var(fit)/Var(mean)，是MSE的标准化版本
+  * Var(mean)是按y的平均值计算方差，Var(fit)是按拟合的直线的取值作为期望算的方差，因为分母一样，其实可以不用除以n，即SS
+  * 假设结果是0.6，就可以说：当我们把x考虑进来后，y的方差有60%的减少；或x"解释(explain)"了y的方差的60%；60%的方差可用x-y的关系解释。越接近1表示强相关
+  * R：相关性的度量标准，量化mean和fit的区别。R^2比R更符合直觉
+  * 计算p值。用于决定R^2的关系有多可靠
+* 在推荐系统，CTR点击率预估领域，还是以LR为主
+
+### 岭回归（Ridge Regression） / L2正则化
+
+* 当训练数据量很少时，即使训练集拟合得好，测试集也不好，称作低bias高variance。岭回归增加bias提升泛化能力
+* 训练目标变为：最小化 SS(residual) + λ * (斜率)^2，后半部分称为岭回归惩罚。增大λ将导致拟合的斜率减小，对feature不敏感，相当于将feature值（包括“最优解”时的值）往0压缩。对于多特征，是λ*sum(各特征^2)
+* 需要对输入数据 中心化和放缩
+* Lasso回归 / L1正则化：λ * abs(斜率)
+  * 效果上可以把一些系数缩小到0，可以理解为一种特征选择。如果无用特征多（稀疏），用Lasso；如果有用特征多，Ridge稍好
+* 弹性网络回归：L1和L2的组合
+* 稳健回归：用于减少异常值的影响。包括huber回归和RANSAC随机采样一致性迭代算法
+
+## 逻辑回归
+
+* sigmoid函数：形状像S的函数。logistic函数：一种典型的sigmoid函数，f(x) = 1 / ( 1 + e ^ -z )
+  * z为线性输出，数学上是 k(x-x0)，ML中是 w1x1 + w2x2 + b
+  * z又称为 对数几率比(log odds ratio, logit)，是logistic函数的反函数。从fx中解出 z = log( y / (1-y) )，其中y和1-y就是两种概率输出
+* 值域在[0,1]，表示概率
+* 对数损失函数（0-1损失函数的平滑版）：sum(log( e^(-y*z) + 1 ))。逻辑回归模型的变化率不是常量，如果用MSE，当输出越来越接近0和1时，精度不够
+* L2正则化：如果不做，在模型具有大量特征的情况下，逻辑回归的渐近性质会不断将损失推向0。一般还配合限制训练次数（Early stop）
+* “逻辑回归是线性的，但Logistic函数不是线性的”：它的核心模型、决策边界在特征空间中是线性的，但为了输出概率值，使用了一个非线性变换
+
+model.predict_proba 对于多分类，依次返回各个类的概率（二分类就会返回2个）
+
+### 与用于分类的线性回归比较
+
+分类任务的label是离散的，必须先数值化。
+线性回归得出的连续值，要经过一个阈值函数映射到类别。如z>0表示类别1，<0表示类别0
+
+## 其它算法原理
+
+### KNN K最临近
+
+* 非参数算法，不需要训练模型，或称为懒惰学习法：给定训练数据时，只是简单存储。对于一个新数据，对其的预测是周围K个的平均值。可用于回归和分类
+* K的取值是超参数，过大会欠拟合，过小会过拟合
+* 距离度量：连续型有闵可夫斯基距离、余弦相似度、皮尔逊相似系数。离散型有汉明(编辑)距离、杰卡德Jaccard相似系数
+* 数据量大时计算花费大。替代：局部敏感哈希LSH、树结构如KD树
+
+### SVM 支持向量机
+
+* 在数据点之间绘制决策边界，将数据尽量分开
+* 所谓的“支持向量”指的是靠近边界的样本
+* 远离边界的正确分类点不会参与拟合（Hinge损失的0-loss区域）
+* 核函数：将数据投影到更高维，处理线性不可分。核技巧：用某些简单的式子来表示距离，不用真的计算出高维投影结果再处理
+* 如果数据量不够DL，可以选用
+
+### 朴素贝叶斯分类器 Naive Bayes
+
+* 假定（现实世界中难以存在）不同特征出现的概率相互独立
+* 贝叶斯定理：P(A|B) = P(B|A) * P(A) / P(B)。P(A|B,C) = P(B|A) * P(C|A) * P(A) / (P(B)*P(C))
+  * A是分类，B是特征（如某个单词的出现次数(count)）
+  * 左边是待计算的（给定新特征B要求计算分类A），右边是模型参数（训练数据样本）
+  * 其中分母不知道也不必计算，对于A的每个取值，计算分子，比大小即可
+* 拉普拉斯修正：如果某个条件概率不存在于训练集中，会导致概率乘积计算为0。修正各个概率为：对于每一种取值，假定先存在一个样本。如P(yes) = (count(yes)+1) / (count(*)+2)，P(x|yes) = (count(yes and x)+1) / (count(yes)+distinct(X))
+* feature和target都要是离散化的
+* 用途：垃圾邮件过滤
+
+## 聚类（寻找物体之间的自然分组）
+
+* 硬聚类、软聚类（一个点可以属于多个集群）
+* 测量相似度：对于点，用欧几里得距离。对于向量，用余弦距离。对于两个簇的距离：如果数值型，用平均欧几里得距离，或“重心”之间的距离。如果平均没有意义，也有选择最近的点或最远的
+* 简单度量指标：纯度 = 簇中占主导地位的类 / 簇的大小。缺点：当分成n类每类1个时能达到100%
+
+### 分层（树）
+
+* 凝聚：AGNES算法，自下而上，每次合并距离最小的两个类
+* 分割：DIANA算法，自上而下，先将距离其他点距离最大的一个点划出来，再遍历其他所有点，看离哪个簇更近
+* 需要终止条件，因为可以把所有点都分成一个类，也可以每个点都各自分一个类。可指定聚类个数K，也可以指定其他阈值如一个类的半径
+* 缺点：一个对象一旦划分，就无法撤销。时间复杂度大
+* 其他算法：BIRCH 使用 CF 树并逐步调整子聚类的质量。CURE 从聚类中选择分散良好的点，然后将它们向聚类中心收缩指定的分数
+
+### 分区（划分）
+
+重定位、K均值、k-medoids(PAM)就是集群由集群中的一个对象表示
+
+### 基于密度
+
+* 可以发现任意形状的簇，对异常值不敏感
+* DBSCAN：给定一个半径从一个点开始画圈，如果圈内点的个数大于给定阈值，则此点称为中心点，圈内的点称为直接密度可达；如果小于阈值，但自身在另一个中心点圈内，称为边界点；否则称为噪声点。如果a->b->c，则称为密度可达。如果a->b a->c，则abc称为密度相连；都连在一起，就是一个簇
+* OPTICS、DENCLUE
+
+### 其它算法
+
+* 基于网格：速度与数据对象个数无关
+* 基于模型：神经网络（Self-Organizing Map、Autoencoder）、统计（混合高斯模型）
+
+### 需求
+
+* 可扩展性（在时间和空间方面）
+* 能够处理不同的数据类型
+* 对确定输入参数的领域知识要求最低
+* 能够处理噪声和异常值
+* 对输入记录的顺序不敏感
+* 合并用户指定的约束
+* 可解释性和可用性
+
+## 问题构建
+
+* 用非ML术语回答“我要达成什么目标？”
+* 先验证当前的非ML解决方案。如果没有，可以用“启发式”(heuristic)，看起来基本就是按经验选几个feature，用固定方式计算，不保证全局最优
+* 比较ML在质量上的改进、费用和维护
+* 用于ML的数据：大量、一致、可信（来源）、正确、代表性。标签与特征之间具有相关性
+* 确定需要的输出
+  * 预测性ML
+    * 二分类、多类别单标签（对图片中的动物进行分类） 、多类别多标签（对图片中的所有动物进行分类）
+    * 一维回归、多维回归（预测多个标签）
+  * 生成式AI
+    * 文本：总结、翻译、分析
+    * 图片：生成、生成变体、应用视觉效果
+    * 音频、视频
+  * 假设您始终拥有正确的答案。您会如何将其用于自己的产品？
+* 代理标签：如用 用户是否愿意分享或点赞 作为衡量用户是否认为视频有用
+* 定义成效指标：提升了 具体的百分之多少。再决定是否有改进模型的可能，以及代价
+* 实现模型：从简单模型开始作为基准（也可用预训练模型），设置好数据流水线，监控训练，部署，训练-应用偏差
+* 安全考量：https://learn.microsoft.com/zh-cn/windows/ai/rai
+
+---
+
+## [pandas](https://pandas.pydata.org/docs/)
+
 * axis=0指行，1指列。许多函数有index和column的命名参数，优先用这个，除非想应用于所有
 * Series具有广播特性：赋单个值就全变成该值，赋list/range/Series就依次改变。与比较运算符计算会产生值都为bool的Series，与另一个Series运算就依次处理，不会变成两列的df。但是不支持'xxx' in S1，要自己用map。长度不可变
 * 如果是自动生成的行名，第0列不为行名
@@ -41,8 +351,8 @@ df.to_numpy()  返回底层的np.array，是view。不推荐df.values
 df.copy(deep=True)
 
 创建：
+pd.DataFrame([ [1,3], [2,4] ], columns=['A','B'])  一般是 按行导入 原无列名 的外部数据
 pd.DataFrame({'A':[1,2], 'B':[3,4]})  两列AB，两行，第0行数据是13。指定行名：index=['row1', 'row2']
-pd.DataFrame([ [1,3], [2,4] ], columns=['A','B'])  另一种创建方式，按行输入数据
 pd.Series([1,3], index=['A','B'])  一行数据，AB是列名；但也可看作一列数据，AB是行id。也可传dict
 pd.Series([1,2], name='A')  一列数据，A是列名，行id自动编号
 columns = pd.MultiIndex.from_product([ ['one','two'], ['first','second'] ])  产生one下的两个和two下的两个，使用时用.loc[:, ('one', 'second')]
@@ -98,10 +408,6 @@ df.round(2)  四舍五入
 pd.concat([df1, df2, rows], ignore_index=True)  合并行，ignore_index重置索引。设定axis=1变为合并列。之前的append废弃了
 df.merge和join() on='列'  类数据库join，根据文档merge默认inner，suffixes=('_1','_2')指定重复列名后缀；join默认left
 df1.combine_first(df2)  用df2填充df1的缺失值。update(df2)：用df2的非空值覆盖
-重复行、空行：
-df.dropna()  删除包含空值的行；只处理全为空的：how='all'
-df.fillna(x)  用x填充空值，或method='ffill或bfill'用前后值填充。df.interpolate(method=默认'linear') 插值填充
-df.drop_duplicates(keep=默认'first')
 其他修改：
 df.drop([xxx])  删除行；删列用axis=1或column=，还能用del且是原地的
 df.columns = ['new_A', 'new_B']  重命名列。按映射重命名：df.rename(columns={'old': 'new'}, index=...)
@@ -140,6 +446,34 @@ df.plot(x='xxx',y=[...])  默认折线图，kind='bar'改为其他图。.bar(sta
 ```py
 %matplotlib inline
 import matplotlib.pyplot as plt
+
+
+
+fig, ax = plt.subplots(ncols=2, figsize=(10, 5), sharex=True, sharey=True)
+
+ax[0].scatter(X_train, y_train, label="Train data points")
+ax[0].plot(
+    X_train,
+    regressor.predict(X_train),
+    linewidth=3,
+    color="tab:orange",
+    label="Model predictions",
+)
+ax[0].set(xlabel="Feature", ylabel="Target", title="Train set")
+ax[0].legend()
+
+ax[1].scatter(X_test, y_test, label="Test data points")
+ax[1].plot(X_test, y_pred, linewidth=3, color="tab:orange", label="Model predictions")
+ax[1].set(xlabel="Feature", ylabel="Target", title="Test set")
+ax[1].legend()
+
+fig.suptitle("Linear Regression")
+
+plt.show()
+
+
+
+
 
 plt.plot([xpoints], [ypoints], label='折线名')
 plt.title()
@@ -183,46 +517,23 @@ rcParams['font.family']=['WenQuanYi Micro Hei']
   * 中文文档：https://scikit-learn.org.cn/lists/8.html 教程 https://scikit-learn.org.cn/lists/2.html 用户指南 https://sklearn.apachecn.org 另一个中文站
   * https://zhuanlan.zhihu.com/p/88729124 https://zhuanlan.zhihu.com/p/103136609 https://zhuanlan.zhihu.com/p/99618155 https://zhuanlan.zhihu.com/p/29649128 https://zhuanlan.zhihu.com/p/190049765
 * 树的层数太浅会导致underfitting，无论是训练还是验证都具有较大误差；层数太多会导致overfitting，能非常好的匹配训练，但验证却有很大误差；应处于中间，一种控制方法是创建model时设定max_leaf_nodes，另一种仅解决of的方法是指定regularization
-* 损失函数：衡量模型的预测值与sample真实值的区别，一般就是相减再平方
-* 另一种评判好坏的方法：bias(偏差)和variance(方差)，两者形成4种组合。高bias为离目标远，低bias为离目标近，高variance为分散，低variance为集中。低bias+高variance为overfitting，高bias+低variance为underfitting
-* 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
 * 决策树(DecisionTree)：xgboost.XGBRegressor，实测不调任何参数时与RF随机森林差不多；后来出了hist版，减少了内存占用。微软出了LightGBM，原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错。这类模型(GBDT)不需要归一化
-* 归一化：概率模型（树形模型）不需要归一化，因为它们不关心变量的值，而是关心变量的分布和变量之间的条件概率，如决策树、RF。而像Adaboost、SVM、LR、Knn、KMeans之类的最优化问题就需要归一化。sklearn.preprocessing.StandardScaler().fit(X_train).transform(X_train) 应只在训练集上放缩
 * pipeline：把pre-processors和estimators连起来自动依次使用
 * 序列化持久保存：pickle、joblib.dump(m, 'filename')第三方二进制序列化库内部基于pickle格式加载时会用mmap、treelite编译决策树的库
 * 其他库：yellowbrick图形化，mlxtend工具类，dtreeviz可视化，scikit-optimize，m2cgen把模型转换为其它语言，featuretools，Sacred能保存各种参数用于复现
+* solver求解器：使用哪种算法寻找参数。可能涉及功能（有的不支持多分类，是否支持正则化），可能涉及性能（大数据集），有的在其他二进制库中实现（一般自带了）
 
 ```py
-y = data.Price # 选择一个列作为预测目标target。小数则为回归，整数或其它离散量则为分类，无监督学习不需要
+y = data.Price # 选择一个列作为预测目标target。小数则为回归，整数或其它离散量则为分类
 X = data[['col1','col2']] # 选择一些列作为“features”。另一种选择方式：去掉不要的drop(columns=['Price'])。如[[1,2,3],[4,5,6]]表示2个sample，3个feature
-
-from sklearn.model_selection import train_test_split # 把源数据分成 训练 和 测试 两部分，此处0.1表示10%
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
 from sklearn.ensemble import RandomForestRegressor/RandomForestClassifier # 比单个决策树更精确且无需调整叶子参数，基本可以无脑替换普通决策树
 model = RandomForestRegressor(random_state=0) # 设定random_state使得每次运行结果一样
-model.fit(X_train, y_train) # 填充数据
-val_predicted_prices = model.predict(X_test) # 预测结果，返回类型是np.ndarray
+model.fit(X_train, y_train)
+val_predicted_prices = model.predict(X_test)
 
-from sklearn.metrics import mean_absolute_error
-mean_absolute_error(y_test, val_predicted_prices)
-model.score(X_test, y_test) # accuracy
-
-
-# 填充空值，用已有的数据模拟，当空值较少时可以用；如果较多，应drop那一列
-from sklearn.impute import SimpleImputer 
-imputed_X_train = pd.DataFrame(imputer.fit_transform(X_train))
-imputed_X_valid = pd.DataFrame(imputer.transform(X_valid))
-imputed_X_train.columns = X_train.columns; imputed_X_valid.columns = X_valid.columns # Imputation会移除列名，此操作加回去
-
-pd.get_dummies(data) # 自动把数据中非整数的离散值变成整数
-data.select_dtypes(exclude=['object']) # 直接去掉非数字列
-object_cols = [col for col in X_train.columns if X_train[col].dtype == "object"] # 提取非数字列的列名
-from sklearn.preprocessing import OrdinalEncoder # 也是把非数字编码为数字，但可能存在X_train和X_valid里有不同值的情形，此时要drop掉差异部分，太复杂略。还有一种OneHotEncoder，转换后toarray()
-label_X_train[object_cols] = ordinal_encoder.fit_transform(X_train[object_cols])
-label_X_valid[object_cols] = ordinal_encoder.transform(X_valid[object_cols])
-
-from sklearn.datasets import load_iris # 内置了一些数据集，小型的自带，大型的使用时会联网下
+# 内置了一些数据集，小型的自带，大型的使用时会联网下
+from sklearn.datasets import load_iris
 X, y = load_iris(return_X_y=True)
 
 from sklearn.model_selection import RandomizedSearchCV # 自动调整超参数
@@ -230,9 +541,6 @@ param_distributions = {'n_estimators': randint(1, 5), 'max_depth': randint(5, 10
 search = RandomizedSearchCV(estimator=RandomForestRegressor(random_state=0),n_iter=5,param_distributions=param_distributions,random_state=0)
 search.fit(X_train, y_train)
 search.best_params_
-
-from sklearn.linear_model import LogisticRegression, LinearRegression
-Input contains NaN, infinity or a value too large：存在空值
 ```
 
 ## gradio
