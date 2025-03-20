@@ -87,7 +87,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted
 * repolist all; clean all; makecache
 * list installed/updates/pkg
 * install -y pkg-ver
-* update --allowerase
+* update --allowerasing
 * search pkg 自动通配
 * provides(或whatprovides) 查询某个程序或so库是哪个包装上的，或rpm -qf。查询指定包内含有的文件：repoquery -l pkgname或rpm -qi --filesbypkg pkgname
 * autoremove

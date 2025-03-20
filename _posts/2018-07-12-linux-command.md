@@ -6,7 +6,7 @@ title: Linux命令
 
 * https://ss64.com/bash/
 * https://www.runoob.com/linux/linux-command-manual.html
-* https://tldr.inbrowser.app/
+* https://tldr.sh/ https://tldr.inbrowser.app/
 * https://cheat.sh/
 * http://bropages.org/
 * https://command-not-found.com/
@@ -16,6 +16,7 @@ title: Linux命令
 * https://cn.x-cmd.com/ 对原生命令的增强
 * https://github.com/denisidoro/navi
 * https://explainshell.com/ 输入一整条命令（可含有|），显示对应选项的帮助
+* https://github.com/cheat/cheat
 
 ## 简单笔记
 

@@ -129,7 +129,7 @@ title: 浏览器
 * https://static.centbrowser.cn/win_stable/
 * 适用于老系统的：https://github.com/win32ss/supermium
 * Ctrl+M：在当前窗口新建隐私页
-* 禁止自动更新：C:\Program Files\Google\Update文件夹 改名
+* 禁止自动更新：C:\Program Files\Google\Update文件夹 改名，但不会阻止下载新版安装包
 * 便携版：https://github.com/henrypp/chrlauncher
 
 ### about:flags
