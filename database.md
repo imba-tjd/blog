@@ -405,6 +405,13 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * binlog归档日志：记录语句的原始逻辑，数据备份(主备 主从)要用到，维护集群数据一致性
   * sync_binlog=0 默认为1表示每次事务都同步binlog，设为0完全交给操作系统刷新，设为N表示经过N个事务后同步
 
+### 分布式集群
+
+* 主从：读写分离，只有主能写。实现方式：监听binlog
+* InnoDB Cluster：基于组复制和MySQL Router
+* NDB：Mysql官方集群方案，支持自动分片、高可用。数据存在内存中，存储引擎就是NDB，不兼容InnoDB
+* 云原生集群：PolarDB
+
 ### 相关软件
 
 * https://github.com/sysown/proxysql
