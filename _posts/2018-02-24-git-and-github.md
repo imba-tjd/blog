@@ -380,9 +380,11 @@ collapsable content
 * https://fossa.com/developers-guide-open-source-software-licenses
 * 修改license：经过所有contributors（copyright author）同意即可，无论改成更宽容的还是更严格的，也可以双重许可
 * TODO：什么是专利，开源协议和专利之间的关系
+* SourceAvailable：https://github.com/nmap/npcap?tab=License-1-ov-file
 
 ### 具体协议
 
+* 一句话总结：https://www.tldrlegal.com/license
 * GPL
   * 中文翻译：https://jxself.org/translations/gpl-3.zh.shtml
   * AGPL：如果能通过网络访问某软件，那就应该要能获得它的源代码。如果只是使用AGPL软件，没有修改它，那可以不公开自己的源代码
@@ -395,9 +397,9 @@ collapsable content
     * 兼容意思是在GPL项目中可以使用这些协议的代码。理论上那些宽松许可证的代码仍然保持原有许可证，只有修改和新增的才是GPL的；甚至修改宽松的可以仍然保持。但实践上如果只需使用宽松许可证部分的代码，则没必要用此混合代码库，用它一定是用了GPL的部分，整个程序是GPL的
 * MPL：修改了MPL下的代码，必须把修改后的开源，且必须也用MPL。但允许把MPL的代码单独作为一些文件，与非MPL的一起使用，且不用开源，因此与GPL不“兼容”
 * SSPL：AGPL的改版，只针对云服务提供商，如果将MongoDB作为服务提供给其他人用，包括搭建管理面板，则必须开源
-* MIT：明确允许sublicense，实际上允许任意使用；没有任何保证，出问题不负责。条件是将许可证放到the Software中。BSD：明确允许专利
+* MIT：明确允许sublicense，实际上允许任意使用；没有任何保证，出问题不负责。条件是将许可证放到the Software中。可能不能relicense，因为原作者仍持有原代码版权，新代码可以用不同协议。BSD：明确允许专利
 * ISC：限制和MIT一样。用的很少，连创造者都不用了。0BSD：和其他BSD系列无关，是ISC的替代，没有要求attribution
-* Apache 2.0：GNU推荐说是permissive中最好的，包含了处理专利的内容
+* Apache 2.0：GNU推荐说是permissive中最好的，包含了处理商标和专利的内容（与版权法不是同一个法）
 * No License：https://choosealicense.com/no-permission/ 保留所有权利
 * CC：https://www.zhihu.com/question/265416787 https://creativecommons.org/licenses/  https://chooser-beta.creativecommons.org/。BY是署名/写原作者，SA是允许演绎/再创作且要以相同协议发布，ND是不允许演绎（如翻译），NC是不用于商业目的
   * CC0：放弃著作权（公有领域），原著作权持有者无法再对其他人如何使用该作品施加任何法律上的限制，二次创作品则在法律上享有完整的著作权。Unlicense：有人说写得很差，在欧洲不允许放弃所有权利；如果不涉及专利，PD/Unlicense/CC0/0BSD是等效的

@@ -299,6 +299,23 @@ Calliope o-- SpindlerBattery
 * backward compatibility 向后兼容/向下兼容：如程序新版本能打开老格式的文件
 * forward compatibility：如程序能跳过未知格式的文件、老版本程序面对新设计不出错
 
+## OOP理论
+
+### 菱形继承
+
+* C++中，继承时结构体中存在父类的布局。对于菱形继承，就存在两份顶父类
+
+### polymorphism多态理论
+
+* 使用一个symbol来表示和处理多种形式的类型或数据对象
+* 一种分类：静态多态（编译时确定）、动态多态（运行时）。重载是静态的，继承和重写是动态的
+* Ad-hoc特设多态：如函数重载
+* Parametric参数多态：泛型
+* Subtyping子类型
+  * Nominal名义子类型，如Java
+  * Structural结构子类型，如TS。又称为Row、Duck typing
+* Kind
+
 ## 参考
 
 * 《Java设计模式》刘伟

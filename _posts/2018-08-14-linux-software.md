@@ -127,7 +127,7 @@ pipgrip --tree pkg：显示依赖哪些包，关键是不需要安装指定的pk
 ### 国内源
 
 ```conf
-# %APPDATA%\pip\pip.ini；~/.config/pip/pip.conf；pip -i；pip config set global.index-url xxx
+# %APPDATA%\pip\pip.ini；~/.config/pip/pip.conf。pip -i；pip config set global.index-url xxx
 [global]
 #timeout = 6000
 index-url = https://mirrors.aliyun.com/pypi/simple/

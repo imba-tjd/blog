@@ -341,6 +341,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://github.com/rui314/chibicc 小型C编译器
 * ICC/ICX：https://www.intel.cn/content/www/cn/zh/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp 大小超过1G
 * https://github.com/jart/cosmopolitan 编译出可以在Linux和Win上运行的程序
+* fastbuild、incredibuild
 
 ## gdb
 

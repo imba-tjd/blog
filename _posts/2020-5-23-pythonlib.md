@@ -486,11 +486,12 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 
 ### urllib3
 
-* urllib3.request('GET',url,fields={'k':'v'},headers={}); r.data.decode()
+* urllib3.request('GET',url,fields={'k':'v'},headers={}); r.data.decode(); v2新增r.json()
 * POST和PUT
   * fields自动编码为body，类型multipart。传json：v2新增json参数
   * 上传文件：fields={'filefield':('filename', str/bytes [,"text/plain"])}
   * 上传二进制内容：设置body参数和Content-Type
+  * 编码url参数（GET时的fields）：urllib.parse.urlencode。二者都不支持'k':[1,2]->'k=1&k=2'，而是'k=[1, 2]'
 * Headers
   * UA默认为python-urllib3/1.26.8。PM和request()的headers相当于对它`|=`，但后者若存在会则会完全替换pm的
   * AUTH：make_headers(basic_auth='user:pw')。相当于requests的auth参数
