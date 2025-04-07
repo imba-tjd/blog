@@ -19,7 +19,7 @@ https://www.youtube.com/watch?v=hfMk-kjRv4c
 * ReLU：x >= 0 ? x : 0，或max(0,x)；负区间导数为0，可能导致神经元“死亡”；0点导数可人为设成0或1。Leaky ReLU：x<0时用x/100
 * Sigmoid（实际是logistic函数）：1 / ( 1+ e^(-x) )，S形曲线，将x压缩到0到1。二分类中常用，在隐藏层中较少使用
 * SoftMax：多分类中的最后一层使用，有几个输入就有几个输出，f(i) = e^i / sum(e^j)，类似于概率，值域在[0,1]，各类值之和为1。有用于反向传播的导数。Sigmoid是它的特例
-* tanh：也是S形的，且关于原点对称，值域-1到1
+* tanh：也是S形的，且关于原点对称，值域-1到1。公式=2*Sigmoid(2x)-1
 * SiLU：x / ( 1+ e^(-x) )。形状整体类似于ReLU，但可导。0点=0，x小于0时y小于但接近0
 * SoftPlus：log(1+e^x)。形状整体类似于e^x，只是大于0时线性上升；也可以说类似于平滑ReLU
 * 当损失不下降时，一种原因是梯度消失（梯度在反向传播过程中逐渐趋近于零，导致靠近输入层的参数更新缓慢）。当使用Sigmoid或Tanh等饱和型激活函数时，其导数在输入值较大或较小时趋近于零，导致反向传播时梯度迅速衰减，无法有效学习。解决办法是ReLU
@@ -86,7 +86,7 @@ w -= eta*2.0 * X.T @ errors / X.shape[0]
 
 * GAN：生成与给定数据集相似的新数据样本，用于图像合成、风格迁移和数据增强
 
-### CNN 卷积神经网络
+### CNN 卷积(Convolution)神经网络
 
 用于图像和视频。
 
@@ -95,8 +95,9 @@ w -= eta*2.0 * X.T @ errors / X.shape[0]
 卷积核：如一个3x3的矩阵（每个元素是可学习的参数），在原图像上按 对应相乘再求和 输出一个值。\
 卷积层：多个（如5个）卷积核，输出多个“通道”。\
 卷积操作：往右移动1步或多步，一般是重叠的。
+输出称作“特征图”
 
-池化：降维操作。如取2x2的范围中的平均值或最大值。没有参数，不可学习。一般不重叠
+池化：降维操作，减少计算量，提升泛化能力。如取2x2的范围中的平均值或最大值。没有参数，不可学习。一般不重叠
 
 现代卷积神经网络：AlexNet、ResNet、DenseNet。
 
@@ -209,7 +210,7 @@ np.sum() min() max() mean() median() var() std() 对于多维数组，如果指�
 np.argmax(arr) 返回值最大的那一项的index
 np.log(arr) np.pow(arr,2) np.sqrt(arr) 对每一项运算
 np.unique()
-np.concatenate((a1,a2))  对于二维数组，它的 axis=0 等于 np.vstack()，axis=1 等于 np.hstack()
+np.concatenate/concat((a1,a2))  对于二维数组，它的 axis=0 等于 np.vstack()，axis=1 等于 np.hstack()；torch还能用cat，维度用dim
 np.insert(a1, ndx, a2) np.delete(arr, ndx)
 添加新轴：[1,2,3][:, None] -> [[1],[2],[3]]  此处None等价于np.newaxis
 
@@ -235,6 +236,7 @@ numpy out has performance benefits？
 * 环境
   * torch.cuda.is_available()、watch -n1 nvidia-smi、nvidia-smi stats、nvtop、nvitop。2.5支持intel的xpu，有xpu-smi
   * torch.set_default_device('cuda')，否则默认为CPU，要用if torch.cuda.is_available(): t=t.to('cuda') 或创建t时指定device
+    * 通用：if torch.accelerator.is_available(): t.to(torch.accelerator.current_accelerator())
   * torch.manual_seed(42)
 
 ### tensor
@@ -242,15 +244,22 @@ numpy out has performance benefits？
 ```py
 torch.tensor(lst)、from_numpy(np_array);t.numpy()二者共享底层
 torch.rand(shape) torch.rand_like()
-torch.cat([tensor, tensor, tensor], dim=1)
-原地改变：x.copy_(y), x.t_()
+原地改变：x.copy_(y), x.t_()  要计算梯度时不能用
 t.view(1, -1) # 转换为shape[1, sequence_length]  np也有view且效果完全不同，是改变dtype
 ```
+
+#### 分页和非阻塞
+
+* 分页：默认可以使用页面文件。创建时加pin_memory=True锁定在内存中
+* 非阻塞：移到device时默认non_blocking=False，相当于每次调用后自动再torch.cuda.synchronize()。如果循环移动一批tensor，可设为True，之后手动执行同步
+* 二者结合：已经pin的tensor再加非阻塞移动，加速很明显；未pin的不要t.pin_memory().to()否则会更慢；仅CPU->GPU且不修改原有tensor才不会损坏数据
+* 单纯非阻塞效果不明显。单纯已经pin的效果还可以
 
 ### Module 和 正向传播
 
 * F.relu()是调用函数。nn.ReLU是一个类(Module)，调用后创建函数实例
 * nn.Linear 创建后会 自动随机初始化值、requires_grad=True
+* 输入只支持mini_batch，如果只有一个输入，用t.unsqueeze(0)添加虚假的第0 batch维
 
 ```py
 import torch.nn as nn
@@ -295,18 +304,18 @@ out = F.relu(in * w + b)
 ### 自动微分autograd
 
 1. 创建tensor时设置 requires_grad=True 或 t.requires_grad_() 会创建计算图，跟踪记录对它的操作。nn.Xxx默认True
-2. 当模型计算出output_data后，调用.backward() （实际一般对loss调用），会触发autograd引擎以相反的顺序遍历计算图，计算出梯度，储存在那个需要梯度的tensor的 .grad 中
+2. 当模型计算出output_data后，调用.backward() （实际一般对loss调用），会触发autograd引擎以相反的顺序遍历计算图，计算出梯度，储存在那个需要梯度的tensor的 .grad 中。只有叶结点有，默认只能计算一次
 
-* 计算原理：将输出tensor看作因变量，对想要的那个输入tensor链式求偏导
-* 如果参数是固定的，则设为False表示不需要优化
-* 获得共享底层参数但去掉梯度：t.detach()。画图时可能用到
+* 计算原理：将输出tensor看作因变量，对想要的那个输入tensor链式求偏导。DAG在pytorch里是动态的，每次迭代重新生成，可配合控制流语句
+* 如果参数是固定的，则设为False表示不需要优化（冻结参数）
+* 获得共享底层参数但去掉梯度：t.detach()。画图时可能用到。另一种方式：with torch.no_grad()或函数上@torch.no_grad，前向传播时用到
 
 ### 优化器
 
 ```py
 optimizer = optim.Adam(model.parameters(), lr=0.001) # 还有SGD
-loss_fn = nn.MSELoss()
-for epoch in range(num_epochs):
+loss_fn = nn.MSELoss() # 还有CrossEntropyLoss
+for epoch in range(num_epochs): # 一般以下封装在train()，一个epoch先train()再test()，test里用model.eval()和no_grad
     loss_sum = 0
     for batch_idx, (data, labels) in enumerate(dataloader):
         outputs = model(inputs)
@@ -316,6 +325,8 @@ for epoch in range(num_epochs):
     if loss_sum < 1e-4: return
     optimizer.step()  # 一批统一调整
     optimizer.zero_grad()
+    if batch % 100 == 0:
+        print("loss: {:>7f}  [{:>5d}/{:>5d}]", loss.item(), (batch + 1) * len(X), len(dataloader.dataset))
 
 自动调整学习率：
 from torch.optim.lr_scheduler import StepLR
@@ -331,7 +342,9 @@ for epoch in range(num_epochs): scheduler.step()
   * universe.roboflow.com
   * data.mendeley.com/research-data
   * kaggle
-  * datasetsearch.research.google.com
+  * datasetsearch.research.google.com 支持搜索其他平台
+  * 国内：OpenDataLab、ModelScope
+  * 注意许可协议
 
 ```py
 from torch.utils.data import Dataset, Dataloader
@@ -351,49 +364,84 @@ dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 TensorDataset(inputs, labels)  组装已有的tensor
 ```
 
-保存：torch.save(model.state_dict(), 'my_model.pth')
-加载：model.load_state_dict(torch.load('my_model.pth'))
+### 持久化
 
+* 保存：torch.save(model.state_dict(), 'my_model.pth')
+* 加载：model.load_state_dict(torch.load('my_model.pth', weights_only=True))
+* 导出onnx：pip install onnx onnxscript; o=torch.onnx.export(model, example_inputs, dynamo=True); o.optimize(); o.save('model.onnx')
 
+### torch.compile(dynamo)
 
+* 实际上支持任何函数，也可以用作装饰器。会递归编译，一般在顶层使用，排除不兼容的或用某上下文管理器关闭；也可以从底层开始测试
+* 在执行时将模型编译成优化的内核，多次执行才有优化效果
+* mode=默认"reduce-overhead"，另一个选项是max-autotune
+* model的grad_fn可以看到是否compile过
+* 只有V100 A100 H100才能看到明显效果
 
+### 量化
 
-加载图片：
-from PIL import Image; import cv2（包名是opencv-python）
+* API：未来优先用PyTorch 2 Export量化，不要用FX Graph Mode量化，老版方法是Eager Mode量化
+* 类型：训练后(PTQ)动态（权重量化，激活浮点，最简单，适合NLP）、训练后静态（权重和激活都量化，训练需要校准，适合CNN）、静态量化感知训练（AWQ，最准）
+* torch.quantization.quantize_dynamic(model, {nn.Linear 要量化的层}, dtype=torch.qint8)
+* 后端：不同后端适合不同设备，支持的算子不同，如arm cpu用qnnpack，还要再对模型设定一下。目前支持x86和arm cpu，gpu的tensorrt在beta
+* 输入的tensor也要量化。一般修改模型，init加self.quant = torch.ao.quantization.QuantStub()，forward第一句x=self.quant(x)
+
+## torchvision
+
+* 预训练模型：m = models.densenet121(weights='IMAGENET1K_V1'); m.eval() 但是输出结果映射回类别要另外下一个json
+
+### datasets 预定义的数据集
+
+```py
+from torchvision import datasets
+training_data = datasets.FashionMNIST(
+    root="data", # 储存路径
+    train=True,  # 指定False返回测试数据
+    download=True,
+    transform=ToTensor() # 每次取单条数据时对feature执行的转换
+    target_transform=Lambda(lambda y: torch.zeros(10).scatter_(0, torch.tensor(y), 1)) # 转换label，此处为OneHot
+)
+DataLoader(training_data, batch_size=64, shuffle=True, pin_memory=True)  # 不推荐改num_workers
+```
+
+### transforms
+
+含有许多“图片处理工具”。一般用Compose([创建多个工具类实例])创建可复用的处理流，再(调用)
+
+```py
 from torchvision import transforms
+trans=Compose([Resize(255),CenterCrop(224),ToTensor(),Normalize(mean=[0.5, 0.5, 0.4],std=[0.2, 0.2, 0.2])])
+```
+
+### 加载图片
+
+```
+from PIL import Image; import cv2（包名是opencv-python-headless）
+
 im = Image.open(path) = cv2.imread(path)  im.shape 0->(高,宽,通道)
 im_tensor = transforms.ToTensor()(im)
 Image.fromarray(nparr.astype('uint8')).show()
 降采样，用步长：im[::10,::10,:]。翻转：im[::-1]。裁剪：切片 im[a:b,c:d]
 
-transforms：
-含有许多“工具”。一般用Compose([创建多个工具类实例])创建可复用的处理流，再(调用)
+OpenCV的默认通道是BGR颜色模型，转换成RGB：img[:, :, [2, 1, 0]]
 
-from torchvision import datasets
-training_data = datasets.FashionMNIST( 预定义的数据集，Each example comprises a 28×28 grayscale image and an associated label from one of 10 classes
-    root="data", 储存路径
-    train=True,
-    download=True,
-    transform=ToTensor() # 修改feature。target_transform修改label
-)
-DataLoader(training_data, batch_size=64, shuffle=True, pin_memory=True)
+摄像头：
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 224); cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 224); cap.set(cv2.CAP_PROP_FPS, 36)
+ret, img = cap.read()
 
+显示图片：
+npimg = img.numpy()
+plt.imshow(np.transpose(npimg, (1, 2, 0)))
+```
 
-OpenCV的默认通道是BGR颜色模型
-opencv-python-headless
+### 示例CNN模型
 
-
-model.eval()
-inputs = tokenizer(…)
-with torch.no_grad(): # 整个函数：@torch.no_grad
-    outputs = model(**inputs)
-
-
-简单的CNN模型：
-class  MyNet(nn.Module):
+```py
+class MyCNN(nn.Module):
     def __init__(self):
         super(MyNet, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, padding=1) # Convolution卷积
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, padding=1) inchannel输入通道数，灰色为1；outchannel输出多少个特征图，也代表有多少个卷积层；卷积核大小还可以设成=(3,3)
         self.dropout1 = nn.Dropout(p=0.25) # 一种正则化方法，随机失活。其他正则化方法还有L2
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
         self.dropout2 = nn.Dropout(p=0.25)
@@ -408,38 +456,42 @@ class  MyNet(nn.Module):
         x = self.conv2(x)
         x = self.dropout2(x)
         x = F.max_pool2d(x,2)
-        x = torch.flatten(x,1)
+        x = torch.flatten(x,1) # 保持第0维不变，从1到-1维 展平连接。因为全连接层只接受1维数据（第0维是batch数）
         x = self.fc1(x); x = F.relu(x)
         x = self.fc2(x); x = F.relu(x)
         x = self.fc3(x)
         output = F.log_softmax(x, dim=1) # 产生probabilities(可能性,概率)，用于分类
         return output
 
+self.pool1 = MaxPool2d((2,2), stride=(2,2))
+kaiming_uniform_(self.conv1.weight, nonlinearity='relu') 一种初始化方法
+xavier_uniform_ 用于初始化全链接层
+```
 
-torch.compile，又叫dynamo
-实际上支持任何函数，也可以用作装饰器。会递归编译，一般在顶层使用，排除不兼容的或用某上下文管理器关闭；也可以从底层开始测试
-在执行时将模型编译成优化的内核，多次执行才有优化效果
-mode=默认"reduce-overhead"，另一个选项是max-autotune
-model的grad_fn可以看到是否compile过
-只有V100 A100 H100才能看到明显效果
-torchtriton：好像能使得在gpu上运行compile
+## 分布式理论
 
-
-分布式理论：
 https://github.com/PacktPublishing/Distributed-Machine-Learning-with-Python
-数据并行（训练）：数据加载带宽和模型训练带宽之间不匹配
-解决：拆分（不相交）数据集到多GPU上。
-新问题：如何同步。解决：①随机梯度下降SGD优化器（且初始化时用相同的种子）。②模型同步（有多种方案）。③超参调整：batch_size、学习率
-模型同步：
-①采用一个(组)中心节点作为“服务器”，工作结点拉取参数，训练后提交。缺点：服务器带宽瓶颈；如果用多个服务器，则会变复杂。
-②All-Reduce架构：只有工作节点。一轮训完全汇总到一个，再广播。Ring All-Reduce（NV NCCL是其理论的实现）：将所有节点视为环，每个节点接收上家发来的，与自己的合并，发给下家，走完一圈后最后的节点拥有总和，再走一圈同步
-③：All-Gather：每个节点都广播自己的值，并且接收所有其他节点。数据传输量远超All-Reduce
 
-多GPU数据并行训练：if torch.cuda.device_count() > 1: model = nn.DataParallel(model)
-模型并行（LLM推理）
+### 数据并行（训练）
 
+* 数据加载带宽和模型训练带宽之间不匹配
+* 解决：拆分（不相交）数据集到多GPU上
+* 新问题：如何同步。解决：①随机梯度下降SGD优化器（且初始化时用相同的种子）。②模型同步（有多种方案）。③超参调整：batch_size、学习率
+* 实现：if torch.cuda.device_count() > 1: model = nn.DataParallel(model)
 
-Lightning：
+#### 模型同步
+
+1. 采用一个(组)中心节点作为“服务器”，工作结点拉取参数，训练后提交。缺点：服务器带宽瓶颈；如果用多个服务器，则会变复杂。
+2. All-Reduce架构：只有工作节点。一轮训完全汇总到一个，再广播。Ring All-Reduce（NV NCCL是其理论的实现）：将所有节点视为环，每个节点接收上家发来的，与自己的合并，发给下家，走完一圈后最后的节点拥有总和，再走一圈同步
+3. All-Gather：每个节点都广播自己的值，并且接收所有其他节点。数据传输量远超All-Reduce
+
+### 模型并行（LLM推理）
+
+TODO
+
+## Lightning
+
+```py
 import lightning as L
 class NN(L.LightningModule):
     init和forward不变
@@ -452,11 +504,14 @@ class NN(L.LightningModule):
 trainer = L.Trainer(max_epochs=99, accelerator='auto', devices='auto')
 model.learning_rate = trainer.tuner.lr_find(...).suggestion()
 trainer.fit(model, dataloader)
+```
 
+## 其他项目
 
-GPU资源：
-https://console.cloud.intel.com/home?region=us-region-2 
-
+* 可视化模型（各层和图）：https://github.com/lutzroeder/netron
+* torchtriton：torch.compile的同类
+* triton：类似py的DSL，不用懂CUDA也可以GPU编程，只优化operator算子，基于MLIR
+* tvm：深度学习编译器，支持模型格式，编译到可执行代码，高低层都优化
 
 
 https://zh.d2l.ai/chapter_introduction/index.html

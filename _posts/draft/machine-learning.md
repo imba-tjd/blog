@@ -4,8 +4,6 @@
 * 数据挖掘任务：①预测：分类、回归。②描述：关联（相似度计算）、聚类、异常
 * 缺点：无法完全准确、难以纠正错误（一般只能改数据，即使调参，也难以评估是否会对正确的部分产生影响）、难以解释原理（尤其是神经网络）
 
-fit是否支持df？
-
 ---
 
 ## 术语
@@ -49,7 +47,7 @@ fit是否支持df？
 * 有的模型如LR不接受空值：Input contains NaN, infinity or a value too large。有的模型内置支持但很少
 
 ```py
-查看：df.isna().sum()
+查看：df.isna().sum() 或 df.info()
 一行只有3个及以下有效数据时删除：df.dropna(thresh=4) 当指定列存在NaN时删除那些行：subset=['C']
 用均值填充：df.fillna(df.mean())，用前后值填充：method='ffill或bfill'。插值填充：df.interpolate(method=默认'linear')
 df.drop_duplicates(keep=默认'first')  # TODO: 处理重复值，还可以聚合（如求和、平均）。现笔记应该只有一整行完全相同时才行，可能还要排序
@@ -93,7 +91,11 @@ label_X_valid[object_cols] = ec.transform(X_valid[object_cols])
 ec.inverse_transform 转换回原始形式
 ```
 
-离散化：将连续变量分箱。
+#### 离散化
+
+将连续变量分箱。
+
+目的一：如年龄对于购买力的影响，25和26不应有显著区别。可分为0-18 18-40 40-60 60-100四类再OneHot编码。但边界处会突变，可改为0-18 15-40 35-60 55-100
 
 #### 样本不均衡
 
@@ -151,7 +153,7 @@ ec.inverse_transform 转换回原始形式
     
 ### 样本切分
 
-训练集(train)、验证集(verify)、测试集(test)：训练用于拟合模型。验证用于调整超参数，由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试用于最终模型的无偏评估
+训练集(train)用于拟合模型。验证集(verify)用于调整超参数，由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试集(test)用于最终模型的无偏评估。
 
 ```py
 # 把源数据分成 训练 和 测试 两部分。此处0.1表示10%。shuffle默认True。stratify=y进行分层
@@ -178,18 +180,32 @@ model.score(X_test, y_test)
 * holdout交叉验证：把训练集划分出验证集，反复调整超参，以在验证集上获得更高分数。一般不用
 * K折 K-Fold：避免验证集过拟合。把训练集分成K份，每次取其中一份作为验证集，其余训练。一共训练K次，得到K个模型超参相同及其在验证集上的得分；调整超参后重新训练K次
 * 留一法 Leave One Out：每一份测试集的大小是1条数据，即上面的K=数据量n
-* Grid Search CV：方便测试多个超参。提前一次性手动提供待测试的各超参和未设定超参的model，得到的对象可视为model的装饰器，fit(数据)会自动依次组合测试且选取最佳的值
+* sklearn
+  * 支持设定n_jobs=-1在所有核心上并行处理
+  * 一部分线性模型内置，自动寻找超参：LogisticRegressionCV。好像仅处理正则化强度
 
 ```py
-# 自动K折验证：cv就是K，默认5。返回分数列表，一般再计算mean和std。当用于寻找超参时，需在前面手动循环超参创建model。n_jobs=-1在所有核心上并行处理
+# 自动K折验证：cv就是K，默认5。返回分数列表，一般再计算mean和std。当用于寻找超参时，需在前面手动循环超参创建model
 sklearn.model_selection.cross_val_score(model或pipe, X_train, y_train, cv=5, n_jobs=-1)
 
 # 手动K折验证
 kfold = sklearn.model_selection.StratifiedKFold(n_splits=5).split(X_train, y_train) # 返回值表示一些下标
 for k, (train, vrf) in enumerate(kfold): model.fit(X_train[train], y_train[train]); print(model.score(X_train[vrf], y_train[vrf]))
 
-# 模型内置，自动寻找超参
-LogisticRegressionCV
+# 查看超参
+model.get_params()
+
+# 自动调整（给定的）超参，训练多个模型取最好的。其中Randomized要提供分布，GridSearch提供多个具体值。最后得到的model可直接predict，不用按最佳超参手动重新训练
+from sklearn.model_selection import RandomizedSearchCV
+param_distributions = {'n_estimators': randint(1, 5), 'max_depth': randint(5, 10)}
+search = RandomizedSearchCV(未设定某些超参的model, param_distributions, n_iter=5, random_state=42)
+search.fit(X_train, y_train)
+search.best_params_
+
+param_grid = [ # 最外层list并列，更改核函数。里面的按笛卡儿积
+  {'C': [1, 10, 100, 1000], 'kernel': ['linear']},
+  {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001], 'kernel': ['rbf']},
+]
 ```
 
 #### 混淆矩阵 Confusion Matrix
@@ -208,17 +224,17 @@ Actual |---------|
 * True Positive(TP)、FN（预测没有实际有，又叫二类错误，如漏诊）、FP（预测有实际没有，又叫一类错误，如误诊）、TN（预测没有实际也没有）。对角线是预测正确的
 * 样例总数 M = TP + FP + TN + FN。MP = TP + FN，MN = FP + TN
 * 准确率(Accuracy, ACC)：识别正确的个数/样本总个数 (TP+TN) / n。表示在所有样本上的预测良好程度；若样本类别不平衡，单纯提高它，不利于发现少数类低正确率
-* 精确率(Precision) / PPV：预测为正类别的样本中，真正的正类别是多少 TP / (TP+FP)。表示阳性是否可靠，当FP代价高时要增加它
+* 精确率(Precision) / PPV：预测为正类别的样本中，真正的正类别是多少 TP / (TP+FP)。表示阳性是否可靠，当FP代价高时要增加它。提高阈值导致二者数量都减少，但比例增加
 * 召回率(Recall) / 敏感性/灵敏度(Sensitivity) / TPR / 查全率：在实际正类别中，模型能预测出(预测为正)多少 TP / (TP+FN)。将所有数据全预测为正（降低阈值）就能达到100%；会导致FP增加，但能降低FN。在推荐系统中，尽可能将正类包括，避免遗漏，之后再排序
 * 特异性(Specificity) / TNR：在实际为负类别的样本中，模型能够正确预测为负类别的比例 TN / (FP+TN)
 * F1分数(F1-score)：精确率和召回率的调和平均数。取值范围[0, 1]，越接近1表示模型的性能越好
-* 接受者操作特性(ROC)图：调整分类阈值（超参），达到增加TP（纵轴）、减少FP（横轴）的目的。纵横轴值域都为1，一开始阈值设为0表示模型都预测为P，导致TP和FP都为1，随着调整逐步往左上角移动，之后再往下移动直到TP和FP都为0即都预测为N。左上角的点代表较好的阈值
+* ROC图：依次调整分类阈值（超参），达到增加TP（纵轴）、减少FP（横轴）的目的。纵横轴值域都为1，一开始阈值设为0表示模型都预测为P，导致TP和FP都为1，随着调整逐步往左上角移动，之后再往下移动直到TP和FP都为0即都预测为N。左上角的点代表较好的阈值
 * 曲线下面积(AUC)：将ROC的点连接起来，与横轴之间的面积就是AUC，更换不同的模型算法，也绘制ROC和计算AUC，AUC更大代表更好。AUC的值也能通过计算得到：依次各取一个P和一个N，进行 MP × MN 次比较，将P类的模型得分高于N类模型的次数记为H，则AUC = H / (MP × MN)。如果AUC=1，则可以完美区分；如果=0.5，则没有任何区分度；如果<0.5，则比随机猜还差
 * sklearn.metrics.confusion_matrix(y_test,y_pred)、classification_report(y_pred,y_test)、roc_auc_score
 
 ## 线性回归 Linear Regression
 
-* 用于预测连续值。也能用于判断变量之间是否相关。也能用于回归：加一个阈值函数映射到类别，如z>0表示类别1，<0表示类别0
+* 用于预测连续值。也能用于判断变量之间是否相关。也能用于回归：加一个阈值函数映射到类别，如z>0表示类别1，<0表示类别0，但太“硬”
 * 用最小二乘法(least squares method, LSM)将数据拟合到直线。数学上可以求导得到正规方程直接得到参数值，但工程上一般用迭代的方式
 * R^2 = ( Var(mean) - Var(fit) ) / Var(mean) = 1 - Var(fit)/Var(mean)，是MSE的标准化版本
   * Var(mean)是按y的平均值计算方差，Var(fit)是按拟合的直线的取值作为期望算的方差，因为分母一样，其实可以不用除以n，即SS
@@ -251,7 +267,7 @@ Actual |---------|
 
 ### Softmax回归
 
-* 又称为 多项式逻辑回归，用于多元分类。另一种方法：OvA(One versus Rest) 为每个类别训练一个分类器，此类别为正，其余所有类别都是负。但我感觉差不多。sklearn在新版只用multinomial
+* 又称为 多项式逻辑回归，用于多元分类。另一种方法：OvR(One versus Rest) 为每个类别训练一个分类器，此类别为正，其余所有类别都是负；最终判断时一个样本可以属于多个分类。sklearn现只用multinomial
 * 相当于只有一个输入、多个神经元（数量等于类别）的单层神经网络，训练一组 wi * x + bi，传给softmax函数，得到“概率”
 * 当K=2时退化为二元逻辑回归
 * 使用交叉熵损失Cross-Entropy Loss = -log(p) 其中p是模型对于目标类的输出值，对每个样本计算求和。此函数对于p=0产生大值，而MSE最大只有1
@@ -263,7 +279,7 @@ Actual |---------|
 
 * 非参数算法，不需要训练模型，或称为懒惰学习法：给定训练数据时，只是简单存储。对于一个新数据，对其的预测是周围K个的平均值。可用于回归和分类
 * K的取值是超参数，过大会欠拟合，过小会过拟合
-* 距离度量：连续型有闵可夫斯基距离、余弦相似度、皮尔逊相似系数。离散型有汉明(编辑)距离、杰卡德Jaccard相似系数
+* 距离度量：连续型有闵可夫斯基距离、余弦相似度、皮尔逊相似系数。离散型有汉明(编辑)距离、杰卡德Jaccard相似系数（= 1 - 二者相同的项/总项）
 * 样本多时计算花费大。替代：局部敏感哈希LSH、树结构如KD树
 * 容易因为“维度灾难”而过拟合：随着feature维数的增加，样本空间变得稀疏，即使最邻近的值也很远。解决：特征选择、降维
 
@@ -315,9 +331,9 @@ Actual |---------|
   * XGBoost：能并行，能处理异常值和缺失值等。实测完全不调参与RF差不多。后期出了hist版内存占用更小。https://neptune.ai/blog/xgboost-everything-you-need-to-know
   * CatBoost Yandex：有序提升、对称树、巧妙地处理类别特征，不适合稀疏数据集。训练速度慢
   * LightGBM 微软：原理类似hist版的XGB，但内存占用更小，速度更快，效果也不错。但有人测试比Cat和XGB分数差
-  * sklearn的HistGradientBoostingClassifier。hist是将大量连续数据先分箱，适合样本数>10000，比普通GBT和RF的快很多
+  * sklearn的HistGradientBoostingClassifier。hist是将大量连续数据先分箱，适合样本数>10000，比普通GBT和RF的快很多。实测class_weight设为balanced会更差，且不能与categorical_features同用
 * stacking：组合不同算法
-* 如果不进行超参调节，RF比GBM好。RF只要调max_depth, n_estimators, class_weight。GBM峰值性能好，但要调的参数多，也相对容易过拟合
+* 如果不进行超参调节，RF比GBM好。RF只要调max_depth, n_estimators, class_weight。GBM峰值性能好，但要调的参数多，也相对容易过拟合。min_samples_leaf当数据集小时应减小
 
 ### 聚类（寻找物体之间的自然分组）
 
@@ -423,7 +439,7 @@ pd.set_option("display.max.columns", None)  列过多时不隐藏
 选取(view)：
 df.A/df['A']  选取一列，保留行名，再用[]能取出指定行的值
 df[['A','B']]  选取多列，仍为DataFrame
-df[0:2]/[1:]  选取一定范围的行，一定要是slice；可被iloc完全替代；仍为DataFrame，即使结果只有一行
+df[0:2]/[1:]  选取一定范围的行，一定要是slice；仍为DataFrame，即使结果只有一行。可被iloc完全替代，原本设计类似py切片，不支持numpy那种，最好不用
 df.iloc[0] / [[0,2]] / [1:] / [:,0]  第一个索引是行范围，用:选择所有行；第二个索引选择列。单索引时类型为Series，且index变为原columns的内容因此可用.A
   df.A.idxmax() 返回A里最大的那一行的index
 df.loc  闭区间，一般不用数字访问
@@ -581,12 +597,6 @@ X = data[['col1','col2']] # 选择一些列作为“features”。另一种选�
 # 内置了一些数据集，小型的自带，大型的使用时会联网下
 from sklearn.datasets import load_iris
 X, y = load_iris(return_X_y=True)
-
-from sklearn.model_selection import RandomizedSearchCV # 自动调整超参数
-param_distributions = {'n_estimators': randint(1, 5), 'max_depth': randint(5, 10)}
-search = RandomizedSearchCV(estimator=RandomForestRegressor(random_state=0),n_iter=5,param_distributions=param_distributions,random_state=0)
-search.fit(X_train, y_train)
-search.best_params_
 ```
 
 ## gradio
@@ -724,9 +734,9 @@ client.query( # 按标量查询。delete类似
 ### 词袋模型
 
 1. 词汇表：dict{单词:序号} 按字母顺序
-2. 特征向量：对于每个文章或句子，将其中的词汇聚合生成 list[(序号，出现次数或称为频率)] 或 隐含序号list[频率]，长度等于词表长度
+2. 特征向量：对于每个文章或句子，将其中的词汇聚合生成 list[(序号，出现次数或称为频率)] 或 隐含序号list[频率]，长度等于词表长度，称为MultiHot
 
-缺点：不考虑词序特征、文法、句法特征。顺序丢失（无聊不好玩，与 好玩不无聊 的BoW完全相同）。忽略语义（单词之间的距离）。也比较稀疏
+缺点：不考虑词序特征、文法、句法特征。顺序丢失（无聊不好玩 与 好玩不无聊 的BoW完全相同）。忽略语义（苹果手机 与 吃苹果 的苹果意义不同）。忽略单词之间的距离（手机 互联网 苹果 前两者距离应更近）。也比较稀疏
 
 sklearn：feature_extraction.text.CounterVectorizer
 
