@@ -407,10 +407,11 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 
 ### 分布式集群
 
-* 主从：读写分离，只有主能写。实现方式：监听binlog
-* InnoDB Cluster：基于组复制Group Replication和MySQL Router。自带故障转移高可用，客户端访问Router，router转发到唯一主，剩余的是从
-* NDB：Mysql官方集群方案，支持自动分片、高可用。数据存在内存中，存储引擎就是NDB，不兼容InnoDB
+* 主从：同一份数据，读写分离，只有主能写。一种实现方式：监听binlog
+* InnoDB Cluster：官方主从分离、多活(故障转移、高可用)。基于组复制Group Replication和MySQL Router，客户端访问Router，router转发到唯一主
+* Mysql NDB：支持自动分片、高可用。数据存在内存中，存储引擎就是NDB，不兼容InnoDB
 * 云原生集群：PolarDB
+* 外部sharding
 
 ### 相关软件
 
