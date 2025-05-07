@@ -1,5 +1,10 @@
 https://www.youtube.com/watch?v=hfMk-kjRv4c
 
+## 方向
+
+* https://paperswithcode.com/sota
+* https://pytorch.org/examples/
+
 ## 原理
 
 * 输入和输出维度是业务决定的，不能随意更改。但隐藏层可以随意改
@@ -12,17 +17,20 @@ https://www.youtube.com/watch?v=hfMk-kjRv4c
   * ArgMax：如[1.5, -1, 0.4] -> [1,0,0]。容易解释，但不能用于反向传播优化，因为一种实现是大于等于第一大的值设为1，小于的设为0，导致导数恒为0
 * 权重可理解为关系的强弱，每层中的一部分神经元可理解为捕获了某种模式
 * cost/loss：可理解为 输入是所有NN参数，输出是一个数值（代价），它的参数是训练样本。梯度下降：改动哪个参数能使得cost减小得更快
+* 矩阵相乘ABC，(AB)C与A(BC)的运算量不同，先计算中间矩阵更小的那个，乘法次数更少
 
 ### 激活函数（非线性变换）
 
 * 使用激活函数后，bias的含义不再是平移直线，而是一种触发激活函数的阈值
-* ReLU：x >= 0 ? x : 0，或max(0,x)；负区间导数为0，可能导致神经元“死亡”；0点导数可人为设成0或1。Leaky ReLU：x<0时用x/100
-* Sigmoid（实际是logistic函数）：1 / ( 1+ e^(-x) )，S形曲线，将x压缩到0到1。二分类中常用，在隐藏层中较少使用
-* SoftMax：多分类中的最后一层使用，有几个输入就有几个输出，f(i) = e^i / sum(e^j)，类似于概率，值域在[0,1]，各类值之和为1。有用于反向传播的导数。Sigmoid是它的特例
+* ReLU：x >= 0 ? x : 0，或max(0,x)。负区间导数为0，可能导致神经元“死亡”；0点导数可人为设成0或1。Leaky ReLU：x<0时用x/100
+* Sigmoid：二分类中使用，隐藏层中较少使用。SoftMax：多分类中使用
 * tanh：也是S形的，且关于原点对称，值域-1到1。公式=2*Sigmoid(2x)-1
 * SiLU：x / ( 1+ e^(-x) )。形状整体类似于ReLU，但可导。0点=0，x小于0时y小于但接近0
 * SoftPlus：log(1+e^x)。形状整体类似于e^x，只是大于0时线性上升；也可以说类似于平滑ReLU
-* 当损失不下降时，一种原因是梯度消失（梯度在反向传播过程中逐渐趋近于零，导致靠近输入层的参数更新缓慢）。当使用Sigmoid或Tanh等饱和型激活函数时，其导数在输入值较大或较小时趋近于零，导致反向传播时梯度迅速衰减，无法有效学习。解决办法是ReLU
+
+当损失不下降时，一种原因是梯度消失（梯度在反向传播过程中逐渐趋近于零，导致靠近输入层的参数更新缓慢）。\
+当使用Sigmoid或Tanh等饱和型激活函数时，其导数在输入值较大或较小时趋近于零，导致反向传播时梯度迅速衰减，无法有效学习。解决办法是ReLU。\
+ReLU对于某些输入也会输出零，称作“假死亡”，因为对于其它一些输入是正常的，这反而是一种Dropout。但如果初始化时随机数选得不好，导致大多数输出零，则无法有效学习。
 
 ### 一种Layer的表示方法
 
@@ -111,13 +119,14 @@ MCP和CNN对于输入都是固定的，而RNN可以处理非固定长度的序�
 
 x可以是向量，若w1具有
 
+TODO: GRU门控循环单元
 
 ### LSTM 长短期记忆神经网络
 
 * 宏观上：RNN对于很久以前的事件和最近的事件，使用同一个反馈循环，来预测明天。而LSTM使用两条独立的路径预测明天。长期记忆是累加而非连乘，避免了梯度爆炸和消失
-* 定义 长期记忆M（又称为Cell State） 短期记忆m（又称为Hidden State）。就是数字；也可能是向量，维度数是超参数，M和m的维度相同。m的值域为[-1,1]
-* 一个计算百分比的单元：`P = sigmoid(w1*x + w2*m + b)`，x是输入的数据，m是短期记忆。以下每步中用到的P的参数不同
-* 一个激活函数为tanh，其余与P相同的单元T
+* 定义 长期记忆M（又称为Cell State） 短期记忆m（又称为Hidden State）。就是数字，m的值域为[-1,1]
+* 一个计算百分比的单元：`P = sigmoid(w1*x + w2*m + b)`，x是输入的数据，m是短期记忆。以下每步中用到的P的参数不同。
+* 一个激活函数为tanh、其余与P相同的单元T
 
 1. “遗忘门”：M *= P，表示长期记忆还留下百分之多少。
 2. “输入门”：M += P * T，表示创建多少百分比的“潜在长期记忆”。
@@ -125,46 +134,152 @@ x可以是向量，若w1具有
 
 在输入时，LSTM会展开(Unroll)成按顺序处理的单元。
 
+M和m还有x其实也可以是向量；M和m和b的维度数相同，是超参数Hidden Size，不必与x的维度相同。\
+为了做`W1*x + W2*m`，令m的维度为h，x的维度为i。W2的形状为hh，W1的形状为hi，m和x两个向量看作h1和i1的矩阵，相乘得到形状h1即h的向量。\
+实际运算会将W1和W2横向拼起来，变为(h, h+i)；x和m拼起来，变为(h+i, 1)。\
+sigmoid(向量)应理解为对每一项依次用sigmoid，因为它本身只接受标量。
+
 ### Word Embedding、Word2Vec
 
 已经分词了，要对token编号。如果直接按顺序编，或者随机分配浮点数，意思相近的词不会聚集在一起。本模型解决此问题。\
-首先有一个词汇表（如长度几千），有一些句子。目标是把所有单个词转换成固定长度（如128）的list[float]，且近义词的距离小。
+首先有一个词汇表（如长度几千），有一些句子。目标是把所有单个词转换成固定长度（如128）的list[float]，且近义词的距离小，且类似于father-mother≈man-woman。
 
 先对词表做OneHot编码，每个词变为 长len(词表) 只有自己为1 其他都为0 的向量；也可理解为按顺序编码每个词，作为下标。\
 创建一个单隐藏层神经网络：输入 上一行 向量；隐藏层的神经元权重就是最终需要的嵌入，共有 len(词表) x 128 个权重，每个词有128个权重，没有偏置项；输出长度又是 len(词表)，再加softmax。\
 训练时：依次输入句子中的每个词，target为句子中的下一个词。即期待预测下一个词。\
 如句子里有A is good, B is good，则训练后A B的嵌入向量距离小。
 
-负采样优化：因为输入向量极其稀疏，其余词 0 x w 结果都是0，可以不用算。在未训练时模型会输出 len(词表) 的随机向量，而target只有1位为1，可随机选择一些词（如20个）只正向传播计算和反向传播优化它们。
+负采样优化：①因为输入向量极其稀疏，其余词 0 x w 结果都是0，可以不用算。\
+②在未训练时模型会输出 len(词表) 的随机向量，而target只有1位为1，可随机选择一些词（如20个）只正向传播计算和反向传播优化它们。
 
-Word2Vec：使用“上下文”信息。①连续词袋：输入时向量变为 [1, 0, 1] 其中一个1是当前词，另一个1代表待预测词的下一个词，用来预测中间词。②跳跃模型：用中间词预测周围词。
+Word2Vec 使用“上下文”信息：①连续词袋：输入时向量变为 [1, 0, 1] 其中一个1是当前词，另一个1代表待预测词的下一个词，用来预测中间词。②跳跃模型：用中间词预测周围词。
 
-### Encoder-Decoder、Seq2Seq
+### 原始Encoder-Decoder、Seq2Seq
 
 Encoder将一整个句子或文章转换成一个固定长度的“上下文向量”，Decoder将向量解码成句子。两个句子之间长度可以不同，关键是可以具有不同的词表，如用于翻译。
 
-二者都包含多个LSTM堆叠起来。第一层(Layer)LSTM的m不仅作为下一个时间的m，还作为第二层**在相同时间步**的输入。不同层的LSTM有不同的参数，但每个LSTM本身的参数对于时间序列输入来说是复用的。
+二者都包含多层LSTM，第一层(Layer)LSTM的m不仅作为下一个时间的m，还作为第二层**在相同时间步**的输入。不同层的LSTM有不同的参数，但每个LSTM本身的参数对于时间序列输入来说是复用的。\
+每层LSTM具有多个Unit，但似乎就是单个LSTM输出向量，视为多个输出标量的叠加，而非输出向量的叠加。
 
 Encoder输入时，先将句子中的词，逐个编码成Embedding向量，按顺序输入；最后输入EOS。\
-Encoder最后一层的最后一个的m是输出，称为“上下文向量”。连接Decoder时也将所有M和m称为上下文向量，对应传给Decoder的层。\
+Encoder最后一层的最后一个的m（最终隐状态）是输出，称为“上下文向量”。连接Decoder时也将所有M和m称为上下文向量，对应传给Decoder的层。\
 即Encoder处理整个文章，得到上下文向量，后续就和它无关了，与Decoder解耦。
 
 Decoder的第一个输入是EOS，此时间经过Decoder计算，最后一层的m为输出，用一个全连接层（len(ctx_vec) x len(输出词表)）和softmax转换成词汇。该词汇再编码成Embedding作为下一个时间的Decoder的输入，直到输出EOS。\
 训练时，不将Decoder的输出作为下一时的输入，而是输入“正确内容”；输出仅用于计算损失。且如果到了该输出EOS时未输出，直接停止训练。这称为Teacher Forcing。
 
-### Attention
+TODO：gemini的说法，Encoder输入最后有EOS。Decoder输入先输入SOS，最后直到输出EOS结束。statequest视频没有说Encoder最后输入EOS，且Decoder最初输入SOS。
 
-最初加在LSTM上，后来只用Attention了。
+### 原始(标准)Attention
 
-输入的Token并行编码成Embedding，此时同一个词的向量是一样的，经过Attention层后根据上下文“调整”了。\
-每个Attention层有三个矩阵QKV可学习参数，QK的大小为
+加在LSTM上，且是不可训练的。
 
-Cross Attention：翻译任务时，输入输出词表不同，每个输出要考虑每个输入。
-Self Attention：自回归预测下一个词时
-多头Attention：多个Attention层并行计算
+LSTM可能会遗忘最初的序列，如 不要xxx 变为 要xxx 区别很大。Attention的思路是对于每个原始输入都增加了一条路径到当前输入。
 
-TODO:位置编码
+Encoder的架构不变，但保留每个时间的输出（记为Eo）。
 
+在Decoder中，单次输出（记为Do）与之前所有Eo依次点乘计算相似度（实际原理是余弦相似度，但分母仅用于归一，所以就省略了），\
+再SoftMax一下变到[0,1]表示比例，再与各Eo对应相乘，表示优先考虑（加权）与Do最相似的Eo。\
+再对于每一维将所有处理结果对应位置相加（不是将向量求和，向量长度始终保持Hidden Size不变）。\
+再与Do一维拼接，放到全连接层解码。
+
+### Transformer
+
+#### Encoder
+
+目的是将输入的与上下文无关的向量调整为相关的；每个输入的token都会产生一个向量：
+
+1. 将Token编码为Embedding。假设长度为d。此时同一个词的向量是一样的
+2. 位置编码：创建i个周期不同的sin/cos函数，传入当前token是第几个，与1相加。这样不同顺序向量就不同。RNN和LSTM天然隐式包含顺序信息，是时间上递归；而Transformer是非循环结构，本身不包含顺序信息
+3. 自注意力层
+  1. 创建三个权重矩阵Wq Wk Wv，形状一样都为dd，都与2点乘求和。注意此处是将向量求和，但因为又做了d次，又产生了长为d的向量；假设记为qkv
+  2. 对于一个单词，将q与其他各个单词的k点乘，向量求和（即q*单个k -> 1个数），可选除以根号d进行缩放，一起组成向量传给softmax，得到与其他单词的相似度
+  3. 加权：将所有单词的v对应与3.2的相似度相乘，再对应位置相加。得到AttentionOutput
+4. 残差连接：2 + 3。或者另一个角度看3得到的是Δ2，即2的调整值。实际还会在2 3后加一个归一层，二者都是使得训练更容易，减少梯度消失问题。
+
+对于一份输入，所有Token都可以并行做1234。
+
+#### QKV矩阵
+
+* 有可能指Wqkv权重矩阵，也可能指与Embedding计算后的实际值
+* qk的大小一般小于Embedding的大小，如128。理解为将原始Embedding映射到一个低维空间
+  * 一般输入矩阵形状为(n,d)，其中n是token数（相当于样本）。Wq的形状为(d,128)，Wk一样，计算后QV为(n, 128)。V必须与输入一样(n,d)
+* q是某种询问，当q和k的方向对齐（点乘大）时，它们就匹配，称作那些k对应词的嵌入“注意到了”q对应词的嵌入
+* 将各个q作为横轴，k作为纵轴，得到的表格称为“注意力模式”。softmax处理整个kv时是按列的
+* Wqkv对于所有输入都是相同的，称作自注意力单元。可以再堆叠几份独立计算，称为多头注意力MHA。多查询注意力MQA：对于多头，Wq不变，Wkv共享一个。分组查询注意力GQA，每个组内共享Wkv
+
+#### Decoder
+
+先输入EOS。经过与Encoder完全相同的流程（参数不同）变成向量。\
+再经过Encoder-Decoder Attention交叉注意力层，就是将Eo也考虑进来，经过KV，当前Decoder暂时的输出经过Q。\
+得到的向量再经过残差连接，再全连接层解码。\
+下一个时间，**输入之前的所有输出**（不同于LSTM的标准Attention），仅解码最后一个token。
+
+##### Decoder训练和掩码
+
+对于一个Token序列，将source设为BOS+它，target设为它+EOS。\
+经过Attention层时，为了使后面词语的q只检查前面词语的k，将qk矩阵的下三角（不含对角线，即要处理自己的qk）设为-∞（原矩阵 + 下三角为-math.inf的矩阵），这样softmax后就变为了0。\
+使得输出的Token可以一次性与target进行误差比较，且每个Token只会关注之前的输入，就好似逐字生成（推理时）一样。
+
+#### 其它技术
+
+* kv cache：对于Transformer架构的Decoder-Only和Encoder-Decoder模型的生成阶段，当前token之前的kv已经算过了，可以缓存。但Encoder-Only不需要，它一次处理所有序列；标准Attention也不需要
+* LoRA：观察发现微调时，模型权重的变化往往是“低秩”的。假设要调整W，不直接调整，而是创建一个ΔW，固定W不变与其相加；再将ΔW拆分成两个矩阵AB，大小分别为(h,r) (r,h)，r远小于h。缺点：前向和反向传递的速度大约是原来的两倍
+* 解决上下文窗口太小
+  1. 训练
+    1. 在训练阶段使用更长的序列数据
+    2. 改进注意力机制：稀疏注意力、线性注意力
+    3. 新的模型架构：Mamba
+  2. 应用层面：RAG、滑动窗口或分块处理、摘要链、关键信息抽取（先用非LLM处理）。Qwen的RoPE、YaRN缩放技术（如果ctx小于3万不要启用）
+* 生成策略
+  * 贪心搜索的主要缺点：它错过了隐藏在低概率词后面的高概率词
+  * 波束搜索：在每个时间步保留最可能的num_beams个词，最终选概率最高的序列，仍然是确定性的。在翻译中可以考虑使用
+    * 使用：num_beams=5, early_stopping=True
+  * 采样：非确定性，根据当前条件概率分布随机选词。选中低概率词后可能导致生成内容语义不连贯。
+    * （降低）温度：增大原本概率高的概率
+    * Top-K：先保留K个概率最大的，归一化，再采样
+    * Top-P：在累计概率超过p的最小单词集中进行；当容易预测时，它会保留较少词
+  * 其它生成选项：min_length 强制在达到它之前不生成EOS。num_return_sequences：返回多个结果，对于波束搜索各结果区别不大
+* 分词器未登录词(out of vocabulary, OOV)问题
+  * 基于词Word、基于字符Character：遇到不存在的会变为 UNK Token。如果Character包含所有Unicode字符，则太大
+  * 基于子词Subword：Byte Pair Encoding (BPE), WordPiece, SentencePiece。如果一个完整的词语不在词汇表中，分词器会尝试分解成已知的子词单元组合。如 tokenization 可能分解为 token 和 ization。是Word和Character的中间形态
+  * 字节级别BPE：从根本上解决了任何OOV问题。简单来说就是以Byte的256种可能作为Fallback
+* 估算内存
+  * bf16每个参数用2字节，训练时需要8字节，合计(2+8) * 7B = 70GB
+  * Lora：1B的参数在整个微调过程中占大约1.4GB
+
+#### GPT
+
+因果语言模型(causal Language Models)，也被称为自回归语言模型(autoregressive language models) 或仅解码器语言模型(decoder-only language models)
+
+#### Bert
+
+更擅长 自然语言理解NLU 任务，如文本分类（情感分析）、抽取式问答（填空题）
+
+两个预训练任务：
+1. 掩码语言模型MLM，随机遮盖输入序列中的一部分词语，训练模型去预测这些被遮盖的词语。能对输入序列进行双向理解。
+2. Next Sentence Prediction (NSP)：给出两个句子A B，让模型判断B是否是A的下一句话。目的在于学习句子级别的关系，比如问答或句子排序任务。
+
+由于需要未来上下文，它们无法实时生成顺序输出。
+
+#### MoE层
+
+1. 门控网络 (Gate Network) 或路由网络 (Router): 这是一个小型的前馈网络或线性层，它接收输入，并决定将输入“路由”给哪些专家（通常是选择排名靠前的 k 个专家）以及如何组合这些专家的输出。这个门控网络有自己的参数。
+2. 多个专家网络 (Expert Networks): 包含多个独立的子网络（即“专家”）。每个专家通常是一个前馈网络（例如两个线性层加一个激活函数）。所有的专家通常具有相同的架构，但它们内部的权重是独立训练的。
+
+### Stable Diffution
+
+是一个潜在扩散模型(Latent Diffusion Model)
+
+核心组件：
+
+1. Text Encoder文本编码器 将文本转换为Embedding。常用 CLIP (Contrastive Language–Image Pre-training) 的文本部分
+  * CLIP：通过对比学习(Contrastive Learning)的方式，在大规模的图片-文本对数据集上进行预训练，学习 图像与其对应的文本描述（而非预定义类别），使得模型
+理解图片和文本之间的语义关联。架构为 双编码器，包括图片编码器（ResNet和Vision Transformer）和文本编码器，将它们映射到同一个共享的嵌入空间。训练完成后就可计算文本和图片之间的相似度
+2. U-Net:核心。执行图像的去噪过程。一种具有编码器-解码器结构的卷积神经网络。接收带噪声的潜在表示、当前的时间步信息（表示去噪的进度）以及文本嵌入作为输入，然后预测出添加到潜在表示中的噪声（或者预测去噪后的潜在表示）
+3. 变分自编码器 (Variational Autoencoder, VAE)
+  * 编码器 (VAE Encoder): 将原始图像（或初始的随机噪声）压缩到维度更低的潜在空间中。让复杂的扩散过程在计算成本更低的潜在空间中进行
+  * 解码器 (VAE Decoder): 将在潜在空间中经过 U-Net 处理和去噪后的最终潜在表示，解码回高分辨率的像素空间图像
 
 ## numpy
 
@@ -312,8 +427,11 @@ out = F.relu(in * w + b)
 
 ### 优化器
 
+* SGD：最基本的优化器。实现简单。收敛过程可能震荡，容易陷入局部最优或鞍点。对学习率敏感
+* Adam：维护梯度的指数加权平均（一阶矩，提供动量方向）和平方梯度的指数加权平均（二阶矩，提供自适应缩放），进行早期阶段的偏差修正。从而自动调整学习率。AdamW：变种，推荐使用
+
 ```py
-optimizer = optim.Adam(model.parameters(), lr=0.001) # 还有SGD
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 loss_fn = nn.MSELoss() # 还有CrossEntropyLoss
 for epoch in range(num_epochs): # 一般以下封装在train()，一个epoch先train()再test()，test里用model.eval()和no_grad
     loss_sum = 0
@@ -328,7 +446,7 @@ for epoch in range(num_epochs): # 一般以下封装在train()，一个epoch先t
     if batch % 100 == 0:
         print("loss: {:>7f}  [{:>5d}/{:>5d}]", loss.item(), (batch + 1) * len(X), len(dataloader.dataset))
 
-自动调整学习率：
+按规则调整学习率：
 from torch.optim.lr_scheduler import StepLR
 scheduler = StepLR(optimizer, step_size=30, gamma=0.1)  # Reduce LR by 0.1 every 30 epochs
 for epoch in range(num_epochs): scheduler.step()
@@ -372,11 +490,17 @@ TensorDataset(inputs, labels)  组装已有的tensor
 
 ### torch.compile(dynamo)
 
+* 需要g++。使用后要空生成一次编译内核，速度很慢
 * 实际上支持任何函数，也可以用作装饰器。会递归编译，一般在顶层使用，排除不兼容的或用某上下文管理器关闭；也可以从底层开始测试
 * 在执行时将模型编译成优化的内核，多次执行才有优化效果
-* mode=默认"reduce-overhead"，另一个选项是max-autotune
+* mode=可选reduce-overhead和max-autotune，默认二者平衡
+* fullgraph=默认False，设为True如果失败会抛异常
 * model的grad_fn可以看到是否compile过
 * 只有V100 A100 H100才能看到明显效果
+* 保存编译结果
+  * 无法按模型级别保存。但有一些全局缓存
+  * 先调用一次触发编译。torch.compiler.save_cache_artifacts()，把bytes持久化保存，之后torch.compiler.load_cache_artifacts()
+  * 在本机上：TORCHINDUCTOR_FX_GRAPH_CACHE=1 TORCHINDUCTOR_AUTOGRAD_CACHE=1 默认存放在 /tmp/torchinductor_username
 
 ### 量化
 
@@ -435,7 +559,7 @@ npimg = img.numpy()
 plt.imshow(np.transpose(npimg, (1, 2, 0)))
 ```
 
-### 示例CNN模型
+## 示例CNN模型
 
 ```py
 class MyCNN(nn.Module):
@@ -471,6 +595,10 @@ xavier_uniform_ 用于初始化全链接层
 ## 分布式理论
 
 https://github.com/PacktPublishing/Distributed-Machine-Learning-with-Python
+
+* 数据并行：不同设备处理不同数据样本，但模型结构相同
+* 张量并行：拆分模型内部张量（如矩阵乘法）到多个设备。用于模型层太大，一张卡放不下
+* 流水线并行：拆分模型层到多个设备，一个GPU处理一部分层，数据样本“流动”处理。如同一时间GPU1处理样本1的1-4层，另一个GPU处理样本2的5-8层
 
 ### 数据并行（训练）
 
