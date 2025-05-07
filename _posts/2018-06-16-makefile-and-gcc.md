@@ -307,6 +307,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://github.com/skeeto/w64devkit/releases 解压后很小，只有c c++，有busybox
 * https://github.com/mmozeiko/build-gcc-mingw 比较小，有lto
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
+* https://github.com/redpanda-cpp/mingw-lite
 * __MINGW64_VERSION_STR定义了它自己的版本
 * 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads但可以静态链接。win32版没有这些功能
 * Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc
