@@ -377,6 +377,7 @@ collapsable content
     * 最终用户许可协议(EULA)中列出使用条款
     * CC的NC不是专有软件，是非自由软件。专有软件可以是闭源软件，也可以是源代码可用软件
   * attribution/giving credit：署名
+  * freeware不是free software，前者是价格免费，通常是专有闭源的
 * https://fossa.com/developers-guide-open-source-software-licenses
 * 修改license：经过所有contributors（copyright author）同意即可，无论改成更宽容的还是更严格的，也可以双重许可
 * TODO：什么是专利，开源协议和专利之间的关系
