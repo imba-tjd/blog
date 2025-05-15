@@ -112,12 +112,20 @@ w -= eta*2.0 * X.T @ errors / X.shape[0]
 ### RNN 循环神经网络
 
 MCP和CNN对于输入都是固定的，而RNN可以处理非固定长度的序列，且输入样本的顺序是有关的，如NLP、语音。\
-序列建模：多对一，如情感分析输入文本，输出类别。一对多，如输入图像，输出文字描述。多对多，可以是每个输入都对应一个输出；也可以等输入全部完成后再输出，如翻译。
+序列建模：多对一，如情感分析输入文本，输出类别。一对多，如输入图像（固定），输出文字描述（不定长）。多对多，可以是每个输入都对应一个输出；也可以等输入全部完成后再输出，如翻译。\
+输入形状：一般为 (batch_size, sequence_len, feature_len)。以下先假设不存在batch_size，且feature_len为1，即序列为单个数字。
 
-结构：对于一个输入x1，计算 `z = act(w1*x1+b)`。此时若继续传播到下一个神经元w3 b3，即预测输出。它还可以与新数据一起投入下一次的输入，乘以w2，与 w1和下一个数据 求和，再加偏置，称为反馈循环：`z2 = act(w1*x2 + w2*z + b)`，其中w1 w2 w3对于所有输入数据都是共享的。\
-但不太适用于长序列，当w2>1时会梯度爆炸，w2<1会梯度消失。
+结构：对于一个输入x1，计算 `z = act(w1*x1+b)`。此时若继续传播到下一个神经元Wo即预测输出。\
+它还有另一权重w2，与新数据一起投入下一次的输入，称为**反馈循环**：`z2 = act(w1*x2 + w2*z + b)`，其中w1 w2 w3对于所有输入数据都是共享的。
 
-x可以是向量，若w1具有
+若输入是向量（feature_len > 1），设长度为x，隐藏层长度为h。则w1形状为hx，w2形状为hh，b长h。\
+组合w1 w2为[Whx:Whh]即(h, h+x)，一维连接输入和上一时刻的输出[x:h]即(x+h)。
+
+缺点：不太适用于长序列，当w2>1时会梯度爆炸，w2<1会梯度消失。
+
+多层RNN：第一层在某一时刻的输出，作为第二层**在相同时间步**的输入。不同层的参数不同，但对于不同时刻是复用的。
+
+除了隐藏层循环连接，还有输出层循环连接，可以投入下一时刻的隐藏层或输出层。
 
 TODO: GRU门控循环单元
 
@@ -158,7 +166,7 @@ Word2Vec 使用“上下文”信息：①连续词袋：输入时向量变为 [
 
 Encoder将一整个句子或文章转换成一个固定长度的“上下文向量”，Decoder将向量解码成句子。两个句子之间长度可以不同，关键是可以具有不同的词表，如用于翻译。
 
-二者都包含多层LSTM，第一层(Layer)LSTM的m不仅作为下一个时间的m，还作为第二层**在相同时间步**的输入。不同层的LSTM有不同的参数，但每个LSTM本身的参数对于时间序列输入来说是复用的。\
+二者都包含多层LSTM，第一层(Layer)LSTM的m不仅作为下一个时间的m，还作为第二层**在相同时间步**的输入。\
 每层LSTM具有多个Unit，但似乎就是单个LSTM输出向量，视为多个输出标量的叠加，而非输出向量的叠加。
 
 Encoder输入时，先将句子中的词，逐个编码成Embedding向量，按顺序输入；最后输入EOS。\
@@ -167,6 +175,11 @@ Encoder最后一层的最后一个的m（最终隐状态）是输出，称为“
 
 Decoder的第一个输入是EOS，此时间经过Decoder计算，最后一层的m为输出，用一个全连接层（len(ctx_vec) x len(输出词表)）和softmax转换成词汇。该词汇再编码成Embedding作为下一个时间的Decoder的输入，直到输出EOS。\
 训练时，不将Decoder的输出作为下一时的输入，而是输入“正确内容”；输出仅用于计算损失。且如果到了该输出EOS时未输出，直接停止训练。这称为Teacher Forcing。
+
+使用LSTM作为Encoder-Decoder的缺点：
+1. 编码阶段，所有输入信息都储存在一个状态中，描述能力有限。
+2. 长距离衰减，句子靠前部分的影响降低。
+3. 解码阶段，编码信息仅在第一时刻输入，随着序列推移，编码信息越来越弱。
 
 TODO：gemini的说法，Encoder输入最后有EOS。Decoder输入先输入SOS，最后直到输出EOS结束。statequest视频没有说Encoder最后输入EOS，且Decoder最初输入SOS。
 
@@ -195,18 +208,20 @@ Encoder的架构不变，但保留每个时间的输出（记为Eo）。
   1. 创建三个权重矩阵Wq Wk Wv，形状一样都为dd，都与2点乘求和。注意此处是将向量求和，但因为又做了d次，又产生了长为d的向量；假设记为qkv
   2. 对于一个单词，将q与其他各个单词的k点乘，向量求和（即q*单个k -> 1个数），可选除以根号d进行缩放，一起组成向量传给softmax，得到与其他单词的相似度
   3. 加权：将所有单词的v对应与3.2的相似度相乘，再对应位置相加。得到AttentionOutput
-4. 残差连接：2 + 3。或者另一个角度看3得到的是Δ2，即2的调整值。实际还会在2 3后加一个归一层，二者都是使得训练更容易，减少梯度消失问题。
+4. 残差连接：2 + 3。或者另一个角度看3得到的是Δ2，即2的调整值。实际还会在2 3后加一个行归一层，二者都是使得训练更容易，减少梯度消失问题。
 
 对于一份输入，所有Token都可以并行做1234。
 
 #### QKV矩阵
 
-* 有可能指Wqkv权重矩阵，也可能指与Embedding计算后的实际值
-* qk的大小一般小于Embedding的大小，如128。理解为将原始Embedding映射到一个低维空间
-  * 一般输入矩阵形状为(n,d)，其中n是token数（相当于样本）。Wq的形状为(d,128)，Wk一样，计算后QV为(n, 128)。V必须与输入一样(n,d)
-* q是某种询问，当q和k的方向对齐（点乘大）时，它们就匹配，称作那些k对应词的嵌入“注意到了”q对应词的嵌入
-* 将各个q作为横轴，k作为纵轴，得到的表格称为“注意力模式”。softmax处理整个kv时是按列的
-* Wqkv对于所有输入都是相同的，称作自注意力单元。可以再堆叠几份独立计算，称为多头注意力MHA。多查询注意力MQA：对于多头，Wq不变，Wkv共享一个。分组查询注意力GQA，每个组内共享Wkv
+* 有可能指Wqkv权重矩阵，也可能指权重与Embedding计算后的值
+* qk的长度一般小于Embedding的长度d，如128。理解为将原始Embedding映射到一个低维空间
+* q是某种询问，当q和k的方向对齐（点乘大）时，它们就匹配，称作那些k对应词的嵌入“注意到了”q对应词的嵌入。一个q可以查询多个k，得到的相似度
+* 一般输入矩阵形状为(n,d)，其中n是token数（相当于样本）。Wq的形状为(d,128)，Wk一样。与Embedding计算后QK大小为(n, 128)。实际可以用一个Q查询所有K，即QKT大小为(i,j)，V为(j,)。V必须与输入一样(n,d)，但也可以低秩分解
+* QKT -> 每一行是一个q对其余各个k的相似度，此表格称为“注意力模式”。之后再softmax理解为按行处理
+* Wqkv对于所有输入都是相同的，称作自注意力单元
+* 多头注意力MHA：简单理解为将qkv拆分成几份，分别计算。重点在于对于不同token并行拆分后是将第i份先连起来，之后再经过Wo
+* 多查询注意力MQA：对于多头，Wq不变，Wkv共享一个。分组查询注意力GQA，每个组内共享Wkv
 
 #### Decoder
 
@@ -242,8 +257,9 @@ Encoder的架构不变，但保留每个时间的输出（记为Eo）。
   * 其它生成选项：min_length 强制在达到它之前不生成EOS。num_return_sequences：返回多个结果，对于波束搜索各结果区别不大
 * 分词器未登录词(out of vocabulary, OOV)问题
   * 基于词Word、基于字符Character：遇到不存在的会变为 UNK Token。如果Character包含所有Unicode字符，则太大
-  * 基于子词Subword：Byte Pair Encoding (BPE), WordPiece, SentencePiece。如果一个完整的词语不在词汇表中，分词器会尝试分解成已知的子词单元组合。如 tokenization 可能分解为 token 和 ization。是Word和Character的中间形态
+  * 基于子词Subword：Byte Pair Encoding (BPE), WordPiece, SentencePiece。如果一个完整的词语不在词汇表中，分词器会尝试分解成已知的子词单元组合。如 tokenization 可能分解为 token 和 ization。是Word和Character的中间形态。先分解到character(或byte)级别，再按merges.txt中的顺序合并，再按vocab.json映射。不适合中文
   * 字节级别BPE：从根本上解决了任何OOV问题。简单来说就是以Byte的256种可能作为Fallback
+  * Ċ和Ġ分别表示空格和换行符
 * 估算内存
   * bf16每个参数用2字节，训练时需要8字节，合计(2+8) * 7B = 70GB
   * Lora：1B的参数在整个微调过程中占大约1.4GB
@@ -295,7 +311,7 @@ ones_like(lst)  与参数相同形状且值都为1.0
 指定整数类型：dtype=np.int32或'int32'或'i'。转换类型：arr.astype(int)、tensor.to(不支持字符串)
 np.random.xxx  包括生成 整数或浮点 和 指定范围和个数 或 某种shape，可以生成各种分布。推荐用 rng=np.random.default_rng(42)。如果直接用，不要用rand randn randint。可以用random(可选长度)范围[0.0, 1)
 np.linspace(0,1,5)  将[0,1]划分5份：[0, .25, .5, .75, 1]
-np.arange(15).reshape(3, 5)
+np.arange(15).reshape((3, 5))  用-1表示推断。不改变原来元素的数量和值，只按新维度依次填入
 
 属性：
 arr.shape 各维度元素个数，一定返回元组
@@ -327,7 +343,7 @@ np.log(arr) np.pow(arr,2) np.sqrt(arr) 对每一项运算
 np.unique()
 np.concatenate/concat((a1,a2))  对于二维数组，它的 axis=0 等于 np.vstack()，axis=1 等于 np.hstack()；torch还能用cat，维度用dim
 np.insert(a1, ndx, a2) np.delete(arr, ndx)
-添加新轴：[1,2,3][:, None] -> [[1],[2],[3]]  此处None等价于np.newaxis
+添加新维度：[1,2,3][:, None] -> [[1],[2],[3]]; [1,2,3][None, :] -> [[1,2,3]]  此处None等价于np.newaxis
 
 arr.argsort()  返回arr排序后对应原数组中的索引。如[3,1,2].argsort() -> [1,2,0]，表示原数组排序后的结果为 arr[1],arr[2],arr[0]。再加一次argsort()得到排名[2,0,1]。手动实现：将原数组转化为(元素值, 索引)，按值排序，返回索引
 
@@ -353,6 +369,19 @@ numpy out has performance benefits？
   * torch.set_default_device('cuda')，否则默认为CPU，要用if torch.cuda.is_available(): t=t.to('cuda') 或创建t时指定device
     * 通用：if torch.accelerator.is_available(): t.to(torch.accelerator.current_accelerator())
   * torch.manual_seed(42)
+* CUDA Toolkit和Driver
+  * nvcc -V
+  * https://docs.nvidia.com/cuda/cuda-installation-guide-linux/
+  * 有两种安装方式：rpm/deb包、runfile包
+  * runfile
+    * sudo /usr/local/cuda-11/bin/cuda-uninstaller 如果没有，说明不是此方法安装的。apt装的也在此目录里
+    * curl https://developer.download.nvidia.com/compute/cuda/12.2.0/local_installers/cuda_12.2.0_535.54.03_linux.run | sudo sh
+  * apt
+    * 如果已经安装了驱动：使用nvidia-smi能看到支持的最高cuda版本，再安装cuda-toolkit-12-1
+    * 未安装驱动，连带安装：sudo apt install cuda
+    * 好像debian内置的要加nvidia-前缀，在non-free里。nv官方repo则不用，而是要加keyring：wget https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb; dpkg -i cuda-keyring_1.1-1_all.deb
+  * 只安装驱动（无nvcc，但已经可以跑torch）：apt search nvidia-driver
+  * 其他安装选择：NV驱动+conda安装cuda toolkit、docker
 
 ### tensor
 
@@ -616,6 +645,27 @@ https://github.com/PacktPublishing/Distributed-Machine-Learning-with-Python
 ### 模型并行（LLM推理）
 
 TODO
+
+## 混合精度训练
+
+* 结合FP32和FP16。参数和Loss仍用FP32，正向和反向传播运算用FP16
+* 如果全用FP16训练，容易出现溢出、梯度爆炸等问题
+
+```py
+from torch.cuda.amp import autocast, GradScaler # Automatic Mixed Precision
+scaler = GradScaler()
+
+for data, target in dataloader:
+    data, target = data.cuda(), target.cuda()
+    optimizer.zero_grad()
+    with autocast(): # 训练时用，自动将运算转换为FP16
+        output = model(data)
+        loss = loss_fn(output, target)
+
+    scaler.scale(loss).backward() # 放大loss避免反向梯度过小下溢
+    scaler.step(optimizer) # 它先unscale（缩小），判断是否溢出，如果梯度值不是inf或nan，再optimizer.step()
+    scaler.update()
+```
 
 ## Lightning
 
