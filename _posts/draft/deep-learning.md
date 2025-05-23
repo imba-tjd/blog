@@ -234,7 +234,8 @@ Encoder的架构不变，但保留每个时间的输出（记为Eo）。
 
 对于一个Token序列，将source设为BOS+它，target设为它+EOS。\
 经过Attention层时，为了使后面词语的q只检查前面词语的k，将qk矩阵的下三角（不含对角线，即要处理自己的qk）设为-∞（原矩阵 + 下三角为-math.inf的矩阵），这样softmax后就变为了0。\
-使得输出的Token可以一次性与target进行误差比较，且每个Token只会关注之前的输入，就好似逐字生成（推理时）一样。
+使得输出的Token可以一次性与target进行误差比较，且每个Token只会关注之前的输入，就好似逐字生成（推理时）一样。\
+交叉注意力部分没有掩码。
 
 #### 其它技术
 
@@ -266,17 +267,24 @@ Encoder的架构不变，但保留每个时间的输出（记为Eo）。
 
 #### GPT
 
-因果语言模型(causal Language Models)，也被称为自回归语言模型(autoregressive language models) 或仅解码器语言模型(decoder-only language models)
+因果语言模型(causal Language Models)，也被称为自回归语言模型(autoregressive language models)或仅解码器语言模型(decoder-only language models)。
+
+自监督学习(Self-supervised Learning)：训练时使用下一个Token；实际并行输入，用掩码注意力。而Seq2Seq虽然也有Teacher Forcing，但它是监督学习。
 
 #### Bert
 
-更擅长 自然语言理解NLU 任务，如文本分类（情感分析）、抽取式问答（填空题）
+双向（Bidirectional）Transformer编码器，能对输入序列进行双向理解。\
+更擅长 自然语言理解NLU 任务，如文本分类（情感分析）、抽取式问答（填空题）。
 
 两个预训练任务：
-1. 掩码语言模型MLM，随机遮盖输入序列中的一部分词语，训练模型去预测这些被遮盖的词语。能对输入序列进行双向理解。
-2. Next Sentence Prediction (NSP)：给出两个句子A B，让模型判断B是否是A的下一句话。目的在于学习句子级别的关系，比如问答或句子排序任务。
+1. 掩码语言模型MLM，随机遮盖（替换为`[MASK]`）输入序列中的一部分（15%）词语，训练模型去预测这些被遮盖的词语。一个MASK只生成一个Token。
+2. Next Sentence Prediction (NSP)：给出两个句子A B，让模型判断B是否是A的下一句话。目的在于学习句子级别的关系，比如问答或句子排序任务。输入格式为`[CLS] A [SEP] B [SEP]`，以CLS的状态二分类IsNext还是NotNext。
 
 由于需要未来上下文，它们无法实时生成顺序输出。
+
+生成Embedding的原理：CLS的最终状态。\
+分类任务的原理：添加一个线性层，从CLS的隐藏状态映射到类别。\
+MLM的训练原理：添加一个线性层，从MASK的隐藏状态隐射到Token。其交叉熵损失仅对于MASK计算。
 
 #### MoE层
 
