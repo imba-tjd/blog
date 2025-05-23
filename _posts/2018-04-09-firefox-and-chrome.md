@@ -128,9 +128,10 @@ title: 浏览器
 
 * https://static.centbrowser.cn/win_stable/
 * 适用于老系统的：https://github.com/win32ss/supermium
+* 便携版：https://github.com/henrypp/chrlauncher
+* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/
 * Ctrl+M：在当前窗口新建隐私页
 * 禁止自动更新：C:\Program Files\Google\Update文件夹 改名，但不会阻止下载新版安装包
-* 便携版：https://github.com/henrypp/chrlauncher
 
 ### about:flags
 
@@ -145,6 +146,8 @@ title: 浏览器
 * Zero-copy rasterizer：在chrome://gpu/中如果Native GpuMemoryBuffers是Software only就无法使用，当前状态在Tile Update Mode中，不清楚Default是否会合适时自动启用，有文章说启用后很容易崩溃；--disable-zero-copy
 * Skia API for compositing：还不稳定，且不兼容Overlay Scrollbars；--disable-skia-renderer
 * edge-enhance-text-contrast 更好的字体渲染
+* Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”。其他不受支持的：--no-sandbox
+* --single-process 配合ProxyOmega时报ERR_MANDATORY_PROXY_CONFIGURATION_FAILED
 
 #### [Overlay Scrollbars](https://www.zhihu.com/question/64630817/answer/223528093)
 

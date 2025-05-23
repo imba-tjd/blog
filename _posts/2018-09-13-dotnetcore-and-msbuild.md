@@ -10,6 +10,7 @@ category: dotnet
 * Linux，不支持x86：https://docs.microsoft.com/zh-cn/dotnet/core/install/linux-debian
 * dotnet-install.sh自动安装脚本，支持无root权限安装，但只是用于CI环境临时使用，且需要手动添加Path：`export PATH=~/.dotnet:$PATH`、`$env:Path="$env:LocalAppdata\Microsoft\dotnet;"+$env:Path`
 * 源代码：https://source.dot.net/，部分API只会显示Linux的。FX的源码：https://referencesource.microsoft.com
+* dotnet tool --global 安装在 ~/.dotnet/tools
 
 ## [CSProj](https://docs.microsoft.com/zh-cn/dotnet/core/tools/csproj)
 
@@ -309,6 +310,40 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * 永久回退许可证：订阅一年以上，若停止订阅，仍可以一直使用订阅到期日往回推一年前时的正式版本
 * 开源项目免费许可证：需正在积极开发、不提供付费版本和付费支持等、未获得商业公司的资助
 * EAP：无限制，无需订阅，可以商用。但每个build只有Release后的30天内有效。CLion和Rider都有
+
+## 调试工具
+
+* dotnet-stack report -p pid
+
+### dotnet-trace
+
+```
+dotnet-trace collect -p pid
+dotnet-trace report xxx.nettrace topN
+dotnet-trace convert xxx.nettrace --format speedscope/chromium
+https://www.speedscope.app/
+```
+
+### dotnet-dump
+
+```
+dotnet-dump collect -p pid
+dotnet-dump analyze dmp文件
+
+threads列出所有线程，或clrthreads
+setthread 编号（不是tid，而是上一步的序号，或clrthreads中的ID）
+clrstack
+
+dumpobj(do) addr 显示对象的各种信息，包括字段的值
+
+获取线程对象：ThreadObj是native对象的地址，不是managed的
+对于Core3，可以：
+name2ee System.Private.CoreLib.dll System.Threading.Thread 找到MethodTable
+dumpclass 上一步MT的地址
+此时最后一大堆 Thread:Value 中，冒号前为tid（十六进制）的就是线程地址
+
+显示字符串的值：du addr
+```
 
 ## TODO
 
