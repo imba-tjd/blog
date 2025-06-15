@@ -19,6 +19,8 @@
 
 初面：一般是技术面，可能是未来的Mentor。二面：Leader，主要问项目。
 
+在线测试，不知道问题是不是固定的：https://www.cloudskillsboost.google/interview_warmup
+
 ### 自我介绍
 
 面试官，您好！我叫xxx。
@@ -28,6 +30,8 @@
 我一直都非常想加入贵公司，我觉得贵公司的文化和技术氛围我都非常喜欢。
 
 FAB法则：Feature特征/优势、Advantage比别人好在哪些地方、Benefit如果雇佣你，招聘方会得到什么好处
+
+Throughout my computer science studies, I've been fascinated by the possibilities of mobile app development. I immersed myself in projects, building apps like a fitness tracker that integrated with wearable devices. This hands-on experience solidified my passion for creating impactful user experiences. I'm excited to bring my enthusiasm, knowledge of Swift and Kotlin, and eagerness to learn to your team, where I can contribute to the development of innovative mobile applications.
 
 ### 介绍项目
 
@@ -52,15 +56,18 @@ STAR法则：Situation情景、Task任务、Action行动、Result结果
 
 ### HR面（HRBP？）
 
-为什么你希望来我们公司工作
-为什么学计算机
-优势、优缺点
-为什么从上一家离职
-什么时候可以入职
-你希望通过这份工作获得什么
-短期和长期目标分别是什么
-期望薪资
-你对加班的看法
+背景动机
+    为什么希望来我们公司工作
+    为什么从上一家离职
+    你希望通过这份工作获得什么：参与大型项目、成为领域技术专家、掌握新技能
+    短期和长期目标分别是什么（未来几年的规划）：持续学习
+能力
+    为什么适合这个职位（优势）
+    性格优缺点
+    学习新知识的过程
+非主观
+    什么时候可以入职
+    期望薪资
 
 ## 黑话
 
