@@ -668,6 +668,7 @@ fire.Fire(Calculator) # python cli.py add 1 2；python cli.py o --offset=1
 * ?加带*的对象名：显示匹配的对象名；其实是psearch命令
 * save：把指定的行保存到文件中、load把目标文件的内容输进终端且不自动执行、recall把上一次的输出(_)输进终端中且不执行、reset -f清除所有定义了的变量、%%writefile将本单元格保存到文件中、paste粘贴并执行、rerun：重运行指定指定行的代码
 * load_ext autoreload; autoreload 2修改源文件后会自动重载，autoreload 1修改通过aimport a,b的文件后自动重载；对C模块无效
+* 仅colab：# @title xxx 在代码格里显示标题
 
 ### 配置
 

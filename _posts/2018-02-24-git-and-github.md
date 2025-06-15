@@ -95,6 +95,8 @@ title: Git/GitHub笔记
   * core.fsyncObjectFiles：设为false表示交给操作系统flush数据，对于现代文件系统没必要设为true但好像默认是它，batch在NTFS下安全性应和true相当
   * core.fsmonitor true：Win和Mac有效，启用后好像会产生守护进程
   * feature.manyFiles true：相当于修改另外两项设置，遇到大量文件时有一些优化
+  * core.compression 9 仅影响ssh的传输
+  * core.preloadindex true
 
 ### 查看diff信息的工具
 
@@ -334,6 +336,7 @@ vendor-dir/** linguist-vendored # 排除某些文件夹，默认自动排除vend
 ### 在issue中标签隐藏过长的代码
 
 * summary和内容之间需要一个空行，否则markdown样式无法生效
+* GH网页版 模板：/details /table
 
 ```html
 <details>
