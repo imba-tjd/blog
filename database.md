@@ -156,6 +156,10 @@ END
 * OLTP适合行储存，也即普通的RDBMS。OLAP适合列储存、大数据、数据仓库，用于高层分析，数据变化慢，使用人数少。二者混合叫HTAP
 * 主键不应修改、不应重用（很难严格处理外键）
 * 关系型数据库基于集合论，实现为具有行列的二维表。KV数据库：文件系统就可以看作；不适合复杂的查询和聚合需求。列型数据库：添加列很容易，每一行可以有一组不同的列，不需要存null可以保持稀疏，包括HBase、Cassandra。文档型数据库：如Mongodb原生用js查询。图数据库：善于处理高度互联的数据
+* Instance - DataBase(Catalog) - Schema - Table/View/...
+  * DataBase是备份、事务的边界
+  * Schema是逻辑组织，用于存放表、细粒度授权。不同Schema可以有同名表；Oracle每个用户默认自动创建一个Schema
+  * MySQL没有Schema。跨库操作要用XA事务
 
 ### 索引
 
