@@ -348,8 +348,8 @@ END
   * 以Deamon运行，日志写入datadir中的 .err：-D
   * Win下默认就是Deamon，以前台运行：--console
   * Win下创建/删除服务：--install/remove，停止：sc start/stop mysql。会启动两个进程用于使用RESTART命令
-* mysql_secure_installation：设置root密码等，官方推荐初始化后用一次
-* systemctl管理的不需要用mysqld_safe
+* mysql_secure_installation：设置root密码、关闭test数据库等，官方推荐初始化后用一次
+* mysqld_safe：systemctl管理的不需要用
 
 ### my.cnf
 
@@ -392,7 +392,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
   * host默认localhost，端口默认3306，user默认root，-p不加参数表示交互式输入密码
   * 指定初始数据库用-D。重定向stdin可读取执行sql脚本
   * Win下用户名默认为无意义的odbc，考虑在配置文件里加[mysql]user=root
-* 修改密码：mysqladmin -u用户名 -p旧密码 password 新密码，或set password [for xxx] ='新密码';
+* 修改密码：mysqladmin -u用户名 -p旧密码 password 新密码，或set password [for xxx] ='新密码';。忘记密码：mysqld配置中加skip_grant_tables，之后任意用户名密码都可登录，会自动禁止远程连接
 * 交互式中顺便保存记录：--tee
 * 执行命令后退出：-e
 * 压缩：-C 对于100M以下网速应启用，若客户端和服务端在同一机器上不应启用
