@@ -258,9 +258,10 @@ Encoder的架构不变，但保留每个时间的输出（记为Eo）。
   * 其它生成选项：min_length 强制在达到它之前不生成EOS。num_return_sequences：返回多个结果，对于波束搜索各结果区别不大
 * 分词器未登录词(out of vocabulary, OOV)问题
   * 基于词Word、基于字符Character：遇到不存在的会变为 UNK Token。如果Character包含所有Unicode字符，则太大
-  * 基于子词Subword：Byte Pair Encoding (BPE), WordPiece, SentencePiece。如果一个完整的词语不在词汇表中，分词器会尝试分解成已知的子词单元组合。如 tokenization 可能分解为 token 和 ization。是Word和Character的中间形态。先分解到character(或byte)级别，再按merges.txt中的顺序合并，再按vocab.json映射。不适合中文
+  * 基于子词Subword：Byte Pair Encoding (BPE), WordPiece, SentencePiece。如果一个完整的词语不在词汇表中，分词器会尝试分解成已知的子词单元组合。如 tokenization 可能分解为 token 和 ization。是Word和Character的中间形态。先分解到character(或byte)级别，再按merges.txt中的顺序合并，再按vocab.json映射成数值索引。不适合中文
   * 字节级别BPE：从根本上解决了任何OOV问题。简单来说就是以Byte的256种可能作为Fallback
   * Ċ和Ġ分别表示空格和换行符
+  * tokenizer.json：前两个文件是它的子集，分别在model.vocab和model.merges。它还包括额外token、填充截断策略等。tokenizer_config.json：好像是tokenizer.json不包含词表的部分。tokenizer.model：好像也是必要的，有时没有是用了其他模型的
 * 估算内存
   * bf16每个参数用2字节，训练时需要8字节，合计(2+8) * 7B = 70GB
   * Lora：1B的参数在整个微调过程中占大约1.4GB
