@@ -60,11 +60,13 @@ title: Linux命令
     * 选择内容：按住Shift
     * 一次性杀掉多个进程：c选择条目，k相当于F9
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
-  * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器。nmon、njmon(c)：社区为sourceforge较差，后者适合做二次开发。gtop(node)、bottom(rust)：比较类似于overview面板，能显示网速，有折线图显示CPU和内存历史。iotop
-* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序。直接写数字就是指定pid，-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别；pstree：以简单形式显示父子程序名关系；在`procps`包中
+  * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器。nmon、njmon(c)：社区为sourceforge较差，后者适合做二次开发。gtop(node)、bottom(rust)：比较类似于overview面板，能显示网速，有折线图显示CPU和内存历史。iotop。netop(rust)：能显示网络流量速率
+* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序；空格ww表示不截断命令行。直接写数字就是指定pid。-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别
+  * pstree：以简单形式显示父子程序名关系。在procps包中
   * pkill：根据ps的一些Filter来kill，一般就是pkill -fe 进程名，f表示完全匹配防止误杀，e显示杀了的程序
   * pgrep：同理，另外查找进程时不会显示grep自身
   * dalance/procs：rust的重写
+  * 另一种查看命令行的方式：cat /proc/pid/cmdline | tr '\0' ' '
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
 * nethogs、nload：显示网速
 
@@ -78,7 +80,7 @@ title: Linux命令
 * ls：-R递归，-r倒序，-t按日期降序，-S按文件大小降序，-d显示当前文件夹自己的信息，-A列出除.和..以外的所有文件
   * eza、lsd：Rust的重写
 * cd -：切换到之前的目录
-* tail -f：持续输出指定文件，如果有变化立即显示；与less -F相同
+* tail -F：持续输出指定文件，如果有变化立即显示；其中-F用于rotate日志场景原文件被重命名后仍按原文件名输出，而-f会跟踪被重命名的文件（因为跟踪fd）导致不再输出。less -F：会缓存所有输出内容，中断后进入普通less模式可回看
 * which、whereis：找到程序的路径，其中which只在PATH中找可执行文件，默认只显示直接使用的那一个，用-a显示全部；whereis还在一些系统目录中找且可找二进制、源文件、文档
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * shasum/md5sum：指定文件时默认二进制模式，从stdin读取时默认文本模式，-c验证
