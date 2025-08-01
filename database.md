@@ -354,13 +354,17 @@ END
 ### my.cnf
 
 * 会在多个位置搜索此文件，如/ect/mysql、/etc、~/.my.cnf。Win的msi版在%ProgramData%/MySQL/MySQL Server 8.0，zip版考虑放在basedir下，实际也会在C:/Windows和C:/下搜索
+  * 权限：Owner必须为root，Mod必须为644，否则不会使用
 * 直接运行的重载配置：/etc/init.d/mysql reload
-* 显示当前配置项：mysqld --print-defaults、SHOW VARIABLES like 'xxx'、--help --verbose显示所有选项实际值
+* 显示当前配置项：mysqld --print-defaults。显示所有选项实际值：--help --verbose
+* 客户端运行时读写配置项：SHOW GLOBAL VARIABLES like 'xxx'，其中开关类型的值为'ON'/'OFF'。SET GLOBAL xxx=yyy
+* 日志文件的权限：必须由mysql自动生成文件。轮转：mysql会按fd写，mv成历史文件后按原值重设一次路径，就会生成写入新文件
+* TODO：好像各查询日志默认都是关的，包括错误日志。命令行日志除外，另有地方记录。还要查默认日志的路径
 
 ```conf
 [mysqld]
 user=mysql
-datadir=/data/mysql 默认在basedir/data。basedir就是安装目录
+datadir=/data/mysql 其他选项如日志文件的相对路径为相对它；若它用相对路径，会相对于CWD，建议永远用绝对路径。默认在basedir/data。basedir就是安装目录。TODO：看此默认的说法是否正确
 bind_address=指定ip，默认为*
 
 innodb_strict_mode 感觉可以无脑开
