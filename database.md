@@ -326,7 +326,6 @@ END
 ## MySQL
 
 * set foreign_key_checks=0：不检查外键约束
-* status：状态
 * 工具：https://github.com/github/gh-ost MySQLTuner-perl
 * SSL加密
   * 默认就会在datadir中生成自签名证书，客户端（不含mariadb）默认就会进行加密连接，只不过默认允许回退到未加密
@@ -403,6 +402,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * 命令
   * 执行sql文件：source或\.
   * 显示连接信息：\s
+  * status
 * 记录登录选项：mysql_config_editor set，会把参数混淆存到~/.mylogin.cnf中，之后简单用mysql命令行就能登录。还支持创建多个配置，称为login-path
 
 ### 事务日志
