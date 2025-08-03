@@ -415,6 +415,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 * binlog归档日志：记录所有执行的SQL语句，但将要修改的数据设为最终值（如SET A=A+1改为=3）。一般用于主从同步和数据备份
   * 事务中也是写buffer。提交时刷盘。sync_binlog=默认1表示每次事务commit都刷盘。=0交给操作系统刷盘，=N表示经过N个事务后刷盘
   * 与redolog保持一致：2PC两阶段提交。commit时，redolog刷盘，但不表示完成提交，而是设为prepared状态，等binlog刷盘再返回完成。如果redolog写完了但binlog刷盘时挂了，重启后会自动恢复
+  * redolog是Innodb层面的，binlog是Server层面的
 * undolog：见MVCC
 
 ### 分布式集群
