@@ -245,8 +245,9 @@ END
 * 显示当前隔离级别：PG:SHOW TRANSACTION ISOLATION LEVEL
 * MVCC
   * MySQL用来实现读写不冲突且保持隔离级别的免锁（用CAS）的方式。每个表添加两个隐藏列，记录 修改当前行的事务ID 和 历史数据RowID（指针）
-  * 发生修改时，把老数据备份到undolog中（记录反向操作，如INSERT对应DELETE），修改表，并把历史数据指针指向undolog中的老数据
+  * 发生修改时，把老数据备份到undolog中，修改表，并把历史数据指针指向undolog中的老数据
   * 当修改未commit时有另一事务SELECT，会创建一个ReadView，记录当前所有事务。可以读取 小于最早未commit的事务ID 的行。对于RC，每次SELECT都会重新创建ReadView；对于RR，只会创建一次，保留直到事务结束
+  * undolog：在一般数据库中用于保持事务原子性、回滚功能。一种实现方式是 记录反向操作，如INSERT对应DELETE
 * 锁
   * 按属性分：共享锁S锁、排他锁X锁
   * 按粒度分：全局锁（用于全库备份恢复）、表锁（串行化隔离级别、存储引擎无行锁）、MDL元数据锁、意向锁（如果锁了某一行，再加表锁就要遍历每一行，意向锁解决此问题）、InnoDB行锁（记录锁、间隙锁、临键锁 后两者防止幻读）
@@ -407,11 +408,14 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
 
 ### 事务日志
 
-* 进行事务时写redo log，提交时写入redo log缓存，写入文件系统缓存，fsync。这也是innodb_flush_log_at_trx_commit=1默认策略
-  * =0时，提交事务写入redo log缓存，不写入文件系统缓存，由后台线程每隔1秒写入文件系统缓存和fsync。可能损失1秒数据
-  * =2时，会写入文件系统缓存，但不会fsync。如果mysql挂了不会损失数据，但系统挂了会损失1秒数据
-* binlog归档日志：记录语句的原始逻辑，数据备份(主备 主从)要用到，维护集群数据一致性
-  * sync_binlog=0 默认为1表示每次事务都同步binlog，设为0完全交给操作系统刷新，设为N表示经过N个事务后同步
+* 事务中写数据流程：1.如果数据页不在buffer pool里，先读到内存里。2.写undolog。3.修改内存中的buffer。4.写redolog buffer
+* 提交流程：把redolog buffer刷盘（写入文件系统缓存，fsync），就已经认为commit成功。这也是innodb_flush_log_at_trx_commit=1默认策略
+  * =2时，commit后，会写入文件系统缓存，但不fsync。如果mysql挂了不会损失数据，但系统挂了会损失1秒数据
+  * =0时，commit后，后台线程每秒将redolog刷盘。可能损失1秒数据
+* binlog归档日志：记录所有执行的SQL语句，但将要修改的数据设为最终值（如SET A=A+1改为=3）。一般用于主从同步和数据备份
+  * 事务中也是写buffer。提交时刷盘。sync_binlog=默认1表示每次事务commit都刷盘。=0交给操作系统刷盘，=N表示经过N个事务后刷盘
+  * 与redolog保持一致：2PC两阶段提交。commit时，redolog刷盘，但不表示完成提交，而是设为prepared状态，等binlog刷盘再返回完成。如果redolog写完了但binlog刷盘时挂了，重启后会自动恢复
+* undolog：见MVCC
 
 ### 分布式集群
 
