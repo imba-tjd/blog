@@ -366,14 +366,13 @@ END
 user=mysql
 datadir=/data/mysql 其他选项如日志文件的相对路径为相对它；若它用相对路径，会相对于CWD，建议永远用绝对路径。默认在basedir/data。basedir就是安装目录。TODO：看此默认的说法是否正确
 bind_address=指定ip，默认为*
+port=默认3306
 
-innodb_strict_mode 感觉可以无脑开
-innodb_buffer_pool_size=默认128M，应设为内存的50-75%；或开启innodb_dedicated_server后会自动调整，在容器中也推荐开
-innodb_use_fdatasync  8.0.26+无脑开，不过对于O_DIRECT_NO_FSYNC无作用
-innodb_flush_method=O_DIRECT_NO_FSYNC  当redo_log和data不在同一块磁盘上或无UPS时用O_DIRECT，在NFS上时用默认值。Win下用默认值
+innodb_buffer_pool_size=默认128M，应设为内存的50-75%。或开启innodb_dedicated_server后会自动调整，在容器中也推荐开
+innodb_flush_log_at_trx_commit=2 见下面
 innodb_io_capacity=默认值是机械硬盘的200，用SSD时设为1000
 innodb_file_per_table=1 有好处也有坏处且感觉都不明显
-innodb_flush_log_at_trx_commit=2 见下面
+
 
 sql_mode=ansi,traditional  默认为traditional，这样表示也启用ansi：real为float、||拼接字符串、双引号指示标识符
 mysqlx=off
@@ -381,13 +380,15 @@ block_encryption_mode=aes-128-cbc  默认ECB。影响AES_ENCRYPT()
 
 # 启用慢查询日志，如果执行时间大于3秒则记录
 slow_query_log=1
-slow_query_log_file=log-slow-queries.log
+slow_query_log_file=slow-queries.log
 long_query_time=3
 
-#skip_name_resolve  客户端连接时默认会对ip反向解析，指定此项能加速，但会影响root@localhost登录
-#shared_memory  仅限Win，只有cli .NET mariadb connector/j支持，mysql connector/j不支持
-#innodb-buffer-pool-instances：size大于1G时会自动调整
+skip_name_resolve  客户端连接时默认会对ip反向解析，指定此项能加速，但会影响root@localhost登录
+shared_memory  仅限Win，只有cli .NET mariadb connector/j支持，mysql connector/j不支持
+innodb-buffer-pool-instances：size大于1G时会自动调整
 join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会话中适当增大，如1MB。不要全局设置，因为每个会话都会分配，而且太大没用。类似的还有sort_buffer_size、read_rnd_buffer_size、tmp_table_size
+innodb_use_fdatasync  将fsync在支持的时候变为fdatasync。8.4默认开
+innodb_flush_method=linux下默认O_DIRECT，O_DIRECT_NO_FSYNC应该与innodb_use_fdatasync一样。当redo_log和data不在同一块磁盘上或无UPS时要求用O_DIRECT，在NFS上时要求用默认值。Win下要求用默认值。总结不用调
 ```
 
 ### CLI
@@ -417,6 +418,7 @@ join_buffer_size：默认256KB，对于复杂的多表关联查询，可在会�
   * 与redolog保持一致：2PC两阶段提交。commit时，redolog刷盘，但不表示完成提交，而是设为prepared状态，等binlog刷盘再返回完成。如果redolog写完了但binlog刷盘时挂了，重启后会自动恢复
   * redolog是Innodb层面的，binlog是Server层面的
 * undolog：见MVCC
+* DoubleWrite Buffer：MySQL的数据页为16KB，而硬盘一般只支持4KB原子写入。如果刷盘到一半失败，会出问题，且redolog不考虑这种情况下的恢复。解决办法（默认已启用）：先把旧数据备份一下，如果出问题了，先恢复旧数据，再用redolog
 
 ### 分布式集群
 
