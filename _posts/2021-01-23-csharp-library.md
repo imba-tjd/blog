@@ -2,24 +2,6 @@
 title: C#库
 ---
 
-## Newtonsoft.Json
-
-* 部分功能依赖Microsoft.CSharp命名空间引用
-* 反序列化时json字面量支持单引号
-
-```c#
-JsonConvert.SerializeObject(obj [,Formatting.Indented]); 支持基元类型、IEnumerable、IDictionary
-JsonConvert.DeserializeObject<T>(str);
-SerializeObject<dynamic>()，之后object可用.xxx或同JObject，数组同JArray
-// 文件
-var serializer = new JsonSerializer() {NullValueHandling = NullValueHandling.Ignore};
-serializer.Serialize(File.CreateText(...), obj)/Deserialize<T>(new JsonTextReader(File.OpenText(...)));
-// Newtonsoft.Json.Linq
-JObject.Parse(str); 之后当作dict用，还可SelectToken(jsonpath)
-JObject.FromObject(匿名对象)
-JArray 当作List用，长度用Count
-```
-
 ## Config.Net
 
 * 支持多种数据源：app.config 命令行 环境变量 ini json
