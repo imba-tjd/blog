@@ -585,6 +585,7 @@ gcc sqlite3.c shell.c -o sqlite3.exe \
 * https://github.com/milvus-io/milvus/ 国产向量搜索引擎
 * Oracle 免费版：https://www.oracle.com/database/technologies/appdev/xe.html
 * ElasticSearch的替代品：https://github.com/zincsearch/zincsearch https://github.com/manticoresoftware/manticoresearch
+* https://github.com/apache/ignite
 
 ### GUI
 
