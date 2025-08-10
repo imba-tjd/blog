@@ -37,13 +37,15 @@ Throughout my computer science studies, I've been fascinated by the possibilitie
 
 选一个项目作为重点。
 
-项目是做什么的，整体设计、架构图
-担任了什么角色，你负责了什么。使用哪些技术栈，做了什么
+项目是做什么的：应用场景
+技术方案：使用哪些技术栈，整体设计、架构图
+担任了什么角色，你负责做了什么
 解决过什么问题，怎么解决的，收获了什么
 学会了哪些新东西
 犯过的错误，怎么弥补的
 
-STAR法则：Situation情景、Task任务、Action行动、Result结果
+STAR法则：Situation情景、Task任务、Action行动、Result结果。
+背景、理论、分论、结论。
 
 ### 反问
 
@@ -51,7 +53,7 @@ STAR法则：Situation情景、Task任务、Action行动、Result结果
 工作地点。主要项目。是否盈利。
 如果录用，会给我安排什么样的工作。
 转正率、条件。
-加班、倒班、oncall。
+上班时间：早几，晚几，一周几天，中午多久。有无oncall
 正式工的工资额，工资组成，职位对工资的影响
 
 ### HR面（HRBP？）

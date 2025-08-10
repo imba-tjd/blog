@@ -2,6 +2,7 @@
 
 ## 功能
 
+* Path：模板
 * Header：MultiMap
 * Body：纯数据、application/x-www-form-urlencoded、multipart/form-data
 * 透明gzip压缩
@@ -12,7 +13,10 @@
 * Cookie
 * Proxy
 * TLS：信任哪些证书（默认系统，支持自定义）、使用的加密套件
+* 连接池：每主机最大连接数
+* Basic Auth
 * HTTP/2、Websockets、SSE
+* 可观测性、拦截器
 
 ## [OkHttp](https://square.github.io/okhttp/)
 
