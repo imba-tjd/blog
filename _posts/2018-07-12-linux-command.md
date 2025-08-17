@@ -528,9 +528,10 @@ ip link
 
 ### crontab
 
-* crontab -l [-u username]：列出当前/某个用户的任务；列出所有用户的任务：`cat /etc/passwd | cut -d: -f1 | xargs -I {} crontab -l -u {}`
+* crontab -l：列出当前用户的任务，对应/var/spool/cron/xxx；-u指定其他用户。列出所有用户的：`cat /etc/passwd | cut -d: -f1 | xargs -I {} crontab -l -u {}`
 * crontab -e：编辑；-r：删除
 * 默认开机会自动启动crond。cron的调度文件：crontab、cron.d、cron.daily、cron.hourly、cron.monthly、cron.weekly
+* systemctl restart cron（debian）/crond（rh）
 * systemctl list-timers
 * https://crontab.guru/ https://cron-ai.vercel.app https://crontab.cronhub.io/ http://www.cronmaker.com
 * https://zhuanlan.zhihu.com/p/58719487

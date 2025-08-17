@@ -258,7 +258,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 -static-libgcc -static-libstdc++ -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
 ```
 
-* MinGW32编译出来的程序可能依赖libgcc_s_sjlj-1.dll等，使用-static-libgcc就可避免依赖。好像MinGW64不会。另外g++必须用shared-libgcc
+* MinGW32编译出来的程序可能依赖libgcc_s_sjlj-1.dll等，使用-static-libgcc就可避免依赖。好像MinGW64不会。另外g++必须用shared-libgcc。根据AI，libgcc默认已经将用于辅助的函数静态链接了，只有异常处理的部分是动态链接的，且需要动态链接才能用（不同so在运行时要用同一个异常处理模块）。估计单exe可以考虑用static-libgcc；C++要么-static，要么加-static-libstdc++
 
 ### 临时禁用警告
 
@@ -303,7 +303,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
 * https://musl.cc/
-* https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能
+* https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能。实测下下来有一些别的组件，g++编译出来默认会报找不到libstdc++-6.dll
 * https://github.com/skeeto/w64devkit/releases 解压后很小，只有c c++，有busybox
 * https://github.com/mmozeiko/build-gcc-mingw 比较小，有lto
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
