@@ -4,7 +4,7 @@ title: 算法
 
 ## 技巧
 
-* 用max()替代if，记录最大值：`if cur > m: m = cur` -> m = max(m, cur)；限制下限：`if x < limit: x = limit` -> x = max(x, limit)
+* 用max()替代if，记录最大值：`if cur > m: m = cur` -> m = max(m, cur)；限制下限：`if x < limit: x = limit` -> x = max(x, limit)。`if x:y else: max(y,z)`->`if x:y=0; max(y,z)`
 * 整数的ceiling：(a + b - 1) / b。或 math.ceil()
 * 同时遍历两个长度不同的序列：if len(A) > len(B): return f(B,A) 保证A的长度更短，后续取下标时不用再判断是否越界；如果按更长的遍历，也可以在后续只判断短的是否越界
 * any(x>k for x in arr) == x > min(arr)
@@ -391,6 +391,7 @@ dp[i][1]表示第i天不持有股票时的剩余金额=max(dp[i-1][1], price[i]+
 * 一维滚动数组（空间复杂度O(W)）：因为dp[i]仅依赖于dp[i-1]，可改为只保留dp[j]=max(dp[j], dp[j-w[i]]+v[i])，表示当容量为j时的最大价值。仍二重循环，但**必须先遍历i，且j必须从后往前遍历**，每轮只需更新到j>=w[i]
   * 若j从前往后遍历：从公式上讲，本应使用二维中的dp[i-1]变为了dp[i]，或者说覆盖了。从原理上讲，会导致重复选取物品，因为dp[i]表示的最大重量中可能已经存在v[i]了
 * 多重背包：简单的可以看作多个重量相同的物品。实际只要算 `j-k*w[i]] + d*v[i]`。还有一个二进制优化，如某物品有7个，则拆分成价值为v 2v 4v的三个子物品，再按01背包
+* 递归解法：def f(ndx, wleft): if ndx<0 or wleft<=0: return 0; if wleft>=w[ndx] return max(f(ndx-1, wleft), v[ndx] + f(ndx-1, wleft-w[ndx])) else return f(ndx-1, wleft)。记忆化一下即可，没有遍历每个重量，而是按需计算
 
 #### 例子
 
@@ -557,6 +558,7 @@ for (i2, j2) in dirs:
 * 可解决大部分区间上的修改和查询的问题。如 1.单点修改，单点查询。2.区间修改，单点查询。3.区间查询，区间修改（太复杂，不方便，改用线段树）
 * 高效计算数列的前缀和、区间和。以O(logn)的时间得到任意前缀和；单点值的修改也变为O(logn)
 * 线段树能解决的问题，树状数组大部分也可以，反之则不行。树状数组更简单，线段树扩展性高
+* 离散化：如要求满足比较条件的(i,j)元组数，但值的范围太大。可用此操作映射到[1,n]，做法为sorted(set(arr))，枚举它构建{v:ndx}，再遍历原数组将值替换为ndx
 
 ### 演化
 

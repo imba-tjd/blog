@@ -2,10 +2,10 @@
 
 ## 功能
 
-* 映射规则：全局设置、单个字段设置。CamelCase对应SnakeCase、大小写不敏感
-* 类型转换器：日期、Long
+* 映射规则：全局设置、单个字段设置。CamelCase对应SnakeCase（默认不更改）、大小写不敏感
+* 类型转换器：日期（包括自定义模式、时区）、Long
 * 序列化
-  * 忽略某字段
+  * 忽略某字段（一般支持transient）
   * 美化输出
 * 反序列化
   * 额外字段：一般默认忽略
@@ -28,7 +28,7 @@
 ## [moshi](https://github.com/square/moshi)
 
 * com.squareup.moshi:moshi
-* okhttp组织出的，是原gson开发者做的
+* okhttp组织出的，是原gson开发者做的。但性能很差，比gson还差，只比javax.json好
 
 ```java
 Moshi moshi = new Moshi.Builder().build(); // 此处添加类型转换器
@@ -42,26 +42,31 @@ Model m = ada.fromJson(jsonstr);
 
 * com.fasterxml.jackson.core:jackson-databind
   * 处理LocalDateTime：jackson-datatype-jsr310
+  * 新底层引擎（需JDK11）：com.fasterxml.jackson.module:jackson-module-blackbird
+  * 精简版：https://github.com/FasterXML/jackson-jr 还提供自包含包（但默认仍不能用注解，还要引入另一个包），序列化和反序列化的方式也和普通的不一样
+* 反序列化
+  * 要存在无参ctor，record不必。字段要public或setter
+  * 默认支持jsonstr传字符串而类型为int
 * TODO: Spring中的配置
 
 ```java
 ObjectMapper mapper = JsonMapper.builder()
     .findAndAddModules()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // 默认为true，设为false后当JSON存在Bean没有的字段时不报错
-    .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true) // 便于反序列化record
-    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false) // 默认true将Date和TS序列化为unix时间戳毫秒，设为false后默认为ISO格式0时区字符串；LocalDateTime分别为内部结构表示和当前时区ISO格式。Spring默认false
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // 默认为true当JSON存在Model没有的字段时会报错
+    .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false) // 默认true将Date和TS序列化为unix时间戳毫秒，设为false（Spring默认）后默认为ISO格式0时区字符串；LocalDateTime分别为内部结构表示和当前时区ISO格式
+    .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CASE)
+    .defaultTimeZone(TimeZone.getDefault()) // 仅当不设置DateFormat且WRITE_DATES_AS_TIMESTAMPS=false时考虑使用，设置了DateFormat似乎默认就变成当前时区了
+    .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")) // 对LocalDateTime无效
     .build();
 
-mapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CASE) // 默认不改变大小写。还有SNAKE_CASE
-    .setTimeZone(TimeZone.getDefault()) // 仅当不设置DateFormat且WRITE_DATES_AS_TIMESTAMPS=false时考虑使用，设置了DateFormat似乎默认就变成当前时区了
-    .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")); // 对LocalDateTime无效
+mapper.writeValueAsString(obj); writeValue(o_s, obj)
+mapper.readValue(str/in_s, clazz)
 
-mapper.writeValueAsString(obj); writeValue(os, obj)
-mapper.readValue(str/in_stream, clazz); // 一般的类要求存在无参ctor，record不必
-类字段注解：@JsonIgnore、@JsonProperty("重命名", access = Access.WRITE_ONLY)、@JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
-类注解：@JsonIgnoreProperties(ignoreUnknown = true)
-前端无法直接处理Long，使用：@JsonSerialize(using=ToStringSerializer.class)，反序列化默认就支持传入字符串
-将一般的对象变为Map：mapper.convertValue(obj, Map<String,Object>.class)
+类字段注解：@JsonIgnore、@JsonProperty("重命名", access = Access.WRITE_ONLY)、@JsonFormat(pattern="yyyy-MM-dd", timezone="GMT+8")
+
+前端无法直接处理Long：加 @JsonSerialize(using=ToStringSerializer.class) 或 @JsonFormat(shape = Shape.STRING)
+将一般的对象变为Map：mapper.convertValue(obj, new TypeReference<Map<String, Object>>(){})
 ```
 
 ## FastJson2
