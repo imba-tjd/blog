@@ -358,7 +358,7 @@ END
 * 直接运行的重载配置：/etc/init.d/mysql reload
 * 显示当前配置项：mysqld --print-defaults。显示所有选项实际值：--help --verbose
 * 客户端运行时读写配置项：SHOW GLOBAL VARIABLES like 'xxx'，其中开关类型的值为'ON'/'OFF'。SET GLOBAL xxx=yyy
-* 日志文件的权限：必须由mysql自动生成文件。轮转：mysql会按fd写，mv成历史文件后按原值重设一次路径，就会生成写入新文件
+* 日志文件的权限：必须由mysql自动生成文件。轮转：mysql会按fd写，mv成历史文件后运行FLUSH XXX LOGS;
 * TODO：好像各查询日志默认都是关的，包括错误日志。命令行日志除外，另有地方记录。还要查默认日志的路径
 
 ```conf
