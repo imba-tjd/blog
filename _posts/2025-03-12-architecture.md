@@ -175,6 +175,7 @@ Fencing token：先使用ectd作为可靠的分布式值存储，每次抢主成
 * 分布式文件系统：NFS、SMB协议
 * 区块链：去中心化分布式账本，不可篡改。共识机制：PoW、PoS
 * 架构设计：share-nothing、share-disk、share-everything(单机)
+* JuiceFS、SeaweedFS、ChubaoFS
 
 ## 场景设计
 

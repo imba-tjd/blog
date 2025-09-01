@@ -150,7 +150,7 @@ title: 浏览器
 * GPU rasterization、Enable Zero-Copy Video Capture、Zero-copy partial raster with GPU compositor、Force High Performance GPU、Skia Graphite
 * Choose ANGLE graphics backend：默认D3D11，可选D3D11onD12
 * Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”。其他不受支持的：--no-sandbox
-* --single-process 配合ProxyOmega时报ERR_MANDATORY_PROXY_CONFIGURATION_FAILED
+* --single-process 配合ProxyOmega时报ERR_MANDATORY_PROXY_CONFIGURATION_FAILED。无法打开菜单和右键
 
 #### [Overlay Scrollbars](https://www.zhihu.com/question/64630817/answer/223528093)
 
