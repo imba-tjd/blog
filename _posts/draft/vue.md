@@ -150,6 +150,7 @@ beforeCreated -> 注入 -> created -> 模板编译 -> beforeMount 无真实DOM -
 ## 模板template
 
 * 只能是单根元素，因为编译成虚拟结点 `render(h=>h('根元素', [子内容]))` 后是单根的
+* 使用data里的变量时，必须不能加this，会隐式加。只有在js中（和动态绑定表达式）才可用this
 
 ### 文本插值
 
@@ -264,6 +265,10 @@ app.component('MyCmp', MyCmp或{定义})  在app范围内注册组件，使得�
 app.mount(可传DOM对象)  返回值不是app
 console中用$vm0也能访问到第一个app
 ```
+
+## vue2
+
+* 若data的属性是数组，修改时要用splice，而不能直接赋值
 
 ## vite
 

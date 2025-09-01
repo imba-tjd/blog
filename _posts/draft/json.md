@@ -8,8 +8,8 @@
   * 忽略某字段（一般支持transient）
   * 美化输出
 * 反序列化
-  * 额外字段：一般默认忽略
-  * 缺少字段：一般默认报错。一种策略是设为默认值，另一种策略是调用构造函数
+  * 额外字段：一般默认忽略（但Jackson默认报错）。还有一种策略是自动放到Map里
+  * 缺少字段：感觉一般默认报错（但Jackson默认忽略）。一种策略是设为默认值，另一种策略是调用构造函数
   * 字段类型是数字但jsonstr的值是字符串：一般会自动转换
 * 引用类型null值的处理
   * 序列化：若value是null，是否序列化key
@@ -46,16 +46,17 @@ Model m = ada.fromJson(jsonstr);
   * 精简版：https://github.com/FasterXML/jackson-jr 还提供自包含包（但默认仍不能用注解，还要引入另一个包），序列化和反序列化的方式也和普通的不一样
 * 反序列化
   * 要存在无参ctor，record不必。字段要public或setter
-  * 默认支持jsonstr传字符串而类型为int
+  * 支持jsonstr传字符串而类型为int
+  * 若jsonstr缺少field，不会报错，会保留正常初始化的值。改为报错：@JsonCreator + (构造函数参数上的@JsonProperty(required=true) 或 DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)。或在setter上加：@JsonSetter(nulls = Nulls.FAIL)，它还能处理key存在但value为null的情形；或用.defaultSetterInfo(JsonSetter.Value.construct(Nulls.FAIL, Nulls.FAIL))
 * TODO: Spring中的配置
 
 ```java
 ObjectMapper mapper = JsonMapper.builder()
     .findAndAddModules()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // 默认为true当JSON存在Model没有的字段时会报错
-    .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // 默认当jsonstr存在Model没有的字段时会报错；spring默认false
+    .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true) // 默认当jsonstr里存在基础类型key但value为null时不报错
     .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false) // 默认true将Date和TS序列化为unix时间戳毫秒，设为false（Spring默认）后默认为ISO格式0时区字符串；LocalDateTime分别为内部结构表示和当前时区ISO格式
-    .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CASE)
+    .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
     .defaultTimeZone(TimeZone.getDefault()) // 仅当不设置DateFormat且WRITE_DATES_AS_TIMESTAMPS=false时考虑使用，设置了DateFormat似乎默认就变成当前时区了
     .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")) // 对LocalDateTime无效
     .build();

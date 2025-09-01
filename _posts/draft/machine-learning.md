@@ -713,7 +713,9 @@ client.list_rows(table, max_results=5).to_dataframe() # 数据转df
 ## milvus向量数据库
 
 * sdk版本与服务端版本具有严格对应关系，必须看发行文档
-* 其他向量数据库收集：https://cookbook.openai.com/examples/vector_databases/readme
+* 其他向量数据库
+  * https://github.com/facebookresearch/faiss
+  * 收集：https://cookbook.openai.com/examples/vector_databases/readme
 
 ```py
 # 连接
