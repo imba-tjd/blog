@@ -410,7 +410,7 @@ collapsable content
 
 ## bare和mirror
 
-* git init --bare xxx.git：用作同步中心，不包含工作区，可以**接受**push，不能使用平常的git命令；命名按照习惯以.git结尾，实际上下下来的就是.git文件夹
+* git init --bare xxx.git：用作同步中心，不包含工作区，不能使用平常的git命令。可以**接受**push，如果客户端能通过ssh访问某主机，在主机上用此命令，客户端就可以指定路径推送了。命名按照习惯以.git结尾，实际下下来的就是`.git`文件夹
 * git clone --mirror：隐含bare；普通的clone会把origin作为直接上游，会有跟踪远端的本地分支，没有origin的上游信息；bare直接是本地分支，没有跟踪分支，也没有origin的上游；mirror则有origin的上游，运行git remote update会覆盖所有的refs，与删掉再clone一致
 * git push --mirror
 * 不通过fork创建重复的仓库：https://help.github.com/cn/github/creating-cloning-and-archiving-repositories/duplicating-a-repository

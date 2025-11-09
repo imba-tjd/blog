@@ -137,24 +137,17 @@ title: 浏览器
 ### about:flags
 
 * 没有方法找出Default对应哪个选项
-* https://bbs.kafan.cn/thread-2133336-1-1.html
 * Password import
 * Experimental JavaScript
 * Future V8 VM features
 * Enable sharing page via QR Code
 * Parallel downloading
-* Out of process rasterization：在Cent上有bug
 * Zero-copy rasterizer：在chrome://gpu/中如果Native GpuMemoryBuffers是Software only就无法使用，当前状态在Tile Update Mode中，不清楚Default是否会合适时自动启用，有文章说启用后很容易崩溃；--disable-zero-copy
-* Skia API for compositing：还不稳定，且不兼容Overlay Scrollbars；--disable-skia-renderer
-* edge-enhance-text-contrast 更好的字体渲染
-* GPU rasterization、Enable Zero-Copy Video Capture、Zero-copy partial raster with GPU compositor、Force High Performance GPU、Skia Graphite
-* Choose ANGLE graphics backend：默认D3D11，可选D3D11onD12
-* Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”。其他不受支持的：--no-sandbox
-* --single-process 配合ProxyOmega时报ERR_MANDATORY_PROXY_CONFIGURATION_FAILED。无法打开菜单和右键
-
-#### [Overlay Scrollbars](https://www.zhihu.com/question/64630817/answer/223528093)
-
-* --enable-features=OverlayScrollbar --enable-prefer-compositing-to-lcd-text
+* GPU rasterization、Enable Zero-Copy Video Capture、Zero-copy partial raster with GPU compositor、Skia Graphite
+* Trees in viz：Edge暂不支持
+* Choose ANGLE graphics backend：默认D3D11，可选D3D11WARP（曾经叫D3D11on12）。但实测与Skia冲突，会导致GPU加速失效
+* Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”。其他不受支持的：--no-sandbox。单进程导致无法使用右键和菜单，Edge直接整个无法显示
+* Force High Performance GPU
 
 ### 忽略HSTS证书错误
 
@@ -166,7 +159,7 @@ title: 浏览器
 
 ### Edge
 
-* Enable history accelerator to open the full page：Ctrl+H显示历史页而非浮窗
+* Enable history accelerator to open the full page：Ctrl+H显示历史页而非浮窗。现在好像没了
 * 设置 - 侧栏(sidebar) - 始终显示边栏。下面的 应用和通知设置 - 特定于应用的设置 - Discover - 显示必应聊天
 
 ## PAC
