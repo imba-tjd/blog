@@ -70,6 +70,7 @@ title: 油猴
 * 其他脚本站：https://openuserjs.org/ https://www.userscript.zone https://userscripts-mirror.org/ 好像原站挂了
 * User Style：https://userstyles.org/ https://github.com/openstyles/stylus https://stylebot.dev/
 * 老版本Chrome内置了一部分userscript的支持，但后来越来越严格，尤其是原版Chrome。实测Cent可以添加
+* 同类：https://scriptcat.org/zh-CN
 
 ## 参考
 

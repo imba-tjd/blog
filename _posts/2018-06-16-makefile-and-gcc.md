@@ -237,7 +237,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -fomit-frame-pointer 使得反编译和调试更困难
   * -z,nodlopen和nodump
   * -mmitigate-rop
-  * MSVC：/guard:cf。扩展了/GS缓冲区安全检查、数据执行防护DEP、地址空间布局随机化ASLR。GCC不支持，LLVM16支持
+  * MSVC：/guard:cf。扩展了/GS缓冲区安全检查、数据执行防护DEP、地址空间布局随机化ASLR(/DynamicBase)。GCC不支持，LLVM16支持
 * sanitizer
   * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
   * ASan和TSan在MinGW上不可用，但MSYS的clang/llvm支持ASan

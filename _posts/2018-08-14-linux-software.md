@@ -129,7 +129,7 @@ pipgrip --tree pkg：显示依赖哪些包，关键是不需要安装指定的pk
 ```conf
 # %APPDATA%\pip\pip.ini；~/.config/pip/pip.conf。pip -i；pip config set global.index-url xxx
 [global]
-#timeout = 6000
+#timeout = 6
 index-url = https://mirrors.aliyun.com/pypi/simple/
 # https://pypi.doubanio.com/simple/ https://mirrors.163.com/pypi/simple/ https://pypi.tuna.tsinghua.edu.cn/simple/
 [install]
@@ -433,7 +433,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
     * u2b推荐配置：https://support.google.com/youtube/answer/1722171
   * 码率(比特率)：-minrate 964K -maxrate 3856K -bufsize 2000K
     * 平均码率(abr)/目标码率：-b:v xxxk。不应直接使用，因为编码器只能猜测；一种解决办法是配合-pass 1和2。不是固定码率(cbr)，仍是vbr
-  * 分辨率：-vf scale=480:-1 其中-1表示保持原比例。另一种参数：-s:v 854x480 
+  * 分辨率：-vf scale=480:-1 其中-1表示保持原比例。另一种参数：-s:v 854x480
   * 帧率：-r 24
 * 裁剪一段：-ss start -to end 或 -t 经过。时间格式默认为秒，还可以是 00:01:30.500
   * 截图：-ss 秒 -vframes 1 output.jpg
@@ -468,9 +468,9 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
   * 教程：https://github.com/leandromoreira/ffmpeg-libav-tutorial/blob/master/README-cn.md https://slhck.info/posts/
 * 带有解码器的mpchc：https://www.codecguide.com/download_kl.htm
-* 视频转换工具（ffmpeg的GUI）：https://handbrake.fr/ staxrip Medlexo魔力玄（闭源，小）
+* 视频转换工具（ffmpeg的GUI）：https://handbrake.fr/ staxrip Medlexo魔力玄（闭源，小） https://github.com/jeanslack/Videomass
   * 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
-  * 第三方图形化配置：https://ffmpeg.guide/graph/demo 至少从24年12月挂了
+  * 第三方图形化配置：https://ffmpeg.guide/graph/demo 至少从24年12月挂了 https://dji-compress.cornradio.org/
   * 剪辑软件：https://www.shotcut.org/ QT https://www.shutterencoder.com/ Java avidemux2不太活跃
   * https://www.videohelp.com/software/clever-FFmpeg-GUI
   * https://mkvtoolnix.org/

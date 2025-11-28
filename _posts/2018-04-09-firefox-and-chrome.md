@@ -11,6 +11,9 @@ title: 浏览器
 * 正在进行的实验：about:studies
 * 网络状况：about:networking
 * 搜索的高亮只会显示1000个
+
+### 快捷键
+
 * 地址栏搜索选择非默认搜索引擎时按住shift可直接进行搜索而不触发联想
 * 按住alt键就可以开启强制选择模式，这样鼠标就不会发出拖拽等其他功能
 * 删除地址栏中的搜索记录：Shift+del，但删不掉历史网址的联想，可打开历史窗口删
@@ -129,10 +132,14 @@ title: 浏览器
 * https://static.centbrowser.cn/win_stable/
 * 适用于老系统的：https://github.com/win32ss/supermium
 * 便携版：https://github.com/henrypp/chrlauncher
-* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/
-* https://github.com/RobRich999/Chromium_Clang
-* Ctrl+M：在当前窗口新建隐私页
+* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/ 支持单进程
+* https://github.com/RobRich999/Chromium_Clang https://thorium.rocks/
 * 禁止自动更新：C:\Program Files\Google\Update文件夹 改名，但不会阻止下载新版安装包
+
+### 快捷键
+
+* Ctrl+Shift+A：搜索标签页，包括当前已打开的和历史的
+* Ctrl+M：在当前窗口新建隐私页
 
 ### about:flags
 
@@ -146,8 +153,9 @@ title: 浏览器
 * GPU rasterization、Enable Zero-Copy Video Capture、Zero-copy partial raster with GPU compositor、Skia Graphite
 * Trees in viz：Edge暂不支持
 * Choose ANGLE graphics backend：默认D3D11，可选D3D11WARP（曾经叫D3D11on12）。但实测与Skia冲突，会导致GPU加速失效
-* Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”。其他不受支持的：--no-sandbox。单进程导致无法使用右键和菜单，Edge直接整个无法显示
+* Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”，关闭：--test-type。其他不受支持的：--no-sandbox。单进程--single-process导致无法使用右键和菜单，Edge直接整个无法显示；也许可改用--renderer-process-limit=N
 * Force High Performance GPU
+* 启用MV2：--disable-features=ManifestV2Unsupported,ManifestV2Disabled
 
 ### 忽略HSTS证书错误
 
@@ -183,3 +191,23 @@ https://msedgeblockertoolkit.blob.core.windows.net/blockertoolkit/MicrosoftEdgeC
 未测试：
 加防火墙规则
 ```
+
+## 卸载Edge
+
+```
+C:\Program Files (x86)\Microsoft\
+有Edge、EdgeCore、EdgeWebview三个文件夹，已经使用了硬链接优化。
+
+Application\版本号\Installer
+setup.exe --uninstall --system-level --force-uninstall
+
+setup.exe --uninstall --msedgewebview --system-level --force-uninstall
+
+卸载上两者后EdgeCore会自动消失。但EdgeUpdate还在，要手动删
+```
+
+## HEVC扩展
+
+* ms-windows-store://pdp/?ProductId=9N4WGH0Z6VHQ
+* https://bbs.pcbeta.com/forum.php?mod=redirect&goto=findpost&ptid=2053927&pid=57246099 https://zhuanlan.zhihu.com/p/1972401403990381624
+* 实测对于媒体播放器，装制造商的这个扩展无法生效。对于浏览器，好像Chrome现在已经支持了，Edge好像在gpu里也能看搜到，即使没装扩展
