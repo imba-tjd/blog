@@ -166,7 +166,7 @@ ec.inverse_transform 转换回原始形式
 * 线性判别分析LDA：监督算法，用于分类任务
 * 非线性方法：流形学习算法t-SNE（也能用于聚类，常用于将复杂数据进行二维或三维可视化，但不可解释）、UMAP
 * TF-IDF、Word2Vec
-    
+
 ### 样本切分
 
 训练集(train)用于拟合模型。验证集(verify)用于调整超参数，由训练集划分出来；调超参实际上也是一种拟合，逐渐由无偏估计变为有偏。测试集(test)用于最终模型的无偏评估。
@@ -184,7 +184,7 @@ from sklearn.metrics import *
 
 y_pred = model.predict(X_test)
 print("MSE: %.2f" % mean_squared_error(y_test, y_pred))
-print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred)) 
+print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
 
 # 以上是分开predict和获得score。还有一种通用的集成方式。对于不同模型，分数的意义不同，如回归模型的score就是R^2，分类模型就是accuracy
 model.score(X_test, y_test)
@@ -211,7 +211,7 @@ for k, (train, vrf) in enumerate(kfold): model.fit(X_train[train], y_train[train
 # 查看超参
 model.get_params()
 
-# 自动调整（给定的）超参，训练多个模型取最好的。其中Randomized要提供分布，GridSearch提供多个具体值。最后得到的model可直接predict，不用按最佳超参手动重新训练
+# 自动调整（给定的）超参，训练多个模型取最好的。其中Randomized要提供分布，GridSearch人工指定多个具体值。最后得到的model可直接predict，不用按最佳超参手动重新训练。可以先粗再细；如果模型很大，随机也许比人工好
 from sklearn.model_selection import RandomizedSearchCV
 param_distributions = {'n_estimators': randint(1, 5), 'max_depth': randint(5, 10)}
 search = RandomizedSearchCV(未设定某些超参的model, param_distributions, n_iter=5, random_state=42)
@@ -234,15 +234,22 @@ Actual |---------|
  True  | FP | TN |
         -----------
 ```
-        
+
 * 又称可能性矩阵、错误矩阵。用于评估分类任务
 * 其中Actual和Predicted的组合就是符合直觉的那种。但在某些时候，ML中，用True来存放模型的输出，Predicted存放验证数据
 * True Positive(TP)、FN（预测没有实际有，又叫二类错误，如漏诊）、FP（预测有实际没有，又叫一类错误，如误诊）、TN（预测没有实际也没有）。对角线是预测正确的
 * 样例总数 M = TP + FP + TN + FN。MP = TP + FN，MN = FP + TN
-* 准确率(Accuracy, ACC)：识别正确的个数/样本总个数 (TP+TN) / n。表示在所有样本上的预测良好程度；若样本类别不平衡，单纯提高它，不利于发现少数类低正确率。提高分类阈值对它的变化影响：无法确定
-* 精确率(Precision) / PPV：预测为正类别的样本中，真正的正类别是多少 TP / (TP+FP)。表示阳性是否可靠，当FP代价高时要增加它。提高阈值导致二者数量都减少，但比例增加
-* 召回率(Recall) / 敏感性/灵敏度(Sensitivity) / TPR / 查全率：在实际正类别中，模型能预测出(预测为正)多少 TP / (TP+FN)。将所有数据全预测为正（降低阈值）就能达到100%；会导致FP增加，但能降低FN。在推荐系统中，尽可能将正类包括，避免遗漏，之后再排序
-* 特异性(Specificity) / TNR：在实际为负类别的样本中，模型能够正确预测为负类别的比例 TN / (FP+TN)
+* 准确率(Accuracy, ACC)、识别率：识别正确的个数/样本总个数 (TP+TN) / n
+  * 表示在所有样本上的预测良好程度
+  * 若样本类别不平衡，单纯提高它，不利于发现少数类低正确率
+  * 提高分类阈值对它的变化影响：无法确定
+* 精确率(Precision)、PPV：预测为正类别的样本中，真正的正类别是多少 TP / (TP+FP)
+  * 表示阳性是否可靠，当FP代价高时要增加它
+  * 提高阈值导致二者数量都减少，但比例增加
+* 召回率(Recall)、敏感性/灵敏度(Sensitivity)、TPR真正例率、查全率：在实际正类别中，模型能预测出(预测为正)多少 TP / (TP+FN)
+  * 将所有数据全预测为正（降低阈值）就能达到100%；会导致FP增加，但能降低FN
+  * 在推荐系统中，尽可能将正类包括，避免遗漏，之后再排序
+* 特异性(Specificity)、TNR：在实际为负类别的样本中，模型能够正确预测为负类别的比例 TN / (FP+TN)
 * F1分数(F1-score)：精确率和召回率的调和平均数。取值范围[0, 1]，越接近1表示模型的性能越好
 * ROC图：依次调整分类阈值（超参），达到增加TP（纵轴）、减少FP（横轴）的目的。纵横轴值域都为1，一开始阈值设为0表示模型都预测为P，导致TP和FP都为1，随着调整逐步往左上角移动，之后再往下移动直到TP和FP都为0即都预测为N。左上角的点代表较好的阈值
 * 曲线下面积(AUC)：将ROC的点连接起来，与横轴之间的面积就是AUC，更换不同的模型算法，也绘制ROC和计算AUC，AUC更大代表更好。AUC的值也能通过计算得到：依次各取一个P和一个N，进行 MP × MN 次比较，将P类的模型得分高于N类模型的次数记为H，则AUC = H / (MP × MN)。如果AUC=1，则可以完美区分；如果=0.5，则没有任何区分度；如果<0.5，则比随机猜还差

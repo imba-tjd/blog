@@ -368,29 +368,20 @@ numpy out has performance benefits？
 
 ### 安装
 
-* Linux版默认有cuda，Win默认为CPU。Linux装CPU版：conda install pytorch-cpu；或-i https://download.pytorch.org/whl/cpu TODO:conda要-c conda_forge？
+* pip install torch --find-links https://mirrors.aliyun.com/pytorch-wheels/cu130
+  * CPU版：cu130改为cpu。Win默认为CPU，Linux默认为cuda
+  * conda install pytorch-cpu 不知道要不要-c conda_forge
+  * cuda版是自包含的，不需要装cuda toolkit，但需要装显卡驱动。用nvidia-smi查看支持的最高cuda版本
+  * 不会传递装numpy
 * 相关项目
-  * intel_extension_for_pytorch(IPEX)：对于支持avx512的CPU能加速训练。仅linux或WSL2。https://huggingface.co/docs/transformers/main/en/perf_train_cpu
+  * intel_extension_for_pytorch(IPEX)：对于支持avx512的CPU能加速训练。仅linux或WSL2。不再更新，理由是它的内容已经集成进了pytorch 2.8
   * 优化超参数的框架，支持ML和DL框架：https://optuna.org/
   * https://pytorch.org/tnt training tools and utilities
 * 环境
-  * torch.cuda.is_available()、watch -n1 nvidia-smi、nvidia-smi stats、nvtop、nvitop。2.5支持intel的xpu，有xpu-smi
+  * torch.cuda.is_available()、watch -n1 nvidia-smi、nvidia-smi dmon（每秒显示功耗温度等。原stats命令废弃了。还有一个pmon查看进程占用，普通GeForce卡用不了，必须不用于显示才行，即不能是WDDM模式，要TCC模式）、nvtop、nvitop。2.5支持intel的xpu，有xpu-smi
   * torch.set_default_device('cuda')，否则默认为CPU，要用if torch.cuda.is_available(): t=t.to('cuda') 或创建t时指定device
     * 通用：if torch.accelerator.is_available(): t.to(torch.accelerator.current_accelerator())
   * torch.manual_seed(42)
-* CUDA Toolkit和Driver
-  * nvcc -V
-  * https://docs.nvidia.com/cuda/cuda-installation-guide-linux/
-  * 有两种安装方式：rpm/deb包、runfile包
-  * runfile
-    * sudo /usr/local/cuda-11/bin/cuda-uninstaller 如果没有，说明不是此方法安装的。apt装的也在此目录里
-    * curl https://developer.download.nvidia.com/compute/cuda/12.2.0/local_installers/cuda_12.2.0_535.54.03_linux.run | sudo sh
-  * apt
-    * 如果已经安装了驱动：使用nvidia-smi能看到支持的最高cuda版本，再安装cuda-toolkit-12-1
-    * 未安装驱动，连带安装：sudo apt install cuda
-    * 好像debian内置的要加nvidia-前缀，在non-free里。nv官方repo则不用，而是要加keyring：wget https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb; dpkg -i cuda-keyring_1.1-1_all.deb
-  * 只安装驱动（无nvcc，但已经可以跑torch）：apt search nvidia-driver
-  * 其他安装选择：NV驱动+conda安装cuda toolkit、docker
 
 ### tensor
 

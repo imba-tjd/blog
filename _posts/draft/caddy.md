@@ -1,30 +1,43 @@
 ## cli
 
-* 运行：caddy run [--watch]。非阻塞：start stop
-* 重载配置：caddy reload
-* 服务：Debian安装的支持systemctl，配置在/etc/caddy/Caddyfile。Win支持sc创建
-  * 日志：journalctl -u caddy --no-pager | less +G
-* 静态文件命令：caddy file-server --root ~/mysite --browse --domain example.com --listen :2015
-* 反代命令：caddy reverse-proxy --from example.com --to localhost:9000
-  * 默认转发所有Header，包括Host。可用--change-host-header更改Host
-  * from默认为localhost。可设为:80
+* 运行：caddy run
+  * 重载配置：caddy reload。或run --watch
+  * 非阻塞：start、stop
+* 服务：Debian包支持systemd，安装后就会启用，配置在/etc/caddy/Caddyfile。Win支持sc创建
+* 静态文件命令：caddy file-server -b(--browse) --listen 默认:80 -r(--root) ~/mysite默认CWD --access-log
+* 反代命令：caddy reverse-proxy --from example.com --to :9000
+  * 默认转发所有Header，包括Host
+  * from默认为localhost:443。可设为:80
+* 自动升级替换二进制文件：caddy upgrade
 
 ## Caddyfile
 
-* 默认使用CWD下的。手动指定：--config Caddyfile
-* 转换为json配置：caddy adapt --config Caddyfile
-* 格式化：caddy fmt --overwrite
-* VSC：Caddyfile Support
+* 默认使用CWD下的。手动指定：-c /path/to/Caddyfile 文件名需以它开头
+* 测试内容是否正确：caddy validate。格式化：caddy fmt --overwrite/-w。转换为json格式输出到stdout：caddy adapt
+* VSC扩展：Caddyfile Support
 
 ```
-:2015
+:80  # 替换为域名，会启用自动HTTPS
 
-respond "Hello, world!"
+encode  # 压缩
 
-:8080, :8081 { }
+root * /var/www
+file_server /static/*
 
-(snippet) { {args.0} }
-import snippet ARG
+reverse_proxy /api/* :5000
+
+www.example.com {
+  redir https://example.com{uri}
+}
+```
+
+高级语法：
+
+```
+:8080, :8081 { ... }
+
+(snippet) { {args.0} } # 定义
+import snippet ARG  # 使用
 
 @namedmatcher { 之后用在Matcher部分。若只有一个条件可以不加大括号
 	method POST
@@ -41,47 +54,80 @@ expression {method}.startsWith("P")
 abort @denied
 ```
 
+SPA惯用法：
+
+```
+example.com {
+  encode
+
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+
+  # 1. 任意路径转到使用/index.html，由前端处理。
+  # 2. 不缓存index.html的内容，以便css和js内容更新后新hash文件名能被读取。
+	handle {
+		root * /srv
+		route {
+      try_files {path} /index.html
+      header /index.html Cache-Control "public, max-age=0, must-revalidate"
+    }
+		file_server
+	}
+  # 3. try_files的优先级比reverse_proxy高，如果不用handle，则会永远执行。
+  # 另一种方式：不用handle。用route { reverse_proxy /api/* backend 其余两句相同 }
+}
+```
+
 ### 指令
 
-* file_server 静态文件
-* encode gzip 只会压缩文本。还支持zstd但没有浏览器支持
-* root * /home/me/mysite
-* reverse_proxy /api/* 127.0.0.1:9005
+* file_server 一般配合root。文件不存在时触发handle_errors。默认会找index.html和index.txt
+  * hide：访问指定系统文件（不是按URI path）时拒绝。默认已加当前Caddyfile。支持glob。相对路径为相对于CWD而非root
+* root * /home/me/mysite 第一项称为matcher，匹配路径；当下一个参数不是path时才能省。不设定时相当于CWD。以systemd运行时不支持读取home
+* reverse_proxy 支持设置多项以负载均衡、健康检查
 * header k v 操纵响应头：覆盖 增加(+因为某些头可以多次出现) 删除(-) 不存在则添加(?) 替换
-
-#### 全局设定
-
-* log：设定级别、输出到文件(包括设定rotated参数)、输出到socket。默认不会记录敏感信息头
-* strict_sni_host on
-* protocols 默认h1 h2 h3
-* trusted_proxies static private_ranges
-* timeouts 可设定四个阶段的超时时间
+* encode：压缩，无参用会开zstd gzip且只处理可压缩内容（看Content-Type，一般是文本）
 
 #### 操纵路径
 
-* redir https://example.com{uri} 默认302
-* rewrite /add /add/
-* uri strip_prefix /app
-* handle、handle_path /app/* {子指令} 类似于nginx的location，同一级可以有多个，按最长(具体)匹配。_path版相当于自带uri strip_prefix
-* route {子指令} 处理HTTP handler chain，里面的内容会按书写顺序处理
-* try_files {path} /index.html 用于SPA
+* redir 默认302
+* rewrite /add /add/ 内部重写
+  * uri strip_prefix /app 部分改变路径，支持strip_suffix、replace、path_regexp等操作。当想要做的处理已经由此指令支持时比rewrite更方便，不用完整构建处理后的内容
+* handle /app/* {子指令} 类似于nginx的location，同一级可以有多个，按最长(具体)匹配
+  * 不指定matcher时是作为fallback。嵌套时默认仍从原路径开始匹配
+  * handle_path：隐含使用uri strip_prefix
+* route [matcher] {子指令}：手动控制HTTP处理链路，里面的内容会按书写顺序处理，而不是自动重新排序（如redir默认在file_server之前）。默认顺序：caddyfile/directives#directive-order
+* try_files
 * handle_errors { rewrite * /{err.status_code}.html file_server }
+
+#### 全局设定
+
+* 在最开始用一个大括号。所有指令：caddyfile/options
+* log：设定级别默认INFO、输出到文件(可rotated)。默认不记录敏感信息头。启用access log：在站点设置里用log
+* strict_sni_host on
+* protocols 默认h1 h2 h3
+* trusted_proxies static private_ranges; trusted_proxies_strict 处理X-Forwarded-For
+* timeouts 可设定四个阶段的超时时间
+* grace_period 关闭时等待连接结束，默认超时时间无限
 
 ### 变量
 
-* 环境变量：{$SITE_ADDRESS}
+* 环境变量：{$ENV_VAR:DEFAULT_VAL}会在启用时一次性解析完毕。运行时：{env.XXX}，但需要插件自行支持
+* 下面的变量：{xxx}
 * host、hostport、method
 * uri 是path加query
 * labels.n 如对于example.com，则0是com，1是example
 * remote_host、remote_port
 * header.*
+* 完整版：https://caddyserver.com/docs/caddyfile/concepts#placeholders
 
-## 非常见指令
+### 非常见指令
 
-* template
+* templates
 * storage：支持s3 pg mysql redis
 * metrics：要配合Prometheus
 * php_fastcgi unix//run/php/php-version-fpm.sock
+* respond "Hello, world!" 相当于nginx-echo。还有一个命令行
 
 ## 非内置模块
 
@@ -95,10 +141,10 @@ abort @denied
 
 ## 自动HTTPS
 
-* localhost会自签证书
+* localhost会自签证书。Win命令行第一次运行会弹窗提示添加
 * 自动Let's Encrypt：设置的域名能解析到本机IP，开放80和443。证书会放在$HOME里，Win下是%AppData%\Caddy
 * 自动80转443
-* 阻止：在地址前加http://、仅监听80、auto_https off
+* 禁用：在地址前加http://、仅监听80、auto_https off
 
 ## 其它
 

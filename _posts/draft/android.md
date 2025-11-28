@@ -40,7 +40,8 @@
 
 * https://kernelsu.org/zh_CN/ 国产，比magisk更不容易被检测。一般需出场安卓12
   * https://kernelsu-next.github.io/webpage/zh_CN/
-* https://apatch.dev/zh_CN/ 国产，支持的内核版本比kernelsu多。需要内核支持修补，但查看是否支持又需要root权限
+* https://apatch.dev/zh_CN/ 国产，支持的内核版本比kernelsu多。好像优点是兼容magisk的模块
+* https://sukisu.org/zh/
 
 ## [shizuku](https://shizuku.rikka.app/zh-hans/)
 
@@ -58,6 +59,8 @@
 * Scene：http://vtools.omarea.com/
 * SAI：用于安装split apk，在设置里调模式
 * https://github.com/iamr0s/Dhizuku/blob/main/docs/README_zh_rCN.md 提供“设备所有者”权限。会影响系统自带双开
+* https://github.com/timschneeb/awesome-shizuku
+
 
 ## LSPatch
 
@@ -111,6 +114,7 @@
 * HyperCeiler 集成了许多功能的MIUI优化
 * https://github.com/JingMatrix/LSPatch
 
-* https://sukisu.org/zh/
+# 验机
 
-https://github.com/timschneeb/awesome-shizuku
+* APP：全渠道质检、设备信息by流舟
+* 面交：确定付钱的人与给设备的人是同一个人
