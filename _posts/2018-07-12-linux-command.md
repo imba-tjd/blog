@@ -198,6 +198,7 @@ title: Linux命令
 
 * 防火墙：ufw易用，有gufw图形界面，但yum里没有。firewalld较复杂。其它开源有GUI的：opensnitch portmaster SafeLine(国产WAF)
 * firewall-cmd --add-port=8080/tcp --permanent; firewall-cmd --reload
+* ufw allow port; ufw enable; ufw status
 
 ### ping
 
@@ -396,22 +397,27 @@ ip link
 
 ### [nftables](https://wiki.nftables.org)
 
-* 代替iptables。ipset是与iptables配合使用的，而不是封装。bpfilter：作为daemon，将iptables或nftables作为前端，编译成eBPF
+* 代替iptables，优点有原子性更新规则不怕竞态。ipset是与iptables配合使用的，而不是封装。bpfilter：作为daemon，将iptables或nftables作为前端，编译成eBPF
+* 查看所有规则：nft list ruleset
 * 先创建table
-  * family支持ip arp ip6 bridge inet netdev，其中ip仅指v4，也是省略时的默认值；不同family可以有同名table，因此一般不省
-  * nft add 族类型 table filter(表名)
+  * nft add 族类型 table filter(表名，常见的还有nat用于端口转发、mangle表示修改)
+  * family支持ip arp ip6 bridge inet netdev。其中ip仅指v4，也是省略时的默认值；inet=v4+v6；不同family可以有同名table，因此一般不省
   * nft list tables、nft -nn list table filter 其中-nn阻止将ip解析为域名和将端口转换为服务名
 * 再创建chain
   * nft add chain 族类型 表名 INPUT(链名) '{ type filter hook input priority 0; policy 默认accept或drop; }' 如果不加单引号就要转义分号或用交互模式
   * type根据table的family不同而不同，一般就是filter
   * hook对于ip有prerouting input forward output postrouting，就是对应iptables预定义的几个
-  * 优先级越小越优先，相同优先级的处理顺序未定义
-  * policy是rule未匹配时的行为
+  * 优先级越小越优先，相同优先级的处理顺序未定义，不写默认0
+  * policy是rule未匹配时的行为（fallback）。有另一种可用但不推荐的写法是在rule的最后一条写drop
 * 再创建rule
   * nft add rule 族类型 表名 链名 matches statements
-  * matches是对三四层协议属性的匹配
-  * statements：Verdict语句控制包的control flow，还预定义了一些其它功能如计数、限流
+  * matches是对三四层协议属性的匹配，如tcp dport 22、ct state established,related用于允许已建立的连接继续
+  * statements：Verdict裁决语句控制包的control flow如accept drop reject。还预定义了一些其它功能如counter计数、限流
+  * 删除：先查看规则编号，再按handle删除。不推荐按文本删除
+  * rule在chain里是按顺序逐条匹配的，一旦某条规则返回终止类verdict就不再继续
 * set：类似于ipset，定义好后再在chain里复用
+  * 定义：set allowed_ports { 22, 80, 443 }、{ type ipv4_addr; elements = { 1.2.3.4, 5.6.7.0/24 } }
+  * 使用：tcp dport @allowed_ports accept
 * nft -i进入交互模式。-f读取配置文件，里面的内容可以是交互模式的内容，或一种避免重复写table和chain的大括号方式。nft list ruleset将现有规则输出成配置
 * https://zhuanlan.zhihu.com/p/139678395
 

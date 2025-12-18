@@ -222,6 +222,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * 查看库导出的符号，但必须有调试符号：nm。加-C解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
   * 上面两条都支持：objdump -p
   * 查看库的架构（32位还是64位，解决ld: skipping incompatible xxx when searching for xxx）：objdump -f
+  * 用于dll的GUI：https://www.dependencywalker.com/depends22_x64.zip
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
   * -fhardened 是其它几项的集合
@@ -291,6 +292,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * Win: https://github.com/mstorsjo/llvm-mingw 有ucrt，但支持太多的target导致可执行文件有点多
 * winlib的
 * https://gitee.com/qabeowjbtkwb/windows-hosted-llvm-clang
+* LSP：https://clice.io/ 代替clangd
 
 ### MinGW
 
@@ -302,10 +304,10 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * https://nuwen.net/mingw.html
 * https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
-* https://musl.cc/
-* https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能。实测下下来有一些别的组件，g++编译出来默认会报找不到libstdc++-6.dll
+* https://musl.cc/ 有一套交叉编译到Linux的
+* https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能。下下来有一些别的组件，g++编译出来默认会报找不到libstdc++-6.dll
 * https://github.com/skeeto/w64devkit/releases 解压后很小，只有c c++，有busybox
-* https://github.com/mmozeiko/build-gcc-mingw 比较小，有lto
+* https://github.com/mmozeiko/build-gcc-mingw 比较小，有lto，无pretty-printing
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
 * https://github.com/redpanda-cpp/mingw-lite
 * __MINGW64_VERSION_STR定义了它自己的版本

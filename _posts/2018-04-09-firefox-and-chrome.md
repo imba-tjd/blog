@@ -129,10 +129,12 @@ title: 浏览器
 
 ## Chrome
 
+### 安装包
+
 * https://static.centbrowser.cn/win_stable/
 * 适用于老系统的：https://github.com/win32ss/supermium
 * 便携版：https://github.com/henrypp/chrlauncher
-* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/ 支持单进程
+* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/
 * https://github.com/RobRich999/Chromium_Clang https://thorium.rocks/
 * 禁止自动更新：C:\Program Files\Google\Update文件夹 改名，但不会阻止下载新版安装包
 
@@ -143,19 +145,30 @@ title: 浏览器
 
 ### about:flags
 
+* 已知Edge如果开了启动增强，命令行参数只会在第一次点的时候生效
 * 没有方法找出Default对应哪个选项
-* Password import
-* Experimental JavaScript
-* Future V8 VM features
-* Enable sharing page via QR Code
+* Experimental JavaScript、Future V8 VM features
+* GPU（chrome://gpu/）
+  * Skia Graphite
+  * Choose ANGLE graphics backend：默认D3D11。可用--use-angle=d3d11on12，但有个direct_composition_support报错一个特性不支持，内存占用明显增加。有个D3D11WARP是CPU软件渲染不要用
+  * Trees in viz：Edge在flags里无。--enable-features=TreesInViz
+  * Zero-copy rasterizer：当前状态看Tile Update Mode
+  * Enable Zero-Copy Video Capture
+  * GPU rasterization：默认已部分有效，手动启用后在所有页面上生效
+  * 查看当前用于渲染的GPU：GL_RENDERER。测试：https://webglreport.com/?v=2
+* 安全
+  * 关闭“您使用的是不受支持的命令行标记”：--test-type，其实有别的用处
+  * Disable site isolation (--disable-site-isolation-trials) 有人说会导致CF挑战不过。查看是否生效：chrome://process-internals
+  * 单进程 --single-process 必须启用skia或--disable-gpu才能正常显示，否则老版法使用右键和菜单，新版整个无法显示全白。一种也许受支持的类似方式：--renderer-process-limit=N
+  * --no-sandbox
 * Parallel downloading
-* Zero-copy rasterizer：在chrome://gpu/中如果Native GpuMemoryBuffers是Software only就无法使用，当前状态在Tile Update Mode中，不清楚Default是否会合适时自动启用，有文章说启用后很容易崩溃；--disable-zero-copy
-* GPU rasterization、Enable Zero-Copy Video Capture、Zero-copy partial raster with GPU compositor、Skia Graphite
-* Trees in viz：Edge暂不支持
-* Choose ANGLE graphics backend：默认D3D11，可选D3D11WARP（曾经叫D3D11on12）。但实测与Skia冲突，会导致GPU加速失效
-* Disable site isolation 减少内存占用。但有人说会导致CF挑战不过。会产生“您使用的是不受支持的命令行标记”，关闭：--test-type。其他不受支持的：--no-sandbox。单进程--single-process导致无法使用右键和菜单，Edge直接整个无法显示；也许可改用--renderer-process-limit=N
-* Force High Performance GPU
+* Smooth Scrolling
+* Experimental QUIC protocol：考虑禁用
+* Auto picture in picture for video playback：考虑禁用
 * 启用MV2：--disable-features=ManifestV2Unsupported,ManifestV2Disabled
+* Edge：Fluent overlay scrollbars、Experimental Web Platform features（默认显式禁用了）、New PDF Viewer
+* Ungoogled：No default browser check、Hide tab close buttons、Tab Hover Cards、Show avatar/people/profile button、SetIpv6ProbeFalse、Hide Fullscreen Exit UI、Hide Extensions Menu
+* https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md https://peter.sh/experiments/chromium-command-line-switches/
 
 ### 忽略HSTS证书错误
 
@@ -165,17 +178,21 @@ title: 浏览器
 
 * 没有保存历史版本，仅本地保存了上一个版本，在`User Data\Default\Bookmarks.bak`中
 
-### Edge
+### 其他
 
-* Enable history accelerator to open the full page：Ctrl+H显示历史页而非浮窗。现在好像没了
-* 设置 - 侧栏(sidebar) - 始终显示边栏。下面的 应用和通知设置 - 特定于应用的设置 - Discover - 显示必应聊天
+* chrome://net-export/ chrome://net-internals
 
 ## PAC
 
 * `function FindProxyForURL(url, host)`：其中url现在不包含协议和查询参数。返回一个字符串，如果为空或者为`DIRECT`就直连，`PROXY host:port`就使用HTTP代理，改为SOCKS就是SOCKS代理。支持用分号指定Fallback
 * 扩展名为pac，MIME为`application/x-ns-proxy-autoconfig`
 
-## 禁止Edge自动更新
+## Edge
+
+* Enable history accelerator to open the full page：Ctrl+H显示历史页而非浮窗。现在好像没了
+* 设置 - 侧栏(sidebar) - 始终显示边栏。下面的 应用和通知设置 - 特定于应用的设置 - Discover - 显示必应聊天
+
+### 禁止Edge自动更新
 
 ```
 C:\Program Files (x86)\Microsoft\EdgeUpdate 权限全部禁止
@@ -192,7 +209,7 @@ https://msedgeblockertoolkit.blob.core.windows.net/blockertoolkit/MicrosoftEdgeC
 加防火墙规则
 ```
 
-## 卸载Edge
+### 卸载Edge
 
 ```
 C:\Program Files (x86)\Microsoft\
@@ -203,10 +220,10 @@ setup.exe --uninstall --system-level --force-uninstall
 
 setup.exe --uninstall --msedgewebview --system-level --force-uninstall
 
-卸载上两者后EdgeCore会自动消失。但EdgeUpdate还在，要手动删
+卸载上两者后EdgeCore会自动消失。但EdgeUpdate还在，要手动删。System32里还有一个Microsoft-Edge-WebView
 ```
 
-## HEVC扩展
+### HEVC扩展
 
 * ms-windows-store://pdp/?ProductId=9N4WGH0Z6VHQ
 * https://bbs.pcbeta.com/forum.php?mod=redirect&goto=findpost&ptid=2053927&pid=57246099 https://zhuanlan.zhihu.com/p/1972401403990381624

@@ -91,12 +91,13 @@ title: Git/GitHub笔记
 * core.symlinks true：默认是启用的，但不知为何VS附带的Git把它设为了false
 * core.pager false：某些时候默认会用less
 * 性能
-  * core.fscache true：仅Win有效，缓存status
-  * core.fsyncObjectFiles：设为false表示交给操作系统flush数据，对于现代文件系统没必要设为true但好像默认是它，batch在NTFS下安全性应和true相当
-  * core.fsmonitor true：Win和Mac有效，启用后好像会产生守护进程
+  * core.fscache true：仅支持Win，缓存status。但官方文档里没写
+  * core.fsync none：默认设置已经较优。这样设置完全不做fsync，交给操作系统
+  * core.fsmonitor true：支持Win和Mac，启用后好像会产生守护进程。只应在大型仓库上使用
   * feature.manyFiles true：相当于修改另外两项设置，遇到大量文件时有一些优化
-  * core.compression 9 仅影响ssh的传输
-  * core.preloadindex true
+  * pack.compression 9 影响ssh的zlib压缩传输，默认为6也还好
+  * pack.threads 没说默认值，设为0等于设为核心数，太大了耗内存，好像默认值就是0，调小可以减少内存消耗
+  * fetch.writeCommitGraph 对于其他命令有帮助
 
 ### 查看diff信息的工具
 

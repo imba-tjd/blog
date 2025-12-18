@@ -338,6 +338,7 @@ Calliope o-- SpindlerBattery
 
 * 使用一个symbol来表示和处理多种形式的类型或数据对象
 * 一种分类：静态多态（编译时确定）、动态多态（运行时）。重载是静态的，继承和重写是动态的
+* 经典论文 On Understanding Types, Data Abstraction, and Polymorphism 将多态分为下面三类标准
 * Ad-hoc特设多态：如函数重载
 * Parametric参数多态：泛型
 * Subtyping子类型

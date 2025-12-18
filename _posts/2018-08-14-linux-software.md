@@ -428,11 +428,12 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * “恒定质量”预设
     * -crf按某种比率调整质量。x264默认23推荐18-28；x265默认28推荐24-34。数字越小质量越好文件越大，每±6差不多减半或加倍码率
       * 实测x264 23 1080p30f 半小时 码率约1Mb 大小约250MB
-    * -preset主要影响速度和压缩率（质量理论上不变），默认medium，可选slow和fast等，直播用ultrafast，长期储存选慢一点的
-    * -tune film代表高质量/animation/stillimage用于ppt/zerolatency用于直播
+    * -preset主要影响速度和压缩率，质量理论上不变。默认medium，有slow/fast，直播用ultrafast，长期储存用veryslow。实测slow速度是medium的一半
+    * -tune 把有限的码率进行合理分配。film代表高质量，一般选用。animation用于古早美漫线条少大面积纯色，stillimage用于ppt，zerolatency用于直播。好像hevc_nvenc不支持此选项
     * u2b推荐配置：https://support.google.com/youtube/answer/1722171
   * 码率(比特率)：-minrate 964K -maxrate 3856K -bufsize 2000K
-    * 平均码率(abr)/目标码率：-b:v xxxk。不应直接使用，因为编码器只能猜测；一种解决办法是配合-pass 1和2。不是固定码率(cbr)，仍是vbr
+    * 平均码率(abr)/目标码率：-b:v xxxk。不应直接使用，因为编码器只能猜测。一般再加-pass 2。不是固定码率(cbr)，是vbr
+    * 在其他参数不变的情况下，码率*时长=文件大小
   * 分辨率：-vf scale=480:-1 其中-1表示保持原比例。另一种参数：-s:v 854x480
   * 帧率：-r 24
 * 裁剪一段：-ss start -to end 或 -t 经过。时间格式默认为秒，还可以是 00:01:30.500
@@ -467,6 +468,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 图片：包括是否无损、静态动态。WebP是JPEG的替代，也支持无损，也支持动画（VP8比特流）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
   * 教程：https://github.com/leandromoreira/ffmpeg-libav-tutorial/blob/master/README-cn.md https://slhck.info/posts/
+  * 通用视频教程：https://guides.vcb-s.com/
 * 带有解码器的mpchc：https://www.codecguide.com/download_kl.htm
 * 视频转换工具（ffmpeg的GUI）：https://handbrake.fr/ staxrip Medlexo魔力玄（闭源，小） https://github.com/jeanslack/Videomass
   * 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
@@ -490,6 +492,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
     * “基地版”，自带虚拟显示器（连好后类似副屏） https://github.com/qiin2333/Sunshine
     * Sunshine是服务端。客户端用 https://moonlight-stream.org/ 最后支持32位的版本：6.0.1。手机端：https://github.com/Axixi2233/moonlight-android
     * 闭源fork，可能挂了：https://open-stream.net/
+    * https://github.com/VirtualDrivers/Virtual-Display-Driver
   * parsec：不开源。多个设备下载客户端登录同一个账户即可，也能分享，但必须登录现在被q了。如有NAT必须要打洞成功，一般来说至少要有一个有公网IP
   * gameviewer(网易UU远程)：目前免费。不支持文件传输
 * 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控、RadminLAN
@@ -497,6 +500,8 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
 * 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
 * Sysinternal的Remote Desktop Connection Manager：添加了TAB，适合需要切换多个服务器时使用
+* https://remotedesktop.google.com/
+* https://deskin.io/zh/products/deskin-personal
 
 ## perl
 
@@ -529,6 +534,18 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * 其它守护程序：supervisord是py，有fork的for win版，缺点：https://stackoverflow.com/questions/12156434 Go的重写：ochinchina/supervisord。monit是C
 * 其它监控metric程序：https://github.com/topics/monitoring
 
+## ddrescue
+
+1. apt install gddrescue
+2. mount -t ntfs-3g -o ro /dev/sda1 /mnt/bad。AI说比ntfs3容忍度高
+3. ddrescue -n -r0 -d /path/to/bad/file /path/to/safe/saved_file /path/to/safe/log_file.map
+  * -n No scrape，跳过损坏区域
+  * -r0 不重试
+  * -d 直接读取，绕过操作系统缓存。普通的cp会卡住因为操作系统会“缓存”文件
+  * 最后一个参数是日志文件
+4. 重复上一条命令，只不过用-d -r3。能填补空洞
+5. 重命名saved_file
+
 ## 面板
 
 * https://1panel.cn/
@@ -554,3 +571,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * magika：谷歌出的，Py，用深度学习检测文件类型
 * https://github.com/draios/sysdig
 * 终端文件管理：https://github.com/jarun/nnn https://github.com/sxyazi/yazi https://github.com/Canop/broot https://github.com/gokcehan/lf https://github.com/yorukot/superfile https://github.com/kamiyaa/joshuto
+* mail server：https://github.com/stalwartlabs/stalwart https://mailcow.email/

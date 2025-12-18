@@ -1326,4 +1326,3 @@ ret = hc.ResponseText
 * joblib：有三个功能，一是透明硬盘缓存，二是并行计算，三是快速二进制序列化
 * pyupgrade：自动把老版本语法更新到新版本，但条目不多
 * https://tox.wiki/en/latest/
-* https://github.com/charliermarsh/ruff An extremely fast Python linter, written in Rust. 代替Flake8 Black isort
