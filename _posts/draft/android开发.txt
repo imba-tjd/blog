@@ -1,0 +1,152 @@
+# Android Studio
+
+1. https://developer.android.google.cn/studio
+2. 初次运行报 Unable to access Android SDK add-on list：不用管，之后在首页的更多操作-SDK Manager（或设置-Language&Frameworks-AndroidSDK）点Edit下载，再删掉模拟器。也可能是如果点取消无法继续，就随便设置一下跳过。因为dl.google.com可以访问。不用装jdk
+3. 汉化：https://github.com/sollyu/AndroidStudioChineseLanguagePack
+4. 设置-工具-Google Accounts：IDE要开Proxy，单纯浏览器开不行，现象是浏览器访问localhost回调失败，实际上是IDE访问谷歌超时
+5. 创建项目，删除`.gradle`和`gradle/gradle-wrapper`，**不要删`gradle`文件夹**。刷新build，点Change Gradle JDK location，改为本地安装的。
+
+云端版：Android Studio on IDX但还在内测
+
+
+官方示例：
+https://developer.android.google.cn/courses/android-basics-compose/course?hl=zh-cn
+https://www.youtube.com/@AndroidDevelopers/courses
+https://developer.android.com/samples?hl=zh-cn
+https://github.com/android/compose-samples https://github.com/android/architecture-samples 前者是多个UI/MD，后者是一个TODO APP
+
+其他项目示例：
+https://github.com/FunnySaltyFish/Transtation-KMP
+
+相关开发软件：
+LibChecker
+
+## 报错
+
+* cause: index == 7：设置了代理但又用不了
+
+# gradle
+
+https://mirrors.aliyun.com/gradle/distributions/v9.2.1/gradle-9.2.1-all.zip 不能下bin，否则idea会自动下src
+
+镜像：创建 ~/.gradle/init.gradle
+
+```
+gradle.beforeSettings { settings ->
+    settings.pluginManagement {
+        repositories {
+            clear()
+            maven { url = 'https://maven.aliyun.com/repository/public' }
+            maven { url = 'https://maven.aliyun.com/repository/google' }
+            maven { url = 'https://maven.aliyun.com/repository/gradle-plugin' }
+        }
+    }
+    settings.dependencyResolutionManagement {
+        repositoriesMode.set(org.gradle.api.initialization.resolve.RepositoriesMode.PREFER_SETTINGS)
+        repositories {
+            maven { url = 'https://maven.aliyun.com/repository/public' }
+            maven { url = 'https://maven.aliyun.com/repository/google' }
+        }
+    }
+}
+```
+
+命令：gradle --stop，gradle clean，依赖树gradle buildEnvironment
+
+---------------
+# Jetpack Compose
+
+https://jetpackcompose.cn/docs/
+https://jetpackcompose.cn/docs/elements/alertdialog
+
+```
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MessageCard("Android")
+        }
+    }
+}
+
+@Composable
+fun MessageCard(name: String) {
+    Column {
+        Text(text = "Hello")
+        Text(text = name)
+    }
+}
+
+@Preview
+@Composable
+fun PreviewMessageCard() {
+    MessageCard("Android")
+}
+```
+
+Modifier：大小、外观、可点击
+
+基础控件：
+
+Image(
+    painter = painterResource(R.drawable.profile_picture),
+    contentDescription = "Contact profile picture",
+    modifier = Modifier.size(40.dp).clip(CircleShape)
+)
+
+Scaffold：MD的标准布局，有一个top bar、bottom navigation bar、floating action button (FAB)、主内容区。一般是Theme下的根元素
+Surface：相当成一张卡片，有背景，形状（圆角），边框，阴影
+
+
+布局：
+
+Column垂直排列多个元素，Row水平
+Box：堆叠，可控制zindex，默认后声明的在上层。如在图片上放文字，在按钮上放图标
+LazyColumn {
+    items(msgs) { msg ->
+        MessageCard(msg)
+    }
+}
+
+Spacer(modifier = Modifier.width(8.dp))
+
+
+主题：
+
+```
+app.ui.theme：
+Color.kt存放颜色常量：val Purple80 = Color(0xFFD0BCFF)。动态主题颜色：由设备偏好设置定义
+Type.kt存放文字设置（排版）：val Typography = Typography(display、headline、title、body、lable的大中小=TextStyle(fontFamily等))
+Theme.kt创建MaterialTheme
+
+使用：
+颜色：Modifier.border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+字体：Text(color=xxx, style = MaterialTheme.typography.titleSmall)
+形状：Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp)
+```
+设计：https://stitch.withgoogle.com/
+
+兼容低版本：build.gradle中，minSdk是app能运行的最低系统版本；targetSdk代表在那个版本的系统上测试过了，特性最高使用此版本。
+如果在低版本上使用了高版本特性，要区分处理：if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Xxx) {使用高版本特性}
+
+库：
+https://google.github.io/accompanist/ 相当于未转正但有用的Jetpack组件
+
+---------------
+
+# Kotlin
+
+默认Nullsafe
+
+字符串内插：直接"$var"
+
+类：
+class MyClass(private val 本类构造函数参数名: 某需要的类型) : 父类(调用父类构造函数参数)
+
+尾参lambda：如果一个函数的最后一个参数是lambda，如 ()->Xxx。则调用传实参时可以把lambda写在小括号外面且做一些省略，如 data.map { it.fun() }，相当于data.map(it->{it.fun()})
+
+Flow：相当于IAsyncEnumerable。使用时data.collect{it.xxx}相当于await foreach(var it in data)
+
+suspend fun：相当于async Task
+
+类似于元组：data class Message(val author: String, val body: String)
