@@ -4,7 +4,7 @@
 
 Win：https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=11&target_type=exe_network 镜像：https://github.com/futureflsl/cuda_cudnn_mirror
 
-只安装驱动（无nvcc，但已经可以跑torch）：apt search nvidia-driver
+只安装驱动（无nvcc，但已经可以跑torch）：apt search nvidia-driver。启用dynamic boost：nvidia-powerd
 
 官方两种安装方式：rpm/deb包、runfile包。还可用conda装cuda toolkit。还有docker
 

@@ -1,6 +1,9 @@
+刷机概念教程：https://www.bilibili.com/video/BV1BY4y1H7Mc
+
 ## rec
 
-* https://orangefox.download/zh-CN
+* https://wiki.orangefox.tech/
+  * 如果已经安装了TWRP，进入，把zip包传进内部存储，选Install安装，装zip，完成。选位置的时候右下角有个InstallImage，是用来装img文件的，好像升级twrp是用这个，需要选分区
 * 线刷：fastboot flush recovery twrp.img。临时进入：fastboot boot twrp.img。卡刷更新：Install - Install from image
 
 ## adb
@@ -34,6 +37,7 @@
   * F-Droid Privileged：允许F-Droid静默安装
   * https://github.com/CRANKV2/ZRAM 爱玩机工具箱也能调整
   * https://github.com/muink/Magisk-Captive-Manager 解决WIFI连接性检测时无法访问Google的问题。爱玩机工具箱也能调整：界面显示调节 - 去！和x
+  * HyperCeiler 集成了许多功能的MIUI优化
 * 翻车自救：adb shell magisk --remove-modules
 
 ### 同类软件
@@ -61,36 +65,37 @@
 * https://github.com/iamr0s/Dhizuku/blob/main/docs/README_zh_rCN.md 提供“设备所有者”权限。会影响系统自带双开
 * https://github.com/timschneeb/awesome-shizuku
 
-
 ## LSPatch
 
 * 免root使用LSPosed框架
-* https://github.com/HSSkyBoy/NPatch
+* https://github.com/JingMatrix/LSPatch https://github.com/HSSkyBoy/NPatch
 
 ## 其它软件
 
 * https://nikgapps.com/
+* https://github.com/microg/GmsCore/wiki
+* https://playmods.net/zh/ 破解版下载站
+* https://geek.wugov.com/ 底层刷机工具
 
 ## ROM
 
 * https://wiki.lineageos.org/
-* https://www.droidontime.com/ 官网很卡
-* https://download.pixelexperience.org/ 不过更新了
-* https://resurrectionremix.com/ https://sourceforge.net/projects/resurrectionremix-ten/files 感觉不太行
-* https://www.aospextended.com/ 522错误
-* https://xiaomirom.com/ 非官方原版MIUI
+* https://xiaomirom.com/ 原版MIUI
+* https://download.pixelexperience.org/ 不更新了
 * https://crdroid.net/ 类原生
 * https://pixelos.net/
+* https://www.pling.com
+* https://grapheneos.org/ https://axpos.org/ https://evolution-x.org/ https://derpfest.org/
 
 ### mido
 
-* 非官方lineage https://github.com/zeelog/OTA/releases https://github.com/zeelog/device_mido_twrp/releases https://t.me/LOSRN4 安卓14
+* 非官方lineage https://github.com/zeelog/OTA/releases https://github.com/zeelog/device_mido_twrp/releases https://t.me/LOSRN4 安卓15
   * https://xdaforums.com/t/android-13-lineageos-20-mido-vanilla-by-zeelog-stable-no-bugs-smooth.4516771/
 * https://t.me/s/rn4downloads
-* https://download.pixelexperience.org/mido 安卓13，维护者是印度的
+* https://get.pixelexperience.org/mido 安卓14，维护者是印度的，上次更新是24年3月
   * https://sourceforge.net/projects/nranjan-17/files/BETA/
 * https://xdaforums.com/t/android-14-custom-roms-list.4639540/ 14收集
-* https://www.pling.com/p/1451939 安卓13
+* https://xdaforums.com/t/rom-16-beta-unofficial-mido-axion-aosp-2-0-22-08-25.4755711 16
 * https://sourceforge.net/projects/mokee/files/RELEASE/mido/ 魔趣，不更新了，安卓10
 * 论坛
   * https://forum.xda-developers.com/f/xiaomi-redmi-note-4-snapdragon-roms-kernels-re.6145/
@@ -103,18 +108,24 @@
 ## 播放器
 
 * https://github.com/anilbeesetti/nextplayer
+* https://github.com/namidaco/namida
+* oplayer：有广告，不适配平板
 
 ## 系统自带应用包名
 
 * realme：https://tieba.baidu.com/p/7404872902
 * hm4：https://www.bilibili.com/opus/1026398532683169809
 
-## 模块
-
-* HyperCeiler 集成了许多功能的MIUI优化
-* https://github.com/JingMatrix/LSPatch
-
 # 验机
 
-* APP：全渠道质检、设备信息by流舟
+* APP：全渠道质检、设备信息by流舟、DevCheck
 * 面交：确定付钱的人与给设备的人是同一个人
+
+# 互联
+
+* 副屏：https://www.spacedesk.net/ https://superdisplay.app/beta/ 后者有线技术更好，但apk破解不了
+* 播放器（但有线连接不太行）：https://liteapks.com/download/audiorelay-204451 https://audiorelay.net/downloads 可以用热点（WiFi Direct），注意要手动输入热点虚拟网卡IP
+  * 另一款：https://georgielabs.net/
+* USB共享网络：https://www.jianshu.com/p/61762932acbd https://www.lanzoux.com/b08l43p2j 但实测只能将平板作为跳板，电脑访问平板连的wifi，而不能平板访问电脑。电脑上会安装虚拟网卡
+* USB反向共享网络：https://github.com/Genymobile/gnirehtet 开启USB调试，下载rust实现，给adb添加进PATH，运行run，手机上会自动收到安装包。但实测用不了audiorelay，甚至能连接上，但收不到音频数据。看起来是它在win上起了一个NAT进程，安卓开启VPN
+* https://github.com/Genymobile/scrcpy 将安卓投屏到电脑

@@ -368,11 +368,13 @@ numpy out has performance benefits？
 
 ### 安装
 
-* pip install torch --find-links https://mirrors.aliyun.com/pytorch-wheels/cu130
+* pip install torch -f https://mirrors.aliyun.com/pytorch-wheels/cu130
   * CPU版：cu130改为cpu。Win默认为CPU，Linux默认为cuda
   * conda install pytorch-cpu 不知道要不要-c conda_forge
   * cuda版是自包含的，不需要装cuda toolkit，但需要装显卡驱动。用nvidia-smi查看支持的最高cuda版本
   * 不会传递装numpy
+  * 官方用的是-i，但阿里云镜像不行，不是符合包索引。而--find-links只扫描whl。南大的好像可以：https://mirrors.nju.edu.cn/pytorch/whl/cu130
+  * 如果下载的版本不对，用pip cache purge
 * 相关项目
   * intel_extension_for_pytorch(IPEX)：对于支持avx512的CPU能加速训练。仅linux或WSL2。不再更新，理由是它的内容已经集成进了pytorch 2.8
   * 优化超参数的框架，支持ML和DL框架：https://optuna.org/
