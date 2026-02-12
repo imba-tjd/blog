@@ -11,10 +11,10 @@ System.Diagnostics.Process.Start("explorer.exe /n," + Environment.GetFolderPath(
 
 ## 当前程序的真实路径
 
-* System.Reflection.Assembly.GetExecutingAssembly().Location
-* System.Windows.Forms.Application.ExecutablePath，与MainModule.FileName一样；还有个Application.StartupPath，与CWD一样
+* AppContext.BaseDirectory 和 AppDomain.CurrentDomain.BaseDirectory：目录，含有末尾反斜杠
+* System.Reflection.Assembly.GetExecutingAssembly().Location 模块的位置，不一定是主exe
 * System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName
-* AppContext.BaseDirectory和AppDomain.CurrentDomain.BaseDirectory：目录，含有末尾反斜杠
+* System.Windows.Forms.Application.ExecutablePath，与MainModule.FileName一样；还有个Application.StartupPath，与CWD一样
 * .NET6：Environment.ProcessPath
 
 ## 判断系统版本
@@ -90,21 +90,4 @@ class UserService: ServiceBase {
   protected override void OnStart(string[] args) {}
 }
 ServiceBase.Run(new UserService());
-```
-
-## 从资源中加载程序集
-
-```c#
-AppDomain.CurrentDomain.AssemblyResolve += OnResolveAssembly; // 当找不到时自动执行此委托
-static Assembly OnResolveAssembly(object sender, ResolveEventArgs e) {
-    var thisAssembly = Assembly.GetExecutingAssembly();
-    foreach (string name in thisAssembly.GetManifestResourceNames()) // 当前程序集的所有资源名。以项目名.开头，因此下面要用EndsWith
-        if (name.EndsWith(e.Name + ".dll")) {
-            var stream = thisAssembly.GetManifestResourceStream(name);
-            var block = new byte[stream.Length];
-            stream.Read(block, 0, block.Length);
-            return Assembly.Load(block);
-        }
-    return null;
-}
 ```
