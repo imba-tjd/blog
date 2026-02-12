@@ -216,7 +216,7 @@ TODO
 * however/but：nevertheless, notwithstanding
 * idea/view：perception
 * ignore: overlook, neglect
-* important: significant, vital, essential, critical, crucial, indispensable, unavoidable, be of great importance to sb, necessary, imperative, inevitable, meaningful, fundamental, radical
+* important: significant, vital, essential, critical, crucial, indispensable, unavoidable, be of great importance to sb, necessary, imperative, inevitable, meaningful, fundamental, radical, prominent
 * in order to: for the sake of, in anticipation of
 * in terms of: 只用在对比时。可以用regarding，没有to
 * pain：agony

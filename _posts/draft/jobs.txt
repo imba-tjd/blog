@@ -187,3 +187,9 @@ STAR法则：Situation情景、Task任务、Action行动、Result结果。
 
 * 弹性计算基础产品：熟悉但不限于k8s/kubelet/docker/kafka/rocketmq/zookeeper/codis/redis等任意一种开源产品源代码。有一定规模的生产实践经验，能独立分析和解决k8s各个组件的问题
 * 数据研发工程师：Hadoop生态，Hdfs、Hive等，熟悉Spark、Flink 等计算框架原理，有过大数据相关实习开发经验
+
+## 招聘市场
+
+* https://job.nju.edu.cn/
+* https://24365.smartedu.cn/
+* https://www.91job.org.cn/

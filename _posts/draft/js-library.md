@@ -74,7 +74,7 @@
 
 ## 替代品
 
-* 本体90KB。slim版无ajax和动画，72KB，不用
+* 4.0支持IE11，支持以ESM引用。slim版不支持ajax和动画
 * 原生：https://github.com/nefe/You-Dont-Need-jQuery/blob/master/README.zh-CN.md https://youmightnotneedjquery.com/ https://blog.garstasio.com/you-dont-need-jquery/
 * fabiospampinato/cash NPM上叫cash-dom，17KB
 * https://umbrellajs.com/ 操作DOM和事件，有ESM版，8KB，最后更新2022年

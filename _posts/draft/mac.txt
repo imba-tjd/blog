@@ -1,5 +1,25 @@
 https://github.com/waydabber/BetterDisplay
 
-https://xclient.info/
+软件站：https://xclient.info/
 
 缺点：https://www.bilibili.com/video/BV1p4YCz8Ezx
+
+卸载工具：PearCleaner、腾讯柠檬、https://github.com/tw93/Mole
+
+解压：keka
+
+通知隐藏：Ice
+
+鼠标滚轮：mos
+
+允许任何来源的应用程序：sudo spctl --master-disable。“安装包已损坏”：xattr -cr xxx
+
+视频播放器：IINA
+
+# ipad
+
+数字版：非全贴合屏幕，容易进灰，不支持广色域，无抗反射图层；维修成本低。笔离屏幕有距离，不支持2代笔和磁吸。USB2.0。10代开始全面屏，11开始6+128起步（之前是4+64）
+
+mini：5代非全面屏，3G内存起步。6代全面屏，处理器A15尚可，但竖屏果冻。一直没有高刷。
+
+air：4代与数字10代几乎一致。5代M1。6代M2，内存6G起步。7代M3，续航更好。

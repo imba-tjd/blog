@@ -32,28 +32,19 @@ https://docs.nvidia.com/cuda/cuda-installation-guide-linux/
 
 * Builder：优化模型，产生Engine
 * Engine：特定于创建它的TRT版本（可放宽，新版运行时一般可运行老版的）、GPU（同代高端的可运行低端生成的）、操作系统、CPU架构
-* Torch-TensorRT：转换模型，从torch到trt。其他类型要导出为ONNX，再转换为TRT（第二步内置）。
+* Torch-TensorRT：转换模型，从torch到trt。其他类型要导出为ONNX，再转换为TRT（第二步内置）
+* https://www.bilibili.com/video/BV15McveEEWB
 
 ## 相关项目
 
-### TensorRT Model Optimizer
+### [Model Optimizer (ModelOpt)](https://github.com/NVIDIA/Model-Optimizer)
 
 * 量化、剪枝、蒸馏
 * 已经做好的模型：https://huggingface.co/collections/nvidia/inference-optimized-checkpoints-with-model-optimizer
 
 ### triton-inference-server
 
-部署Engine，提供HTTP/GRPC API，后端支持多个，支持serve多个模型。对于windows的支持较差，曾经可以，后来不行，有人提issue没人处理
-
-### TensorRT-LLM
-
-* https://github.com/NVIDIA/TensorRT-LLM https://nvidia.github.io/TensorRT-LLM/latest/overview.html
-* 包含了对LLM的优化，如custom attention kernels, inflight batching, paged KV caching, quantization (FP8, FP4, INT4 AWQ, INT8 SmoothQuant, ...), speculative decoding。前身叫FasterTransformer，甚至不需要TensorRT，后来才改了
-* 是python-native的，提供不同于HF的API
-* 必须用系统级别的CUDA，推荐使用容器，只支持linux。目前py轮子不支持cu13
-* 不支持win
-* trtllm-serve "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-* trtllm-bench、trtllm-eval
+部署Engine，提供HTTP/GRPC API，后端支持多个，支持serve多个模型。对于windows的支持较差，曾经可以，后来不行，有人提issue没人处理。对于非LLM考虑用。其它选择：LitServe、RayServe、bentoml
 
 # TODO
 

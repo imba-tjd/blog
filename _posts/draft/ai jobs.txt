@@ -188,7 +188,7 @@
   * 云：托管服务、存储。GCP、AWS、Azure
 * 工程经验
   * DevOps：Git、Docker、k8s、Terraform、裸机
-  * 监控和警报（Grafana、Prometheus、Datadog）
+  * 监控和警报（Grafana、Prometheus、Datadog），OpenTelemetry
   * 强大的算法技能
   * 使用现代工具并始终寻求改进
 

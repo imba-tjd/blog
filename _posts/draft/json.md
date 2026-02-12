@@ -73,6 +73,7 @@ mapper.readValue(str/in_s, clazz)
 ## FastJson2
 
 * com.alibaba.fastjson2:fastjson2、fastjson2-extension-spring6
+* 默认支持非string的key
 
 ```java
 JSON.toJSONString(o)

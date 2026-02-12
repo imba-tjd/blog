@@ -13,7 +13,7 @@
 * 命令
   * shell：相当于进入手机的Linux目录里，并不是用于省略其它命令的adb前缀
     * pm list package; pm disable-user/uninstall *pkg_name*
-  * 安装apk：install x.apk
+  * 安装apk：install x.apk。不是pm的子命令，apk在win上
   * 复制文件：push a.txt /sdcard/
   * reboot recovery/bootloader
 * 图形化
@@ -53,6 +53,7 @@
 * 线激活：adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh
 * 本机激活：开发者选项里启动无线调试，本程序将作为客户端，进入授权码界面后，在通知栏里输入。只需配对一次，后续再开无线调试，app直接点启动即可。快速开启：开发者选项 - 快捷设置开发者图块，将无线调试加到下拉菜单里
 * 对于已经安装了Magisk，优先用 https://github.com/RikkaApps/Sui 模块
+* Fork：https://github.com/thedjchi/Shizuku
 
 ### 相关软件
 
@@ -91,14 +92,16 @@
 
 * 非官方lineage https://github.com/zeelog/OTA/releases https://github.com/zeelog/device_mido_twrp/releases https://t.me/LOSRN4 安卓15
   * https://xdaforums.com/t/android-13-lineageos-20-mido-vanilla-by-zeelog-stable-no-bugs-smooth.4516771/
-* https://t.me/s/rn4downloads
+* https://evolution-x.org/devices/mido
+* https://www.axionos.org/
+* https://t.me/s/rn4downloads https://t.me/s/midoid_update
 * https://get.pixelexperience.org/mido 安卓14，维护者是印度的，上次更新是24年3月
   * https://sourceforge.net/projects/nranjan-17/files/BETA/
 * https://xdaforums.com/t/android-14-custom-roms-list.4639540/ 14收集
 * https://xdaforums.com/t/rom-16-beta-unofficial-mido-axion-aosp-2-0-22-08-25.4755711 16
 * https://sourceforge.net/projects/mokee/files/RELEASE/mido/ 魔趣，不更新了，安卓10
 * 论坛
-  * https://forum.xda-developers.com/f/xiaomi-redmi-note-4-snapdragon-roms-kernels-re.6145/
+  * https://xdaforums.com/f/xiaomi-redmi-note-4-snapdragon-roms-kernels-re.6145/
   * https://thecustomrom.com/category/redmi-note-4-4x/
 
 ## 桌面

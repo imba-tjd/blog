@@ -30,7 +30,9 @@ export default {
 <style scoped> @import './base.css'; 支持 k: v-bind(引用data里的变量) </style>
 ```
 
-### 选项式Options API：对OOP用户友好
+### 选项式Options API
+
+对OOP用户友好。缺点：响应式数据依赖于组件，颗粒度太粗，如果不同组件有相同的数据处理逻辑，就不能复用；除非用vuex，但又比较重；还有mixin，但不好用，容易重名。
 
 ```html
 <script>
@@ -266,6 +268,12 @@ app.mount(可传DOM对象)  返回值不是app
 console中用$vm0也能访问到第一个app
 ```
 
+### 运行时渲染原理
+
+数据变化 -> 派发更新（运行依赖函数） -> render（全量重新生成组件中的所有UI节点） -> 生成虚拟DOM -> diff + patch -> 运行渲染函数（抽象层）
+
+vue未来（3.6+）不会全量生成，而是更精细化地生成响应式代码（Vapor模式），就不需要虚拟dom和diff了。但必须用编译器，没有渐进式
+
 ## vue2
 
 * 若data的属性是数组，修改时要用splice，而不能直接赋值
@@ -276,19 +284,6 @@ console中用$vm0也能访问到第一个app
 * 特性：自动重载。可以直接在html的script中引入module和ts。内置postcss支持。可以在js中import css
 * https://github.com/fi3ework/vite-plugin-checker
 * 编译打包：index在项目根目录。public目录下的会原封不动复制，src下的会被处理。
-
-## petite-vue
-
-* petite-vue.iife.js 通过PetiteVue使用API，可加defer init。其中init会自动查找含有v-scope="{状态}"的元素并渲染
-* createApp({状态而非组件，包括属性和方法}).mount('#app 省略时找无值的v-scope')
-* 生命周期钩子：行内写 @vue:mounted="js代码"
-* v-effect="修改DOM等产生副作用的js，使用的状态属性改变时会自动执行"
-* $el：当前行内指令应用到的元素。Vue中是组件根元素
-* 组件：返回{状态}的普通函数。模板：名为$template的属性，值可以是模板字符串内容，也可以是css选择器，指向HTML部分的template元素的id
-* 能更改handlebar的大括号为其它符号，方便也用大括号语法的SSR
-* 支持reactive()，不支持ref() computed()等
-* 不支持：Map和Set的响应式、v-on="object"、v-is、Transition, KeepAlive, Teleport, Suspense
-* 内部使用了new Function()，在严格的CSP下可能会失败
 
 ## 其它组件
 

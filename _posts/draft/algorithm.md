@@ -14,7 +14,7 @@ title: 算法
   * 若数据分成两部分，一部分量级允许暴力，另一部分量大，且又看不到结果，可以if(n<=1e5) 暴力 else 正常解。即一个题目里同时写两种算法，这样暴力过了也有分，防止爆0
   * 找规律：数字非常大，如第202420242024项，一般输出前100项，每10个一组，之后看第xxx0项，再往后4项
 * dict的key可为(L,R)元组，代替dp[l][r]
-* 反复计算区间和：前缀和。计算：[0]+itertools.accumulate(arr)，psum[i]得到[0..i-1]的和
+* 反复计算区间和：前缀和。计算：itertools.accumulate(arr,initial=0)，psum[i]得到[0..i-1]的和
 * 数组元素乘积<K，如果怕溢出，可全取log，变为加法，但有精度问题
 * 用变量取索引时如 arr[i-j] 最好先 assert i-j>=0，因为小于0不会报错，而是取末尾
 * python库
@@ -514,9 +514,9 @@ def permutations(l, path=()):
 ```py
 dirs = ((1,0), (-1,0), (0,1), (0,-1))
 for (i2, j2) in dirs:
-	i3 = i+i2; j3 = j+j2
-	if i3 >=0 and i3 < n and j3 >=0 and j3 < m:
-		search(i3,j3)
+  i3 = i+i2; j3 = j+j2
+  if i3 >=0 and i3 < n and j3 >=0 and j3 < m:
+    search(i3,j3)
 ```
 
 ## 区间、覆盖
