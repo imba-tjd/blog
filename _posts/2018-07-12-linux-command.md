@@ -61,7 +61,7 @@ title: Linux命令
     * 一次性杀掉多个进程：c选择条目，k相当于F9
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
   * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器。nmon、njmon(c)：社区为sourceforge较差，后者适合做二次开发。gtop(node)、bottom(rust)：比较类似于overview面板，能显示网速，有折线图显示CPU和内存历史。iotop。netop(rust)：能显示网络流量速率
-* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序；空格ww表示不截断命令行。直接写数字就是指定pid。-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别
+* ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序；空格ww表示不截断命令行，再加e显示命令行运行那时的环境变量。直接写数字就是指定pid。-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别
   * pstree：以简单形式显示父子程序名关系。在procps包中
   * pkill：根据ps的一些Filter来kill，一般就是pkill -fe 进程名，f表示完全匹配防止误杀，e显示杀了的程序
   * pgrep：同理，另外查找进程时不会显示grep自身
@@ -145,6 +145,7 @@ title: Linux命令
 * brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点。但字典中专门为HTML、CSS设计了
 * 比lzma更高压缩率且速度差不多：lzham_codec_devel
 * gzip -9
+* 分卷压缩：7z是7z.001 7z.002，rar是part1.rar part2.rar。且7z无法解压rar
 
 #### tar
 
@@ -196,7 +197,7 @@ title: Linux命令
 
 ## 网络
 
-* 防火墙：ufw易用，有gufw图形界面，但yum里没有。firewalld较复杂。其它开源有GUI的：opensnitch portmaster SafeLine(国产WAF)
+* 防火墙：ufw易用，有gufw图形界面，但yum里没有。firewalld较复杂。其它开源有GUI的：opensnitch portmaster SafeLine(国产WAF)。其他：gamemann/XDP-Firewall基于ebpf效率高
 * firewall-cmd --add-port=8080/tcp --permanent; firewall-cmd --reload
 * ufw allow port; ufw enable; ufw status
 
@@ -333,7 +334,7 @@ ip link
 
 #### ss(Socket Statistics)
 
-* 替代netstat
+* 替代netstat。功能类似的tui（不是封装）：https://github.com/karol-broda/snitch
 * ss -t为TCP，-u为UDP，-w为raw，-x为Unix Socket，不加就都有
 * 默认只显示establish了的，-l显示listen状态的，-a同时显示所有状态，-4/-6略
 * -p显示使用端口的进程和uid
@@ -411,7 +412,7 @@ ip link
   * policy是rule未匹配时的行为（fallback）。有另一种可用但不推荐的写法是在rule的最后一条写drop
 * 再创建rule
   * nft add rule 族类型 表名 链名 matches statements
-  * matches是对三四层协议属性的匹配，如tcp dport 22、ct state established,related用于允许已建立的连接继续
+  * matches是对三四层协议属性的匹配，如tcp dport 22、ct state established,related用于允许已建立的连接继续、iifname "lo"
   * statements：Verdict裁决语句控制包的control flow如accept drop reject。还预定义了一些其它功能如counter计数、限流
   * 删除：先查看规则编号，再按handle删除。不推荐按文本删除
   * rule在chain里是按顺序逐条匹配的，一旦某条规则返回终止类verdict就不再继续

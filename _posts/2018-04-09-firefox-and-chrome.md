@@ -132,10 +132,10 @@ title: 浏览器
 ### 安装包
 
 * https://static.centbrowser.cn/win_stable/
-* 适用于老系统的：https://github.com/win32ss/supermium
+* 适用于老系统：https://github.com/win32ss/supermium
 * 便携版：https://github.com/henrypp/chrlauncher
-* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/
-* https://github.com/RobRich999/Chromium_Clang https://thorium.rocks/
+* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/ 其中exe包会静默安装
+* https://github.com/RobRich999/Chromium_Clang https://thorium.rocks/ 后者集成了前者的某些patch
 * 禁止自动更新：C:\Program Files\Google\Update文件夹 改名，但不会阻止下载新版安装包
 
 ### 快捷键
@@ -149,25 +149,29 @@ title: 浏览器
 * 没有方法找出Default对应哪个选项
 * Experimental JavaScript、Future V8 VM features
 * GPU（chrome://gpu/）
-  * Skia Graphite
-  * Choose ANGLE graphics backend：默认D3D11。可用--use-angle=d3d11on12，但有个direct_composition_support报错一个特性不支持，内存占用明显增加。有个D3D11WARP是CPU软件渲染不要用
-  * Trees in viz：Edge在flags里无。--enable-features=TreesInViz
+  * Skia Graphite。--skia-graphite-backend=dawn-d3d12 默认11，改为12后基础内存占用加100M
+  * Trees in viz
   * Zero-copy rasterizer：当前状态看Tile Update Mode
   * Enable Zero-Copy Video Capture
-  * GPU rasterization：默认已部分有效，手动启用后在所有页面上生效
+  * GPU rasterization：默认已部分有效，手动启用后对所有页面生效
+  * Choose ANGLE graphics backend：默认D3D11，不用调。--use-angle=d3d11on12 内存占用会增加，且AI说反而不如11。D3D11WARP是CPU软件渲染不要用。不原生支持12
+  * Use Skia Renderer （for PDF），Edge无
   * 查看当前用于渲染的GPU：GL_RENDERER。测试：https://webglreport.com/?v=2
-* 安全
-  * 关闭“您使用的是不受支持的命令行标记”：--test-type，其实有别的用处
+  * 管线：Skia是跨平台绘图引擎，老版叫Ganesh，且只能使用GL；新版叫Graphite，使用Dawn。WebGL基本相当于OpenGL，是跨平台的，老的叫OpenGL Desktop，后来精简为了OpenGL ES。ANGLE是个翻译层，将GL翻译成原生图形API。Dawn是WebGPU的底层实现，直接调用原生图形API。Dawn和ANGLE都支持多个backend驱动，其中SwiftShader是谷歌开发的用CPU模拟支持Vulkan和OpenGL ES的设备的驱动
+* 不受支持的
+  * 不显示“您使用的是不受支持的命令行标记”：--test-type，其实有别的用处
   * Disable site isolation (--disable-site-isolation-trials) 有人说会导致CF挑战不过。查看是否生效：chrome://process-internals
-  * 单进程 --single-process 必须启用skia或--disable-gpu才能正常显示，否则老版法使用右键和菜单，新版整个无法显示全白。一种也许受支持的类似方式：--renderer-process-limit=N
-  * --no-sandbox
-* Parallel downloading
+  * 单进程 --single-process 某些情况下必须启用skia否则无法显示界面或右键菜单崩溃，但仍然导致关闭浏览器时崩溃。一种也许受支持的类似方式：--renderer-process-limit=N 一般情况下不同标签页不共享渲染进程但共享GPU进程
+  * --no-sandbox 在单进程下已经隐含。查看：chrome://sandbox
 * Smooth Scrolling
-* Experimental QUIC protocol：考虑禁用
-* Auto picture in picture for video playback：考虑禁用
+* 考虑禁用：Experimental QUIC protocol、Auto picture in picture for video playback
+* Parallel downloading
 * 启用MV2：--disable-features=ManifestV2Unsupported,ManifestV2Disabled
 * Edge：Fluent overlay scrollbars、Experimental Web Platform features（默认显式禁用了）、New PDF Viewer
-* Ungoogled：No default browser check、Hide tab close buttons、Tab Hover Cards、Show avatar/people/profile button、SetIpv6ProbeFalse、Hide Fullscreen Exit UI、Hide Extensions Menu
+* Ungoogled：No default browser check、Hide tab close buttons、Tab Hover Cards、Show avatar/people/profile button、SetIpv6ProbeFalse、Hide Fullscreen Exit UI、Hide Extensions Menu、Auto picture in picture for video playback
+* --enable-features=RawDraw：目前用不了，https://crbug.com/330655403 ECS上可开
+* Direct Rendering Display Compositor：只支持安卓
+* Override software rendering list：某些老硬件和老驱动运行新功能有问题，启用此项后强行启用硬件加速
 * https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md https://peter.sh/experiments/chromium-command-line-switches/
 
 ### 忽略HSTS证书错误
@@ -220,7 +224,8 @@ setup.exe --uninstall --system-level --force-uninstall
 
 setup.exe --uninstall --msedgewebview --system-level --force-uninstall
 
-卸载上两者后EdgeCore会自动消失。但EdgeUpdate还在，要手动删。System32里还有一个Microsoft-Edge-WebView
+卸载上两者后EdgeCore会自动消失。但EdgeUpdate还在，要手动删。System32和WinSxS里还有一个Microsoft-Edge-WebView，这个不能删。
+新建EdgeCore和EdgeWebview文件夹可防止再被安装，但是某些第三方软件setup时还是会下载安装包
 ```
 
 ### HEVC扩展

@@ -359,7 +359,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * -m -p -k -P ./local url：镜像一个网页及其依赖文件放到./local里
 * 官方发布了64位exe：https://github.com/rockdaboot/wget2/releases/latest/download/wget2.exe
 
-### youtube-dl
+### youtube-dl、yt-dlp
 
 * -F：列出可用格式；-f使用指定格式，可指定数字或类型，一般手动指定-f best
 * --download-archive archive.txt：下载列表时保存已下过的，恢复更快，可用于会更新的播放列表
@@ -374,6 +374,7 @@ rpc-listen-all=true # 默认只允许本地回环访问
 * -a links.txt/-
 * 多线程下载单个视频：--external-downloader aria2c --external-downloader-args -x5
 * 获取播放列表里所有的网页链接：`youtube-dl -j --flat-playlist '播放列表链接' | jq -r '.id' | sed 's_^_https://youtu.be/_' > links.txt`
+* 修复了某些bug的FFmpeg：https://github.com/yt-dlp/FFmpeg-Builds
 
 ### rsync
 
@@ -410,18 +411,19 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 ## FFmpeg
 
 * 二进制：https://github.com/BtbN/FFmpeg-Builds https://www.gyan.dev/ffmpeg/builds/
-  * win 32位：https://github.com/defisym/FFmpeg-Builds-Win32/releases
+  * 32位：https://github.com/defisym/FFmpeg-Builds-Win32/releases
 * ffmpeg 全局参数 输入文件的参数 -i 输入文件 调整的参数 输出文件
   * -y 覆盖
   * 不加输出文件，可只查看元数据
   * -hide_banner隐藏编译参数，可用alias默认加上
   * 显示支持的格式：-formats、-codecs、-encoders（对应-c）
     * -h encoder=xxx 列出xxx的详细参数
-* 内部流程：文件首先用libavformat进行demuxing。如果需要进一步处理，用libavcodec进行decoding和libavfilter应用effect。用libavcodec进行encoding，再用libavformat进行muxing
+* 内部流程：首先用libavformat进行demuxing（如文件含有视频和音频，把它们分解出来）。如果需要进一步处理，用libavcodec进行decoding和libavfilter应用effect。用libavcodec进行encoding，再用libavformat进行muxing
   * 处理时的speed：如0.5x，表示每处理原视频1s需要花费2s
 * 转换视频编码（指定编码器）：-c:v libx265 -c:a copy
   * copy表示不重新编码加快速度，a表示音频。剪辑或仅更改容器时不要重新编码
   * 老版参数：-vcodec
+  * 为Web优化，将元数据放在开头：-movflags +faststart
 * 转换容器会根据输出文件后缀自动处理，编码也会自动猜测。支持将srt转换为ass
   * 视频转音频（去除视频流）：-vn -c:a copy，也可以直接保存成音频文件，还可以-map 0:a。去除音频流：-an
 * 压缩
@@ -434,20 +436,22 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * 码率(比特率)：-minrate 964K -maxrate 3856K -bufsize 2000K
     * 平均码率(abr)/目标码率：-b:v xxxk。不应直接使用，因为编码器只能猜测。一般再加-pass 2。不是固定码率(cbr)，是vbr
     * 在其他参数不变的情况下，码率*时长=文件大小
-  * 分辨率：-vf scale=480:-1 其中-1表示保持原比例。另一种参数：-s:v 854x480
-  * 帧率：-r 24
-* 裁剪一段：-ss start -to end 或 -t 经过。时间格式默认为秒，还可以是 00:01:30.500
+  * 分辨率：-vf scale=-1:480 其中-1表示保持原比例。另一种参数：-s:v或–resize 854x480
+  * 帧率：
+    * 可变帧率-fps_mode vfr -vf "fps=30"：如手机拍的视频、obs录屏、会议录制
+    * 固定帧率cfr：-r 24。把vfr转换成cfr会重复或丢弃帧。
+    * -fps_mode默认是自动，mp4就是cfr，mkv可以是vfr。以前叫-vsync
+* 处理
+  * 裁剪一段：-ss start -to end 或 -t 经过。时间格式默认为秒，还可以是 00:01:30.500
   * 截图：-ss 秒 -vframes 1 output.jpg
-* 合并：-i videos.txt -f concat。其中输入文件必须为每一行`file '片段名'`
-* 为Web优化，将元数据放在开头：-movflags +faststart
-* Filter：-filter:v或-vf "filter1=option1=value1:o2=v2,filter2"。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度、画文字
-* DeMuxer：如文件含有视频和音频，把它们分解出来就叫它。之后再Decode、按需要Filter、Encode
+  * 合并：-i videos.txt -f concat。其中输入文件必须为每一行`file '片段名'`
+  * Filter：-filter:v或-vf "filter1=option1=value1:o2=v2,filter2"。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度、画文字
 * AAC
   * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要--enable-nonfree；高质量用-vbr 4(约128k)，最大5。aac_at更好，但只有mac有
   * 默认的内置aac，比特率默认128k，高质量的考虑加-b:a 192k。它的vbr比cbr质量差
   * 格式：AAC-LC比HE-AAC好，只有码率<=32kb才用HE。内置aac只支持LE
   * 其他音频格式：Vorbis比FLAC和Opus好。不要用"vorbis"编码器，用"libvorbis"
-* 视频编码格式：AV1是比较好的，是VP9的继任，无版权问题。MPEG4 AVC和H264是一个东西，HEVC是H265，VVC是H266。MPEG-5(EVC)也比较新但可能没有硬件加速
+* 视频编码格式：AV1是比较好的，是VP9的继任，无版权问题，比HEVC压缩率高，解码性能差不多。MPEG4 AVC和H264是一个东西，HEVC是H265，VVC是H266；VVC比HEVC压缩率高很多但编解码性能差。MPEG-5(EVC)也比较新但可能没有硬件加速
   * H264又叫MPEG-4 Part 10。H262又叫MPEG-2 Part H
   * H264 Profile：不同设备的能力不同，有些功能也许难支持，比如10bit色深就要用Hi10P。老设备选Constrained Baseline或Main，设定用-profile:v baseline，ffmpeg默认High
   * libaom: AV1 encoder
@@ -457,18 +461,18 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * MP4：H264的标准封装格式，音频默认AAC。3GP是MP4的一种简化版本。MKV(Matroska video)和MP4差不多但有流媒体功能
   * WebM：开放的格式，MKV的子集，里面支持AV1 VP9。但音频是不常见的两种。u2b支持，无声。可用于“自适应流”
 * [硬件加速](https://trac.ffmpeg.org/wiki/HWAccelIntro)
-  * 解码器分为internal和external(standalone)，前者用-hwaccel xxx指定，后者以及编码器用-c:v指定，如h264_nvenc
+  * 解码器分为internal和external(standalone)，前者用-hwaccel xxx指定，后者以及编码器用-c:v指定
   * 列出可用的：-hwaccels
   * qsv：Intel Quick Sync Video 是一个宣传名字，不同代cpu支持不同特性。4代支持编解码H.264 MPEG-2，13代AV1
   * dxva2(D3D9)，d3d11va：只支持Win，解码H.264 MPEG-2 WMV3 AV1 HEVC
-  * cuda(NVENC/NVDEC/CUVID)：支持编解码。编译选项中要有--enable-cuda-llvm且编译环境中装了ffmpeg修改过的nv-codec-headers
+  * cuda(NVENC/NVDEC/CUVID)：支持编解码。编译选项中要有--enable-cuda-llvm且编译环境中装了ffmpeg修改过的nv-codec-headers。全流程用法：ffmpeg -vsync 0 -hwaccel cuda -hwaccel_output_format cuda -i xxx -c:a copy -c:v av1_nvenc
   * vulkan：只支持解码H.264 HEVC AV1
   * vaapi：Video Acceleration API，是intel qsv和AMD UVD/VCE的包装。好像只支持Linux
   * 对于x264+CPU，默认就会用SSE
-* 图片：包括是否无损、静态动态。WebP是JPEG的替代，也支持无损，也支持动画（VP8比特流）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
+* 图片：包括是否无损、静态动态。WebP是JPEG的替代，也支持无损，也支持动画（VP8比特流，可以算代替gif）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
   * 教程：https://github.com/leandromoreira/ffmpeg-libav-tutorial/blob/master/README-cn.md https://slhck.info/posts/
-  * 通用视频教程：https://guides.vcb-s.com/
+  * 通用视频教程：https://guides.vcb-s.com/ https://github.com/leandromoreira/digital_video_introduction/blob/master/README-cn.md
 * 带有解码器的mpchc：https://www.codecguide.com/download_kl.htm
 * 视频转换工具（ffmpeg的GUI）：https://handbrake.fr/ staxrip Medlexo魔力玄（闭源，小） https://github.com/jeanslack/Videomass
   * 特定任务的脚本：https://github.com/KnightDanila/BAT_FFMPEG
@@ -492,11 +496,14 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
     * “基地版”，自带虚拟显示器（连好后类似副屏） https://github.com/qiin2333/Sunshine
     * Sunshine是服务端。客户端用 https://moonlight-stream.org/ 最后支持32位的版本：6.0.1。手机端：https://github.com/Axixi2233/moonlight-android
     * 闭源fork，可能挂了：https://open-stream.net/
-    * https://github.com/VirtualDrivers/Virtual-Display-Driver
+    * https://github.com/VirtualDrivers/Virtual-Display-Driver 前面那些只能“复制”，装了这个相当于“扩展”
   * parsec：不开源。多个设备下载客户端登录同一个账户即可，也能分享，但必须登录现在被q了。如有NAT必须要打洞成功，一般来说至少要有一个有公网IP
   * gameviewer(网易UU远程)：目前免费。不支持文件传输
 * 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控、RadminLAN
-  * rustdesk：开源。它的服务端是用于各客户端交流的，设置里填“ID/中继服务器”；不部署也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行；修改文件名可预置服务器信息。支持32位
+  * rustdesk：开源
+    * 不部署服务端也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行。修改文件名可预置服务器信息。支持32位
+    * 搭建服务端：防火墙放开21114:21119/tcp、21116/udp；下载rustdesk-server，运行hbbr和hbbs，会生成密钥。客户端设置-网络-“ID/中继服务器”，填pub；被控端不需要填key，主控端不需要“启动服务”。不要运行setup，会下载webview且实际用不了，还会装nssm。Fork：https://github.com/lejianwen/rustdesk-server
+    * hbbr是中继服务器，如果打洞失败会使用。hbbs是ID服务器
 * 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
 * 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
 * Sysinternal的Remote Desktop Connection Manager：添加了TAB，适合需要切换多个服务器时使用
@@ -537,7 +544,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 ## ddrescue
 
 1. apt install gddrescue
-2. mount -t ntfs-3g -o ro /dev/sda1 /mnt/bad。AI说比ntfs3容忍度高
+2. mount -t ntfs-3g -o ro /dev/sda1 /mnt/bad。AI说比ntfs3容忍度高。ntfs3是Paragon提交给上游的驱动，它自己还有一个闭源的驱动，也提供免费功能受限版。ntfs-3g是FUSE用户空间驱动，Paragon的两个都是内核的。还有一个NTFSPlus驱动，后来就改名叫NTFS，也出了个v3，说是性能比ntfs3和3g好，基于内核里最老的只读NTFS驱动，开发者是做了exFAT支持的，说ntfs3维护不善
 3. ddrescue -n -r0 -d /path/to/bad/file /path/to/safe/saved_file /path/to/safe/log_file.map
   * -n No scrape，跳过损坏区域
   * -r0 不重试
@@ -572,3 +579,4 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
 * https://github.com/draios/sysdig
 * 终端文件管理：https://github.com/jarun/nnn https://github.com/sxyazi/yazi https://github.com/Canop/broot https://github.com/gokcehan/lf https://github.com/yorukot/superfile https://github.com/kamiyaa/joshuto
 * mail server：https://github.com/stalwartlabs/stalwart https://mailcow.email/
+* 运行win app：https://github.com/TibixDev/winboat

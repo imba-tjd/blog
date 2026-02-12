@@ -169,6 +169,7 @@ https://www.youtube.com/watch?v=y7ndUhdQuU8 https://www.youtube.com/watch?v=y9kS
 https://github.com/onqtam/awesome-cmake
 https://cmake.org/cmake/help/latest/command/target_sources.html
 install: https://github.com/ttroy50/cmake-examples/blob/master/01-basic/E-installing/CMakeLists.txt https://github.com/BrightXiaoHan/CMakeTutorial/blob/master/Installation/README.md
+https://cmake.org/cmake/help/latest/prop_tgt/UNITY_BUILD.html
 ```
 
 ## gcc
@@ -222,15 +223,15 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * 查看库导出的符号，但必须有调试符号：nm。加-C解码C++符号，-l列出源文件行号。类型T是本库实现的，U是引用外部的
   * 上面两条都支持：objdump -p
   * 查看库的架构（32位还是64位，解决ld: skipping incompatible xxx when searching for xxx）：objdump -f
-  * 用于dll的GUI：https://www.dependencywalker.com/depends22_x64.zip
+  * 用于dll的GUI：https://github.com/himeshsameera/Dependencies 老版：https://www.dependencywalker.com/depends22_x64.zip
 * 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
   * -fhardened 是其它几项的集合
   * -DFORTIFY_SOURCE 将memcpy等几个不安全函数替换为对应的_chk版本，=1时只在编译期检查，=2时在运行时检查，=3需gcc12消耗更多
   * -fstack-protector-strong 防止缓冲区溢出。默认--param ssp-buffer-size=8，只有缓冲区大小超过它时才会生成检查代码
   * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，会在启动时全部加载符号，可能影响性能
-  * -Wl,-z,noexecstack,-z,noexecheap 栈不可执行，exe和so都要使用，对应Win的DEP。好像有人说默认开了，用ProcessExplorer能看到
-  * -Wl,--dynamicbase,--high-entropy-va,--nxcompat Win的ALSR和DEP，前者对应pie和pic
+  * -Wl,-z,noexecstack,-z,noexecheap 栈不可执行，主程序和库都要使用。对应Win的DEP
+  * -Wl,--dynamicbase,--high-entropy-va,--nxcompat Win的ALSR和DEP，前者对应pie和pic。Win下64位进程默认已开
   * -fstack-clash-protection 代替-fstack-check 只在多线程时需要
   * -ftrapv 使得整数溢出时触发core dump，性能损耗大。另一种选择是-fwrapv
   * -fanalyzer 启用一些静态检查项，不支持C++
@@ -238,7 +239,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -fomit-frame-pointer 使得反编译和调试更困难
   * -z,nodlopen和nodump
   * -mmitigate-rop
-  * MSVC：/guard:cf。扩展了/GS缓冲区安全检查、数据执行防护DEP、地址空间布局随机化ASLR(/DynamicBase)。GCC不支持，LLVM16支持
+  * MSVC：/guard:cf 控制流防护。扩展了/GS缓冲区安全检查、数据执行防护DEP、地址空间布局随机化ASLR(/DynamicBase)。GCC不支持，LLVM16支持
 * sanitizer
   * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
   * ASan和TSan在MinGW上不可用，但MSYS的clang/llvm支持ASan
@@ -314,6 +315,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 * 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads但可以静态链接。win32版没有这些功能
 * Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc
 * v12 默认UCRT
+* mingw不能链接到vcruntime，而clang可以。非官方做法：github.com/trcrsired/windows-msvc-sysroot
 
 ### [TCC](https://download.savannah.gnu.org/releases/tinycc/)
 

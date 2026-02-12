@@ -346,6 +346,10 @@ Calliope o-- SpindlerBattery
   * Structural结构子类型，如TS。又称为Row、Duck typing
 * Kind
 
+## 画图
+
+* https://excalidraw.com/
+
 ## 参考
 
 * 《Java设计模式》刘伟

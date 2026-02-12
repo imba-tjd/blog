@@ -132,6 +132,7 @@ Span、Memory
 * System.Runtime.InteropServices.MemoryMarshal类的AsMemory静态方法允许把ReadOnlyMemory转换成Memory
 * 如果要改变Span里的数据，可用局部的ref变量：ref char first = ref span[0];。这样不会分配真正的变量，而是直接用类似于指针的方式，所以也许可以提升一点点性能；但ReadOnlySpan无法这样用，因为不允许改变内容
 * Memory用于异步方法和流，具有Span属性
+* CollectionsMarshal.AsSpan
 
 ```c#
 // 隐式转换或用AsSpan（只读）或传递给构造函数

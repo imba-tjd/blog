@@ -163,7 +163,6 @@ title: Git/GitHub笔记
 * git help -g：显示一些内置的教程，git help -a：显示所有的git命令
 * git update-ref -d HEAD：把所有的改动都放回local并清空所有的commit
 * git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/：以最后提交的顺序列出所有分支，无参使用显示所有分支和tag，包括远端的
-* git worktree add -B gh-pages public upstream/gh-pages：在当前分支的一个文件夹中checkout另一个分支
 * git rev-list --all | xargs git fgrep "xxx"：搜索所有历史中指定文字出现地点。git log -S/-G搜索指定内容在哪个提交中变动
 * 下载单个文件：https://graphite.dev/guides/git-clone-single-file
 
@@ -220,6 +219,15 @@ git stash branch STASHBRANCH # 然而untracked的无法pop，一种办法是此�
 * 适用于子仓库是独立封装好了的情形（模块/组件），只在父仓库中引用子仓库的某一个提交。在子仓库目录中时，就相当与在一个单独的仓库内，对父仓库完全不可见。push父仓库时不会push子仓库的代码；如果对子仓库（的引用）做了改变，会显示**一个**名字为子仓库名的**文件**改变了
 * subtree适用于进行系统级的开发的情形，会把子仓库的历史直接全部放到父仓库里（可squash为一个提交），但不会有子仓库的branch。大概相当于全部rebase到自己的仓库里。修改子仓库后在父仓库的status能直接看到
 * submodule is link, subtree is copy
+
+## worktree
+
+当需要同时处理多个分支，且有未commit的内容时使用，如review别人的代码。另一种用法：无关联的两个分支在同一个repo里（monorepo），如gh-pages。
+
+基本就是把分支单独建立一个文件夹，但共享.git。一个分支只能被检出到一个worktree，可以简单新建多个分支解决。
+
+1. git clone --bare xxx .git
+2. git worktree add main 对应main分支创建main文件夹。如果目标分支不存在会类似于switch -c。再加一个参数（如origin/dev或refs）指定要跟踪的分支
 
 ## 处理换行符
 
@@ -497,6 +505,10 @@ collapsable content
 
 * repo:user/repo
 * 排除文件：NOT path:/.+\.svg/
+
+## 其它工具
+
+* https://github.com/not-an-aardvark/lucky-commit
 
 ## 参考
 
