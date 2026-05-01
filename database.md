@@ -466,6 +466,7 @@ innodb_flush_method=linux下默认O_DIRECT，O_DIRECT_NO_FSYNC应该与innodb_us
   * 对应数据库级别或者所有连接，不是单个连接级别，且是持久的，关闭连接重新打开后还是此模式
   * 不支持NFS
   * WAL2：需从源码分支编译。能避免长时间写入导致日志没有机会清除，实现方式是创建两个日志文件，运行checkpoint时先切换到另一个日志，后续写入就不会使用老日志
+  * 在运行时db-wal文件不会自动缩小大小，但完成checkpoint后会复用空间；一般持续增大是由于长读事务。手动缩小用PRAGMA wal_checkpoint(TRUNCATE);或VACUUM
 * 其他工具
   * rqlite：Go，使用SQLite作为储存，与原版SQLiteAPI完全不同，本身是HTTP API，官方提供了多种语言的库
   * dqlite：只支持Linux，官方只有Go的库，没看懂怎么启服务端。由Ubuntu的公司维护
