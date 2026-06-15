@@ -58,7 +58,7 @@ class A {
 
 ### SpinLock
 
-只有定时器精度不够时才用。等待时间不应超过10ms，否则可能会因为线程切换错过。
+只有定时器精度不够时才用。等待时间不应超过10us，否则可能会因为线程切换错过。
 定时器精度：老机器是15.625ms，现在一般10ms，台式机1ms，手动设置最小0.5ms，设置高优先级可以提高。影响Sleep()
 如果想保证实时性还需要低负载、无页面文件切换。有好几个定时器，有的调精度是系统全局的，调小了会费电。一般直接用高精度的定时器API
 
@@ -109,3 +109,4 @@ try {
 * https://zhuanlan.zhihu.com/p/46673002 看到 使用Monitor来同步
 * https://zhuanlan.zhihu.com/p/345492089 https://zhuanlan.zhihu.com/p/349503079 https://devblogs.microsoft.com/dotnet/an-introduction-to-system-threading-channels/ System.Threading.Channels
 * list.SyncRoot
+* IAsyncEnumerable、EnumeratorCancellation

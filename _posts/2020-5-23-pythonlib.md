@@ -96,6 +96,7 @@ except ImportError:
   * 单模块：根下只有一个.py
   * 手动指定：[tool.setuptools] packages或py_modules = ["mypkg"]
 * 显示详细的构建信息：DISTUTILS_DEBUG=1
+* TODO: pyproject不再用console_scripts了。总之看https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
 
 ```py
 [build-system]
@@ -510,7 +511,7 @@ cached_se = CacheControl(requests.session()) # 指定文件缓存：cache=cachec
 * POST x-www-form-urlencoded：给urlopen或req传data=parse.urlencode(dict).encode('ascii')，此方法一定程度上也能用于构建GET的查询参数字符串
 * 似乎没有办法做出浏览器的URL编码的方式：把空格编码为%20，把中文用UTF8编码后每个加上%，其余的特殊字符不变。urllib3 requests不会对URL自动编码
 * 支持HTTP_PROXY
-* 默认超时20秒
+* 默认超时20秒。默认会进行重定向
 
 ```py
 req = urllib.request.Request(url, headers={...}) # 应可复用
@@ -518,6 +519,8 @@ with urllib.request.urlopen(req/url) as resp # 返回类型是个无意义的私
 text = resp.read().decode();
 resp.getheader('xxx')/getheaders();headers.xxx()有少量提取charset和contenttype等内容的函数且是dict-like且大小写不敏感
 resp.getcode()、resp.info().get_content_charset()
+
+urllib.request.urlretrieve(url, saved_filename) 直接下载为文件
 
 urllib.parse：
 quote() 用于编码?k=v中的v，会编码所有特殊字符除了斜杠；逆过程为unquote()；还有quote_plus()会把空格编码为+而非%20
@@ -779,7 +782,7 @@ def update_item(item_id: int, item: Item): # 自动把非路径参数从body中�
 * 不以`/`结尾的路由会自动重定向，`/{xxx}`时/后必须有内容否则不会匹配，不匹配时返回Not Found文本
 * Route还可以设置name，之后可用request或app.url_for获取那个名字的url
 * 使用类：继承starlette.endpoints.HTTPEndpoint，定义get等方法
-* 自带一些中间件：gzip、httpsredirect
+* 自带一些中间件：gzip、httpsredirect。第三方：https://github.com/TypeError/secure
 * Config封装了.env的读取
 * taoufik07/responder是一个基于Starlette的类似于Flask的框架，但依赖太多，这么重不如用别的框架，也不活跃
 * TODO：https://www.starlette.io/schemas/
@@ -1021,6 +1024,7 @@ for row in cur.tables(tableType='table'): # 显示所有用户定义的表名
 * 变量的声明和赋值
 * 返回值
 * 持续时间
+* 同类项目：birdseye
 
 ```py
 @pysnooper.snoop(normalize=True)
@@ -1186,6 +1190,7 @@ ffi.cast("int", 2)
 * AOT：运行时不再需要numba，但仍需要numpy
 * 函数中用了isinstance()“重载”：@generated_jit
 * 特化对数组类似于卷积运算的情形：@stencil
+* 其它项目：https://github.com/facebookincubator/cinderx/tree/main/cinderx/Docs https://github.com/exaloop/codon
 
 ## 定时任务和任务队列
 
@@ -1321,7 +1326,6 @@ ret = hc.ResponseText
 * decorator：更方便地创建装饰器
 * 操控浏览器：playwright-python Splinter pyppeteer selenium crawlee
 * pyinstrument：使用简单的profile工具
-* birdseye：调试工具，与pysnooper是同类的
 * https://github.com/JaidedAI/EasyOCR
 * wrapt：方便写装饰器，自动处理方法
 * joblib：有三个功能，一是透明硬盘缓存，二是并行计算，三是快速二进制序列化

@@ -74,12 +74,13 @@ $(filter 模式, 列表)
 * 项目组织形式：include与src同级。include/项目名/xxx.h放公开接口，被install后会放在/usr/local/include里因此要加项目名，使用者用<项目名/xxx.h>
 * 各个版本新增的特性：https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/chapters/intro/newcmake.html
 * CMAKE_CXX_COMPILER_LAUNCHER=ccache 可以-D或用环境变量
+* cmake的-D与编译器的-D不同，前者是设定CMakeLists的变量
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 17) set(CMAKE_CXX_STANDARD_REQUIRED ON) # 后者不设置时若编译器不支持会自动降低版本
 set(CMAKE_CXX_EXTENSIONS OFF) # 默认on，表示启用GUN扩展。这些需要在project之前设置
-project(hello VERSION 1.0)  # 产生PROJECT_NAME、PROJECT_SOURCE_DIR。还有CMAKE_SOURCE_DIR表示根目录，BINARY_DIR一般就是build。CURRENT表示当前目录，若当前不存在project语句时PROJECT目录就为上层的。LANGUAGE默认为C和CXX。还有VERSION x.y.z DESCRIPTION HOMEPAGE_URL
+project(hello VERSION 1.0)  # 产生PROJECT_NAME、PROJECT_SOURCE_DIR。还有CMAKE_SOURCE_DIR表示最顶层根目录，CMAKE_CURRENT_SOURCE_DIR为当前CMakeLists.txt所在的目录，BINARY_DIR一般就是build。CURRENT表示当前目录，若当前不存在project语句时PROJECT目录就为上层的。LANGUAGE默认为C和CXX。还有VERSION x.y.z DESCRIPTION HOMEPAGE_URL
 
 add_executable(${PROJECT_NAME} main.cpp utils.cpp)  # 生成exe，第一个参数是文件名
 
@@ -100,19 +101,20 @@ target_include_directories(hello_library  # 相当于-I。第一个参数是目�
 
 target_link_libraries(hello_binary  # 相当于-l。target不存在时会寻找系统库
     PRIVATE  # 目标是exe时一般用PRIVATE，是库时如果依赖在头文件里出现了则用PUBLIC，只在cpp里出现则用PRIVATE
-        hello_library # 会自动引入它的PUBLIC和INTERFACE的-I的内容
+        hello_library # 会自动引入它的target_include_directories的PUBLIC和INTERFACE的-I内容
 )
 
 target_compile_definitions(hello
-    PRIVATE MYMACRO=1  # 相当于-DMYMACRO=1；此条也兼容加-D
+    PRIVATE MYMACRO=1  # 相当于编译器-DMYMACRO=1；此条也兼容加-D
 )
 target_compile_options
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEX2" CACHE STRING "Set C++ Compiler Flags" FORCE)  # 全局参数，FORCE表示忽略命令行调用时-D的覆盖，STRING是类型，后面那个是注释
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEX2" CACHE STRING "Set C++ Compiler Flags" FORCE)  # 用CACHE表示全局参数，FORCE表示忽略“缓存”中已设定的值，STRING是类型，后面那个是注释
 # 还有CMAKE_C_FLAGS CMAKE_LINKER_FLAGS。可以在cmake命令行时加-D设定
 
 
 find_package(Boost 1.46.1 REQUIRED COMPONENTS filesystem system) # 另一个支持CMAKE且被install了的包
-源码依赖：add_subdirectory()
+源码依赖：把带有CMakeLists.txt的项目放在一个文件夹里，add_subdirectory()
 下载GitHub的内容：https://cmake.org/cmake/help/latest/module/FetchContent.html
 
 添加预编译的库：
@@ -130,7 +132,7 @@ else()  # 不用REQUIRED时手动处理不存在的场景
     message (FATAL_ERROR "Cannot find Boost")
 endif()
 
-option (USE_MYMATH  # 是set BOOL类型的简写，另外能在图形化配置或cmake -LH中显示出来
+option (USE_MYMATH  # 是set CACHE BOOL的简写。是“先入为主的默认值”设定，当此选项已经被设定时（查看CMakeCache.txt是否存在），option会什么也不做，自动无效。另外能在图形化配置或cmake -LH中显示出来
        "Use provided math implementation" ON)
 if (USE_MYMATH) ... endif()
 
@@ -177,14 +179,10 @@ https://cmake.org/cmake/help/latest/prop_tgt/UNITY_BUILD.html
 * gcc -o如果没有后缀，会自动加exe；touch也是这样
 * 链接过程中，需要进行符号解析，并且是按照顺序解析；如果库链接在前，就可能出现库中的符号不会被需要，链接器不会把它加到未解析的符号集合中，那么后面引用这个符号的目标文件就不能解析该引用，导致最后链接失败。因此链接库的一般准则是将它们放在命令行的结尾
 * [ccache](https://github.com/ccache/ccache)缓存编译信息
-* -Ofast开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
 * /bin/gcc-10、/bin/gcc、/bin/x86_64-linux-gnu-gcc
-* -flto：编译和链接都要用，与make -j同时用或自动多线程时加=auto，-fno-fat-lto-objects能减少生成时间但无法进行普通链接，只需在编译时用，没看懂默认是否启用。clang支持=thin比普通的更好
-* -march指定代码能运行的最小CPU，默认x86-64；设为native可能就等于skylake这样，就可能不能运行在其它机器上。-mtune默认generic，改成native可生成为本机优化的代码
 * -g等于-g2，-g3还会包含宏定义体积更大，-g0禁用前面的-g，-ggdb(3)产生仅限于gdb的信息，-Og保留调试信息且优化。-gsplit-dwarf能减少一些体积，把信息放到dwo文件中，能提升链接速度，但无法与-flto一起使用
 * -###为dry-run，能显示具体编译用到的命令
 * --help=xxx能显示更多选项帮助，在前面加-Q改为看是否启用
-* -s：去掉符号信息
 * --include：相当于`#include`，与-I无关
 * -rdynamic：使得可执行程序也导出符号，只在Linux下有效
 
@@ -205,7 +203,7 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 
 * Linux
   * .a是静态库，由多个.o组成，编译时当作.o附加到参数中就是
-  * .so是动态库，需要-L指定库存在的文件夹，当前目录也不可省，再-l库名
+  * .so是动态库，需要-L指定库存在的文件夹，当前目录也不可省，再-l库名（L和l顺序重要）
   * -l也支持静态库但优先用动态的，可在前面加-Wl,-Bstatic优先用静态的
   * 一般库都以lib开头，-l时省略前缀和后缀。-l:可精确指定名字
   * 指定产物运行时要搜索的动态库目录：`-Wl,-rpath='$ORIGIN'`，此变量表示可执行文件的目录，Linux默认不会寻找；若用.或:列表中为空则表示CWD。另外还可用LD_LIBRARY_PATH和LD_PRELOAD
@@ -214,9 +212,10 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * so的链接顺序是有要求的，被依赖的要放在前面，相互依赖要用--start-group；允许存在同名符号，会使用先找到的
 * Windows
   * .lib是静态库，.dll是动态库
-  * 另有一种dll，函数符号在lib中，虽然类型为T但没有实现，还会再生成一个`__imp_`开头的I符号，实现在dll中。MinGW产生用-o example.dll -Wl,--out-implib=libexample.a。使用时将它当作.o编译
+  * 另有一种dll，函数符号在lib中，虽然类型为T但没有实现，还会再生成一个`__imp_`开头的I符号，实现在dll中。MinGW产生用-o example.dll -Wl,--out-implib=libexample.dll.a。使用时将它当作.o编译
     * 对于现在的MinGW，作为使用者，用上面这条、把dll当作.o、用-l，产生的效果一样
     * 假如两个库ab，a依赖b，在编译a时可以自己生成.o，但必须要引用b才能生成dll
+    * msys的dll文件命名中含有-0，表示ABI版本；而.a中没有，引用.a方便自动转到-0
   * MinGW的-lxxx的搜索顺序：libxxx.dll.a xxx.dll.a libxxx.a cygxxx.dll libxxx.dll xxx.dll
 * 工具
   * 查看程序所依赖的共享库：ldd
@@ -224,12 +223,13 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * 上面两条都支持：objdump -p
   * 查看库的架构（32位还是64位，解决ld: skipping incompatible xxx when searching for xxx）：objdump -f
   * 用于dll的GUI：https://github.com/himeshsameera/Dependencies 老版：https://www.dependencywalker.com/depends22_x64.zip
-* 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效
+* 理论上MinGW可以直接链接.lib的，但32和64不能通用。lib转a可以见：https://stackoverflow.com/questions/11793370/how-can-i-convert-a-vsts-lib-to-a-mingw-a ，但我试了一下无效。AI说可以用Clang-cl
 * 增强安全性的参数：https://gist.github.com/jrelo/f5c976fdc602688a0fd40288fde6d886 https://security.stackexchange.com/questions/24444
   * -fhardened 是其它几项的集合
   * -DFORTIFY_SOURCE 将memcpy等几个不安全函数替换为对应的_chk版本，=1时只在编译期检查，=2时在运行时检查，=3需gcc12消耗更多
+  * -D_GLIBCXX_DEBUG 检查 vector/string 越界、迭代器失效
   * -fstack-protector-strong 防止缓冲区溢出。默认--param ssp-buffer-size=8，只有缓冲区大小超过它时才会生成检查代码
-  * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，会在启动时全部加载符号，可能影响性能
+  * -Wl,-z,relro使得GOT部分只读，再加,-z,now全部只读，（控制动态符号绑定时机）会在启动时全部加载符号。缺点：无法在程序运行过程中通过修改GOT表来动态地“劫持”函数、无法动态修补；后者可能影响启动时的性能，但稍微有利于运行时性能，推荐再加-fno-plt
   * -Wl,-z,noexecstack,-z,noexecheap 栈不可执行，主程序和库都要使用。对应Win的DEP
   * -Wl,--dynamicbase,--high-entropy-va,--nxcompat Win的ALSR和DEP，前者对应pie和pic。Win下64位进程默认已开
   * -fstack-clash-protection 代替-fstack-check 只在多线程时需要
@@ -240,19 +240,41 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
   * -z,nodlopen和nodump
   * -mmitigate-rop
   * MSVC：/guard:cf 控制流防护。扩展了/GS缓冲区安全检查、数据执行防护DEP、地址空间布局随机化ASLR(/DynamicBase)。GCC不支持，LLVM16支持
+  * -fcf-protection=full
 * sanitizer
   * -fsanitize=undefined -fsanitize-trap 发生未定义行为时调用gdb
-  * ASan和TSan在MinGW上不可用，但MSYS的clang/llvm支持ASan
-  * -fsanitize=thread 检测数据竞争
-  * -fsanitize=cfi Control Flow Integrity
+  * 基本都不能在MinGW上用，但MSYS的clang/llvm支持ASan
+  * -fsanitize=address 检测 越界、use-after-free、double free、栈溢出。hwaddress只有x86-64才能用，开销小
+    * pointer-compare、pointer-subtract
+  * -fsanitize=leak 内存泄漏。会覆盖malloc
+  * -fsanitize=thread 检测数据竞争。不能与ASan同用
+  * -fsanitize=cfi Control Flow Integrity 仅LLVM
+  * 组合多个：逗号
 * 现在的编译器对未定义行为优化得太多了，但写底层代码时又时又无法避免。此时就要加-fno-strict-aliasing和-fwrapv
 * Linux允许多个库存在相同的符号，会使用先链接的那一个，即命令中的链接顺序会影响结果。Win会报错
-* 减少体积
-  * -Wl,--as-needed
-  * -s或-Wl,--strip-all 去掉所有符号和重定向信息，相当于strip -s。-Wl,--strip-debug或-S去掉调试符号
-  * -Wl,-dead_strip 好像只有lld支持
-  * -ffunction-sections -fdata-sections -Wl,--gc-sections 可能阻止一些优化
 * 不要用-lpthread，而是-pthread。TODO:mingw有个-mthreads，看起来是用的win运行库，且添加了线程安全异常处理，但会自动-lmingwthrd
+* pkg-config：将系统中已安装的库变为编译所需的CFLAG。如`g++ main.cpp $(pkg-config --cflags --libs opus)`
+
+### 优化
+
+* -Ofast开启最高优化，包含O3和ffast-math等，但可能产生不符合标准的行为
+* -flto 编译和链接都要用
+  * -fno-fat-lto-objects 不再生成普通链接的机器码，仅生成lto链接专用的GIMPLE，减少编译时间。只需在编译时用。Clang默认就是no-fat的，GCC默认是fat的
+  * =auto 自动并行化。必须把mingw32-make改名为make否则报警只能顺序处理。可以与make一同用，会与Jobserver共享“令牌”，不超过-j指定的
+  * clang支持=thin比普通的更快、内存占用更低，优化上限略低
+* -march 为某些CPU优化，默认x86-64。设为native就像对应skylake，就可能不能运行在其它机器上。隐含了-mtune
+* -pipe 加快编译速度
+* PGO：首次编译-fprofile-generate，运行，再次编译-fprofile-use -freorder-functions
+* make -j
+* llvm-bolt
+* 减少体积
+  * -Wl,--as-needed 如果某个-l没有用到，则从依赖列表里剔除。要写在源文件后、-l前
+  * -s或-Wl,--strip-all 去掉所有符号和重定向信息，相当于strip -s。仅去掉调试符号：-Wl,--strip-debug或-S
+  * -Wl,-dead_strip 好像只有lld支持，AI说等效gc-sections
+  * -ffunction-sections -fdata-sections -Wl,--gc-sections 前者是后者的前提，会导致中间文件内容增多（编译链接慢体积大）。可能会误删动态调用的符号
+  * -Wl,--icf=safe gcc的ld不支持。合并完全相同的函数。不清楚默认值是all还是不启用。需配合ffunction-sections
+* 查询开关是否启用：gcc -O2 -Q --help=optimizers
+* -fwhole-program：当要生成可执行文件而不是库时使用，要把所有用到的源文件都放在编译参数里，且一般要开lto，否则会报找不到符号。隐含fvisibility=hidden，当本程序有被其他程序回调的符号（dlopen）时不能用
 
 ### 超级静态的编译
 
@@ -297,23 +319,26 @@ gcc和g++都是driver，它们会调用cpp、cc1、cc1plus等。
 
 ### MinGW
 
+* https://github.com/redpanda-cpp/mingw-lite 比niXman小。下 mingw64_v2-win32。带有中文语言，删掉share\locale里其它语言
 * https://github.com/brechtsanders/winlibs_mingw/releases 下x86_64-posix-seh-*.7z 没有pretty-printer(#2)，有ucrt cmake objc
 * http://www.equation.com/servlet/equation.cmd?fa=fortran 线程模式为win32。安装必须用它的程序，可以自己解压但不能直接复制，因为内部用了bzip2，env文件控制自动添加PATH。有32位
+* https://github.com/niXman/mingw-builds-binaries 有ucrt
 * https://gcc-mcf.lhmouse.com/ 小文件太多；有ucrt
-* https://github.com/niXman/mingw-builds-binaries https://github.com/RoEdAl/ucrt-mingw-builds 有ucrt。后者不更新了
-* https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3。有32位
 * https://nuwen.net/mingw.html
-* https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 下载对应包的File，解压tar.zst。只下gcc的还不够，也许下gcc的Dependencies就行了
+* https://packages.msys2.org/group/mingw-w64-ucrt-x86_64-toolchain 需要在msys2的环境里用
 * https://gitee.com/qabeowjbtkwb/x86_64-w64-mingw32-gcc-native-toolchain 也有Linux下运行的编译到Win的
 * https://musl.cc/ 有一套交叉编译到Linux的
 * https://www.ed-x.cc/manual.html 国产，优化了某些工具的性能。下下来有一些别的组件，g++编译出来默认会报找不到libstdc++-6.dll
 * https://github.com/skeeto/w64devkit/releases 解压后很小，只有c c++，有busybox
 * https://github.com/mmozeiko/build-gcc-mingw 比较小，有lto，无pretty-printing
 * https://osdn.net/projects/mingw/releases/ MinGW32，只能用mingw-get-setup.exe这个在线安装器，因为各个组件都分散了。不如用TDM-GCC-32
-* https://github.com/redpanda-cpp/mingw-lite
+* https://jmeubank.github.io/tdm-gcc/ 自动添加系统级别的PATH，目前最新10.3。有32位
 * __MINGW64_VERSION_STR定义了它自己的版本
-* 线程模式：posix提供std::thread std::mutex，依赖libwinpthreads但可以静态链接。win32版没有这些功能
-* Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc
+* **线程模式**
+  * posix提供std::thread mutex future，依赖libwinpthreads但可以静态链接
+  * win32版：GCC12支持不提供那几个库，13后也支持了，且无额外dll依赖，但mutex高竞争时性能差。还有mcfgthread版也可以
+  * 许多ucrt版只提供posix线程，但mingw-lite可以看到存在win32线程的
+* Linux下运行编译到Win的：gcc-mingw-w64-x86-64-win32，Ubuntu需要2204，Debian要bullseye(11)，命令行为x86_64-w64-mingw32-gcc。Debian13提供gcc-mingw-w64-ucrt64，命令行为x86_64-w64-mingw32ucrt-gcc
 * v12 默认UCRT
 * mingw不能链接到vcruntime，而clang可以。非官方做法：github.com/trcrsired/windows-msvc-sysroot
 

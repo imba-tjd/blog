@@ -5,6 +5,7 @@ category: linux
 
 * https://pkgs.org 搜索多个发行版的软件包
 * /usr/local/bin 存放不在包管理器里的程序，一般是自己编译的
+* 各软件镜像源：https://help.mirrorz.org/ 自动换源脚本：https://github.com/SuperManito/LinuxMirrors
 
 ## APT
 
@@ -186,7 +187,7 @@ gem install bundler # 也能用apt装，但是会装一大堆依赖，包括gcc�
 ## 不在包管理器中的软件
 
 * [chafa](https://github.com/hpjansson/chafa)：在终端中显示图像，支持gif，不过是像素化显示的
-* [browsh](https://github.com/browsh-org/browsh)：基于文本的运行于终端的浏览器，图片是像素化显示的
+* [browsh](https://github.com/browsh-org/browsh)：基于文本的运行于终端的浏览器，图片是像素化显示的。新软件效果更好：Carbonyl，基于Chromium，但不更新了
 * [deepin-wine-ubuntu](https://github.com/wszqkzqk/deepin-wine-ubuntu)：安装后可安装微信QQ
 * VSC 32bit：https://go.microsoft.com/fwlink/?LinkID=760680 官方最后的版本是1.35.1
 * [uGet](https://ugetdm.com/)：图形化下载工具，开源但不在GitHub上
@@ -469,7 +470,7 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * vulkan：只支持解码H.264 HEVC AV1
   * vaapi：Video Acceleration API，是intel qsv和AMD UVD/VCE的包装。好像只支持Linux
   * 对于x264+CPU，默认就会用SSE
-* 图片：包括是否无损、静态动态。WebP是JPEG的替代，也支持无损，也支持动画（VP8比特流，可以算代替gif）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
+* 图片：包括是否无损、静态动态。WebP是JPEG的替代（Chrome145支持JPEG-XL），也支持无损，也支持动画（VP8比特流，可以算代替gif）。AVIF支持动图（基于AV1技术），在线转换：https://go-avif.com/
 * 文档：https://ffmpeg.org/documentation.html https://trac.ffmpeg.org/wiki
   * 教程：https://github.com/leandromoreira/ffmpeg-libav-tutorial/blob/master/README-cn.md https://slhck.info/posts/
   * 通用视频教程：https://guides.vcb-s.com/ https://github.com/leandromoreira/digital_video_introduction/blob/master/README-cn.md
@@ -501,9 +502,9 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * gameviewer(网易UU远程)：目前免费。不支持文件传输
 * 自带内网穿透，个人免费不开源：teamviewer、anydesk、向日葵、todesk（商业化严重）、RayLink（延迟低，画质低）、AskLink连连控、RadminLAN
   * rustdesk：开源
-    * 不部署服务端也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行。修改文件名可预置服务器信息。支持32位
-    * 搭建服务端：防火墙放开21114:21119/tcp、21116/udp；下载rustdesk-server，运行hbbr和hbbs，会生成密钥。客户端设置-网络-“ID/中继服务器”，填pub；被控端不需要填key，主控端不需要“启动服务”。不要运行setup，会下载webview且实际用不了，还会装nssm。Fork：https://github.com/lejianwen/rustdesk-server
-    * hbbr是中继服务器，如果打洞失败会使用。hbbs是ID服务器
+    * 不部署服务端也能用免费的且不用注册，也可直接填IP。控制和被控都是客户端，可单文件运行。修改文件名可预置服务器信息。客户端支持32位，下sciter版（另一个UI框架）
+    * 搭建服务端：防火墙放开21115-21119/tcp、21116/udp；下载rustdesk-server，运行hbbr和hbbs，会生成密钥。客户端设置-网络-“ID/中继服务器”，填pub；被控端不需要填key，主控端不需要“启动服务”。不要运行setup，会下载webview且实际用不了，还会装nssm。Fork：https://github.com/lejianwen/rustdesk-server
+    * hbbr是流量中继服务器，如果打洞失败会使用。hbbs是ID服务器
 * 异地组网，之后可用微软RD。收集见gist的Cloud中的NAT traversal && DDNS.md和tun.txt
 * 挂了的：Quasar。收费：RealVNC、Splashtop。其他不考虑的：nomachine
 * Sysinternal的Remote Desktop Connection Manager：添加了TAB，适合需要切换多个服务器时使用

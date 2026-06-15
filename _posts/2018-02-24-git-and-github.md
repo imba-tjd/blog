@@ -379,21 +379,24 @@ collapsable content
 ## License
 
 * 各种协议对比 https://choosealicense.com/appendix/ 首页是按需求选择协议的Guide
-* 开源理论
-  * https://www.gnu.org/licenses/gpl-faq.zh-cn.html
-  * https://opensource.org/faq
-  * Selling Exception(Richard Stallman)：如mysql和x264.org/licensing和Qt，开源版只有一个GPL协议，也允许使用者付费选择专有许可证。RMS说这不是双重许可(dual licensing)，后者一般指软件中带有两种协议，使用者可以任意选择一种或都传递
-  * copyleft：要求软件的修改版必须同样以自由软件的形式发布，这条限制与四条核心自由并不冲突。如GPL就是copyleft的，MIT不是。与之相对的是permissive，如MIT，允许任何人进行专有再分发。它们都是开源许可证
-  * free software和open source理论上指的是同一件事，都指自由开放，而不只是可以看源代码而不能改。但实践中人们觉得开源只需源代码可用，GNU反对用开源这个词，说它们指同一类软件，但对于运动，它们关注的重点不同
-  * proprietary software(works)专有软件：是非自由软件的子集。专有软件的所有者可以决定是否可以分发该软件，而自由软件可以被任何持有者随意分发
-    * 最终用户许可协议(EULA)中列出使用条款
-    * CC的NC不是专有软件，是非自由软件。专有软件可以是闭源软件，也可以是源代码可用软件
-  * attribution/giving credit：署名
-  * freeware不是free software，前者是价格免费，通常是专有闭源的
 * https://fossa.com/developers-guide-open-source-software-licenses
 * 修改license：经过所有contributors（copyright author）同意即可，无论改成更宽容的还是更严格的，也可以双重许可
 * TODO：什么是专利，开源协议和专利之间的关系
 * SourceAvailable：https://github.com/nmap/npcap?tab=License-1-ov-file
+
+### 开源理论
+
+* https://www.gnu.org/licenses/gpl-faq.zh-cn.html
+* https://opensource.org/faq
+* Selling Exception(Richard Stallman)：如mysql和x264.org/licensing和Qt，开源版只有一个GPL协议，也允许使用者付费选择专有许可证。RMS说这不是双重许可(dual licensing)，后者一般指软件中带有两种协议，使用者可以任意选择一种或都传递
+* copyleft：要求软件的修改版必须同样以自由软件的形式发布，这条限制与四条核心自由并不冲突。如GPL就是copyleft的，MIT不是。与之相对的是permissive，如MIT，允许任何人进行专有再分发。它们都是开源许可证
+* free software和open source理论上指的是同一件事，都指自由开放，而不只是可以看源代码而不能改。但实践中人们觉得开源只需源代码可用，GNU反对用开源这个词，说它们指同一类软件，但对于运动，它们关注的重点不同
+* proprietary software(works)专有软件：是非自由软件的子集。专有软件的所有者可以决定是否可以分发该软件，而自由软件可以被任何持有者随意分发
+  * 最终用户许可协议(EULA)中列出使用条款
+  * CC的NC不是专有软件，是非自由软件。专有软件可以是闭源软件，也可以是源代码可用软件
+* attribution/giving credit：署名
+* freeware不是free software，前者是价格免费，通常是专有闭源的
+* open watcom是OSI承认的开源协议，但不认为是自由的：它要求即使只是“私下部署”修改后的软件，也必须公开源代码
 
 ### 具体协议
 
@@ -439,6 +442,7 @@ collapsable content
 * gh repo view user/repo -w -b dev
 * gh repo fork：无参时必须在本地repo中调用，用于fork之前clone到本地的非自己repo并自动把origin改成upstream；如果带user/repo参数，则相当于fork并clone，支持depth
 * gh api repos/:owner/:repo --jq '.full_name, .description'
+* 拉取某个pr的最新提交：git fetch origin pull/*pr_id*/head:pr/*pr_id*
 
 ## readme渲染顺序
 
@@ -493,13 +497,6 @@ collapsable content
 * 考虑屏蔽js.sentry-cdn.com因为太慢了
 * 精确代码智能感知：Go、TS/JS、C/C++、Java，需要上传LSIF数据
 * 类似网站：https://grep.app/ 很快但只索引一部分仓库。https://bloop.ai 桌面端，带有AI解释代码库
-
-## Copilot
-
-* 问答模式：前一行写//q: 问题，下一行就会回答
-* 多个任务：注释写1. 2.
-* 行内快速问答：Ctrl+I
-* GitHub Copilot Labs：提供一些预定义场景的功能，如代码翻译（Convert this from A to B; A version ...; END; B version），TS自动声明变量类型，添加文档等
 
 ## GitHub Search
 

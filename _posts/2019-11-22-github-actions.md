@@ -132,6 +132,10 @@ ${{ github.workspace }}
 { "cgroup-parent": "/actions_job" }
 ```
 
+## Bot
+
+* https://www.coderabbit.ai/ 帮忙review PR
+
 ## 收集
 
 * fregante/setup-git-user

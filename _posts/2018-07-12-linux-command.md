@@ -69,6 +69,7 @@ title: Linux命令
   * 另一种查看命令行的方式：cat /proc/pid/cmdline | tr '\0' ' '
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
 * nethogs、nload：显示网速
+* https://github.com/pranshuparmar/witr Why is this running，显示进程的fork链来源、CWD、开始时间、监听端口等
 
 ## 文件处理
 
@@ -95,24 +96,30 @@ title: Linux命令
 
 ### find
 
-* `find path -name '*.txt' -exec wc -l {}\;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件
-* -name仅匹配基本名，不匹配路径
-* -type指定文件类型，f为普通文件，l为链接文件，d为文件夹
-* -not -path：排除目录；默认会搜索隐藏目录，但好像不能递归排除；还有个-prune更快
-* -size +1m：大于1M的文件
-* -mtime -1：一天之内修改的；atime 访问时间，ctime 创建时间
-* -print0：与xargs -0配合用
-* -delete：直接删除找到的文件
-* -maxdepth：最大搜索深度
-* exec的结尾必须有\;或';'，这样设计是因为后面可以再加给find的参数，如可以有多个exec。fd保留了此行为，只不过如果确实只有一个-x且在最后则可省
-* 进入当前目录下所有子文件夹分别执行命令：`find . -maxdepth 1 -type d ! \( -name ".*" -o -name "System Volume Information" -o -name '$RECYCLE.BIN' \) -exec ./script.sh {} \;`
+* find path options action。如find . -name '*.txt'
+* -name 仅匹配基本名，不匹配路径
+* -type 指定文件类型。f普通文件，d文件夹，l链接文件
+* 排除目录：`-path "./要排除的目录" -prune -o \( 真正的匹配条件 \)`。默认不会排除隐藏目录
+* -mtime -1：一天之内修改的；atime 访问时间，ctime 创建时间。-size +1m：大于1M的文件。-maxdedth 1：只搜索当前目录下的文件
+* 逻辑表达式：括号分组、-not 或 ! 对后面的取反、-o 表示or。默认多个条件是and
+* Action
+  * 一个Action只会绑定到前一个条件（组）上
+  * -print0：后跟xargs -0配合，正确处理特殊字符文件名
+  * -delete：直接删除找到的文件
+  * -ls
+  * exec
+    * `find .(path) -name '*.txt' -exec wc -l {} \;` ：统计txt文件有多少个，其中{}会被依次替换成找到的文件
+    * exec的结尾必须有\;或';'且要与前面的命令有空格。这样是因为后面可以再加给find的参数，如可以有多个exec或其他Action。fd当只有一个-x且在最后则可省
+    * 另一种选择：+代替分号。会把所有结果拼接为一条命令的多个参数，类似于xargs。而分号每有一行结果就会执行一次命令
 * https://www.zhihu.com/question/487213837
 
 #### fd
 
-* fd abc相当于`find -iname '*abc*'`，第二个参数指定开始搜索的根目录
-* 模式默认为正则，-g改为glob
-* 模式只存在小写字母时大小写不敏感，有大写字母时自动变为大小写敏感
+* 安装：Debian在fd-find包中，安装后的二进制名为fdfind
+* 模式
+  * fd abc相当于`find -iname '*abc*'`，第二个参数指定开始搜索的根目录
+  * 模式默认为正则。-g改为glob
+  * 模式只存在小写字母时大小写不敏感，有大写字母时自动变为大小写敏感
 * 默认忽略点开头文件和gitignore中的文件，用-HI分别禁用前后者，其中禁用前者会搜到.git里的文件
 * 无参使用会递归列出所有文件，相当于模式用`.`
 * -t/--type
@@ -120,8 +127,7 @@ title: Linux命令
 * 默认只匹配文件名(基本名)，指定-p匹配路径
 * -x并行执行外部命令，每项都执行一次；-X执行一次外部命令，把所有项当作那一次的参数；-i交互模式每次执行前询问，-j指定并行数。占位符支持{.}路径去扩展，{/}文件名带扩展，{//}父目录，{/.}文件名无扩展；不存在时默认在最后加一个{}
 * -E排除路径，为glob
-* 原生不具有-delete功能
-* Debian在fd-find包中，安装后的二进制名为fdfind
+* 无-delete功能
 
 ### 压缩/解压
 

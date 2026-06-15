@@ -259,6 +259,7 @@ docker run -it --rm -p 3000:80 --name myappcontainer myapp
 * ngen update
 * 需要管理员权限
 * 本机映像生成在C:\Windows\assembly中
+* 另一个适用于fx4.6.2+的native image优化技术：安装 Microsoft.DotNet.Framework.NativeImageCompiler，平台不能设置为anycpu。编译后可能放在 obj\x86\Release\R2R\DesktopApp1.exe 也可能就是同一二进制文件。不过此技术发布后就不更新了
 
 ## bflat
 

@@ -111,7 +111,6 @@ title: 浏览器
 * https://github.com/Noitidart/Chrome-Store-Foxified：让FF使用Chrome的扩展商店
 * History Master：统计历史访问的网页的数据
 * 云盘万能钥匙
-* https://github.com/lqzhgood/wechat-need-web 让微信网页版可用
 
 ### 主题
 
@@ -131,12 +130,13 @@ title: 浏览器
 
 ### 安装包
 
-* https://static.centbrowser.cn/win_stable/
+* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/ 其中exe包会静默安装
+* https://centbrowser.cn/
 * 适用于老系统：https://github.com/win32ss/supermium
 * 便携版：https://github.com/henrypp/chrlauncher
-* 无谷歌服务版：https://ungoogled-software.github.io/ungoogled-chromium-binaries/ 其中exe包会静默安装
 * https://github.com/RobRich999/Chromium_Clang https://thorium.rocks/ 后者集成了前者的某些patch
 * 禁止自动更新：C:\Program Files\Google\Update文件夹 改名，但不会阻止下载新版安装包
+* https://github.com/imputnet/helium 宣传以隐私保护为重点
 
 ### 快捷键
 
@@ -167,10 +167,10 @@ title: 浏览器
 * 考虑禁用：Experimental QUIC protocol、Auto picture in picture for video playback
 * Parallel downloading
 * 启用MV2：--disable-features=ManifestV2Unsupported,ManifestV2Disabled
-* Edge：Fluent overlay scrollbars、Experimental Web Platform features（默认显式禁用了）、New PDF Viewer
+* Edge：Fluent overlay scrollbars、Experimental Web Platform features（默认显式禁用了）、New PDF Viewer。Show autofill signatures好像要启用它才能自动生成密码。Enable Compose (AI-writing) on the web。Edge Copilot Mode。Edge Journeys。NewTabPagePrerender
 * Ungoogled：No default browser check、Hide tab close buttons、Tab Hover Cards、Show avatar/people/profile button、SetIpv6ProbeFalse、Hide Fullscreen Exit UI、Hide Extensions Menu、Auto picture in picture for video playback
 * --enable-features=RawDraw：目前用不了，https://crbug.com/330655403 ECS上可开
-* Direct Rendering Display Compositor：只支持安卓
+* Direct Rendering Display Compositor (drdc)：只支持安卓
 * Override software rendering list：某些老硬件和老驱动运行新功能有问题，启用此项后强行启用硬件加速
 * https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md https://peter.sh/experiments/chromium-command-line-switches/
 
@@ -225,11 +225,37 @@ setup.exe --uninstall --system-level --force-uninstall
 setup.exe --uninstall --msedgewebview --system-level --force-uninstall
 
 卸载上两者后EdgeCore会自动消失。但EdgeUpdate还在，要手动删。System32和WinSxS里还有一个Microsoft-Edge-WebView，这个不能删。
-新建EdgeCore和EdgeWebview文件夹可防止再被安装，但是某些第三方软件setup时还是会下载安装包
+新建EdgeCore和EdgeWebview文件可防止再被安装，但是某些第三方软件setup时还是会下载安装包
 ```
 
 ### HEVC扩展
 
 * ms-windows-store://pdp/?ProductId=9N4WGH0Z6VHQ
-* https://bbs.pcbeta.com/forum.php?mod=redirect&goto=findpost&ptid=2053927&pid=57246099 https://zhuanlan.zhihu.com/p/1972401403990381624
+* https://bbs.pcbeta.com/forum.php?mod=redirect&goto=findpost&ptid=2053927&pid=57246099 https://zhuanlan.zhihu.com/p/1972401403990381624 https://www.free-codecs.com/hevc_video_extension_download.htm
 * 实测对于媒体播放器，装制造商的这个扩展无法生效。对于浏览器，好像Chrome现在已经支持了，Edge好像在gpu里也能看搜到，即使没装扩展
+* 测试
+  * 查看状态：about:media-internals
+  * https://rbuj.net/ 不支持media-internals。用API测试而非真实视频
+  * 不测试hevc，不支持media-internals https://systemdiagnose.com/tools/codec-support/
+  * 测多种色深，但基本是软解的 https://academysoftwarefoundation.github.io/EncodingGuidelines/tests/codec_web_tests/codec_web_test.html
+  * 仅hevc视频源：https://lf3-cdn-tos.bytegoofy.com/obj/tcs-client/resources/video_demo_hevc.html
+* 验证是否硬解：https://github.com/StaZhu/enable-chromium-hevc-hardware-decoding/blob/main/README.zh_CN.md
+  * 实测在装了扩展的前提下，ungoogled-chromium能硬解hevc，且about:gpu中的decode没有任何显示，media-internals里显示的和edge不同。根据文章所说，其实Edge用了扩展，而chromium用的是与本地VLC一样的。好像gpu里如果有则对应VideoToolbox
+* https://webcodecsfundamentals.org/datasets/codec-support-table
+
+## 开发扩展
+
+* https://www.zhihu.com/question/20179805
+* https://zhuanlan.zhihu.com/p/25711435
+* https://developer.chrome.com/docs/extensions/
+* https://github.com/tjx666/awesome-chrome-extension-boilerplate
+* https://github.com/Sneezry/chrome_extensions_and_apps_programming
+* https://www.plasmo.com/
+* https://github.com/xuejianxianzun/PixivBatchDownloader https://github.com/hanydd/BilibiliSponsorBlock
+* https://github.com/xifangczy/cat-catch
+* https://github.com/wxt-dev/wxt
+* https://github.com/microsoft/MicrosoftEdge-Extensions
+
+## K-Meleon
+
+http://kmeleonbrowser.org/download.php 点中间的Download，点第一个STICKY的链接。解压后点Preference(F2)，点第一个GUI Apperance，选中文
