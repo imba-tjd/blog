@@ -1,20 +1,27 @@
-https://github.com/waydabber/BetterDisplay
-
-软件站：https://xclient.info/
-
 缺点：https://www.bilibili.com/video/BV1p4YCz8Ezx
 
-卸载工具：PearCleaner、腾讯柠檬、https://github.com/tw93/Mole
+优点：
 
-解压：keka
+* 续航长，离电不掉性能
+* 某些剪辑软件对触摸板手势有定制
 
-通知隐藏：Ice
+## 软件
 
-鼠标滚轮：mos
+* 允许任何来源的应用程序：sudo spctl --master-disable。“安装包已损坏”：xattr -cr xxx
 
-允许任何来源的应用程序：sudo spctl --master-disable。“安装包已损坏”：xattr -cr xxx
+### 系统
 
-视频播放器：IINA
+* 通知隐藏：Ice
+* 鼠标滚轮：mos
+* https://github.com/waydabber/BetterDisplay https://github.com/MonitorControl/MonitorControl
+
+### 应用
+
+* 软件站：https://xclient.info/
+* 卸载工具：PearCleaner、腾讯柠檬、https://github.com/tw93/Mole
+* bt下载器：transmission
+* 视频播放器：IINA
+* 解压：keka
 
 # ipad
 

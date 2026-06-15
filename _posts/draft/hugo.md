@@ -44,9 +44,8 @@ slug: xxx # 永久链接，默认等于文件名
 * https://github.com/google/docsy
 * https://themes.gohugo.io/hugo-theme-terminal/ 暗色
 * https://themes.gohugo.io/hugo-papermod/
-* https://themes.gohugo.io/hugo-eureka/ 国产，首页有头图，有TOC
 * https://themes.gohugo.io/hugo-clarity/ nav锁定，有侧边栏和分类
-* https://github.com/wowchemy/wowchemy-hugo-modules
+* https://github.com/HugoBlox/kit
 
 
 https://github.com/marketplace/actions/hugo-setup

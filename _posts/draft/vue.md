@@ -300,7 +300,7 @@ vue未来（3.6+）不会全量生成，而是更精细化地生成响应式代�
 * 官方各UI列表：https://ui-libs.vercel.app/
 * 星数较多：Vuetify MD风格、daisyUI 基于Tailwind
 * 国产：NaiveUI、ElementPlus、AntDesignVue
-* quasar：用同一套代码同时开发桌面端和移动端应用
+* quasar：用同一套代码同时开发桌面端和移动端应用。不漂亮
 * primefaces/primevue
 * 小众：balmjs/balm-ui antoniandre/wave-ui epicmaxco/vuestic-ui varletjs/varlet MD风格
 

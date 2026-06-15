@@ -1,3 +1,5 @@
+# Excel
+
 Excel打开csv乱码：使用U8-with-BOM保存csv
 
 SUMIF(
@@ -54,3 +56,75 @@ DATEDIF(开始日期, 结束日期, 间隔单位) 计算两个日期之间的差
 页面布局：横向。高度、宽度：一般一个选自动，另一个选1页。每一张纸都出现标题：打印标题 - 顶端标题行，横向时选第一列
 
 https://www.youtube.com/watch?v=Vl0H-qTclOg
+
+# PowerPoint
+
+选择重叠对象：开始 - 右边的选择 - 选择窗格
+
+文字输出到Word：文件 - 导出 - 创建讲义 - 只使用大纲。但实测是空白的
+
+将多个图片插入PPT，一整页一张：插入 - 相册。提取所有图片：改为zip，在media文件夹里
+
+主题：设计。右边“变体”可统一调整颜色、字体等
+
+字体嵌入文件：文件 - 选项 - 保存。启用后再保存一次PPT
+
+SmartArt：先插入文本框，给二级文本用tab缩进。选择文本框或文本，开始 - 转换为SmartArt
+
+单屏进入演示模式：Alt + F5
+
+## 母版
+
+视图 - 幻灯片母版；在最上面的母版里添加图片会应用到所有幻灯片里；选某版式，第一个菜单，勾上“隐藏背景图形”可在该版式里隐藏母版的背景。
+
+下面是版式，相当于子模板。使用：开始 - 第二块“幻灯片”菜单 - 版式。
+
+跨PPT文件复制粘贴，默认不复制母版。选择“保留源文件”可复制版式库。
+
+## 图片格式
+
+颜色 - 重新着色
+
+压缩图片：包括删除裁剪区域、更改分辨率。可应用于单个或所有图片
+
+裁剪 - 裁剪为形状。如平行四边形。F4：重复上一步操作
+
+安排多个图片：选中 - 图片版式。其实就是把图片填充进SmartArt占位符里
+
+背景：设计 - 设计背景格式 - 图片 - 插入 - 下方应用到全部。
+如果勾上“将图片平铺为纹理”，则当图片小于幻灯片大小时会重复，一般只有专用于平铺的图片才用。
+取消勾选时，会保持图片缩放比，按长宽中的一边适配到幻灯片大小，选取图片中间的区域。选项中的“偏移”实际上是拉伸/压缩图片，而不是平移；解决方法：先普通地插入图片，放到想要的位置后裁剪，再复制到剪贴板，插入时选择剪贴板。
+
+## 快捷键
+
+复制：Ctrl + 左键。平行移动、按比例缩放：Shift。快捷键版格式刷：Ctrl + Shift + C/V
+段落居中对齐：Ctrl + E
+组合对象：Ctrl + G。取消组合：Ctrl + Shift + G
+
+## 素材
+
+* 图片
+  * https://pixabay.com/zh/
+  * https://www.pexels.com/zh-cn/
+  * https://unsplash.com/
+  * https://www.freeimages.com/cn
+  * https://magdeleine.co/ 以户外摄影为主
+  * https://picjumbo.com/
+  * https://pxhere.com/
+  * https://www.hippopx.com/
+* 图标
+  * https://roundicons.com/vector-free-icons/
+  * https://undraw.co/illustrations 单人画的比较具体的动作
+  * https://www.streamlinehq.com/free
+  * https://igoutu.cn/
+  * https://www.iconfont.cn/ 阿里的
+  * 品牌logo：https://www.60logo.com/ https://svglogo.top/ https://worldvectorlogo.com/zh
+  * https://pictogram2.com/?lang=en 人类形象图形
+* 模板
+  * https://www.officeplus.cn/
+  * https://www.islide.cc/ppt/template?filters=content-category.free
+  * https://www.51pptmoban.com/
+
+## 参考
+
+* 和秋叶一起学

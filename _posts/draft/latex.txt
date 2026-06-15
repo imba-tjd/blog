@@ -1,0 +1,307 @@
+在线编译：https://www.latexlive.com/ https://www.overleaf.com 左下角设置修改编译器
+本地：https://miktex.org “自动安装缺少的包”推荐选是。更新-检索源-更改-下一步，选择镜像站。还要装https://strawberryperl.com/ 。如果不能联网：用TexLive，每年发布一个稳定的全量包5-7G
+VSC：LaTeX Workshop、Utilities。设置：Out Dir设为build，Auto Clean选onFailed。双侧预览时，在右边按Ctrl，双击，左边会跳转到对应位置
+编译器：原始latex不推荐用。pdfLaTeX是最稳定的但对于中文支持差。XeLaTeX是中文和现代的首选。LuaLaTeX是pdfLaTeX的官方继任
+
+教程：https://zhuanlan.zhihu.com/p/426376935
+
+```
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+
+\title{...}
+\author{...}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents 生成目录
+\listoffigures、\listoftables 插图清单、表格清单
+
+\begin{abstract} ... \end{abstract}
+
+大标题：\part{xxx}。显示效果：Part I 换行 内容。不同documentclass显示效果不同，有的此项会占单独一页。毕业论文一般不用
+章：\chapter{内容}。显示效果：第一章 内容。且居中。不同chapter之间可能会多一整个空白页，有的又没有，因为它默认按“右页（奇数页）起始”排版
+编号标题，节：\section{内容}。显示效果：1 内容。如果用了chapter，则变为1.1
+小标题：\subsection{内容}。显示效果：1.1 内容
+\paragraph{内容}	段落标题。显示效果：顶格加粗放大文本，不会换行。不出现在toc中。代替手动加粗+空格的“伪标题”
+\newpage	强制分页
+
+\appendix
+
+附录部分
+
+\end{document}
+
+其它类型的文档：beamer类似于ppt。\usetheme{metropolis}。\begin{frame}、columns
+```
+
+
+
+
+```
+特殊字符：$, %, #, &, _, {, }。如果不写进$里，会报错：Missing $ inserted
+
+数学模式：特殊字符、忽略空格
+行内公式：$ ... $
+单行块公式：$$ ... $$ 需amsmath包，不自动换行。实际上推荐用 \[ ... \]
+
+下标：_
+上标：^
+
+注释：%
+
+有序列表：\begin{enumerate} \item 第一项 \item 第二项 \end{enumerate}。修改样式为括号：[label=(\arabic*)]
+无序列表：{itemize}
+
+小空格：\,
+强制空格：\空格
+
+加粗：\textbf
+
+\texttt{} 文本模式，修改样式为等宽字体
+行内代码块：\verb|xxx|，其中xxx不能含有|，如果有，可换为\verb@xxx@
+
+脚注：\footnote{内容}，正文中自动变为上标编号，页面底部出现对应的内容
+```
+
+
+```
+放大最左右的括号以适配内容：\left(内容\right)
+省略号：\ddots
+波浪号：\textasciitilde。不是\~，这是重音符号，会在下一个字符上加波浪
+```
+
+格式：
+
+
+```
+纸张横向：
+\usepackage{landscape}
+\begin{landscape} ... \end{landscape}
+
+调整页边距：
+\usepackage[margin=45mm]{geometry}
+```
+
+插入图片：
+
+一般将图导出为svg或pdf
+
+```
+\usepackage{graphicx}
+
+\includegraphics[选项如缩放]{文件名}
+
+\newcommand{\figref}[1]{\hyperref[#1]{图~\ref*{#1}}} % 让 图 x 之间有空格且不换行，且点击整体都能跳转
+
+详细设定：
+
+% 在正文中
+\begin{figure}[ht]     % h 表示尽量放在此处 (here)，如果放不下，则放到下一页的顶部t；还可指定底部b、独立页p；它们可以连用，不能只用h，全用会避免大空白，但p又可能导致单独占一页；还有个!表示放宽默认美观限制，当图片被拉走时可以试试。\usepackage{float}提供H强制“就在这里”
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/architecture.png} % 宽度为文本宽度的 80%，不指定时会用图片本身的大小基本不行
+    \caption{图标题} % 还会自动生成图注，如"图 1-1 图标题"，且用它才能自动收集图清单
+    \label{fig:arch}     % 用于引用的标签
+\end{figure}
+% 引用图片：如 \figref{fig:arch} 所示
+```
+
+插入表格：
+https://www.tablesgenerator.com/
+
+```
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|l|}
+        \hline
+        ID & 描述 \\ \hline
+        01 & 用户登录 \\ \hline
+        02 & 数据处理 \\ \hline
+    \end{tabular}
+    \caption{表格标题}
+    \label{tab:func}
+\end{table}
+
+|c|l| 表示两列，c居中，l左对齐，竖线分隔样式。宽度取决于单元格最小宽度，不会自动换行。
+p{2cm} m{2cm} 显式设定宽度，使得文本能换行。后者垂直居中，来自array包
+
+调大行距：\renewcommand{\arraystretch}{1.5}
+
+水平垂直居中：
+\usepackage{array}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
+
+单元格内换行：好像要makecell。以下为不可行的：
+\newline，会导致\centering无法按预期水平居中。
+\\ 第二列无法垂直居中。似乎无法用于longtable还是ltablex
+
+--------------
+
+\usepackage{longtable} % 跨页表格，不再乱跑。好像预设调大了行距
+
+\begin{longtable}{|C{3cm}|m{11cm}|}
+\caption{标题}\label{...} \\
+\hline
+\textbf{表头1} & \textbf{表头2} \\ \hline
+\endfirsthead  % longtable专用
+
+\hline
+\textbf{表头1} & \textbf{表头2} \\ \hline  % 此为跨页时显示的头，一般设为一样的，不设置则没有
+\endhead
+
+
+\hline
+\endlastfoot  % 最后一行数据不要加\hline，否则跨页时可能存在额外一个横线的问题
+
+列1值 & 列2值
+\\ \hline
+
+列1值 & 列2值
+\\
+
+\end{longtable}
+
+--------------
+
+\usepackage{ltablex} = longtable + tabularx 的融合实现
+\keepXColumns 列宽度不因跨页重新计算
+\renewcommand{\tabularxcolumn}[1]{m{#1}} 修改X为垂直居中
+\newcolumntype{Y}{>{\centering\arraybackslash}X} 水平居中的X
+
+\begin{tabularx}{\textwidth} 功能：自动换行。如果列中有X，则不会超出边界
+
+使用X列说明符自动换行，但不会水平居中。用>{\centering\arraybackslash}X
+
+不需要自动换行的：c说明符，列宽。普通tabular就支持
+
+如果不需要跨页表格，而需要换行，则tabularx外必须加table来浮动，否则无法使用caption。
+
+----------------
+
+中间没有横线分隔，只有表头有横线，且中间无竖线分隔的表：booktabs
+提供\toprule \midrule \bottomrule 粗细比\hline有区别。
+手动创建粗分隔符：\noalign{\hrule height 1pt}
+
+```
+
+参考文献 (BibTeX)
+
+```
+1. 创建一个 .bib 文件如 ref.bib
+2. 从 Google Scholar 或知网导出 citation 为 BibTeX 格式
+3. 在 .tex 中引用
+
+% 导言区或文档末尾
+\bibliographystyle{ieeetr} % 参考文献样式
+\bibliography{ref}         % 关联 ref.bib 文件
+% 正文中
+这是一个重要的观点 \cite{smith2020ai}。
+```
+
+文件模块化：
+
+```
+thesis/
+├── main.tex          (主文件，只负责引用)
+├── chapters/
+│   ├── intro.tex
+│   ├── method.tex
+│   └── conclusion.tex
+├── figures/          (图片资源)
+├── refs.bib          (参考文献)
+└── thesis.pdf        (输出结果)
+
+\input{chapters/intro} 相当于粘贴。路径为相对于main.tex
+\include{filename} 强制分页。前后都会自动插入 \clearpage。会生成 filename.aux 文件存储引用信息。不可嵌套，不能在 \include 的文件里再 \include。预览时只编译指定部分从而加速：在最前面 \includeonly{filename}
+```
+
+代码块：
+
+```
+无颜色：verbatim
+
+\usepackage{xcolor}
+\usepackage{listings} // 纯 LaTeX 实现，有颜色
+
+% 全局样式设置
+\lstset{
+    language=Python,                % 默认语言
+    basicstyle=\ttfamily\small,     % 基本字体（等宽）
+    keywordstyle=\color{blue},      % 关键字颜色
+    commentstyle=\color{green!60!black}, % 注释颜色
+    stringstyle=\color{red},        % 字符串颜色
+    showstringspaces=false,         % 不显示字符串中的空格
+    numbers=left,                   % 行号位置
+    numberstyle=\tiny\color{gray},  % 行号样式
+    stepnumber=1,                   % 行号间隔
+    frame=single,                   % 边框
+    breaklines=true,                % 自动换行
+    extendedchars=true,             % 扩展字符
+    inputencoding=utf8,             % 输入编码
+    % 注意：listings 对中文注释支持不好，建议代码中尽量避免中文注释
+}
+
+直接使用：
+\begin{lstlisting}[caption={Python 示例代码}, label={code:python}]
+def hello():
+    print("Hello World")
+\end{lstlisting}
+
+引用文件：
+\lstinputlisting[
+    language=Python,
+    caption={核心算法实现},
+    label={code:algo},
+    firstline=10,   % 可选：只显示第 10 行开始
+    lastline=50     % 可选：只显示到第 50 行
+]{src/core_algorithm.py}
+
+
+最漂亮，底层调用 Python 的 Pygments 库进行高亮，需-shell-escape：
+
+\usepackage{minted}
+\usepackage[most]{tcolorbox}
+\setminted{fontsize=\small,breaklines} % 在空格处换行
+
+%\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=My Code] % 前两项为默认配置，还可用\newtcolorbox创建配置
+\begin{tcolorbox}[breakable] % 当长度过长时允许换页
+\begin{minted}{kotlin}
+<代码内容>
+\end{minted}
+\end{tcolorbox}
+```
+
+数学：
+
+```
+分数 a/b：\frac{a}{b}
+求和 0到9：\sum_{n=0}^9
+极限 n趋向无穷：\lim_{n\to\infty}
+积分 从a到b：\int_a^b
+
+\usepackage{amsmath}
+三重积分符号 \iiint
+向量符号 \vec，点乘 \cdot
+
+矩阵：
+\begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+\end{bmatrix}
+```
+
+中文支持：
+
+```
+选择一，对于pdfLaTex：
+\usepackage{CJKutf8}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+
+选择二，XeLaTex：
+\usepackage{xeCJK}
+可选 \setCJKmainfont{Source Han Serif SC}、sans、mono
+```

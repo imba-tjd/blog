@@ -118,7 +118,12 @@ Ntdll.dll
 
 解决“获得了Ring0就攻破了系统”的问题，允许一个小的只实现了少量功能的内核，放关键服务。
 
-虚拟机之前在Ring0跑自己的hypervisor。启用VBS后，只允许hyper-v作为唯一的根hypervisor，其它虚拟机要用它的API
+虚拟机之前在Ring0跑自己的hypervisor。启用VBS后，只允许hyper-v作为唯一的根hypervisor，其它虚拟机要用它的API。
+
+HVCI <- VBS <- HyperV <- 硬件虚拟化 前者依赖后者。Win10把HyperV拆分，让家庭版也能用VBS/WSL2。\
+HVCI是VBS的一个功能，VBS还有Credential Guard。\
+Devie Guard：之前是一个概念/整体方案，现在已经整合进VBS。\
+内核隔离：算是WD的一个页面入口，里面就是HVCI的开关，也许未来有更多开关，但目前二者可认为相同。
 
 ```
            Hypervisor (VTL2)
@@ -126,7 +131,7 @@ Ntdll.dll
  VTL1 (Secure World)
    - Secure Kernel (Ring0)
    - Credential Guard secure storage
-   - HVCI runtime
+   - HVCI runtime （内存完整性）
    - Key & policy components
    - Isolated User Mode (IUM) 进程
 -------------------------------------------
@@ -162,38 +167,107 @@ Ntdll.dll
 
 * 用cppwinrt从winmd生成头文件
   1. curl -L https://www.nuget.org/api/v2/package/Microsoft.Windows.CppWinRT -o cppwinrt.zip
-  2. cppwinrt -input local -output out -optimize
-* mingw链接：-lwindowsapp，需-std=c++20。无需-lole32 -lruntimeobject -loleaut32
-* 先调用winrt::init_apartment()
-* 常用工具：check_hresult()、`create_instance<IT>(guid_of<T>(), CLSCTX_ALL)`替代CoCreateInstance、__uuidof
-  * winrt::handle safeHandle { fun_that_returns_HANDLE(); }; if (!safeHandle) {return 1;} fun_accept_handle(safeHandle.get())
+  2. cppwinrt -input local -optimize
+* issues/1289说cppwinrt处于maintenance模式。fork：https://github.com/YexuanXiao/cppwinrtplus
+* mingw编译参数：-lwindowsapp -std=c++20。无需-lole32 -lruntimeobject -loleaut32；有时需-luuid
+* 代替vcruntime：https://github.com/Chuyu-Team/VC-LTL5/blob/master/Readme.osc.md
+
+### 常见写法、代替老版
+
+```cpp
+init_apartment(apartment_type::single_threaded) <- CoInitializeEx(nullptr, COINIT_MULTITHREADED)
+
+check_hresult()、check_bool() <- RETURN_IF_FAILED（逻辑与check_bool相反）、RETURN_LAST_ERROR_IF、RETURN_IF_WIN32_BOOL_FALSE
+
+create_instance<IT>(guid_of<T>(), CLSCTX_ALL) <- CoCreateInstance、__uuidof
+
+winrt::com_ptr<T> <- wil::com_ptr_nothrow
+ptr.put()：接受**T的函数参数
+
+winrt::handle safeHandle { fun_that_returns_HANDLE(); }; // 之后再初始化：attach()
+if (!safeHandle) {return 1;}
+fun_accept_handle(safeHandle.get())
+
+WaitForSingleObject(event.get(), INFINITE);SetEvent/ResetEvent(event.get()) <- event.wait()
+
+wil::unique_hlocal_string get() -> winrt::hstring c_str()
+
+iUnknown.as<T>() <- iUnknown.copy_to(&x)
+
+wil::critical_section推荐用std::mutex
+
+class C : public RuntimeClass< RuntimeClassFlags< ClassicCom >, FtmBase, IActivateAudioInterfaceCompletionHandler > -> winrt::implements<LoopbackCapture,IActivateAudioInterfaceCompletionHandler>
+Make<C>() -> winrt::make_self<C>()
+
+
+try {
+    app()
+} catch (const winrt::hresult_error& e) {
+    std::cerr << "HRESULT error: 0x" << std::hex << static_cast<uint32_t>(e.code()) << " - " << u8(e.message().c_str()) << "\n";
+} catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << "\n";
+}
+
+
+命名冲突：props
+```
 
 ## API
 
 * CommandLineToArgvW：把一行命令（一个U16字符串）解析成argv和argc
 * GetBinaryType：判断exe是32位还是64位的，但对dll无效
 * GetCurrentProcess：返回值是-1，表示当前进程对象的伪句柄。为了与将来的操作系统兼容最好调用本函数而不是硬编码
-* Socket：用winsock2.h和ws2_32.dll，别用wsock32.dll
-  * 如果要用Win的扩展，如IOCP：mswsock.h
-  * 头文件必须在windows.h之前include
-  * 从17063(可能是2018)后支持Unix socket（AF_UNIX）。提供双向关闭语义，而命名管道没有。类型仅支持流(SOCK_STREAM)，寻址格式支持pathname；abstract实际上不支持，unnamed因为socketpair不存在而基本不支持
 * -DNOMINMAX，要在包含windows.h前定义
 * -DWIN32_LEAN_AND_MEAN：当不使用COM时定义，能加速；会排除加密、DDE、RPC、Shell、Socket。还有一些其他选项如NOCOMM，但好像如果优化开高就区别不大了
 * `_WIN32_WINNT`和WINVER：MinGW64目前默认为0xa00(Win10)，MinGW.org的为0x500(Win2000)。NTDDI_VERSION：比前者划分得更精细
 * NOMINMAX
 * WSAGetLastError：现在没用了，就用普通的GetLastError即可
 * 现在的Windows不存在global heap，GlobalAlloc和LocalAlloc是废弃的。应该使用HeapAlloc等
-* 某些帮助库：https://github.com/microsoft/wil
+* 某些帮助库：https://github.com/microsoft/wil 不支持mingw。有网友提了一些贡献。未来也许加-fms-extensions可以用
+* 可能chcp65001仅影响控制台函数和文件IO，而无法影响GUI
+* ntdll未公开API：https://github.com/Chuyu-Team/MINT
 
 ### 错误码
 
 * 合集：https://learn.microsoft.com/zh-cn/windows/win32/debug/system-error-codes
   * 输入数字自动匹配可能的：https://www.magnumdb.com/ 国内ip访问会404
   * Microsoft错误查找工具：输入后自动多次尝试分辨是不是HRESULT、十六进制转换等
-  * FORMAT_MESSAGE_FROM_SYSTEM：https://learn.microsoft.com/zh-cn/windows/win32/api/winbase/nf-winbase-formatmessage
 * 0xc0000135：缺失DLL
 * 0xc0000139：定位符号失败，如将MSVC的DLL与MinGW的exe链接到一起
 * WSAGetLastError() 返回的socket错误码从10000开始：https://learn.microsoft.com/zh-cn/windows/win32/winsock/windows-sockets-error-codes-2
+
+#### FormatMessage
+
+A版本不支持检测chcp。结果自带`\r\n`。
+
+```cpp
+std::string format_win32_error(DWORD code) {
+    LPWSTR buffer;
+    DWORD cnt = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, code, 0, (LPWSTR)&buffer, 0, nullptr);
+    if (cnt == 0) return "Unknown Error";
+    std::string msg = ansi(buffer);
+    LocalFree(buffer);
+    return msg;
+}
+```
+
+#### wchar_t -> ansi/u8自适应
+
+标准库本来有转换函数的，但因为不可靠，废弃了。不能混用cout和wcout，且实测直接用wcout什么也不能输出。
+
+```cpp
+inline std::string ansi(const wchar_t* w) {
+    int len = WideCharToMultiByte(GetConsoleOutputCP(),0,w,-1,nullptr,0,nullptr,nullptr);
+    std::string s(len-1,0);
+    WideCharToMultiByte(GetConsoleOutputCP(),0,w,-1,s.data(),len,nullptr,nullptr);
+    return s;
+}
+inline std::string ansi(std::wstring w) {
+    return ansi(w.c_str());
+}
+
+winrt::to_hstring()、to_string()但仅为U8无法为ANSI。hstring(L"")，hs.c_str()->const wchar_t*
+```
 
 ## 时间片、定时器相关概念
 
@@ -202,7 +276,7 @@ Ntdll.dll
 * Resolution分辨率：最小增长（或distinguishable可分辨）的单位。Unix是1ms，Win1803后是1ms，之前是16ms
 * 对于时间来说和精度不完全相等但相近，因为超过分辨率的精度感觉没意义，低于分辨率的精度等效于低分辨率。如int具有32位精度，1分辨率
 * quantum量程，即CPU最小时间片，与调度相关。在高级系统设置-性能-高级里如果选后台服务则会增加，WinServer默认后台。不清楚与Resolution是否是同一概念
-* 计时器类型：TSC时间戳计时器（CPU提供，不精确，速度快），HPET高精度事件计时器（一般在南桥中），PMT平台计时器（主板芯片组上，访问开销大，作为保底；唤醒时使用），RTC实时时钟（BIOS记录现实时间，精度为秒级，CMOS电池供电断电不丢失）。QueryPerformanceCounter会优先用TSC。bcdedit中，useplatformclock选yes，会不使用TSC，会根据BIOS中是否启用了HPET而选择它或PMT
+* 计时器类型：TSC时间戳计时器（CPU提供，不精确，速度快），HPET高精度事件计时器（一般在南桥中），ACPI PMT平台计时器（主板芯片组上，访问开销大，作为保底；唤醒时使用），RTC实时时钟（BIOS记录现实时间，精度为秒级，CMOS电池供电断电不丢失）。QueryPerformanceCounter会优先用TSC。bcdedit中，useplatformclock选yes，会不使用TSC，会根据BIOS中是否启用了HPET而选择它或PMT
 
 ## PE文件
 
@@ -246,10 +320,11 @@ PE头在文件中（即FOA）要对齐（即不满时填充0）到0x400，放入
   * committed - in use = 缓存
   * 可用 = 缓存 + 空闲（不过占用条那里写的也叫“可用”）
 * 进程
-  * reserved和committed：前者基本不消耗资源，用于防止碎片化。后者一定要有某个backing store，后者会隐式前者。当写入一个已提交页面时会移动到工作集（占用物理内存）
+  * reserved和committed：前者基本不消耗资源，只占用虚拟内存地址，用于防止碎片化。后者一定要有backing store，承诺后续写入一定能成功；后者会隐式前者。当只malloc时，可能增加已提交，但不一定实际分配了（包括页面文件也不会写入）。当写入一个已提交页面时会移动到工作集（占用物理内存）
   * working set：使用的物理内存，包括私有数据和共享数据。
   * committed：申请的私有内存，其中一部分在工作集中，还有一部分在页面文件中
   * 类型：Mapped File、Image、Shareable、Private Data、Stack、Heap
+* 匿名页：不对应任何磁盘文件的内存页，如malloc。与之相对的是文件页，不需要页面文件兜底；只读文件页不占用已提交，可写mmap修改的部分会COW变成匿名页
 
 ## 数字签名
 

@@ -381,7 +381,7 @@ numpy out has performance benefits？
   * https://pytorch.org/tnt training tools and utilities
 * 环境
   * torch.cuda.is_available()、watch -n1 nvidia-smi、nvidia-smi dmon（每秒显示功耗温度等。原stats命令废弃了。还有一个pmon查看进程占用，普通GeForce卡用不了，必须不用于显示才行，即不能是WDDM模式，要TCC模式）、nvtop、nvitop。2.5支持intel的xpu，有xpu-smi
-  * torch.set_default_device('cuda')，否则默认为CPU，要用if torch.cuda.is_available(): t=t.to('cuda') 或创建t时指定device
+  * torch.set_default_device('cuda')，否则默认为CPU，要用if torch.cuda.is_available(): t=t.to('cuda')或cuda() 或创建t时指定device；移动回来用.cpu()
     * 通用：if torch.accelerator.is_available(): t.to(torch.accelerator.current_accelerator())
   * torch.manual_seed(42)
 
