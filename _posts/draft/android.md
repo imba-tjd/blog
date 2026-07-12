@@ -67,11 +67,11 @@
 
 ## [shizuku](https://shizuku.rikka.app/zh-hans/)
 
+* 在维护中的Fork：https://github.com/thedjchi/Shizuku
 * 用于只需adb功能执行的程序，无需root权限
 * 线激活：adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh
 * 本机激活：开发者选项里启动无线调试，本程序将作为客户端，进入授权码界面后，在通知栏里输入。只需配对一次，后续再开无线调试，app直接点启动即可。快速开启：开发者选项 - 快捷设置开发者图块，将无线调试加到下拉菜单里
 * 对于已经安装了Magisk，优先用 https://github.com/RikkaApps/Sui 模块
-* Fork：https://github.com/thedjchi/Shizuku
 
 ### 相关软件
 

@@ -716,6 +716,7 @@ onPrimary：当某组件用primary作为背景色时，上面的文字用本色
 ### ViewModel
 
 * 存活原理：挂在在ComponentActivity或Fragment的ViewModelStore上
+* 2.11：允许给子Composable创建VM
 
 ```kotlin
 class CounterViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {

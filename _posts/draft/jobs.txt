@@ -44,6 +44,8 @@ Throughout my computer science studies, I've been fascinated by the possibilitie
 学会了哪些新东西
 犯过的错误，怎么弥补的
 
+过程（不是只有结果）、关键决策（对其他技术的考虑）、迁移
+
 STAR法则：Situation情景、Task任务、Action行动、Result结果。
 背景、理论、分论、结论。
 
