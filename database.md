@@ -406,6 +406,7 @@ innodb_flush_method=linux下默认O_DIRECT，O_DIRECT_NO_FSYNC应该与innodb_us
   * 显示连接信息：\s
   * status
 * 记录登录选项：mysql_config_editor set，会把参数混淆存到~/.mylogin.cnf中，之后简单用mysql命令行就能登录。还支持创建多个配置，称为login-path
+* 将每条数据按kv每行输出，而不是一行多列：SELECT结尾加\G
 
 ### 事务日志
 
