@@ -125,7 +125,10 @@ END
   * 插入数据时如果值能转换成那种类型就转换，否则不会报错而是就按值的类型存，这导致一列可以有不同类型
   * 能把其它DBMS的类型名识别为自己的类型，这导致可以往VARCHAR(50)里插入1000长度的字符串
 * STRICT：3.37(2021.11)，在定义完表的回小括号后加。禁用Flexible Typing且不允许不加类型；又引入了ANY类型，且在非STRICT表中用ANY会优先转换成整数，与不加类型行为不同
-* 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名。非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL。现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
+* 主键
+  * 一般用INTEGER PRIMARY KEY AUTOINCREMENT
+  * 整数主键INTEGER PRIMARY KEY只能存整数，实际就是ROWID的别名。因为历史原因，不定义主键列时会隐式定义它，即使没有AUTOINCREMENT也具有自增能力，但此时存在id复用的问题
+  * 非INTEGER的PRIMARY KEY因为历史原因就等于UNIQUE且可以出现NULL。现在若要使用非整数主键，应在定义完表的回小括号后加WITHOUT ROWID，且最好不要超过200字节，这样不会出现NULL且效率更高
   * 同时指定STRICT和WITHOUT ROWID：逗号
 * 定义表的字符串或WHERE和ORDERBY时可指定COLLATE RTRIM/NOCASE
 
