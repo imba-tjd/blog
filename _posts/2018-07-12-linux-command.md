@@ -11,7 +11,6 @@ title: Linux命令
 * http://bropages.org/
 * https://command-not-found.com/
 * https://cheatography.com/
-* https://explainshell.com/
 * https://devhints.io/
 * https://cn.x-cmd.com/ 对原生命令的增强
 * https://github.com/denisidoro/navi
@@ -54,11 +53,12 @@ title: Linux命令
     * 支持用鼠标操作
     * 默认以线程而显示，导致出现很多重复的程序，按Shift+H隐藏
     * F5以树状显示，但就无法排序了，只按pid排序
-    * RES表示占用的物理内存，无单位时是KB
-    * F2设置里可以调整上面的状态和筛选列。可以把宽度改为2:1，CPU改成Average
+    * 交互式选择排序列：F6。按CPU排序：P，按内存排序：M
     * 显示过长的Command：w
     * 选择内容：按住Shift
-    * 一次性杀掉多个进程：c选择条目，k相当于F9
+    * RES表示占用的物理内存，无单位时是KB
+    * 一次性杀掉多个进程：空格选择条目（c可选择子进程），k相当于F9
+    * F2设置里可以调整上面的状态和筛选列。可以把宽度改为2:1，CPU改成Average
     * 编译：看Readme，不难。不需要静态编译，ncurses是内核的依赖。编译后要strip
   * btop(c++)：代替bashtop。glances(py)：可选webui和支持容器。nmon、njmon(c)：社区为sourceforge较差，后者适合做二次开发。gtop(node)、bottom(rust)：比较类似于overview面板，能显示网速，有折线图显示CPU和内存历史。iotop。netop(rust)：能显示网络流量速率
 * ps auxf：a显示其它用户的进程，u第一列显示用户，x显示后台进程，f显示父子进程关系但导致不完全按时间排序；空格ww表示不截断命令行，再加e显示命令行运行那时的环境变量。直接写数字就是指定pid。-u/g/C分别指定user/group/CMD，不清楚前俩大小写的区别
@@ -68,12 +68,18 @@ title: Linux命令
   * dalance/procs：rust的重写
   * 另一种查看命令行的方式：cat /proc/pid/cmdline | tr '\0' ' '
 * lscpu：相比于`cat /proc/cpuinfo`不会每个核都显示一遍。能显示NUMA信息
-* nethogs、nload：显示网速
+* nethogs、nload、bandwhich、iftop：显示网速
 * https://github.com/pranshuparmar/witr Why is this running，显示进程的fork链来源、CWD、开始时间、监听端口等
+* https://github.com/Canop/dysk 代替df
+* iostat
 
 ## 文件处理
 
-* cp . dest/：复制当前文件夹下的内容，而非一个整文件夹；-L/--dereference：如果src是软链接，可复制源文件；cp -a：相当于-dpR
+* cp
+  * cp -r src dst：当dst不存在时，src被复制并命名为dst；当dst已存在时，会变为 dst/src。可用-T当dst存在时合并（BSD不支持）
+  * cp . VS cp *：前者包括隐藏文件
+  * -L/--dereference：如果src是软链接，可复制源文件
+  * -a：“普通的cp是复制内容，会修改owner、权限、时间戳等元数据，而-a会保留这些（其中owner需root运行才会保留）；隐含-r
 * stat：查看文件的属性；file：以自然语言描述文件格式
 * gcp：有进度条的复制工具，不自带；或者rsync -a --progress src dest
 * basename，dirname：取得路径的文件名或目录。前者第二个参数传后缀还会去掉它。后者支持任意数量的参数，处理后每个一行
@@ -86,13 +92,17 @@ title: Linux命令
 * rename：把所有.c的文件重命名为.cpp的：`rename 's/.c$/.cpp/' *`
 * shasum/md5sum：指定文件时默认二进制模式，从stdin读取时默认文本模式，-c验证
 * base64：默认加密，-d解密，-w0加密时输出不换行，支持跟文件或从stdin读取
-* ln：参数意义与cp相同，-P硬链接（默认？），-s软链接，-f覆盖dest；src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs；文件夹一般只能用软链接，root权限下才可用-d创建文件夹硬链接；cp也可创建链接：-l硬链接，-s软链接
+* ln
+  * 参数意义与cp相同。默认硬链接，-s软链接。更新链接：-fT（比fn更严格）
+  * src一般要写绝对路径，在-s下src写`./xxx`产生的是相对符号文件的链接而不指当前工作目录下的xxx，后者需用-rs
+  * 文件夹一般只能用软链接，root权限下才可用-d创建文件夹硬链接
+  * cp也可创建链接：-l硬链接，-s软链接
 * shred：粉碎文件
 * FILE=$(mktemp)：在/tmp下创建临时文件并获得文件名
 * iconv -f gbk -t utf-8 source-file或省略表示stdin -o target-file
 * less：空格或f或z翻一页，d翻半页，回车或e翻一行，b或w上翻一页，u上翻半页，y上翻一行，可以在前面加数字，具体看h帮助；g移动到第一行，G移动到最后一行，/向下搜索，n搜索下一个，N搜索上一个，q退出，v调用editor编辑；-N显示行号，-s合并连续空行
 * split -b 50m huge_file分隔文件，合并用cat
-* lsof path：查看哪些进程在占用文件。-i显示端口信息。根据占用的端口杀掉程序：kill $(lsof -t -i:端口)
+* lsof path：查看哪些进程在占用文件
 
 ### find
 
@@ -139,7 +149,7 @@ title: Linux命令
 * gunzip是用来解压gzip(gz)的，不是用来解压zip的
 * unrar：是rar官方的，但在non-free中。不支持解压其它任何格式
 * upx --lzma
-* zless：查看压缩文件内容
+* zcat、zless、zgrep：自动处理gz内容
 * lzip：后缀 .lz，仅使用LZMA非2
 * lz4
   * 压缩率很低，比zip低，默认级别为-1，解压速度非常快，用--best会大幅减慢压缩速度且压缩率一般但解压速度不变，-BD增大压缩率
@@ -147,6 +157,7 @@ title: Linux命令
   * lzo：很老，比lz4压缩率高一点点，压缩速度类似，解压速度大幅落后，不考虑；lzo-rle：增加了一定的速度
   * lz4hc：其实就是高压缩级别的lz4，压缩速度非常慢，但解压速度不变
   * snappy：完全不如lz4
+  * 如果磁盘是ssd，且CPU已经比较忙，则zstd的收益可能不如lz4。如果用机械盘、跨机架复制、磁盘容量少，则用zstd
 * zstd：后缀 .zst，速度不如lz4但也不错，最高压缩为--ultra -22，根据IO状态动态调整级别用--adapt，多线程用-T0。命令行程序也能处理gz xz lz4
 * brotli：后缀 .br，默认已使用最高压缩级别。根据测试，各项都不如zstd，仅在单线程下br好一点。但字典中专门为HTML、CSS设计了
 * 比lzma更高压缩率且速度差不多：lzham_codec_devel
@@ -324,7 +335,7 @@ title: Linux命令
 
 ### iproute2
 
-替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它被NetworkManager(Cent, nmcli)和systemd-networkd(Deb)替代。
+替代net-tools(ifconfig, arp, route, netstat, iptunnel, nameif)。不是替代ipupdown的，它被NetworkManager(Cent, nmcli, nmtui)和systemd-networkd(Deb)替代。
 https://www.cnblogs.com/sparkdev/p/9253409.html
 https://www.cnblogs.com/sparkdev/p/9262825.html
 
@@ -351,6 +362,12 @@ ip link
 * Local Address指的是本机，既可以是Listen的，也可以是发出的；Peer Address是“另一端”
 * 监听地址为*的是双栈，`[::]`只是V6
 * 统计数据（打开的TCP数、状态处于tw的数）：cat /proc/net/sockstat
+
+### 其他与端口和进程有关的命令
+
+* lsof -i:端口。缺点：会查看对外建立连接的
+* 根据PID查看占用的端口：lsof -a -p pid -i
+* fuser -v 端口/tcp 基本只显示pid。-k 杀掉该端口的进程
 
 ### curl
 
@@ -530,7 +547,7 @@ ip link
 * fg：把ctrl+z挂起的程序恢复到前台。bg：让ctrl+z挂起的程序在后台运行
 * jobs：显示后台挂起的任务
 * 使用`%1`指定目标任务，可以用kill杀掉
-* 输命令时就指定在后台运行：在最后加个&，一般用`>log.txt 2>&1 &`不让输出到屏幕上。如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样。推荐再加nice降低优先级
+* 输命令时就指定在后台运行：在最后加个&，一般用`>log.txt 2>&1 &`不让输出到屏幕上。如果整个用小括号括起来，就不在当前终端中，jobs里看不到，应该和disown效果一样。推荐再加nice降低优先级；还有个ionice，不指定级别时和默认一样，且只有root才能更改class，非root可以-n7降低，但只对HDD和bfq有意义
 * 再在前面（但在小括号里）加nohup，则正常退出会话时命令不会结束（异常退出还是会结束）。如果不手动重定向，默认会自动把输出都重定向到nohup.out中，但必须按一下回车交互
 * 如果没有用nohup和&就运行了程序，想要退出会话时不结束，用`ctrl+z; bg; disown`，之后那个进程就变成了独立的
 * wait命令可以等待后台任务执行完

@@ -449,9 +449,9 @@ http PUT httpbin.org/put @files/data.xml # 会自动设置Content-Type；重定�
   * Filter：-filter:v或-vf "filter1=option1=value1:o2=v2,filter2"。如调整音量大小、混合声道、低通滤波(lowpass)、旋转缩放、调整亮度对比度、画文字
 * AAC
   * 编码器：libfdk_aac比较好，但二进制不一定编译了因为要--enable-nonfree；高质量用-vbr 4(约128k)，最大5。aac_at更好，但只有mac有
-  * 默认的内置aac，比特率默认128k，高质量的考虑加-b:a 192k。它的vbr比cbr质量差
+  * 默认的内置aac，比特率默认128k，高质量的考虑加-b:a 192k。它vbr比cbr质量差。TODO:9.1重写了，还没发布，之后看怎么使用。已知仍然选用cbr
   * 格式：AAC-LC比HE-AAC好，只有码率<=32kb才用HE。内置aac只支持LE
-  * 其他音频格式：Vorbis比FLAC和Opus好。不要用"vorbis"编码器，用"libvorbis"
+  * 其他音频格式：Vorbis比FLAC和Opus好。不要用"vorbis"编码器，用"libvorbis"。根据AI，在128kbps时Opus>AAC，之后就差不多了，320的AAC已经是“透明”的了。“opus”编码器是ffmpeg原生实现的，音质最佳也不超过libopus包装编码器
 * 视频编码格式：AV1是比较好的，是VP9的继任，无版权问题，比HEVC压缩率高，解码性能差不多。MPEG4 AVC和H264是一个东西，HEVC是H265，VVC是H266；VVC比HEVC压缩率高很多但编解码性能差。MPEG-5(EVC)也比较新但可能没有硬件加速
   * H264又叫MPEG-4 Part 10。H262又叫MPEG-2 Part H
   * H264 Profile：不同设备的能力不同，有些功能也许难支持，比如10bit色深就要用Hi10P。老设备选Constrained Baseline或Main，设定用-profile:v baseline，ffmpeg默认High
