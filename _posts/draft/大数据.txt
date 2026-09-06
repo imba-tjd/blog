@@ -1,0 +1,352 @@
+规模大（储存、计算）、增长快、密度低（总量大）、来源多样，形式多样（结构化和非结构化）。
+
+* Zookeeper
+  * 分布式协调系统。分布式锁、配置管理、集群管理
+  * 角色：Leader（唯一）、Follower（只读）、Observer（不参与Leader选举和事务处理）、Client
+  * Znode：最小的数组储存单元。Watcher：观察者模式的分布式实现
+* Hadoop
+  * HDFS文件系统
+  * MapReduce：批处理计算
+  * YARN资源管理系统：维护CPU、内存等资源的分配，调度计算任务；和k8s有一定相似。Container：本质上就是一个限制了CPU内存的JVM进程。设计上是用于“单次执行”的任务，而Flink是长时间运行的，因此后来有自己的资源管理
+  * 对于ZK的依赖：HDFS NameNode HA、YARN ResourceManager HA
+* HBase：分布式持久化强一致KV数据库。Value是“宽列”，有Schema（建表时固定“列族”，不同列族为不同文件和缓存）、历史版本，列族中的列可动态增加。经常读写的列放到同一个列族里，不同列族一般放不同冷热的数据；列族名要尽量短
+* Hive：数据仓库，使用类SQL查询语言，翻译成MapReduce或Spark进行计算
+* Spark
+  * 代替MapReduce成为Hadoop的缺省计算引擎
+  * 也有SQL引擎，能替代Hive，也能访问Hive
+  * 有流处理，代替Flink
+  * 有几种部署模式，可以选择不用hadoop，自己选择储存机制（如S3、NFS）和资源管理机制（standalone无需YARN，还可用k8s）
+* Flink：MR是批处理的。它是来一条处理一条
+* 服务端与客户端兼容性：一般新版服务端能兼容老版客户端
+
+## ZooKeeper
+
+自身选主原理：所谓的“选票”包括三个字段，具有一些顺序性。投票时所有节点先投自己，再广播。收到其他节点的票时，一些条件下把自己的票改为投别人，再次广播。最后各自统计。
+
+ZK客户端选主：利用“临时节点”和Watcher机制。所有实例竞争创建同一个临时ZNode，创建成功的那个是主。其他节点监听，消失时收到通知，再争抢。\
+当竞争者较多时，推荐用“顺序临时节点 + 最小者”选主，类似于排队依次通知，避免惊群。\
+框架：Apache Curator的LeaderLatch，调用后阻塞，跳出时说明选到主。
+
+还需要实现Fencing Token：网络分区时，虽然其他节点能成功选主，但原主可能存活，导致双写。\
+ZK的Czxid可以全局单调增。被写的业务应检查token，只接受最大的写入，小的忽略，如数据库update时加where ft < ?。
+
+ZKFC（Failover Controller）：避免旧主写入。每个业务进程都在本地配一个Agent，与ZK通信、监控业务进程是否存活。一般JVM卡死但Agent还活着，就可以杀掉业务进程、释放锁；如果Agent也挂了，外部脚本会使用物理手段关闭电源、停止交换机端口。
+
+端口：与客户端通信 2181。集群内Peer通信 2888。Leader选举 3888。Admin Server 8080
+
+## HDFS
+
+### 特点、概念
+
+* 自动保存多个副本（默认3份）。仅支持追加，无法修改
+* NameNode存放元数据：文件目录树、块位置映射。DataNode存放实际数据块
+* FsImage和EditLog
+  * Editlog储存元数据变更（如创建文件xxx）
+  * 安全模式：FsImage只存“文件->块列表”，不存块在哪个DN上。NN启动后靠各DN汇报，达到99.9%后集群才可写。非常耗时
+* Secondary NameNode(SNN)：原始架构运行在NameNode同一机器上，只做一件事：Checkpoint，包括从NameNode拉取FsImage和EditLog、将EditLog合并到FsImage里、将FsImage推送回NameNode；不是NameNode的热备，只不过副作用上保留了一份数据。NameNode不自己做的原因是合并过程中有全局锁，要进入安全模式，会导致所有客户端无法使用。后来增加了一个在另一节点上做Checkpoint的功能，但意义不大
+  * 单机自测：不启用SNN，也不需要NN定时合并，重启时会自动合并
+  * checkpoint默认1小时活100万笔
+* HA高可用、自动故障转移：Active +  Standby NameNode。后者是热备，承担了SNN的功能，不再有单独的SNN。依赖ZK和JournalNodes（用于元数据同步）。
+  * 非HA模式下的高可用：同时写入两个磁盘，可以是NFS、S3等。但不能自动故障转移
+  * Hadoop3支持多Standby。还支持Observer NameNode只读副本，它不参与HA选举、不负责自动故障转移
+* Federation：用于水平扩展，将不同命名空间（如/user、/tmp）分别部署到独立的集群，每个集群内部HA。一般再在外面加Router/ViewFs对客户端屏蔽细节
+* 依赖SSH：集群启停脚本start-dfs.sh会通过 SSH 远程登录到各个节点来启动 NN、DN、SNN 等进程。需配置各节点免密登录（包括本机），一般创建相同的用户名；还要配置dns或hosts，包括HMaster、RegionServer、ZK、客户端，因为某些组件只会报告主机名。但如果使用3.x的容器化支持（包括Docker和K8s）则不必ssh
+* Under-Replicated：DN数 < 目标副本数。不会拒绝写入，只会告警
+* 短路读：如果客户端在DN所在节点上，则绕过网络栈和校验。意义不大
+* 端口
+  * RPC：NN 与客户端交互 8020，老版9000。DN 传输数据(客户端、DN间) 9866，与NN通信(心跳/块汇报) 9867。JN 8485
+  * WebUI：NN http 9870 https 9871，老版50070。DN 9864 9865，老版50075。JN 8480 8481。SNN 9868 9869
+  * ZKFC：8019
+* 异构储存HSM：给data.dir前加储存类型，如 [RAM_DISK]、SSD、DISK。再为目录设置储存策略
+
+### 部署
+
+https://mirrors.aliyun.com/apache/hadoop/core/stable/ 解压tgz后得到含有bin目录的带版本号文件夹。\
+export HADOOP_HOME=/path/to/hadoop && export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+此处的sbin只表示管理脚本，而不是要root运行。实际上默认root执行会拒绝。一般建议创建hadoop用户来执行脚本。
+
+Win：解压时会创建软链接。必须winutils，下载它.exe、hdfs和hadoop.dll：https://github.com/cdarlint/winutils https://github.com/CubeLitBlade/winutils/tree/hadoop-3.4.0 https://github.com/kontext-tech/winutils
+
+初始化：
+
+所有节点使用相同的配置文件。例如NN也要写DN的配置，即使不会用到。
+
+```xml
+hadoop-env.sh：设置JAVA_HOME。如果未设置，也会读取外部的。重点是不会靠PATH里的java.exe。另外Win下不允许JAVA_HOME里有空格
+验证：hadoop version
+
+core-site.xml：全局核心配置。
+<!-- 语义非常混乱的一个设置，看名字表示默认文件系统。不设置时默认用 file:/// 且不会启动HDFS，但可用MR（客户端），表示用本机文件系统做储存。
+  设为以下这一项，会启动HDFS，端口为8020。如果指定别的端口，会影响HDFS Server监听的端口。
+  但指定别的IP，却不会影响HDFS绑定的IP，而是会绑定0.0.0.0。
+  它同时也用作命令行客户端的连接目标。当填写其他IP时表示连接其他机器。-->
+<property> <name>fs.defaultFS</name> <value>hdfs://localhost</value> </property>
+
+hdfs-site.xml：
+<!-- 数据的副本数，默认3 -->
+<property> <name>dfs.replication</name> <value>1</value> </property>
+
+<!-- NN的元数据存放位置，极重要，必须用完整路径。不配置时默认会放到tmp里 -->
+<property>
+  <name>dfs.namenode.name.dir</name>
+  <value>file:///home/你的用户名/hdfs/namenode</value>
+</property>
+
+<!-- DN的数据库存放位置，丢失可从其他副本重建 -->
+<property>
+  <name>dfs.datanode.data.dir</name>
+  <value>file:///home/你的用户名/hdfs/datanode</value>
+</property>
+
+
+hdfs namenode -format 只需执行一次
+```
+
+启动：
+
+```
+前台：hdfs namenode、datanode
+后台：hdfs --daemon start namenode。不要用hadoop-daemon.sh，过时了
+
+start-dfs.sh：集群启动（仍然是单NN）
+先在每个节点（包括本机）上用ssh-copy-id登录每个节点分发密钥。
+fs.defaultFS设置为NN主机地址。在workers无后缀文件中一行一个填写DN主机名。
+运行脚本后，会通过 ssh 远程到每台机器执行 hdfs --daemon start xxx。默认会启动SNN
+```
+
+使用：
+
+一般将配置文件复制到客户端上，即使用与服务端完全相同的配置文件。
+
+```
+# 查看 HDFS 报告
+hdfs dfsadmin -report
+
+# 创建测试目录
+hdfs dfs -mkdir /test
+
+# 上传文件
+hdfs dfs -put some-local-file.txt /test/
+
+# 查看文件
+hdfs dfs -ls /
+
+# WebUI。默认监听0.0.0.0
+http://localhost:9870 NN控制面板
+http://datanode:9864 也是Web端数据传输端口
+
+# 检查坏块
+hdfs fsck /
+-list-corruptfileblocks：比较轻量
+-files -blocks -locations 非常重，仅用于先执行前一条确定坏块路径后，明确指定再用本条
+
+# 客户端
+S3网关
+WebHDFS，就是HTTP接口
+NFS本地挂载
+```
+
+配置项：
+
+```
+dfs.blocksize 默认128MB
+dfs.namenode.handler.count 默认10，多客户端时增大
+dfs.datanode.max.transfer.threads 默认4096
+HADOOP_HEAPSIZE 默认1000（MB）
+```
+
+HA架构：两个 NameNode（Active + Standby）+ JournalNode（3个）共享edit日志 + ZKFC自动故障切换（3个ZK）。\
+两个NN都可以算无状态，ANN把edit日志发往JN，SNN拉取。要配置的比较复杂，暂不考虑。
+
+云原生：单点NN，挂了由K8s重建，PV储存有效性由K8s提供。
+
+停机升级集群：停止上层业务，停止YARN防止新任务，备份数据。依次停止：ZKFC、SNN、DN、NN、JN，最后再停ZK；即先停止故障转移防止混乱，DN依赖NN，JN负责EditLog，又依赖ZK。minor或major版本升级可能需要使用hdfs namenode -upgrade和dfsamin -finalizeUpgrade，具体看更新说明，或拒绝启动信息。\
+HA下升级集群：DN和JN每次滚动升级一定比例（10%），下线、升级、上线。对于NN：先升级SNN，然后主动做HA切换。命令有个-rollingUpgrade
+
+### 相关项目
+
+* Hue：网页版文件管理器，支持HDFS和Hive
+* Apache Ambari：辅助集群搭建、运维、监控。曾经停止维护，现在又复活了
+
+## HBase
+
+ZK中存放少量元数据，负责主备切换。
+Master管理表结构，还负责负载均衡自动转移。客户端使用AdminAPI时才与它通信。高可用，但轻量，它的数据基本都在HDFS里。
+RegionServer管理多个Region，负责读写HDFS、有缓存。客户端从ZK中直接读取RS地址与它通信，不强依赖Master（3.0变为从Master获取，但获取后就有缓存了）；而HDFS则不同。
+Region是个抽象概念，代表一段“范围定义”。一个Region同一时间只会被一个RegionServer写入，但可以转移，如负载高时就会自动被Master转移。
+
+apache phoenix：把SQL语句转换为HBase操作（SQL Proxy），还能建立二级索引。
+
+HBase支持随机访问RowKey，且具有聚集性，支持前缀范围查询。
+相比于关系型数据库，不支持自动创建和维护多个索引。不支持跨行事务；具有单行原子性。
+
+必须保证节点时间正确，因为每个Cell都有一个Version（Timestamp）。还有用TTL判断是否过期。
+
+RowKey设计（必须唯一确定一行）：
+1. 按查询维度：userid#orderid
+2. 按预设数量分桶：x_yyy，其中x为0~9，yyy是后续任意内容。插入时均匀随机生成x，查询时并行搜索10个分桶
+3. 按哈希：hash(userid)#userid，可实现随机避免热点 + 查询时唯一确定分桶
+4. 倒序：Long.MAX_VALUE - timestamp，这样新ts的数据在最前面
+5. 每个 Cell 都要存储 RowKey，不宜过长
+
+热点Region问题：如果id为yyyyMMddxxx流水号，则同一天的数据会全部排在同一个Region里。
+  解决：以xxx流水号作为开头，均匀分布在多个Region里，再在后面拼接日期和其他唯一id
+  方法二：REVERSE一下，则保留了完整id
+
+协处理器：一个jar包，在RS上执行的代码逻辑。有两种，分别类似于Trigger和存储过程。现在用得少，因为升级版本可能不兼容要重新编译、难调试
+Observer：在增删查等动作前后执行的钩子，可用于打印日志、阻止写入（数据校验、权限检查）
+Endpoint：类似于一个RPC服务。一般用于自定义聚合计算，服务端算完后再发数据给客户端
+
+命名空间：不指定时为default。另外还自带一个hbase系统命名空间。可以设定quota，如表的数量
+
+Region Replica：读分流（但非强一致）、减少RS宕机时的恢复时间（仅靠HDFS数据时恢复时间较长）
+
+Minor Compact：可能清理部分旧版本。Major Compact：保证清理旧版本。避免单Region过大，否则压缩时耗时长。可考虑关闭自动Major Compact，改为凌晨手动执行。
+在执行Compaction过程中，RS仍然保持在线可用，但性能会受到显著影响。
+
+VERSION：就是MAX_VERSION。MIN_VERSION：TTL过期后仍保留这些版本，若TTL设为FOREVER则无意义
+
+### 安装
+
+https://mirrors.aliyun.com/apache/hbase/stable/ 安装包里不写hadoop3的是2的（HBase3.0后除外）。client的不能启动服务端。byo版本不带hadoop
+
+默认单机模式，会在一个进程中启动HMaster+RegionServer+ZK，不用HDFS。
+
+启动：start-hbase.sh，需写文件和ssh连通。手动：hbase-deamon.sh start/stop/autostart master/regionserver。其中backup master也用master。
+
+WebUI：Master http://localhost:16010 ，RegionServer 16030。RPC：Master 16000，RS 16020
+
+3.0新功能：
+
+1. 新的Region Replication框架，提升可用性。Secondary Replica仍可能返回旧数据，不改变默认单Region强一致语义。
+2. 内置备份恢复框架。
+3. OpenTelementary取代HTrace
+
+配置：
+
+```xml
+conf/hbase-site.xml：
+<!-- 默认在本地tmp目录里。分布式：hdfs://localhost:8020/hbase。不要提前手动创建文件夹，如果文件夹已存在会做migration。如果core-site.xml里配置了默认FS，则此处可变为/hbase。 -->
+<property>
+    <name>hbase.rootdir</name>
+    <value>file:///data/hbase</value>
+</property>
+<property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>/data/zookeeper</value>
+</property>
+还有一个临时目录，默认也在tmp里，但好像清理了问题不大。如果用hdfs会自动保存到hdfs里。
+
+
+<!-- 启用分布式：默认false -->
+<property>
+    <name>hbase.cluster.distributed</name>
+    <value>true</value>
+</property>
+<!-- 要连接的ZK服务器。另外默认 HBASE_MANAGES_ZK=true 由HBase启动ZK，zookeeper下的项会转换传递 -->
+<property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>node1,node2</value>
+</property>
+在regionservers和backup-masters文件中写入节点主机名。执行start-hbase的机器是HMaster
+
+
+调优：
+BlockCache、MemStore大小比例：分别影响读写，默认都是0.4表示40%
+压缩：包括三层，列族、WAL、RPC。一般列族根据业务开，如图片无法被压缩则不开，以及如果数据只有几十B则不
+内存中compact：BASIC启用某种pipeline，可以提升吞吐，应该没坏处。EAGER在写HFile前就清理旧数据，可能占一点CPU
+Bloom Filter：随机查询提升非常明显，一般选ROW即可
+WAL DURABILITY（与Provider不是一个概念）：默认同步。如果改为ASYNC，则会在内存里每秒Flush，有丢失1秒数据的风险；可用于日志收集、监控数据
+DATA_BLOCK_ENCODING数据库编码：当rk、cf、k的重复内容多时进行压缩。一般用FAST_DIFF
+HBASE_HEAPSIZE：生产环境中推荐指定
+Region大小：默认10GB。如果数据量很大则调大，如果需要快速split则调小
+BLOCKSIZE：调小为点查询优化，调大为Scan优化或数据行很大
+```
+
+滚动升级集群：
+
+先检查集群状况，有无RIT，正常查询、建表。还检查HDFS状况，用HDFS快照/hbase。
+
+如果有外部保活机制，先停止。
+
+先升Backup Master。然后停止Active Master，会自动failover。
+
+RegionServer：可用graceful_stop.sh，会自动迁移走Region，还会自动管理balancer。也可以kill，会触发ServerCrashProcedure，但也就是并行把Region分配给多个RS。
+
+kill（不是-9）与hbase-daemon.sh stop xxx差不多，只是kill不会等待退出。
+
+graceful_stop还能用于重启后把Region迁移回来，有利于HDFS的本地性。迁移Region的成本不高，一秒可以迁移几千个。
+
+
+### 客户端
+
+默认会连接localhost的（其实就是hbase-site的hbase.masters的默认值）。3.0的客户端默认不会读zk的服务端设置。
+
+```
+# hbase shell （ruby REPL，也支持脚本）
+
+status 'simple'、'detailed'：后者显示每个Region的信息，过多。前者主要显示RS的信息：Region数、QPS数、磁盘占用等
+zk_dump 显示连接信息
+
+管理表：
+create 't', 'cf', { NAME => 'cf2', 其他选项如历史版本、压缩 }
+describe 't'
+disable 't'; dorp 't'
+list '正则'、list_region '表名' 可查看空间占用
+count 会全表扫描
+
+增删：
+put 't', 'rowkey', 'cf:k', 'v'
+delete 删cell。deleteall删一行
+
+读：
+get 't', rowkey 可选指定列
+scan 't', {
+  LIMIT => 10,
+  COLUMNS => ['cf:k'],
+  STARTROW => 'rk1', STOPROW => 'rk2', 左闭右开。扫描某前缀：user001#, user001#~，因为~比所有其他ASCII码都大，而#是避免扫到0010。另一种选择：ROWPREFIXFILTER
+  LIMIT => 5
+  不会自动优化：FILTER => "PrefixFilter('...')"
+}
+
+其他：快照（创建、恢复、列出、删除）
+shell执行脚本：一般用cat，可避免权限问题。在第一次遇到错误时退出：-n
+hbase zkcli -server ZK地址
+```
+
+Java：推荐hbase-shaded-client，封装了一份依赖；还需添加一个SLF4J的实现。\
+安装了服务端且单文件测试运行：java -cp "$HBASE_HOME/lib/*:$HBASE_HOME/lib/client-facing-thirdparty/*"
+
+```java
+var conf = HBaseConfiguration.create(); // 会自动读取classpath里的配置文件
+// config.set("hbase.zookeeper.quorum", "zk服务器地址"); // 仅2.x
+config.set("hbase.masters", "node1, node2"); // 3.0。应配置全部Master。或 hbase.client.bootstrap.servers 也支持设置RS但必须加端口
+// 2.7后：new URI("hbase+rpc://" 或 "hbase+zk://.../hbase" ) 还支持 ?k=v 传递配置项
+
+var CON = ConnectionFactory.createConnection(conf); // 重量级、可复用对象
+try(var tb = CON.getTable(TableName.valueOf("t"))) {
+  Put p = new Put(Bytes.toBytes("rk"));
+  p.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("k"), Bytes.toBytes("v"));
+  tb.put(p);
+
+  Get g = new Get(rk); 可选 g.addColumn(避免读取一整行)
+  Result r = tb.get(g);
+  byte[] b = r.getValue(cf, k);
+  String s = Bytes.toString(b);
+
+  Scan scan = new Scan();
+  scan.withStartRow(起始rk); 或 scan.setRowPrefixFilter()
+  try(ResultScanner scanner = table.getScanner(scan)) {
+    for (Result result : scanner) {
+      String row = Bytes.toString(result.getRow());
+    }
+  }
+}
+其他操作：delete、exists。tb.put(List<Put>)
+Filter：可以按Value过滤（包括等值和不等）、设定多个条件（以及AND和OR语义）
+CON.getAdmin() 操作表
+```
+
+## DuckDB
+
+嵌入式OLAP：类似于sqlite，是个库。

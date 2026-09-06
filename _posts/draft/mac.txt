@@ -1,9 +1,45 @@
 缺点：https://www.bilibili.com/video/BV1p4YCz8Ezx
 
+其他专业的需求：https://www.bilibili.com/video/BV1tSuu6AEcS
+
+Safari：
+退出误触。
+cmd+z同时具有撤销和还原标签页的功能，且输入框无法撤销时就会触发，且经常由于各种原因无法撤销而触发
+“翻译可用”：会先出现在“显示阅读器”的位置上，然后再变动。而且有的网页不显示
+
 优点：
 
 * 续航长，离电不掉性能
 * 某些剪辑软件对触摸板手势有定制
+
+## 配置
+
+* 鼠标大小、颜色
+* 屏幕缩放、护眼模式
+* Safari：下载确认、紧凑模式、修改关闭快捷键、搜索引擎
+* 桌面与程序坞：双击标题栏 - 扩展
+* 键盘 - 快捷键 - 输入法：取消“选择上一个输入源”
+* 解决锁屏后断网：电池 - 选项
+* 触控板：用力点按和触感反馈，开启用力按会出现词典翻译。辅助功能-指针控制-触控板选项-使用触控板进行拖移，开启后三指轻触移动就可以拖动，但会导致原有三指手势变为四指
+* 访达
+  * 设置 - 新窗口打开时的文件夹、边栏、按名称排序的窗口中把文件夹保持在顶部、执行搜索时搜索当前文件夹（而不是“这台Mac”）
+  * 上方菜单栏 - 显示 - 显示路径栏
+  * 右键窗口顶部 - 自定义工具栏
+  * 显示 - 列表视图 - 空白处右键 - 查看显示选项 - 计算总大小
+  * 显示隐藏文件：Cmd + Shift + .
+* 自启软件：搜索“登录时打开”
+* 电池：能耗模式、充电限制
+
+## 快捷键
+
+* 应用全屏：Fn + F
+* 访达移动文件（剪切）：Cmd + C，再Cmd + Option + V
+* 拷贝路径：Cmd + Option + C
+
+### Option
+
+* 系统信息：左上
+* 详细Wifi信息：右上
 
 ## 软件
 
@@ -12,16 +48,20 @@
 ### 系统
 
 * 通知隐藏：Ice
-* 鼠标滚轮：mos
+* 鼠标滚轮：https://github.com/Caldis/Mos https://github.com/noah-nuebling/mac-mouse-fix https://github.com/linearmouse/linearmouse
 * https://github.com/waydabber/BetterDisplay https://github.com/MonitorControl/MonitorControl
+* 资源监控：https://github.com/exelban/stats
 
 ### 应用
 
 * 软件站：https://xclient.info/
-* 卸载工具：PearCleaner、腾讯柠檬、https://github.com/tw93/Mole
+* 卸载工具：PearCleaner、腾讯柠檬清理、https://github.com/tw93/Mole
 * bt下载器：transmission
 * 视频播放器：IINA
 * 解压：keka
+* 手机（游戏）模拟器：应用宝（安卓、Win）、PlayCover（iOS）
+* 输入法：微信
+* 调节外接显示器亮度：better display
 
 # ipad
 

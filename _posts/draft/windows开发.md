@@ -320,11 +320,14 @@ PE头在文件中（即FOA）要对齐（即不满时填充0）到0x400，放入
   * committed - in use = 缓存
   * 可用 = 缓存 + 空闲（不过占用条那里写的也叫“可用”）
 * 进程
-  * reserved和committed：前者基本不消耗资源，只占用虚拟内存地址，用于防止碎片化。后者一定要有backing store，承诺后续写入一定能成功；后者会隐式前者。当只malloc时，可能增加已提交，但不一定实际分配了（包括页面文件也不会写入）。当写入一个已提交页面时会移动到工作集（占用物理内存）
+  * reserved和committed：前者基本不消耗资源，只占用虚拟内存地址，用于防止碎片化。后者一定要有backing store，承诺后续写入一定能成功；后者会隐式前者
+    * 单纯malloc时，会增加committed，但不实际分配（包括页面文件也不会写入）。当写入一个committed页时会移动到工作集（占用物理内存）
+    * Linux允许overcommit，不受RAM+swap限制。但二者都是首次访问才分配物理页
   * working set：使用的物理内存，包括私有数据和共享数据。
   * committed：申请的私有内存，其中一部分在工作集中，还有一部分在页面文件中
   * 类型：Mapped File、Image、Shareable、Private Data、Stack、Heap
 * 匿名页：不对应任何磁盘文件的内存页，如malloc。与之相对的是文件页，不需要页面文件兜底；只读文件页不占用已提交，可写mmap修改的部分会COW变成匿名页
+* standby：内容已写进页面文件，但也留了一份在真正的内存里，可随时牺牲；当访问时，会触发软缺页直接从内存读；属于 available+cached。而Modified算Cached但不算 available，硬盘上有副本但过期
 
 ## 数字签名
 

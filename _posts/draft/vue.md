@@ -272,18 +272,50 @@ console中用$vm0也能访问到第一个app
 
 数据变化 -> 派发更新（运行依赖函数） -> render（全量重新生成组件中的所有UI节点） -> 生成虚拟DOM -> diff + patch -> 运行渲染函数（抽象层）
 
-vue未来（3.6+）不会全量生成，而是更精细化地生成响应式代码（Vapor模式），就不需要虚拟dom和diff了。但必须用编译器，没有渐进式
+vue 3.6 Vapor模式：不会全量生成，而是更精细化地生成响应式代码，就不需要虚拟dom和diff了。但必须用编译器，没有渐进式
 
 ## vue2
 
 * 若data的属性是数组，修改时要用splice，而不能直接赋值
 
-## vite
+## [vite](https://cn.vitejs.dev/)
 
-* https://cn.vitejs.dev/
-* 特性：自动重载。可以直接在html的script中引入module和ts。内置postcss支持。可以在js中import css
-* https://github.com/fi3ework/vite-plugin-checker
-* 编译打包：index在项目根目录。public目录下的会原封不动复制，src下的会被处理。
+* import css（示例中的称为“副作用导入”）、svg（包括作为img的src和html结构）、json（自动解析为js对象）
+  * css module：只要把文件命名为 xxx.module.css，里面的class会被局部化、可被import。如果确实需要定义一个全局类，用:global()
+* HMR热更新：只替换变化的那个模块，页面状态保留。而普通live server会整个刷新
+* 内置postcss支持
+* 允许 import ts，其实也允许不写后缀
+* 使得dev也检查错误：https://github.com/fi3ework/vite-plugin-checker
+* 编译打包：index在项目根目录。public目录下的会原封不动复制，src下的会被处理
+
+```
+npm create vite@latest [.] 交互式创建，可选vanilla
+开发：npx vite（5173）。构建：npm run build = tsc + vite build。预览（必须先build，无gzip和缓存）：npm run preview（4173）
+
+vite.config.ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()], // vanilla不需要
+
+  server: { // dev
+    port: 5173, // 端口冲突时默认递增而非报错。默认只监听localhost，用-h监听所有
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true, // 当后端验证Host时使用。与CORS无关，因为浏览器看到的已经是不跨域的
+        rewrite: path => path.replace(/^\/api/, "")
+      }
+    }
+  },
+
+  define: { __APP_VERSION__: JSON.stringify("1.0") }, // 编译期常量
+  base: '/', // 当部署后不在根路径下时必须配置。Electron要用 ./
+  resolve.alias：配置@别名，但还需再配置tsconfig.json的paths。更推荐用package.json原生的imports
+  cors：仅当存在另一个网页要访问本项目时添加
+})
+```
 
 ## 其它组件
 

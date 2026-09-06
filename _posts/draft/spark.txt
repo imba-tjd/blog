@@ -1,19 +1,19 @@
 # Spark
 
-是MapReduce的替代，实现了更多算子。不是Hadoop的替代。
+MapReduce的替代，实现了更多算子。
 
 ## 安装
 
 * https://dlcdn.apache.org/spark/spark-3.5.5/spark-3.5.5-bin-hadoop3-scala2.13.tgz https://mirrors.aliyun.com/apache/spark/
   * 如果本地没有Hadoop，则要下with hadoop的，实际带有hadoop-client的包，是必须使用的。只有本地有Hadoop才能下without的，设置HADOOP_HOME
-  * Win下需要：https://github.com/globalmentor/hadoop-bare-naked-local-fs/issues/2 现象是Hadoop需要%HADOOP_HOME%\bin\WINUTILS.EXE，这个东西最新的预编译只到Hadoop3，用此仓库后能解决，虽然还是报错但不用管
 * 目前最高支持jdk17，再高会报错
 * 如果已有共享文件系统，如NFS和S3，则可以不用Hadoop；如果数据储存在HDFS上，则要。不清楚纯本地文件系统行不行
 * 不用管：Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 
-### Win
+### Win下绕过hadoop的winutils.exe
 
 https://github.com/globalmentor/hadoop-bare-naked-local-fs/issues/2
+https://stackoverflow.com/questions/73503205/why-all-these-hadoop-home-and-winutils-errors-with-spark-on-windows-if-hadoop
 
 1. 下载 https://repo1.maven.org/maven2/com/globalmentor/hadoop-bare-naked-local-fs/0.1.0/hadoop-bare-naked-local-fs-0.1.0.jar 到jars里。
 2. 在jars里创建core-site.xml内容是`""`，创建hdfs-site.xml内容是`<property><name>fs.default.name</name><value>com.globalmentor.apache.hadoop.fs.BareLocalFileSystem</value></property>`。
@@ -68,6 +68,3 @@ print(linesWithSpark.count())
 
 spark.stop()
 ```
-
-https://stackoverflow.com/questions/73503205/why-all-these-hadoop-home-and-winutils-errors-with-spark-on-windows-if-hadoop
-
